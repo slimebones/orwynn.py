@@ -25,5 +25,10 @@ class SingletonMeta(type):
 class Singleton(Node, metaclass=SingletonMeta):
     """Singleton base class."""
     @classmethod
-    def instance(cls: type[SingletonInstance]) -> SingletonInstance:
+    def ie(cls: type[SingletonInstance]) -> SingletonInstance:
+        """Gets the single instance of the Singleton.
+        
+        Returns:
+            Instance the Singleton holds.
+        """
         return cls()
