@@ -1,4 +1,5 @@
 import inspect
+from typing import Any
 
 from orwynn.src.base.model.model import Model
 from orwynn.src.base.module.module import Module
@@ -14,7 +15,7 @@ ParametersByProvider = dict[Provider, ProviderParameters]
 
 class Parameter(Model):
     name: str
-    tp: type
+    type: type[Any]
 
 
 class DI(Worker):
@@ -57,7 +58,7 @@ class DI(Worker):
     ) -> ProviderParameters:
         """Inspects provider and returns requested by him parameters."""
         return [
-        Parameter(name=inspect_parameter.name, tp=inspect_parameter.annotation)  
+        Parameter(name=inspect_parameter.name, type=inspect_parameter.annotation)  
             for inspect_parameter in
             inspect.signature(provider).parameters.values()
         ]
