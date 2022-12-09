@@ -1,4 +1,4 @@
-from orwynn.src.base.singleton.singleton import Singleton
+from orwynn.base.singleton.singleton import Singleton
 
 
 class Controller:

@@ -1,8 +1,8 @@
-from orwynn.src.base.config.config import Config
-from orwynn.src.base.mapping.mapping import Mapping
-from orwynn.src.base.service.root_service import RootService
-from orwynn.src.base.service.service import Service
-from orwynn.src.util.types.provider import Provider
+from orwynn.base.config.config import Config
+from orwynn.base.mapping.mapping import Mapping
+from orwynn.base.service.root_service import RootService
+from orwynn.base.service.service import Service
+from orwynn.util.types.provider import Provider
 
 
 """List of builtin classes in Provider category.

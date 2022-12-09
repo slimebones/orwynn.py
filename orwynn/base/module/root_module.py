@@ -1,9 +1,9 @@
-from orwynn.src.app.app_service import AppService
-from orwynn.src.base.controller.controller import Controller
-from orwynn.src.base.middleware.middleware import Middleware
-from orwynn.src.base.module.module import Module
-from orwynn.src.base.service.root_service import RootService
-from orwynn.src.util.types.provider import Provider
+from orwynn.app.app_service import AppService
+from orwynn.base.controller.controller import Controller
+from orwynn.base.middleware.middleware import Middleware
+from orwynn.base.module.module import Module
+from orwynn.base.service.root_service import RootService
+from orwynn.util.types.provider import Provider
 
 
 class RootModule(Module):

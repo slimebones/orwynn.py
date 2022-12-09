@@ -1,16 +1,16 @@
 import inspect
 from typing import Any
 
-from orwynn.src.base.model.model import Model
-from orwynn.src.base.module.module import Module
-from orwynn.src.di.missing_di_object_error import MissingDIObjectError
-from orwynn.src.util.types.acceptor import Acceptor
-from orwynn.src.base.module.root_module import RootModule
-from orwynn.src.base.worker.worker import Worker
-from orwynn.src.di.collect_modules import collect_modules
-from orwynn.src.di.collect_providers import collect_providers
-from orwynn.src.util.types.provider import Provider
-from orwynn.src.util.validation import validate
+from orwynn.base.model.model import Model
+from orwynn.base.module.module import Module
+from orwynn.di.missing_di_object_error import MissingDIObjectError
+from orwynn.util.types.acceptor import Acceptor
+from orwynn.base.module.root_module import RootModule
+from orwynn.base.worker.worker import Worker
+from orwynn.di.collect_modules import collect_modules
+from orwynn.di.collect_providers import collect_providers
+from orwynn.util.types.provider import Provider
+from orwynn.util.validation import validate
 
 ProviderParameters = list["Parameter"]
 ParametersByProvider = dict[Provider, ProviderParameters]

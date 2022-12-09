@@ -1,11 +1,11 @@
 import os
-from orwynn.src.app.app_mode_enum import AppModeEnum
-from orwynn.src.base.module.root_module import RootModule
+from orwynn.app.app_mode_enum import AppModeEnum
+from orwynn.base.module.root_module import RootModule
 
-from orwynn.src.base.worker.worker import Worker
-from orwynn.src.app.app_service import AppService
-from orwynn.src.di.di import DI
-from orwynn.src.util.validation import validate
+from orwynn.base.worker.worker import Worker
+from orwynn.app.app_service import AppService
+from orwynn.di.di import DI
+from orwynn.util.validation import validate
 
 
 class Boot(Worker):
@@ -27,8 +27,8 @@ class Boot(Worker):
     # main.py
     from orwynn import Boot, AppModeEnum
 
-    # Import root module from your location, it might be `src` directory
-    from .src.root_module import root_module
+    # Import root module from your location
+    from .myproject.root_module import root_module
 
     app = Boot(
         mode_enum=AppModeEnum.DEV,

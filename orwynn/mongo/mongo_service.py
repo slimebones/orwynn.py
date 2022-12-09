@@ -1,4 +1,4 @@
-from orwynn.src.base.database.nosql_database_service import NoSQLDatabaseService
+from orwynn.base.database.nosql_database_service import NoSQLDatabaseService
 
 
 class MongoService(NoSQLDatabaseService):

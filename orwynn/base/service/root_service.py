@@ -1,4 +1,4 @@
-from orwynn.src.base.service.service import Service
+from orwynn.base.service.service import Service
 
 
 class RootService(Service):

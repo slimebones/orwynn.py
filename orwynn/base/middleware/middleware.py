@@ -1,7 +1,7 @@
 from typing import Callable
-from orwynn.src.base.singleton.singleton import Singleton
-from orwynn.src.util.request import Request
-from orwynn.src.util.response import Response
+from orwynn.base.singleton.singleton import Singleton
+from orwynn.util.request import Request
+from orwynn.util.response import Response
 
 
 class Middleware:

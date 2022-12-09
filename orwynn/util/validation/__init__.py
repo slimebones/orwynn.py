@@ -2,7 +2,7 @@ import re
 from enum import EnumMeta
 from typing import Any
 
-from orwynn.src.util.validation.validation_error import (ReValidationError,
+from orwynn.util.validation.validation_error import (ReValidationError,
                                                   ValidationError)
 
 

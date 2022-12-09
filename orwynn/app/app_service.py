@@ -2,8 +2,8 @@ from typing import Literal
 from fastapi import FastAPI
 from starlette.types import Scope, Receive, Send
 from fastapi.testclient import TestClient
-from orwynn.src.app.app_mode_enum import AppModeEnum
-from orwynn.src.base.service.root_service import RootService
+from orwynn.app.app_mode_enum import AppModeEnum
+from orwynn.base.service.root_service import RootService
 
 
 class AppService(RootService):

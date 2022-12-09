@@ -1,13 +1,13 @@
 from fastapi import FastAPI
 from pytest import fixture
 from fastapi.testclient import TestClient
-from orwynn.src.app.app_mode_enum import AppModeEnum
+from orwynn.app.app_mode_enum import AppModeEnum
 
-from orwynn.src.app.app_service import AppService
-from orwynn.src.base.module.root_module import RootModule
-from orwynn.src.base.test.http_client import HttpClient
-from orwynn.src.boot.boot import Boot
-from orwynn.src.di.di import DI
+from orwynn.app.app_service import AppService
+from orwynn.base.module.root_module import RootModule
+from orwynn.base.test.http_client import HttpClient
+from orwynn.boot.boot import Boot
+from orwynn.di.di import DI
 
 
 class Test:

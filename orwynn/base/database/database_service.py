@@ -1,4 +1,4 @@
-from orwynn.src.base.service.root_service import RootService
+from orwynn.base.service.root_service import RootService
 
 
 class DatabaseService(RootService):

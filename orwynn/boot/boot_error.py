@@ -1,4 +1,4 @@
-from orwynn.src.base.http_error.error import Error
+from orwynn.base.http_error.error import Error
 
 
 class BootError(Error):

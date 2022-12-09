@@ -1,5 +1,5 @@
 from typing import Any
-from orwynn.src.base.model.model import Model
+from orwynn.base.model.model import Model
 
 
 class Cell(Model):

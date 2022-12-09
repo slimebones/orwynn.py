@@ -1,8 +1,8 @@
 from typing import Self
-from orwynn.src.base.controller.controller import Controller
-from orwynn.src.base.middleware.middleware import Middleware
+from orwynn.base.controller.controller import Controller
+from orwynn.base.middleware.middleware import Middleware
 
-from orwynn.src.util.types.provider import Provider
+from orwynn.util.types.provider import Provider
 
 
 class Module:

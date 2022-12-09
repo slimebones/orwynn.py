@@ -2,11 +2,11 @@ from datetime import time, timedelta
 from typing import Any, Callable
 
 import loguru
-from orwynn.src.app.app_mode_enum import AppModeEnum
-from orwynn.src.app.app_service import AppService
-from orwynn.src.base.config.config import Config
-from orwynn.src.base.model.model import Model
-from orwynn.src.base.service.root_service import RootService
+from orwynn.app.app_mode_enum import AppModeEnum
+from orwynn.app.app_service import AppService
+from orwynn.base.config.config import Config
+from orwynn.base.model.model import Model
+from orwynn.base.service.root_service import RootService
 
 
 class LogHandler(Model):

@@ -1,5 +1,5 @@
-from orwynn.src.base.http_error.error import Error
-from orwynn.src.util.validation import validate
+from orwynn.base.http_error.error import Error
+from orwynn.util.validation import validate
 
 
 class ParsingError(Error):

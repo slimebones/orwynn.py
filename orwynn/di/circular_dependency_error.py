@@ -1,4 +1,4 @@
-from orwynn.src.boot.boot_error import BootError
+from orwynn.boot.boot_error import BootError
 
 
 class CircularDependencyError(BootError):

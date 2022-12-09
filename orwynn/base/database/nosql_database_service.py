@@ -1,4 +1,4 @@
-from orwynn.src.base.database.database_service import DatabaseService
+from orwynn.base.database.database_service import DatabaseService
 
 
 class NoSQLDatabaseService(DatabaseService):

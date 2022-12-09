@@ -1,7 +1,7 @@
-from orwynn.src.base.model.model import Model
-from orwynn.src.base.module.module import Module
-from orwynn.src.base.module.root_module import RootModule
-from orwynn.src.di.circular_dependency_error import CircularDependencyError
+from orwynn.base.model.model import Model
+from orwynn.base.module.module import Module
+from orwynn.base.module.root_module import RootModule
+from orwynn.di.circular_dependency_error import CircularDependencyError
 
 
 def _traverse(
