@@ -1,5 +1,4 @@
-from src.base.model.model import Model
-from src.util.types.source import Source
+from orwynn.src.base.model.model import Model
 
 
 class Config(Model):

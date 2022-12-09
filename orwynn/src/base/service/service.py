@@ -1,7 +1,7 @@
-from src.base.singleton.singleton import Singleton
+from orwynn.src.base.singleton.singleton import Singleton
 
 
-class Service(Singleton):
+class Service:
     """Manages incoming calls to operate on attached business domain.
     
     Service is a Provider, so it can be injectable. It has higher priority than

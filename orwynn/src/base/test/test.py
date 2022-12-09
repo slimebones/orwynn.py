@@ -2,8 +2,9 @@ from fastapi import FastAPI
 from pytest import fixture
 from fastapi.testclient import TestClient
 
-from src.app.app import App
-from src.base.test.http_client import HttpClient
+from orwynn.src.app.app_service import AppService
+from orwynn.src.base.test.http_client import HttpClient
+from orwynn.src.boot.boot import Boot
 
 
 class Test:
@@ -12,13 +13,14 @@ class Test:
         return HttpClient(client)
 
     @fixture
-    def app(self) -> App:
-        return App.ie()
+    def app(self) -> AppService:
+        # TODO: Initialize Boot here properly or find another solution
+        return Boot().app
 
     @fixture
-    def client(self, app: App) -> TestClient:
+    def client(self, app: AppService) -> TestClient:
         return app.test_client
 
     @fixture
-    def root_dir(self, app: App) -> str:
+    def root_dir(self, app: AppService) -> str:
         return app.root_dir

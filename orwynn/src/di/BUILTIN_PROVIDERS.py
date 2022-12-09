@@ -1,0 +1,17 @@
+from orwynn.src.base.config.config import Config
+from orwynn.src.base.mapping.mapping import Mapping
+from orwynn.src.base.service.root_service import RootService
+from orwynn.src.base.service.service import Service
+from orwynn.src.util.types.provider import Provider
+
+
+"""List of builtin classes in Provider category.
+
+Providers with lower priority cannot inject ones with higher priority.
+"""
+BUILTIN_PROVIDERS: list[Provider] = [
+    Config,
+    RootService,
+    Service,
+    Mapping
+]

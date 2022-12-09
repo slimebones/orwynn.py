@@ -2,7 +2,7 @@ from __future__ import annotations
 from abc import ABCMeta
 from typing import TypeVar
 
-from src.base.node.node import Node
+from orwynn.src.base.node.node import Node
 
 
 SingletonInstance = TypeVar("SingletonInstance")

@@ -1,0 +1,27 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"restoreTerminals.terminals": [
+				{
+						"splitTerminals": [
+								{
+										"name": "base",
+										"commands": []
+								}
+						]
+				},
+				{
+						"splitTerminals": [
+								{
+										"name": "tests/app",
+										"commands": ["cd tests/app"]
+								}
+						]
+				},
+		],
+	}
+}
