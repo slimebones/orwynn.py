@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "orwynn"
 version = "0.1.0"
-description = "Structured backend web-framework built on top of FastAPI"
+description = "Scalable web-framework with out-of-the-box architecture"
 authors = ["ryzhovalex <thed4rkof@gmail.com>"]
 readme = "README.md"
 
