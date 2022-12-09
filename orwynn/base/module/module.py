@@ -47,6 +47,7 @@ class Module:
         exports: list[Provider] = []
     ) -> None:
         super().__init__()
+
         self.Providers = Providers
         self.Controllers = Controllers
         self.Middleware = Middleware

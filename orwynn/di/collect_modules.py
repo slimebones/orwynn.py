@@ -23,6 +23,10 @@ def _traverse(
         return modules
     else:
         if init_module.imports:
+            if init_module in init_module.imports:
+                raise CircularDependencyError(
+                    "Module {} imports self".format(init_module)
+                )
             for m in init_module.imports:
                 _traverse(m, modules, chain)
         else:

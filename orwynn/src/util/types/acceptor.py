@@ -1,1 +1,0 @@
-Acceptor = type

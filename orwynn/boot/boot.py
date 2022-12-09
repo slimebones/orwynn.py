@@ -5,6 +5,7 @@ from orwynn.src.base.module.root_module import RootModule
 from orwynn.src.base.worker.worker import Worker
 from orwynn.src.app.app_service import AppService
 from orwynn.src.di.di import DI
+from orwynn.src.util.validation import validate
 
 
 class Boot(Worker):
@@ -40,11 +41,14 @@ class Boot(Worker):
         mode_enum: AppModeEnum,
         root_module: RootModule
     ) -> None:
-
         super().__init__()
+
+        validate(mode_enum, AppModeEnum)
+        validate(root_module, RootModule)
+
         self._mode_enum = mode_enum
         self._di: DI = DI(root_module)
 
     @property
     def app(self) -> AppService:
-        return self._di.app
+        return self._di.find("app_service")

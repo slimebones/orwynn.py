@@ -3,14 +3,19 @@ from typing import Any
 
 from orwynn.src.base.model.model import Model
 from orwynn.src.base.module.module import Module
+from orwynn.src.di.missing_di_object_error import MissingDIObjectError
+from orwynn.src.util.types.acceptor import Acceptor
 from orwynn.src.base.module.root_module import RootModule
 from orwynn.src.base.worker.worker import Worker
 from orwynn.src.di.collect_modules import collect_modules
 from orwynn.src.di.collect_providers import collect_providers
 from orwynn.src.util.types.provider import Provider
+from orwynn.src.util.validation import validate
 
 ProviderParameters = list["Parameter"]
 ParametersByProvider = dict[Provider, ProviderParameters]
+DIObject = Provider | Acceptor
+DIContainer = dict[str, DIObject]
 
 
 class Parameter(Model):
@@ -28,10 +33,10 @@ class DI(Worker):
 
     Stages of DI:
     - Build a dependency tree, collecting all objects and their requested
-      injections
+        injections
     - Make an order of initialization for dependencies
     - Initialize dependencies according to the order for each making
-      appropriate injections
+        appropriate injections
 
     How high in order dependency will be placed depends on:
     - Dependency's priority, see BUILTIN_PROVIDERS
@@ -40,7 +45,7 @@ class DI(Worker):
     dep1 * dep1_priority + dep2 * dep2_priority + ... + dep_n * dep_n_priority
     ```
     - Amount of imports of other modules at the module, where considered
-      dependency resides
+        dependency resides
 
     Attributes:
         root_module:
@@ -48,17 +53,47 @@ class DI(Worker):
     """
     def __init__(self, root_module: RootModule) -> None:
         super().__init__()
+        validate(root_module, RootModule)
+
+        self._container: DIContainer = {}
 
         collect_providers(
             collect_modules(root_module)
         )
 
-    def _get_parameters_for_provider(
-      self, provider: Provider
+    def find(self, key: str) -> DIObject:
+        """Returns DI object by its key.
+        
+        Keys are converted to snake_case from DI object names. So `AppService`
+        becomes `app_service`.
+
+        Args:
+            key:
+                String value to search with.
+
+        Returns:
+            A DIObject found.
+
+        Raises:
+            MissingDIObjectError:
+                DIObject with given key is not found. 
+        """
+        validate(key, str)
+
+        try:
+            return self._container[key]
+        except KeyError:
+            raise MissingDIObjectError()
+
+    def _get_parameters_for_provider_class(
+        self, ProviderClass: Provider
     ) -> ProviderParameters:
         """Inspects provider and returns requested by him parameters."""
         return [
-        Parameter(name=inspect_parameter.name, type=inspect_parameter.annotation)  
-            for inspect_parameter in
-            inspect.signature(provider).parameters.values()
+            Parameter(
+                name=inspect_parameter.name,
+                type=inspect_parameter.annotation
+            )  
+                for inspect_parameter in
+                inspect.signature(ProviderClass).parameters.values()
         ]

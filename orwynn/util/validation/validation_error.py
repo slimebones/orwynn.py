@@ -1,13 +1,12 @@
 from typing import Any
-from orwynn.src.base.http_error.http_error import HttpError
+from orwynn.src.base.http_error.error import Error
 
 
-class ValidationError(HttpError):
+class ValidationError(Error):
     def __init__(
             self,
             failed_obj: Any,
             expected_type: type | list[type],
-            status_code: int = 400
         ) -> None:
         if isinstance(expected_type, type):
             message = \
@@ -20,18 +19,17 @@ class ValidationError(HttpError):
         else:
             raise TypeError('Unrecognized type of `expected_type`')
 
-        super().__init__(message, status_code)
+        super().__init__(message)
 
 
 # ReValidationError inherits base Error, not ValidationError, since some old
 # features differ from ValidationError
-class ReValidationError(HttpError):
+class ReValidationError(Error):
     def __init__(
             self,
             failed_obj: Any,
-            pattern: str,
-            status_code: int = 400
+            pattern: str
         ) -> None:
         message = \
             f'{repr(failed_obj)} should implement pattern {pattern}'
-        super().__init__(message, status_code)
+        super().__init__(message)
