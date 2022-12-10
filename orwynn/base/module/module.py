@@ -1,8 +1,9 @@
-from typing import Self
+from types import NoneType
 from orwynn.base.controller.controller import Controller
-from orwynn.base.middleware.middleware import Middleware
+from orwynn.base.middleware.middleware import Middleware as MiddlewareClass
 
 from orwynn.util.types.provider import Provider
+from orwynn.util.validation import validate
 
 
 class Module:
@@ -43,22 +44,47 @@ class Module:
     """
     def __init__(
         self,
-        /,
+        *,
         route: str,
-        Providers: list[Provider] = [],
-        Controllers: list[type[Controller]] = [],
-        Middleware: list[type[Middleware]] = [],
-        imports: list["Module"] = [],
-        exports: list[Provider] = []
+        Providers: list[Provider] | None = None,
+        Controllers: list[type[Controller]] | None = None,
+        Middleware: list[type[MiddlewareClass]] | None = None,
+        imports: list["Module"] | None = None,
+        exports: list[Provider] | None = None
     ) -> None:
         super().__init__()
 
-        self.route = route
-        self.Providers = Providers
-        self.Controllers = Controllers
-        self.Middleware = Middleware
-        self.imports = imports
-        self.exports = exports
+        validate(route, str)
+        validate(Providers, [list, NoneType])
+        validate(Controllers, [list, NoneType])
+        validate(Middleware, [list, NoneType])
+        validate(imports, [list, NoneType])
+        validate(exports, [list, NoneType])
+
+        if route:
+            self.route = route
+        else:
+            self.route = []
+        if Providers:
+            self.Providers = Providers
+        else:
+            self.Providers = []
+        if Controllers:
+            self.Controllers = Controllers
+        else:
+            self.Controllers = []
+        if Middleware:
+            self.Middleware = Middleware
+        else:
+            self.Middleware = []
+        if imports:
+            self.imports = imports
+        else:
+            self.imports = []
+        if exports:
+            self.exports = exports
+        else:
+            self.exports = []
 
     def __repr__(self) -> str:
         return "<{} \"{}\" at {}>".format(

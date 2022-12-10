@@ -18,16 +18,16 @@ def validate(
 
     Args:
         obj:
-            Object to be validated
+            Object to be validated.
         expected_type:
-            Type to compare object to
+            Type to compare object to.
         is_strict (optional):
             Whether strict check should be performed. If True, direct type
             comparison is made, disallowing subclasses. If False, isinstance()
-            comparison is made
+            comparison is made.
     Raises:
         ValidationError:
-            Object did not pass validation
+            Object did not pass validation.
     """
     if isinstance(expected_type, type):
         if is_strict:
@@ -37,16 +37,19 @@ def validate(
             if not isinstance(obj, expected_type):
                 raise ValidationError(obj, expected_type)
     elif type(expected_type) is list:
-        found: bool = False
+        is_matched_type_found: bool = False
 
         for type_ in expected_type:
             if type(obj) is type_:
-                found = True
+                is_matched_type_found = True
         
-        if not found:
+        if not is_matched_type_found:
             raise ValidationError(obj, expected_type)
     else:
-        raise TypeError('Expected type should be `type` type')
+        raise TypeError(
+            "{} should be Type or an instance of list"
+            .format(expected_type)
+        )
 
 
 def validate_re(string: str, pattern: str) -> None:

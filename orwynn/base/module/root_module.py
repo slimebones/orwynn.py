@@ -20,8 +20,8 @@ class RootModule(Module):
     Attributes:
         RootServices:
             List of RootServices to be initialized for the whole application.
-            Though it's not necessary, it's recommended that list of root
-            services contain AppService for explicity.
+            By default always have AppService initialized, but you still can
+            add this like `RootServices=[AppService, ...]` for explicity.
         Providers (optional):
             List of Providers to be initialized and shared at least across this
             module.
@@ -39,17 +39,25 @@ class RootModule(Module):
     """
     def __init__(
         self,
-        /,
-        RootServices: list[type[RootService]] = [],
-        Providers: list[Provider] = [], 
-        Controllers: list[type[Controller]] = [],
-        Middleware: list[type[Middleware]] = [], 
-        imports: list[Module] = [], 
-        exports: list[Provider] = []
+        *,
+        RootServices: list[type[RootService]] | None = None,
+        Providers: list[Provider] | None = None,
+        Controllers: list[type[Controller]] | None = None,
+        Middleware: list[type[Middleware]] | None = None,
+        imports: list["Module"] | None = None,
+        exports: list[Provider] | None = None
     ) -> None:
         super().__init__(
-            "/", Providers, Controllers, Middleware, imports, exports
+            route="/",
+            Providers=Providers,
+            Controllers=Controllers,
+            Middleware=Middleware,
+            imports=imports,
+            exports=exports
         )
-        self.RootServices = RootServices
+        if RootServices:
+            self.RootServices = RootServices
+        else:
+            self.RootServices = []
         if AppService not in self.RootServices:
             self.RootServices.append(AppService)

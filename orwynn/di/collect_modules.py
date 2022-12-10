@@ -1,7 +1,17 @@
+import copy
 from orwynn.base.model.model import Model
 from orwynn.base.module.module import Module
 from orwynn.base.module.root_module import RootModule
 from orwynn.di.circular_dependency_error import CircularDependencyError
+    
+
+def collect_modules(
+        root_module: RootModule
+    ) -> list[Module]:
+    """Collects all modules starting from root module."""
+    modules: list[Module] = _traverse(root_module, [], []) 
+
+    return modules
 
 
 def _traverse(
@@ -24,9 +34,7 @@ def _traverse(
         )
     chain.append(init_module)
 
-    if init_module in modules:
-        return modules
-    else:
+    if not init_module in modules:
         if init_module not in modules:
             modules.append(init_module)
         if init_module.imports:
@@ -35,16 +43,17 @@ def _traverse(
                     "module {} imports self".format(init_module)
                 )
             for m in init_module.imports:
+                if isinstance(m, RootModule):
+                    raise CircularDependencyError(
+                        "{} imports root module".format(init_module)
+                    )
                 _traverse(m, modules, chain)
 
-    return modules
-    
-
-
-def collect_modules(
-        root_module: RootModule
-    ) -> list[Module]:
-    """Collects all modules starting from root module."""
-    modules: list[Module] = _traverse(root_module, [], []) 
+    # On blocking case remove recently added module since we don't want this
+    # module to appear in other branch, e.g.:
+    #   A -> B -(blocking: call chain.pop())> C; A -> B -> D -> C;
+    # If C hadn't been removed at the first iteration, we would get a circular
+    # error.
+    chain.pop()
 
     return modules
