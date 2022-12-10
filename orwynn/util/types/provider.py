@@ -1,4 +1,4 @@
 from typing import Any
 
 
-Provider = Any
+Provider = object

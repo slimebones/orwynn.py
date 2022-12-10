@@ -14,6 +14,13 @@ def collect_modules(
     - Dependency circular errors for modules
     - Modules self imports
     - Imports of RootModule
+
+    Args:
+        root_module:
+            Root module of the application.
+
+    Returns:
+        List of modules collected.
     """
     modules: list[Module] = _traverse(root_module, [], []) 
 
