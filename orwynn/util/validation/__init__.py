@@ -31,12 +31,18 @@ def validate(
     """
     if isinstance(expected_type, type):
         if is_strict:
-            if type(obj) is not expected_type:
+            if (
+                type(obj) is not expected_type
+                and not issubclass(obj, expected_type)
+            ):
                 raise ValidationError(
                     failed_obj=obj, expected_type=expected_type
                 )
         else:
-            if not isinstance(obj, expected_type):
+            if (
+                not isinstance(obj, expected_type)
+                and not issubclass(obj, expected_type)
+            ):
                 raise ValidationError(
                     failed_obj=obj, expected_type=expected_type
                 )

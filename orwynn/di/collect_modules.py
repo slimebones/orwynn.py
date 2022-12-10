@@ -51,9 +51,9 @@ def _traverse(
 
     # On blocking case remove recently added module since we don't want this
     # module to appear in other branch, e.g.:
-    #   A -> B -(blocking: call chain.pop())> C; A -> B -> D -> C;
-    # If C hadn't been removed at the first iteration, we would get a circular
-    # error.
+    #   A -> B (blocking: call chain.pop())-> C; A -> B -> D -> C;
+    # If C hadn't been removed at the first iteration, we would have got a
+    # circular error.
     chain.pop()
 
     return modules

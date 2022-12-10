@@ -88,7 +88,7 @@ class Module:
     @staticmethod
     def _parse_route(route: str) -> str:
         if route:
-            if not re.match(r"^\/(.+\/?)+$", route):
+            if not re.match(r"^\/(.+\/?)+$", route) and route != "/":
                 raise IncorrectRouteError(failed_route=route)
         else:
             raise EmptyRouteError()
