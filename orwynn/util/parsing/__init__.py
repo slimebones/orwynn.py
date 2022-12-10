@@ -5,6 +5,8 @@ from orwynn.util.parsing.parsing_error import (StrIntParsingError, KeyParsingErr
                                             ParsingError)
 from orwynn.util.validation import validate
 
+from .parsing_error import ParsingError
+
 ParsedEntity = TypeVar('ParsedEntity', bound=Any)
 
 

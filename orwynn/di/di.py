@@ -57,9 +57,9 @@ class DI(Worker):
 
         self._container: DIContainer = {}
 
-        collect_providers(
-            collect_modules(root_module)
-        )
+        # collect_providers(
+        #     collect_modules(root_module)
+        # )
 
     def find(self, key: str) -> DIObject:
         """Returns DI object by its key.

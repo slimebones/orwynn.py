@@ -10,15 +10,7 @@
 						"splitTerminals": [
 								{
 										"name": "base",
-										"commands": []
-								}
-						]
-				},
-				{
-						"splitTerminals": [
-								{
-										"name": "tests/app",
-										"commands": ["cd tests/app"]
+										"commands": ["source .venv/bin/activate.fish"]
 								}
 						]
 				},

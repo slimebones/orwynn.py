@@ -15,22 +15,24 @@ class RootModule(Module):
 
     No other module can import the RootModule.
 
+    Root module always has "/" route.
+
     Attributes:
         RootServices:
             List of RootServices to be initialized for the whole application.
             Though it's not necessary, it's recommended that list of root
             services contain AppService for explicity.
-        Providers:
+        Providers (optional):
             List of Providers to be initialized and shared at least across this
             module.
-        Controllers:
+        Controllers (optional):
             List of Controllers to be initialized for this module.
-        Middleware:
+        Middleware (optional):
             List of Middleware classes applied to all module' controllers.
-        imports:
+        imports (optional):
             List of imported modules to use their exported providers in this
             module.
-        exports:
+        exports (optional):
             Sublist of providers that are provided by this module for other
             modules importing this module. It cannot contain provider not
             referenced in `providers` field.
@@ -45,7 +47,9 @@ class RootModule(Module):
         imports: list[Module] = [], 
         exports: list[Provider] = []
     ) -> None:
-        super().__init__(Providers, Controllers, Middleware, imports, exports)
+        super().__init__(
+            "/", Providers, Controllers, Middleware, imports, exports
+        )
         self.RootServices = RootServices
         if AppService not in self.RootServices:
             self.RootServices.append(AppService)

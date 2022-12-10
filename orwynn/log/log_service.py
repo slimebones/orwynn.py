@@ -18,7 +18,9 @@ class LogHandler(Model):
     format: str | Callable = \
         "{time:%Y.%m.%d at %H:%M:%S:%f%z}" \
         + " | {level} | {extra} >> {message}"
-    rotation: str | int | time | timedelta | loguru.RotationFunction = "10 MB"
+    # Callable here used instead of loguru.RotationFunction since it has
+    # problems with importing
+    rotation: str | int | time | timedelta | Callable = "10 MB"
     serialize: bool | None = None
     kwargs: dict
 

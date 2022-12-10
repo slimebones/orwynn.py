@@ -2,8 +2,13 @@ import re
 from enum import EnumMeta
 from typing import Any
 
+from pydantic import ValidationError as __PydanticValidationError
+from pydantic import validator as __pydantic_validator
+
 from orwynn.util.validation.validation_error import (ReValidationError,
-                                                  ValidationError)
+                                                     ValidationError)
+
+from .validation_error import ValidationError
 
 
 def validate(
@@ -53,3 +58,7 @@ def validate_re(string: str, pattern: str) -> None:
     """
     if not re.match(pattern, string):
         raise ReValidationError(string, pattern)
+
+
+model_validator = __pydantic_validator
+ModelValidationError = __PydanticValidationError

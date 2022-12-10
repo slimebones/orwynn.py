@@ -2,8 +2,6 @@ from __future__ import annotations
 from abc import ABCMeta
 from typing import TypeVar
 
-from orwynn.base.node.node import Node
-
 
 SingletonInstance = TypeVar("SingletonInstance")
 
@@ -22,7 +20,7 @@ class SingletonMeta(type):
         return cls.instances[cls]
 
 
-class Singleton(Node, metaclass=SingletonMeta):
+class Singleton(metaclass=SingletonMeta):
     """Singleton base class."""
     @classmethod
     def ie(cls: type[SingletonInstance]) -> SingletonInstance:

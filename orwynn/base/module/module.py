@@ -9,17 +9,21 @@ class Module:
     """Provides metadata to organize the application structure.
     
     Attributes:
-        Providers:
+        route:
+            All controllers defined under this module will
+            operate under this route. Route cannot be "/" to be distinguishable
+            from other modules.
+        Providers (optional):
             List of Providers to be initialized and shared at least across this
             module.
-        Controllers:
+        Controllers (optional):
             List of Controllers to be initialized for this module.
-        Middleware:
+        Middleware (optional):
             List of Middleware classes applied to all module' controllers.
-        imports:
+        imports (optional):
             List of imported modules to use their exported providers in this
             module.
-        exports:
+        exports (optional):
             Sublist of providers that are provided by this module for other
             modules importing this module. It cannot contain provider not
             referenced in `providers` field.
@@ -40,6 +44,7 @@ class Module:
     def __init__(
         self,
         /,
+        route: str,
         Providers: list[Provider] = [],
         Controllers: list[type[Controller]] = [],
         Middleware: list[type[Middleware]] = [],
@@ -48,8 +53,16 @@ class Module:
     ) -> None:
         super().__init__()
 
+        self.route = route
         self.Providers = Providers
         self.Controllers = Controllers
         self.Middleware = Middleware
         self.imports = imports
         self.exports = exports
+
+    def __repr__(self) -> str:
+        return "<{} \"{}\" at {}>".format(
+            self.__class__.__name__,
+            self.route,
+            hex(id(self))
+        )
