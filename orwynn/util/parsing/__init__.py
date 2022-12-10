@@ -70,7 +70,7 @@ def parse_int(entity: int | str) -> int:
         try:
             res = int(entity)
         except ValueError:
-            raise StrIntParsingError(entity)
+            raise StrIntParsingError(failed_str=entity)
     else:
         raise
 
@@ -115,7 +115,7 @@ def parse_key(
         value: Any = entity[key]
     except KeyError:
         if default_value is None:
-            raise KeyParsingError(entity, key)
+            raise KeyParsingError(parsed_map=entity, failed_key=key)
         else:
             value = default_value
     else: 

@@ -1,6 +1,12 @@
+import re
 from types import NoneType
+from typing import Any
+from orwynn.app.empty_route_error import EmptyRouteError
+from orwynn.app.incorrect_route_error import IncorrectRouteError
 from orwynn.base.controller.controller import Controller
 from orwynn.base.middleware.middleware import Middleware as MiddlewareClass
+from orwynn.di.BUILTIN_PROVIDERS import BUILTIN_PROVIDERS
+from orwynn.di.not_provider_error import NotProviderError
 
 from orwynn.util.types.provider import Provider
 from orwynn.util.validation import validate
@@ -61,30 +67,16 @@ class Module:
         validate(imports, [list, NoneType])
         validate(exports, [list, NoneType])
 
-        if route:
-            self.route = route
-        else:
-            self.route = []
-        if Providers:
-            self.Providers = Providers
-        else:
-            self.Providers = []
-        if Controllers:
-            self.Controllers = Controllers
-        else:
-            self.Controllers = []
-        if Middleware:
-            self.Middleware = Middleware
-        else:
-            self.Middleware = []
-        if imports:
-            self.imports = imports
-        else:
-            self.imports = []
-        if exports:
-            self.exports = exports
-        else:
-            self.exports = []
+        self.route: str = self._parse_route(route)
+        self.Providers: list[Provider] = self._parse_providers(Providers)
+        self.Controllers: list[type[Controller]] = self._parse_controllers(
+            Controllers
+        )
+        self.Middleware: list[type[MiddlewareClass]] = self._parse_middleware(
+            Middleware
+        )
+        self.imports: list["Module"] = self._parse_imports(imports)
+        self.exports: list[Provider] = self._parse_providers(Providers)
 
     def __repr__(self) -> str:
         return "<{} \"{}\" at {}>".format(
@@ -92,3 +84,77 @@ class Module:
             self.route,
             hex(id(self))
         )
+
+    @staticmethod
+    def _parse_route(route: str) -> str:
+        if route:
+            if not re.match(r"^\/(.+\/?)+$", route):
+                raise IncorrectRouteError(failed_route=route)
+        else:
+            raise EmptyRouteError()
+
+        return route
+
+    @staticmethod
+    def _parse_providers(Providers: list[Provider] | None) -> list[Provider]:
+        res: list[Provider]
+        is_found_in_builtins: bool
+
+        if Providers:
+            for Provider_ in Providers:
+                is_found_in_builtins = False
+                for BuiltinProvider in BUILTIN_PROVIDERS:
+                    if isinstance(BuiltinProvider, Provider_):
+                        is_found_in_builtins = True
+                if is_found_in_builtins:
+                    raise NotProviderError(FailedClass=Provider_) 
+            res = Providers
+        else:
+            res = []
+
+        return res
+
+    @staticmethod
+    def _parse_controllers(
+        Controllers: list[type[Controller]] | None
+    ) -> list[type[Controller]]:
+        res: list[type[Controller]]
+
+        if Controllers:
+            for Controller_ in Controllers:
+                validate(Controller_, Controller)
+            res = Controllers
+        else:
+            res = []
+
+        return res
+
+    @staticmethod
+    def _parse_middleware(
+        Middleware: list[type[MiddlewareClass]] | None
+    ) -> list[type[MiddlewareClass]]:
+        res: list[type[MiddlewareClass]]
+
+        if Middleware:
+            for Middleware_ in Middleware:
+                validate(Middleware_, MiddlewareClass)
+            res = Middleware
+        else:
+            res = []
+
+        return res
+
+    @staticmethod
+    def _parse_imports(
+        imports: list["Module"] | None
+    ) -> list["Module"]:
+        res: list["Module"]
+
+        if imports:
+            for import_ in imports:
+                validate(import_, Module)
+            res = imports
+        else:
+            res = []
+
+        return res

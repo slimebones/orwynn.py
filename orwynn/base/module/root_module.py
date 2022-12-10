@@ -18,10 +18,6 @@ class RootModule(Module):
     Root module always has "/" route.
 
     Attributes:
-        RootServices:
-            List of RootServices to be initialized for the whole application.
-            By default always have AppService initialized, but you still can
-            add this like `RootServices=[AppService, ...]` for explicity.
         Providers (optional):
             List of Providers to be initialized and shared at least across this
             module.
@@ -36,16 +32,20 @@ class RootModule(Module):
             Sublist of providers that are provided by this module for other
             modules importing this module. It cannot contain provider not
             referenced in `providers` field.
+        RootServices:
+            List of RootServices to be initialized for the whole application.
+            By default always have AppService initialized, but you still can
+            add this like `RootServices=[AppService, ...]` for explicity.
     """
     def __init__(
         self,
         *,
-        RootServices: list[type[RootService]] | None = None,
         Providers: list[Provider] | None = None,
         Controllers: list[type[Controller]] | None = None,
         Middleware: list[type[Middleware]] | None = None,
         imports: list["Module"] | None = None,
-        exports: list[Provider] | None = None
+        exports: list[Provider] | None = None,
+        RootServices: list[type[RootService]] | None = None,
     ) -> None:
         super().__init__(
             route="/",
@@ -55,9 +55,21 @@ class RootModule(Module):
             imports=imports,
             exports=exports
         )
+        self.RootServices: list[type[RootService]] = self._parse_root_services(
+            RootServices
+        )
+
+    @staticmethod
+    def _parse_root_services(
+        RootServices: list[type[RootService]] | None
+    ) -> list[type[RootService]]:
+        res: list[type[RootService]]
+
         if RootServices:
-            self.RootServices = RootServices
+            res = RootServices
         else:
-            self.RootServices = []
-        if AppService not in self.RootServices:
-            self.RootServices.append(AppService)
+            res = []
+        if AppService not in res:
+            res.append(AppService)
+
+        return res

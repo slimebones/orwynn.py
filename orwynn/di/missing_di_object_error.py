@@ -1,4 +1,4 @@
-from orwynn.base.http_error.error import Error
+from orwynn.base.error.error import Error
 
 
 class MissingDIObjectError(Error):

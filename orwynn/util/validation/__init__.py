@@ -32,10 +32,14 @@ def validate(
     if isinstance(expected_type, type):
         if is_strict:
             if type(obj) is not expected_type:
-                raise ValidationError(obj, expected_type)
+                raise ValidationError(
+                    failed_obj=obj, expected_type=expected_type
+                )
         else:
             if not isinstance(obj, expected_type):
-                raise ValidationError(obj, expected_type)
+                raise ValidationError(
+                    failed_obj=obj, expected_type=expected_type
+                )
     elif type(expected_type) is list:
         is_matched_type_found: bool = False
 
@@ -44,7 +48,7 @@ def validate(
                 is_matched_type_found = True
         
         if not is_matched_type_found:
-            raise ValidationError(obj, expected_type)
+            raise ValidationError(failed_obj=obj, expected_type=expected_type)
     else:
         raise TypeError(
             "{} should be Type or an instance of list"
@@ -60,7 +64,7 @@ def validate_re(string: str, pattern: str) -> None:
             String does not match given pattern.
     """
     if not re.match(pattern, string):
-        raise ReValidationError(string, pattern)
+        raise ReValidationError(failed_obj=string, pattern=pattern)
 
 
 model_validator = __pydantic_validator
