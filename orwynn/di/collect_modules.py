@@ -8,7 +8,13 @@ from orwynn.di.circular_dependency_error import CircularDependencyError
 def collect_modules(
         root_module: RootModule
     ) -> list[Module]:
-    """Collects all modules starting from root module."""
+    """Collects all modules starting from root module.
+    
+    What is checked:
+    - Dependency circular errors for modules
+    - Modules self imports
+    - Imports of RootModule
+    """
     modules: list[Module] = _traverse(root_module, [], []) 
 
     return modules
