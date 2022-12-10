@@ -1,7 +1,5 @@
-from typing import Generator
 from pytest import fixture
-from conftest import std_structure
-from orwynn.app.app_service import AppService
+
 from orwynn.base.module.module import Module
 from orwynn.base.module.root_module import RootModule
 from orwynn.di.circular_dependency_error import CircularDependencyError
@@ -30,6 +28,7 @@ def twice_occurence_structure() -> RootModule:
     )
 
     return rm
+
 
 @fixture
 def imports_root_module_structure() -> RootModule:

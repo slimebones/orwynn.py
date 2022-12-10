@@ -3,24 +3,17 @@ from typing import Any
 
 from orwynn.base.model.model import Model
 from orwynn.base.module.module import Module
-from orwynn.di.missing_di_object_error import MissingDIObjectError
-from orwynn.util.types.acceptor import Acceptor
 from orwynn.base.module.root_module import RootModule
 from orwynn.base.worker.worker import Worker
 from orwynn.di.collect_modules import collect_modules
-from orwynn.di.collect_providers import collect_providers
+from orwynn.di.collect_provider_acceptors import collect_provider_acceptors
+from orwynn.di.missing_di_object_error import MissingDIObjectError
+from orwynn.util.types.acceptor import Acceptor
 from orwynn.util.types.provider import Provider
 from orwynn.util.validation import validate
 
-ProviderParameters = list["Parameter"]
-ParametersByProvider = dict[Provider, ProviderParameters]
 DIObject = Provider | Acceptor
 DIContainer = dict[str, DIObject]
-
-
-class Parameter(Model):
-    name: str
-    type: type[Any]
 
 
 class DI(Worker):
@@ -57,10 +50,6 @@ class DI(Worker):
 
         self._container: DIContainer = {}
 
-        # collect_providers(
-        #     collect_modules(root_module)
-        # )
-
     def find(self, key: str) -> DIObject:
         """Returns DI object by its key.
         
@@ -84,16 +73,3 @@ class DI(Worker):
             return self._container[key]
         except KeyError:
             raise MissingDIObjectError()
-
-    def _get_parameters_for_provider_class(
-        self, ProviderClass: type[Provider]
-    ) -> ProviderParameters:
-        """Inspects provider and returns requested by him parameters."""
-        return [
-            Parameter(
-                name=inspect_parameter.name,
-                type=inspect_parameter.annotation
-            )  
-                for inspect_parameter in
-                inspect.signature(ProviderClass).parameters.values()
-        ]

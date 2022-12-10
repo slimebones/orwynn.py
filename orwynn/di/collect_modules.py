@@ -3,6 +3,7 @@ from orwynn.base.model.model import Model
 from orwynn.base.module.module import Module
 from orwynn.base.module.root_module import RootModule
 from orwynn.di.circular_dependency_error import CircularDependencyError
+from orwynn.util.format_chain import format_chain
     
 
 def collect_modules(
@@ -37,12 +38,12 @@ def _traverse(
 
     if init_module in chain:
         raise CircularDependencyError(
-            "module {} occured twice in dependency chain {}"
+            "{} occured twice in dependency chain {}"
             .format(
                 init_module,
-                # Init module is added second time to the chain for
+                # Failed module is added second time to the chain for
                 # error descriptiveness
-                " -> ".join([str(x) for x in chain + [init_module]])
+                format_chain(chain + [init_module])
             )
         )
     chain.append(init_module)
@@ -53,7 +54,7 @@ def _traverse(
         if init_module.imports:
             if init_module in init_module.imports:
                 raise CircularDependencyError(
-                    "module {} imports self".format(init_module)
+                    "{} imports self".format(init_module)
                 )
             for m in init_module.imports:
                 if isinstance(m, RootModule):

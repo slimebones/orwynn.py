@@ -6,6 +6,7 @@ from orwynn.app.incorrect_route_error import IncorrectRouteError
 from orwynn.base.controller.controller import Controller
 from orwynn.base.middleware import middleware
 from orwynn.di.BUILTIN_PROVIDERS import BUILTIN_PROVIDERS
+from orwynn.di.is_provider import is_provider
 from orwynn.di.not_provider_error import NotProviderError
 
 from orwynn.util.types.provider import Provider
@@ -76,6 +77,7 @@ class Module:
             Middleware
         )
         self.imports: list["Module"] = self._parse_imports(imports)
+        # TODO: Add check if exports present in Providers
         self.exports: list[type[Provider]] = self._parse_providers(Providers)
 
     def __repr__(self) -> str:
@@ -100,15 +102,10 @@ class Module:
         Providers: list[type[Provider]] | None
     ) -> list[type[Provider]]:
         res: list[type[Provider]]
-        is_found_in_builtins: bool
 
         if Providers:
             for Provider_ in Providers:
-                is_found_in_builtins = False
-                for BuiltinProvider in BUILTIN_PROVIDERS:
-                    if isinstance(BuiltinProvider, Provider_):
-                        is_found_in_builtins = True
-                if is_found_in_builtins:
+                if not is_provider(Provider_):
                     raise NotProviderError(FailedClass=Provider_) 
             res = Providers
         else:
