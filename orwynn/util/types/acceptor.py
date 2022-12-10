@@ -1,4 +1,4 @@
 from typing import Any
 
 
-Acceptor = Any
+Acceptor = object
