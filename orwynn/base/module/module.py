@@ -4,7 +4,7 @@ from typing import Any
 from orwynn.app.empty_route_error import EmptyRouteError
 from orwynn.app.incorrect_route_error import IncorrectRouteError
 from orwynn.base.controller.controller import Controller
-from orwynn.base.middleware.middleware import Middleware as MiddlewareClass
+from orwynn.base.middleware import middleware
 from orwynn.di.BUILTIN_PROVIDERS import BUILTIN_PROVIDERS
 from orwynn.di.not_provider_error import NotProviderError
 
@@ -52,11 +52,11 @@ class Module:
         self,
         *,
         route: str,
-        Providers: list[Provider] | None = None,
+        Providers: list[type[Provider]] | None = None,
         Controllers: list[type[Controller]] | None = None,
-        Middleware: list[type[MiddlewareClass]] | None = None,
+        Middleware: list[type[middleware.Middleware]] | None = None,
         imports: list["Module"] | None = None,
-        exports: list[Provider] | None = None
+        exports: list[type[Provider]] | None = None
     ) -> None:
         super().__init__()
 
@@ -68,15 +68,15 @@ class Module:
         validate(exports, [list, NoneType])
 
         self.route: str = self._parse_route(route)
-        self.Providers: list[Provider] = self._parse_providers(Providers)
+        self.Providers: list[type[Provider]] = self._parse_providers(Providers)
         self.Controllers: list[type[Controller]] = self._parse_controllers(
             Controllers
         )
-        self.Middleware: list[type[MiddlewareClass]] = self._parse_middleware(
+        self.Middleware: list[type[middleware.Middleware]] = self._parse_middleware(
             Middleware
         )
         self.imports: list["Module"] = self._parse_imports(imports)
-        self.exports: list[Provider] = self._parse_providers(Providers)
+        self.exports: list[type[Provider]] = self._parse_providers(Providers)
 
     def __repr__(self) -> str:
         return "<{} \"{}\" at {}>".format(
@@ -96,8 +96,10 @@ class Module:
         return route
 
     @staticmethod
-    def _parse_providers(Providers: list[Provider] | None) -> list[Provider]:
-        res: list[Provider]
+    def _parse_providers(
+        Providers: list[type[Provider]] | None
+    ) -> list[type[Provider]]:
+        res: list[type[Provider]]
         is_found_in_builtins: bool
 
         if Providers:
@@ -131,13 +133,13 @@ class Module:
 
     @staticmethod
     def _parse_middleware(
-        Middleware: list[type[MiddlewareClass]] | None
-    ) -> list[type[MiddlewareClass]]:
-        res: list[type[MiddlewareClass]]
+        Middleware: list[type[middleware.Middleware]] | None
+    ) -> list[type[middleware.Middleware]]:
+        res: list[type[middleware.Middleware]]
 
         if Middleware:
             for Middleware_ in Middleware:
-                validate(Middleware_, MiddlewareClass)
+                validate(Middleware_, middleware.Middleware)
             res = Middleware
         else:
             res = []

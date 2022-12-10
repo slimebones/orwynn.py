@@ -86,7 +86,7 @@ class DI(Worker):
             raise MissingDIObjectError()
 
     def _get_parameters_for_provider_class(
-        self, ProviderClass: Provider
+        self, ProviderClass: type[Provider]
     ) -> ProviderParameters:
         """Inspects provider and returns requested by him parameters."""
         return [

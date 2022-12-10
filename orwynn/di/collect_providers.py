@@ -2,7 +2,7 @@ from orwynn.base.module.module import Module
 from orwynn.util.types.provider import Provider
 
 
-def collect_providers(modules: list[Module]) -> list[Provider]:
+def collect_providers(modules: list[Module]) -> list[type[Provider]]:
     """Collects providers and their dependencies from given modules.
     
     Args:
