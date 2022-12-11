@@ -8,5 +8,5 @@ class NotProviderError(Error):
         FailedClass: type | None = None
     ) -> None:
         if not message and FailedClass:
-            message = "{} is not a provider".format(FailedClass)
+            message = "{} is not a Provider".format(FailedClass)
         super().__init__(message)

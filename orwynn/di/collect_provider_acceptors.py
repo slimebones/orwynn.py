@@ -1,10 +1,13 @@
 import inspect
+from orwynn.base.config.config import Config
 
 from orwynn.base.model.model import Model
 from orwynn.base.module.module import Module
+from orwynn.base.module.root_module import RootModule
 from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.di.is_provider import is_provider
 from orwynn.di.not_provider_error import NotProviderError
+from orwynn.di.provider_already_initialized_for_map_error import ProviderAlreadyInitializedForMapError
 from orwynn.di.provider_not_available_error import ProviderNotAvailableError
 from orwynn.util.format_chain import format_chain
 from orwynn.util.types.acceptor import Acceptor
@@ -17,7 +20,30 @@ class ProvidersAcceptorsMap:
     """Maps Providers and their Acceptors.
     """
     def __init__(self) -> None:
-        self._map: dict[type[Provider], list[type[Acceptor]]]
+        self._map: dict[type[Provider], list[type[Acceptor]]] = {}
+
+    @property
+    def Providers(self) -> list[type[Provider]]:
+        return [P for P in self._map.keys()]
+
+    def init_provider(
+        self,
+        P: type[Provider],
+        is_strict: bool = True
+    ) -> None:
+        """Initialize given Provider in the map.
+        
+        Args:
+            P:
+                Provider to be initialized.
+
+        Raises:
+            ProviderAlreadyInitializedForMapError:
+                Provider already exists in the map. 
+        """
+        if P in self._map and is_strict:
+            raise ProviderAlreadyInitializedForMapError(FailedProvider=P)
+        self._map[P] = []
 
     def add_acceptor(self, A: type[Acceptor], P: type[Provider]) -> None:
         """Adds given Acceptor for Provider.
@@ -85,9 +111,14 @@ def _traverse(
                 format_chain(chain + [P])
             )
         )
+    chain.append(P)
+    metamap.init_provider(P, is_strict=False)
 
     for parameter in _get_parameters_for_provider(P):
+        print(P, " | ", parameter)
         if not is_provider(parameter.RequiredProvider):
+            if issubclass(P, Config):
+                continue
             raise NotProviderError(
                 FailedClass=parameter.RequiredProvider
             ) 
@@ -97,9 +128,12 @@ def _traverse(
             parameter.RequiredProvider,
             target_module
         )
-        chain.append(P)
         metamap.add_acceptor(P, parameter.RequiredProvider)
         _traverse(parameter.RequiredProvider, metamap, chain, target_module)
+
+    # Pop blocking element.  For this concept see collect_modules._traverse
+    # function
+    chain.pop()
 
 
 def _check_availability(
@@ -123,6 +157,7 @@ def _check_availability(
                 return m
 
     raise ProviderNotAvailableError(Provider1=P1, Provider2=P2)
+
 
 def _get_parameters_for_provider(
     Provider: type[Provider]

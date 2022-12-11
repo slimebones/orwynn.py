@@ -7,7 +7,7 @@ from orwynn.util.types.acceptor import Acceptor
 
 """List of builtin classes are able to accept Providers.
 """
-BUILTIN_ACCEPTORS: list[Acceptor] = [
+BUILTIN_ACCEPTORS: list[type[Acceptor]] = [
     # All Providers are Acceptors at the same time
     *BUILTIN_PROVIDERS,
     Controller,

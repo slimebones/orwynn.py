@@ -9,7 +9,7 @@ from orwynn.util.types.provider import Provider
 
 Providers with lower priority cannot inject ones with higher priority.
 """
-BUILTIN_PROVIDERS: list[Provider] = [
+BUILTIN_PROVIDERS: list[type[Provider]] = [
     Config,
     RootService,
     Service,

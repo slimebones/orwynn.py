@@ -69,7 +69,7 @@ class Module:
         validate(exports, [list, NoneType])
 
         self.route: str = self._parse_route(route)
-        self.Providers: list[type[Provider]] = self._parse_providers(Providers)
+        self._Providers: list[type[Provider]] = self._parse_providers(Providers)
         self.Controllers: list[type[Controller]] = self._parse_controllers(
             Controllers
         )
@@ -86,6 +86,10 @@ class Module:
             self.route,
             hex(id(self))
         )
+
+    @property
+    def Providers(self) -> list[type[Provider]]:
+        return self._Providers
 
     @staticmethod
     def _parse_route(route: str) -> str:
@@ -104,9 +108,9 @@ class Module:
         res: list[type[Provider]]
 
         if Providers:
-            for Provider_ in Providers:
-                if not is_provider(Provider_):
-                    raise NotProviderError(FailedClass=Provider_) 
+            for P in Providers:
+                if not is_provider(P):
+                    raise NotProviderError(FailedClass=P) 
             res = Providers
         else:
             res = []

@@ -40,11 +40,11 @@ class RootModule(Module):
     def __init__(
         self,
         *,
-        Providers: list[Provider] | None = None,
+        Providers: list[type[Provider]] | None = None,
         Controllers: list[type[Controller]] | None = None,
         Middleware: list[type[Middleware]] | None = None,
         imports: list["Module"] | None = None,
-        exports: list[Provider] | None = None,
+        exports: list[type[Provider]] | None = None,
         RootServices: list[type[RootService]] | None = None,
     ) -> None:
         super().__init__(
@@ -58,6 +58,15 @@ class RootModule(Module):
         self.RootServices: list[type[RootService]] = self._parse_root_services(
             RootServices
         )
+
+    @property
+    def Providers(self) -> list[type[Provider]]:
+        try:
+            self.RootServices
+        except AttributeError:
+            return super().Providers
+        else:
+            return self.RootServices + super().Providers
 
     @staticmethod
     def _parse_root_services(

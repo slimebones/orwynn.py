@@ -12,6 +12,6 @@ def is_provider(Class: type) -> bool:
         Flag signifies if given class is a Provider.
     """
     for BuiltinProvider in BUILTIN_PROVIDERS:
-        if isinstance(BuiltinProvider, Class):
+        if issubclass(Class, BuiltinProvider):
             return True
     return False

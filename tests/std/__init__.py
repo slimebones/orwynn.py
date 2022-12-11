@@ -4,9 +4,10 @@ import collections
 from orwynn.app.app_service import AppService
 from orwynn.base.module.module import Module
 from orwynn.base.module.root_module import RootModule
+from orwynn.util.types.provider import Provider
 
-from .number import number_module
-from .text import text_module
+from .number import NumberService, number_module
+from .text import TextConfig, TextService, text_module
 
 root_module = RootModule(
     RootServices=[AppService],
@@ -19,4 +20,10 @@ class Assertion:
         root_module,
         text_module,
         number_module
+    ]
+    COLLECTED_PROVIDERS: list[type[Provider]] = [
+        AppService,
+        TextService,
+        TextConfig,
+        NumberService 
     ]
