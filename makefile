@@ -17,3 +17,5 @@ lint:
 		--isolated \
 		--exclude .git,__pycache__,docs/source/conf.py,old,build,dist,.venv,.pytest_cache,.vscode,orwynn/__init__.py \
 		--max-complexity 10
+
+check: test lint
