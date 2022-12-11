@@ -4,7 +4,7 @@ from orwynn.base.singleton.singleton import Singleton
 
 class Controller:
     """Handles incoming requests and returns responses to the client.
-    
+
     Calls service or different services under the hood to prepare a response.
 
     Controller is not a Provider, and it has lower priority than Service which
