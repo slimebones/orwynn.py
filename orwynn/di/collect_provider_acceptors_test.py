@@ -1,11 +1,11 @@
 from pytest import fixture
+
 from orwynn.base.module.module import Module
 from orwynn.base.module.root_module import RootModule
 from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.di.collect_modules import collect_modules
 from orwynn.di.collect_provider_acceptors import (ProvidersAcceptorsMap,
                                                   collect_provider_acceptors)
-from orwynn.di.objects.provider import Provider
 from tests.std import Assertion
 
 

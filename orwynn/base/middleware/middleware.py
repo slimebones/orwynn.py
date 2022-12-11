@@ -1,5 +1,4 @@
 from typing import Callable
-from orwynn.base.singleton.singleton import Singleton
 from orwynn.util.request import Request
 from orwynn.util.response import Response
 

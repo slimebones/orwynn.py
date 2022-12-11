@@ -9,7 +9,6 @@ from pytest import fixture
 from orwynn.app.app_mode_enum import AppModeEnum
 from orwynn.app.app_service import AppService
 from orwynn.base.module.root_module import RootModule
-from orwynn.base.test.test_client import TestClient
 from orwynn.boot.boot import Boot
 from tests.std import root_module as std_root_module
 
@@ -26,6 +25,7 @@ def boot(std_structure: RootModule) -> Boot:
         mode=AppModeEnum.TEST,
         root_module=std_structure
     )
+
 
 @fixture
 def app(boot: Boot) -> AppService:

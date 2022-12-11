@@ -1,4 +1,3 @@
-from typing import Literal
 from fastapi import FastAPI
 from starlette.types import Scope, Receive, Send
 from orwynn.app.app_mode_enum import AppModeEnum

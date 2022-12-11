@@ -4,7 +4,6 @@ from orwynn.app.empty_route_error import EmptyRouteError
 from orwynn.app.incorrect_route_error import IncorrectRouteError
 from orwynn.base.controller.controller import Controller
 from orwynn.base.middleware import middleware
-from orwynn.di.objects.BUILTIN_PROVIDERS import BUILTIN_PROVIDERS
 from orwynn.di.objects.is_provider import is_provider
 from orwynn.di.objects.not_provider_error import NotProviderError
 
@@ -14,7 +13,7 @@ from orwynn.util.validation import validate
 
 class Module:
     """Provides metadata to organize the application structure.
-    
+
     Attributes:
         route:
             All controllers defined under this module will
@@ -68,13 +67,14 @@ class Module:
         validate(exports, [list, NoneType])
 
         self.route: str = self._parse_route(route)
-        self._Providers: list[type[Provider]] = self._parse_providers(Providers)
+        self._Providers: list[type[Provider]] = self._parse_providers(
+            Providers
+        )
         self.Controllers: list[type[Controller]] = self._parse_controllers(
             Controllers
         )
-        self.Middleware: list[type[middleware.Middleware]] = self._parse_middleware(
-            Middleware
-        )
+        self.Middleware: list[type[middleware.Middleware]] = \
+            self._parse_middleware(Middleware)
         self.imports: list["Module"] = self._parse_imports(imports)
         # TODO: Add check if exports present in Providers
         self.exports: list[type[Provider]] = self._parse_providers(Providers)
@@ -109,7 +109,7 @@ class Module:
         if Providers:
             for P in Providers:
                 if not is_provider(P):
-                    raise NotProviderError(FailedClass=P) 
+                    raise NotProviderError(FailedClass=P)
             res = Providers
         else:
             res = []

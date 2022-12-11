@@ -1,5 +1,4 @@
 import re
-from enum import EnumMeta
 from typing import Any
 
 from pydantic import ValidationError as __PydanticValidationError
@@ -8,12 +7,10 @@ from pydantic import validator as __pydantic_validator
 from orwynn.util.validation.validation_error import (ReValidationError,
                                                      ValidationError)
 
-from .validation_error import ValidationError
-
 
 def validate(
-        obj: Any, expected_type: type | list[type], is_strict: bool = False
-    ) -> None:
+    obj: Any, expected_type: type | list[type], is_strict: bool = False
+) -> None:
     """Validates given object against expected type.
 
     Args:
@@ -52,7 +49,7 @@ def validate(
         for type_ in expected_type:
             if type(obj) is type_:
                 is_matched_type_found = True
-        
+
         if not is_matched_type_found:
             raise ValidationError(failed_obj=obj, expected_type=expected_type)
     else:
@@ -64,7 +61,7 @@ def validate(
 
 def validate_re(string: str, pattern: str) -> None:
     """Validates given string using re.match.
-    
+
     Raises:
         ReValidationError:
             String does not match given pattern.

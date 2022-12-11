@@ -12,7 +12,7 @@ class NumberService(Service):
 
         for x in id:
             number += ord(x)
-        
+
         return number
 
 

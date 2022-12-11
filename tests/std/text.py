@@ -4,7 +4,6 @@ from orwynn.base.controller.controller import Controller
 from orwynn.base.module.module import Module
 from orwynn.base.service.service import Service
 from tests.std.number import number_module
-from orwynn.util.response import Response
 from orwynn.util.validation import model_validator
 
 

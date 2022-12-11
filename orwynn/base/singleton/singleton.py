@@ -1,5 +1,4 @@
 from __future__ import annotations
-from abc import ABCMeta
 from typing import TypeVar
 
 
@@ -7,8 +6,8 @@ SingletonInstance = TypeVar("SingletonInstance")
 
 
 class SingletonMeta(type):
-    """Singleton metaclass for implementing singleton patterns. 
-    
+    """Singleton metaclass for implementing singleton patterns.
+
     See:
         https://stackoverflow.com/questions/6760685/creating-a-singleton-in-python
     """
@@ -25,7 +24,7 @@ class Singleton(metaclass=SingletonMeta):
     @classmethod
     def ie(cls: type[SingletonInstance]) -> SingletonInstance:
         """Gets the single instance of the Singleton.
-        
+
         Returns:
             Instance the Singleton holds.
         """

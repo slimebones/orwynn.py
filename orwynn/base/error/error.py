@@ -1,6 +1,6 @@
 class Error(Exception):
     """Base error class of the app.
-    
+
     Attributes:
         message (optional):
             Message to be attached to the error.

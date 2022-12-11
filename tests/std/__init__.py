@@ -1,6 +1,5 @@
 """Standard app structure made up for testing.
 """
-import collections
 from orwynn.app.app_service import AppService
 from orwynn.base.module.module import Module
 from orwynn.base.module.root_module import RootModule
@@ -25,5 +24,5 @@ class Assertion:
         AppService,
         TextService,
         TextConfig,
-        NumberService 
+        NumberService
     ]

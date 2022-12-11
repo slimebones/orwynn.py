@@ -11,7 +11,7 @@ from orwynn.util.validation import validate
 
 class Boot(Worker):
     """Worker responsible of booting an application.
-    
+
     General usage is to construct this class in the main.py with required
     parameters and then access Boot.app for your needs.
 
@@ -20,7 +20,7 @@ class Boot(Worker):
             Selected mode for the app. It can be AppModeEnum or string for
             simplicity.
         root_module:
-            Root module of the app. 
+            Root module of the app.
         root_dir (optional):
             Root directory of the project. Defaults to os.getcwd().
 
@@ -56,7 +56,7 @@ class Boot(Worker):
 
     @property
     def app(self) -> AppService:
-        return self._di.find("app_service")
+        return self._di.app_service
 
     def _parse_mode_enum(self, mode: AppModeEnum | str) -> AppModeEnum:
         if type(mode) is str:

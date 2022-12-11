@@ -1,5 +1,4 @@
 from orwynn.base.middleware.middleware import Middleware
-from orwynn.base.singleton.singleton import Singleton
 
 
 class Controller:
@@ -18,7 +17,7 @@ class Controller:
             A subroute of Module's route (where controller attached) which
             controller will answer to. This attribute is required to be
             defined in subclasses explicitly or an error will be raised.
-            It is allowed to be "/" to handle Module's root route requests. 
+            It is allowed to be "/" to handle Module's root route requests.
         MIDDLEWARE:
             List of Middleware classes to be applied to this controller.
     """

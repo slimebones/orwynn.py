@@ -1,16 +1,14 @@
-import copy
-from orwynn.base.model.model import Model
 from orwynn.base.module.module import Module
 from orwynn.base.module.root_module import RootModule
 from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.util.fmt import format_chain
-    
+
 
 def collect_modules(
-        root_module: RootModule
-    ) -> list[Module]:
+    root_module: RootModule
+) -> list[Module]:
     """Collects all modules starting from root module.
-    
+
     What is checked:
     - Dependency circular errors for modules
     - Modules self imports
@@ -23,7 +21,7 @@ def collect_modules(
     Returns:
         List of modules collected.
     """
-    modules: list[Module] = _traverse(root_module, [], []) 
+    modules: list[Module] = _traverse(root_module, [], [])
 
     return modules
 
@@ -48,7 +46,7 @@ def _traverse(
         )
     chain.append(init_module)
 
-    if not init_module in modules:
+    if init_module not in modules:
         if init_module not in modules:
             modules.append(init_module)
         if init_module.imports:

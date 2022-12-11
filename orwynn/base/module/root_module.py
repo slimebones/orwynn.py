@@ -8,7 +8,7 @@ from orwynn.di.objects.provider import Provider
 
 class RootModule(Module):
     """Special module which rises above whole application structure.
-    
+
     Root module can be defined only in one instance for the whole app. Only
     this module has the possibility to define RootServices through field
     `RootServices`.

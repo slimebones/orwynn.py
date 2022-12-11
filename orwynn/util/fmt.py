@@ -5,13 +5,13 @@ Typically here collected functions which return string.
 from typing import Any
 
 
-def format_chain(l: list[Any]) -> str:
-    return " -> ".join([str(x) for x in l])
+def format_chain(lst: list[Any]) -> str:
+    return " -> ".join([str(x) for x in lst])
 
 
 def snakefy(name: str) -> str:
     """Convert given camel-case name to snake case.
-    
+
     Args:
         name:
             Name to convert.

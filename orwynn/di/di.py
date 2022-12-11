@@ -1,16 +1,9 @@
-import inspect
-from typing import Any
-
-from orwynn.base.model.model import Model
-from orwynn.base.module.module import Module
+from orwynn.app.app_service import AppService
 from orwynn.base.module.root_module import RootModule
 from orwynn.base.worker.worker import Worker
-from orwynn.di.collect_modules import collect_modules
-from orwynn.di.collect_provider_acceptors import collect_provider_acceptors
-from orwynn.di.objects.acceptor import Acceptor
+from orwynn.di.di_error import DIError
 from orwynn.di.objects.di_object import DIObject
 from orwynn.di.objects.missing_di_object_error import MissingDIObjectError
-from orwynn.di.objects.provider import Provider
 from orwynn.util.validation import validate
 
 # DIObjects by their snake_cased names.
@@ -51,9 +44,19 @@ class DI(Worker):
 
         self._container: _DIContainer = {}
 
+    @property
+    def app_service(self) -> AppService:
+        app = self.find("app_service")
+        if isinstance(app, AppService):
+            return app
+        else:
+            raise DIError(
+                f"{app} is not an AppService instance"
+            )
+
     def find(self, key: str) -> DIObject:
         """Returns DI object by its key.
-        
+
         Keys are converted to snake_case from DI object names. So `AppService`
         becomes `app_service`.
 
@@ -66,7 +69,7 @@ class DI(Worker):
 
         Raises:
             MissingDIObjectError:
-                DIObject with given key is not found. 
+                DIObject with given key is not found.
         """
         validate(key, str)
 

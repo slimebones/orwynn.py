@@ -1,18 +1,16 @@
 from types import NoneType
 from typing import Any, TypeVar
 
-from orwynn.util.parsing.parsing_error import (StrIntParsingError, KeyParsingError,
-                                            ParsingError)
+from orwynn.util.parsing.parsing_error import (KeyParsingError, ParsingError,
+                                               StrIntParsingError)
 from orwynn.util.validation import validate
-
-from .parsing_error import ParsingError
 
 ParsedEntity = TypeVar('ParsedEntity', bound=Any)
 
 
 def parse_bool(entity: str | bool) -> bool:
     """Parses given entity to boolean logic.
-    
+
     If an entity is a simple bool, nothing special happened.
     If an entity is a string, parsing is performed according following rules:
     - "true" => True
@@ -29,7 +27,7 @@ def parse_bool(entity: str | bool) -> bool:
     res: bool
 
     validate(entity, [bool, str])
-    
+
     if type(entity) is str:
         match entity:
             case 'true':
@@ -55,7 +53,7 @@ def parse_int(entity: int | str) -> int:
 
     Returns:
         Entity converted to an integer
-    
+
     Raises:
         StrIntParsingError:
             Cannot parse str to int - in case if entity is a str.
@@ -78,14 +76,14 @@ def parse_int(entity: int | str) -> int:
 
 
 def parse_key(
-        key: str,
-        entity: dict,
-        default_value: Any = None,
-        post_validation_type: type | list[type] | None = None,
-        is_post_validation_strict: bool = False
-    ) -> Any:
+    key: str,
+    entity: dict,
+    default_value: Any = None,
+    post_validation_type: type | list[type] | None = None,
+    is_post_validation_strict: bool = False
+) -> Any:
     """Parses a value from an entity by given key.
-    
+
     Apply validation.validate() on result if `post_validation_type` given.
 
     Args:
@@ -100,7 +98,7 @@ def parse_key(
 
     Returns:
         Value parsed.
-    
+
     Raises:
         KeyParsingError:
             If parsing failed and default_value is not set.
@@ -118,7 +116,7 @@ def parse_key(
             raise KeyParsingError(parsed_map=entity, failed_key=key)
         else:
             value = default_value
-    else: 
+    else:
         if post_validation_type is not None:
             validate(
                 value,

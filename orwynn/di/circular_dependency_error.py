@@ -1,5 +1,5 @@
-from orwynn.boot.boot_error import BootError
+from orwynn.di.di_error import DIError
 
 
-class CircularDependencyError(BootError):
+class CircularDependencyError(DIError):
     pass

@@ -1,17 +1,18 @@
 import inspect
-from orwynn.base.config.config import Config
 
+from orwynn.base.config.config import Config
 from orwynn.base.model.model import Model
 from orwynn.base.module.module import Module
-from orwynn.base.module.root_module import RootModule
 from orwynn.di.circular_dependency_error import CircularDependencyError
+from orwynn.di.objects.acceptor import Acceptor
 from orwynn.di.objects.is_provider import is_provider
 from orwynn.di.objects.not_provider_error import NotProviderError
-from orwynn.di.objects.provider_already_initialized_for_map_error import ProviderAlreadyInitializedForMapError
-from orwynn.di.objects.provider_not_available_error import ProviderNotAvailableError
-from orwynn.util.fmt import format_chain
-from orwynn.di.objects.acceptor import Acceptor
 from orwynn.di.objects.provider import Provider
+from orwynn.di.objects.provider_already_initialized_for_map_error import \
+    ProviderAlreadyInitializedForMapError
+from orwynn.di.objects.provider_not_available_error import \
+    ProviderNotAvailableError
+from orwynn.util.fmt import format_chain
 
 _ProviderParameters = list["_ProviderParameter"]
 
@@ -32,14 +33,14 @@ class ProvidersAcceptorsMap:
         is_strict: bool = True
     ) -> None:
         """Initialize given Provider in the map.
-        
+
         Args:
             P:
                 Provider to be initialized.
 
         Raises:
             ProviderAlreadyInitializedForMapError:
-                Provider already exists in the map. 
+                Provider already exists in the map.
         """
         if P in self._map and is_strict:
             raise ProviderAlreadyInitializedForMapError(FailedProvider=P)
@@ -49,7 +50,7 @@ class ProvidersAcceptorsMap:
         """Adds given Acceptor for Provider.
 
         Creates a new Provider entry in the map if it's not exist.
-        
+
         Args:
             A:
                 Acceptor to add.
@@ -71,13 +72,13 @@ def collect_provider_acceptors(
     modules: list[Module]
 ) -> ProvidersAcceptorsMap:
     """Collects providers and their acceptors from given modules.
-    
+
     Args:
         modules:
             List of modules to collect providers from.
 
     Returns:
-        Special structure maps providers to their acceptors. 
+        Special structure maps providers to their acceptors.
     """
     metamap: ProvidersAcceptorsMap = ProvidersAcceptorsMap()
 
@@ -121,7 +122,7 @@ def _traverse(
                 continue
             raise NotProviderError(
                 FailedClass=parameter.RequiredProvider
-            ) 
+            )
 
         target_module = _check_availability(
             P,
@@ -148,7 +149,7 @@ def _check_availability(
         if P is P2:
             # Available within the same module
             return P1_module
-    
+
     # Not available in the same module, check imported ones
     for m in P1_module.imports:
         for P in m.exports:
@@ -168,7 +169,7 @@ def _get_parameters_for_provider(
         _ProviderParameter(
             name=inspect_parameter.name,
             RequiredProvider=inspect_parameter.annotation
-        )  
-            for inspect_parameter in
-            inspect.signature(Provider).parameters.values()
+        )
+        for inspect_parameter in
+        inspect.signature(Provider).parameters.values()
     ]

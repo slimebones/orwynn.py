@@ -43,20 +43,20 @@ class LogService(RootService):
         self.error = self._logger.error
         self.critical = self._logger.critical
         self.ctx = self._logger.contextualize
-        
+
         for handler in config.handlers:
             self._add_handler(handler)
 
     def _add_handler(self, handler: LogHandler) -> None:
         if self._app.mode_enum == AppModeEnum.PROD:
-            if handler.level == None:
+            if handler.level is None:
                 handler.level = "INFO"
-            if handler.serialize == None:
+            if handler.serialize is None:
                 handler.serialize = True
         else:
-            if handler.level == None:
+            if handler.level is None:
                 handler.level = "DEBUG"
-            if handler.serialize == None:
+            if handler.serialize is None:
                 handler.serialize = False
 
         self._logger.add(

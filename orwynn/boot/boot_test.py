@@ -1,4 +1,3 @@
-from pytest import fixture
 from orwynn.app.app_mode_enum import AppModeEnum
 from orwynn.base.module.root_module import RootModule
 
@@ -45,4 +44,3 @@ def test_init_mode_prod_str(std_structure: RootModule):
         mode="prod",
         root_module=std_structure
     )
-
