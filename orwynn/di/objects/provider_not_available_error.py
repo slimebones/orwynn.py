@@ -1,5 +1,5 @@
 from orwynn.base.error.error import Error
-from orwynn.util.types.provider import Provider
+from orwynn.di.objects.provider import Provider
 
 
 class ProviderNotAvailableError(Error):

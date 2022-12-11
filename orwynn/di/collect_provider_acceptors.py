@@ -5,13 +5,13 @@ from orwynn.base.model.model import Model
 from orwynn.base.module.module import Module
 from orwynn.base.module.root_module import RootModule
 from orwynn.di.circular_dependency_error import CircularDependencyError
-from orwynn.di.is_provider import is_provider
-from orwynn.di.not_provider_error import NotProviderError
-from orwynn.di.provider_already_initialized_for_map_error import ProviderAlreadyInitializedForMapError
-from orwynn.di.provider_not_available_error import ProviderNotAvailableError
-from orwynn.util.format_chain import format_chain
-from orwynn.util.types.acceptor import Acceptor
-from orwynn.util.types.provider import Provider
+from orwynn.di.objects.is_provider import is_provider
+from orwynn.di.objects.not_provider_error import NotProviderError
+from orwynn.di.objects.provider_already_initialized_for_map_error import ProviderAlreadyInitializedForMapError
+from orwynn.di.objects.provider_not_available_error import ProviderNotAvailableError
+from orwynn.util.fmt import format_chain
+from orwynn.di.objects.acceptor import Acceptor
+from orwynn.di.objects.provider import Provider
 
 _ProviderParameters = list["_ProviderParameter"]
 

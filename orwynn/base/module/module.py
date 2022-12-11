@@ -5,11 +5,11 @@ from orwynn.app.empty_route_error import EmptyRouteError
 from orwynn.app.incorrect_route_error import IncorrectRouteError
 from orwynn.base.controller.controller import Controller
 from orwynn.base.middleware import middleware
-from orwynn.di.BUILTIN_PROVIDERS import BUILTIN_PROVIDERS
-from orwynn.di.is_provider import is_provider
-from orwynn.di.not_provider_error import NotProviderError
+from orwynn.di.objects.BUILTIN_PROVIDERS import BUILTIN_PROVIDERS
+from orwynn.di.objects.is_provider import is_provider
+from orwynn.di.objects.not_provider_error import NotProviderError
 
-from orwynn.util.types.provider import Provider
+from orwynn.di.objects.provider import Provider
 from orwynn.util.validation import validate
 
 

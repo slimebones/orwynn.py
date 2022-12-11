@@ -7,13 +7,14 @@ from orwynn.base.module.root_module import RootModule
 from orwynn.base.worker.worker import Worker
 from orwynn.di.collect_modules import collect_modules
 from orwynn.di.collect_provider_acceptors import collect_provider_acceptors
-from orwynn.di.missing_di_object_error import MissingDIObjectError
-from orwynn.util.types.acceptor import Acceptor
-from orwynn.util.types.provider import Provider
+from orwynn.di.objects.acceptor import Acceptor
+from orwynn.di.objects.di_object import DIObject
+from orwynn.di.objects.missing_di_object_error import MissingDIObjectError
+from orwynn.di.objects.provider import Provider
 from orwynn.util.validation import validate
 
-DIObject = Provider | Acceptor
-DIContainer = dict[str, DIObject]
+# DIObjects by their snake_cased names.
+_DIContainer = dict[str, DIObject]
 
 
 class DI(Worker):
@@ -48,7 +49,7 @@ class DI(Worker):
         super().__init__()
         validate(root_module, RootModule)
 
-        self._container: DIContainer = {}
+        self._container: _DIContainer = {}
 
     def find(self, key: str) -> DIObject:
         """Returns DI object by its key.

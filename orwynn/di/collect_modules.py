@@ -3,7 +3,7 @@ from orwynn.base.model.model import Model
 from orwynn.base.module.module import Module
 from orwynn.base.module.root_module import RootModule
 from orwynn.di.circular_dependency_error import CircularDependencyError
-from orwynn.util.format_chain import format_chain
+from orwynn.util.fmt import format_chain
     
 
 def collect_modules(

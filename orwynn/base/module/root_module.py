@@ -3,7 +3,7 @@ from orwynn.base.controller.controller import Controller
 from orwynn.base.middleware.middleware import Middleware
 from orwynn.base.module.module import Module
 from orwynn.base.service.root_service import RootService
-from orwynn.util.types.provider import Provider
+from orwynn.di.objects.provider import Provider
 
 
 class RootModule(Module):
@@ -15,9 +15,10 @@ class RootModule(Module):
 
     No other module can import the RootModule.
 
-    Root module always has "/" route.
-
     Attributes:
+        route (optional):
+            All controllers defined under this module will
+            operate under this route. Defaults to "/".
         Providers (optional):
             List of Providers to be initialized and shared at least across this
             module.
@@ -40,6 +41,7 @@ class RootModule(Module):
     def __init__(
         self,
         *,
+        route: str = "/",
         Providers: list[type[Provider]] | None = None,
         Controllers: list[type[Controller]] | None = None,
         Middleware: list[type[Middleware]] | None = None,
@@ -48,7 +50,7 @@ class RootModule(Module):
         RootServices: list[type[RootService]] | None = None,
     ) -> None:
         super().__init__(
-            route="/",
+            route=route,
             Providers=Providers,
             Controllers=Controllers,
             Middleware=Middleware,
