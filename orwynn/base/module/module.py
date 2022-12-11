@@ -1,6 +1,5 @@
 import re
 from types import NoneType
-from typing import Any
 from orwynn.app.empty_route_error import EmptyRouteError
 from orwynn.app.incorrect_route_error import IncorrectRouteError
 from orwynn.base.controller.controller import Controller
