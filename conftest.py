@@ -6,7 +6,7 @@ module has been built with some modules using self importing.
 """
 from pytest import fixture
 
-from orwynn.app.app_mode_enum import AppModeEnum
+from orwynn.app.app_mode import AppMode
 from orwynn.app.app_service import AppService
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
@@ -22,7 +22,7 @@ def std_struct() -> Module:
 @fixture
 def boot(std_struct: Module) -> Boot:
     return Boot(
-        mode=AppModeEnum.TEST,
+        mode=AppMode.TEST,
         root_module=std_struct
     )
 

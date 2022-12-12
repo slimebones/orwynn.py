@@ -1,5 +1,5 @@
 import os
-from orwynn.app.app_mode_enum import AppModeEnum
+from orwynn.app.app_mode import AppMode
 from orwynn.base.module.module import Module
 from orwynn.base.service.framework_service import FrameworkService
 
@@ -46,14 +46,13 @@ class Boot(Worker):
     def __init__(
         self,
         *,
-        mode: AppModeEnum | str,
+        mode: AppMode | str,
         root_module: Module,
         FrameworkServices: list[type[FrameworkService]] | None = None,
         root_dir: str = os.getcwd()
     ) -> None:
         super().__init__()
-
-        validate(mode, [AppModeEnum, str])
+        validate(mode, [AppMode, str])
         validate(root_module, Module)
         if FrameworkServices:
             validate_each(FrameworkServices, FrameworkService)
@@ -64,7 +63,7 @@ class Boot(Worker):
             FrameworkServices = [AppService]
         validate(root_dir, str)
 
-        self._mode_enum: AppModeEnum = self._parse_mode_enum(mode)
+        self._mode_enum: AppMode = self._parse_mode_enum(mode)
         self._root_dir = root_dir
 
         self._di: DI = DI(root_module)
@@ -73,22 +72,22 @@ class Boot(Worker):
     def app(self) -> AppService:
         return self._di.app_service
 
-    def _parse_mode_enum(self, mode: AppModeEnum | str) -> AppModeEnum:
+    def _parse_mode_enum(self, mode: AppMode | str) -> AppMode:
         if type(mode) is str:
             return self._parse_mode_enum_from_str(mode)
-        elif type(mode) is AppModeEnum:
+        elif type(mode) is AppMode:
             return mode
         else:
             raise
 
     @staticmethod
-    def _parse_mode_enum_from_str(mode: str) -> AppModeEnum:
+    def _parse_mode_enum_from_str(mode: str) -> AppMode:
         match mode:
             case "test":
-                return AppModeEnum.TEST
+                return AppMode.TEST
             case  "dev":
-                return AppModeEnum.DEV
+                return AppMode.DEV
             case  "prod":
-                return AppModeEnum.PROD
+                return AppMode.PROD
             case _:
                 raise BootError("Unrecognized mode: {}".format(mode))

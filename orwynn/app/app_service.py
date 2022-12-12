@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from starlette.types import Scope, Receive, Send
-from orwynn.app.app_mode_enum import AppModeEnum
+from orwynn.app.app_mode import AppMode
 from orwynn.base.service.framework_service import FrameworkService
 from orwynn.base.test.test_client import TestClient
 
@@ -24,5 +24,5 @@ class AppService(FrameworkService):
         raise
 
     @property
-    def mode_enum(self) -> AppModeEnum:
+    def mode_enum(self) -> AppMode:
         raise

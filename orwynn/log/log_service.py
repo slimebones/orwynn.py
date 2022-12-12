@@ -1,8 +1,8 @@
 from datetime import time, timedelta
-from typing import Any, Callable
+from typing import Any, Callable, Self
 
 import loguru
-from orwynn.app.app_mode_enum import AppModeEnum
+from orwynn.app.app_mode import AppMode
 from orwynn.app.app_service import AppService
 from orwynn.base.config.config import Config
 from orwynn.base.model.model import Model
@@ -16,7 +16,7 @@ class LogHandler(Model):
     sink: Any
     level: int | str | None = None
     format: str | Callable = \
-        "{time:%Y.%m.%d at %H:%M:%S:%f%z}" \
+        "{time:%Y.%m.%d at %H:%M:%S.%f%z}" \
         + " | {level} | {extra} >> {message}"
     # Callable here used instead of loguru.RotationFunction since it has
     # problems with importing
@@ -32,23 +32,44 @@ class LogConfig(Config):
 class LogService(FrameworkService):
     """Logs messages across the app.
     """
-    def __init__(self, config: LogConfig, app: AppService) -> None:
+    def __init__(
+        self,
+        config: LogConfig,
+        app: AppService,
+        extra: dict[str, Any] | None = None
+    ) -> None:
         super().__init__()
-        self._logger = loguru.logger
+        self._config = config
         self._app = app
 
-        self.debug = self._logger.debug
-        self.info = self._logger.info
-        self.warning = self._logger.warning
-        self.error = self._logger.error
-        self.critical = self._logger.critical
-        self.ctx = self._logger.contextualize
+        if not extra:
+            extra = {}
+        self._extra: dict[str, Any] = extra
 
         for handler in config.handlers:
             self._add_handler(handler)
 
+        self._logger = loguru.logger
+        self.debug = self._logger.bind(**self._extra).debug
+        self.info = self._logger.bind(**self._extra).info
+        self.warning = self._logger.bind(**self._extra).warning
+        self.error = self._logger.bind(**self._extra).error
+        self.critical = self._logger.bind(**self._extra).critical
+        self.ctx = self._logger.bind(**self._extra).contextualize
+
+    def bind(self, **kwargs) -> Self:
+        """Creates a new log service with extra parameters.
+
+        Attributes:
+            kwargs:
+                Extra parameters to apply.
+        """
+        # No need to validate kwargs keys since Python does it for us if input
+        # is like `bind(**{1: "str1", 2: "str2"})` - TypeError is raised
+        return self.__class__(self._config, self._app, extra=kwargs)
+
     def _add_handler(self, handler: LogHandler) -> None:
-        if self._app.mode_enum == AppModeEnum.PROD:
+        if self._app.mode_enum == AppMode.PROD:
             if handler.level is None:
                 handler.level = "INFO"
             if handler.serialize is None:
