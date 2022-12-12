@@ -1,5 +1,5 @@
 import re
-from typing import Any
+from typing import Any, Iterable, Sequence
 
 from pydantic import ValidationError as __PydanticValidationError
 from pydantic import validator as __pydantic_validator
@@ -58,6 +58,30 @@ def validate(
             .format(expected_type)
         )
 
+
+def validate_each(
+    obj: list | tuple | set | frozenset,
+    expected_type: type | list[type],
+    is_strict: bool = False
+) -> None:
+    """Validates each object in given array against expected type.
+
+    Args:
+        obj:
+            Object to be validated. Note that not all iterables are accepted,
+            only meaningful ones. E.g. there is not sence for this function
+            to accept string and validate each char in it.
+        expected_type:
+            Type to compare object to.
+        is_strict (optional):
+            Whether strict check should be performed. If True, direct type
+            comparison is made, disallowing subclasses. If False, isinstance()
+            comparison is made.
+    """
+    validate(obj, [list, tuple, set, frozenset])
+
+    for o in obj:
+        validate(o, expected_type, is_strict)
 
 def validate_re(string: str, pattern: str) -> None:
     """Validates given string using re.match.
