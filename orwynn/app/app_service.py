@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 from starlette.types import Scope, Receive, Send
 from orwynn.app.app_mode_enum import AppModeEnum
-from orwynn.base.service.root_service import RootService
+from orwynn.base.service.framework_service import FrameworkService
 from orwynn.base.test.test_client import TestClient
 
 
-class AppService(RootService):
+class AppService(FrameworkService):
     def __init__(self) -> None:
         super().__init__()
         self._app: FastAPI = FastAPI()

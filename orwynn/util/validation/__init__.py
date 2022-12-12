@@ -1,5 +1,5 @@
 import re
-from typing import Any, Iterable, Sequence
+from typing import Any
 
 from pydantic import ValidationError as __PydanticValidationError
 from pydantic import validator as __pydantic_validator
@@ -82,6 +82,7 @@ def validate_each(
 
     for o in obj:
         validate(o, expected_type, is_strict)
+
 
 def validate_re(string: str, pattern: str) -> None:
     """Validates given string using re.match.

@@ -1,11 +1,10 @@
 from orwynn.base.module.module import Module
-from orwynn.base.module.root_module import RootModule
 from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.util.fmt import format_chain
 
 
 def collect_modules(
-    root_module: RootModule
+    root_module: Module
 ) -> list[Module]:
     """Collects all modules starting from root module.
 
@@ -55,10 +54,6 @@ def _traverse(
                     "{} imports self".format(init_module)
                 )
             for m in init_module.imports:
-                if isinstance(m, RootModule):
-                    raise CircularDependencyError(
-                        "{} imports root module".format(init_module)
-                    )
                 _traverse(m, modules, chain)
 
     # On blocking case remove recently added module since we don't want this

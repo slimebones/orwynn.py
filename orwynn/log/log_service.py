@@ -6,7 +6,7 @@ from orwynn.app.app_mode_enum import AppModeEnum
 from orwynn.app.app_service import AppService
 from orwynn.base.config.config import Config
 from orwynn.base.model.model import Model
-from orwynn.base.service.root_service import RootService
+from orwynn.base.service.framework_service import FrameworkService
 
 
 class LogHandler(Model):
@@ -29,7 +29,7 @@ class LogConfig(Config):
     handlers: list[LogHandler]
 
 
-class LogService(RootService):
+class LogService(FrameworkService):
     """Logs messages across the app.
     """
     def __init__(self, config: LogConfig, app: AppService) -> None:

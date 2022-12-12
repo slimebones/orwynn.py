@@ -3,6 +3,7 @@ import inspect
 from orwynn.base.config.config import Config
 from orwynn.base.model.model import Model
 from orwynn.base.module.module import Module
+from orwynn.base.service.framework_service import FrameworkService
 from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.di.objects.acceptor import Acceptor
 from orwynn.di.objects.is_provider import is_provider
@@ -19,9 +20,19 @@ _ProviderParameters = list["_ProviderParameter"]
 
 class ProvidersAcceptorsMap:
     """Maps Providers and their Acceptors.
+
+    Attributes:
+        FrameworkServices:
+            Framework-level services to collect first.
     """
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        FrameworkServices: list[type[FrameworkService]]
+    ) -> None:
         self._map: dict[type[Provider], list[type[Acceptor]]] = {}
+
+        for FwS in FrameworkServices:
+            self.init_provider(FwS)
 
     @property
     def Providers(self) -> list[type[Provider]]:
@@ -69,18 +80,21 @@ class _ProviderParameter(Model):
 
 
 def collect_provider_acceptors(
-    modules: list[Module]
+    modules: list[Module],
+    FrameworkServices: list[type[FrameworkService]]
 ) -> ProvidersAcceptorsMap:
     """Collects providers and their acceptors from given modules.
 
     Args:
         modules:
             List of modules to collect providers from.
+        FrameworkServices:
+            Framework-level services to collect first.
 
     Returns:
         Special structure maps providers to their acceptors.
     """
-    metamap: ProvidersAcceptorsMap = ProvidersAcceptorsMap()
+    metamap: ProvidersAcceptorsMap = ProvidersAcceptorsMap(FrameworkServices)
 
     # Traverse all parameters of all providers in all modules to add them in
     # united structure
@@ -116,7 +130,6 @@ def _traverse(
     metamap.init_provider(P, is_strict=False)
 
     for parameter in _get_parameters_for_provider(P):
-        print(P, " | ", parameter)
         if not is_provider(parameter.RequiredProvider):
             if issubclass(P, Config):
                 continue

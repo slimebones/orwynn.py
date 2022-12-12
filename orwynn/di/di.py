@@ -1,5 +1,5 @@
 from orwynn.app.app_service import AppService
-from orwynn.base.module.root_module import RootModule
+from orwynn.base.module.module import Module
 from orwynn.base.worker.worker import Worker
 from orwynn.di.di_error import DIError
 from orwynn.di.objects.di_object import DIObject
@@ -38,9 +38,9 @@ class DI(Worker):
         root_module:
             Root module of the app.
     """
-    def __init__(self, root_module: RootModule) -> None:
+    def __init__(self, root_module: Module) -> None:
         super().__init__()
-        validate(root_module, RootModule)
+        validate(root_module, Module)
 
         self._container: _DIContainer = {}
 

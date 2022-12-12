@@ -2,14 +2,13 @@
 """
 from orwynn.app.app_service import AppService
 from orwynn.base.module.module import Module
-from orwynn.base.module.root_module import RootModule
 from orwynn.di.objects.provider import Provider
 
 from .number import NumberService, number_module
 from .text import TextConfig, TextService, text_module
 
-root_module = RootModule(
-    RootServices=[AppService],
+root_module = Module(
+    route="/",
     imports=[text_module, number_module]
 )
 
