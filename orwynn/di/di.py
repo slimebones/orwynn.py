@@ -1,10 +1,9 @@
 from orwynn.app.app_service import AppService
 from orwynn.base.module.module import Module
 from orwynn.base.worker.worker import Worker
-from orwynn.di.objects.di_container import DIContainer
 from orwynn.di.di_error import DIError
-from orwynn.di.objects.di_object import DIObject
-from orwynn.di.objects.missing_di_object_error import MissingDIObjectError
+from orwynn.di.di_object.di_container import DIContainer
+from orwynn.di.di_object.di_object import DIObject
 from orwynn.util.validation import validate
 
 
@@ -40,11 +39,11 @@ class DI(Worker):
         super().__init__()
         validate(root_module, Module)
 
-        # So here we have generally two phases of DI:
+        # So here we have generally two stages of DI:
         #   1. Collecting (module "di/collecting")
         #   2. Initializing (module "di/init")
 
-        self._container: DIContainer = {}
+        self._container: DIContainer
 
     @property
     def app_service(self) -> AppService:
@@ -59,8 +58,8 @@ class DI(Worker):
     def find(self, key: str) -> DIObject:
         """Returns DI object by its key.
 
-        Keys are converted to snake_case from DI object names. So `AppService`
-        becomes `app_service`.
+        Note that searching is made using PascalCased keys, but actual object
+        returned is an initialized instance of searched class.
 
         Args:
             key:
@@ -73,9 +72,4 @@ class DI(Worker):
             MissingDIObjectError:
                 DIObject with given key is not found.
         """
-        validate(key, str)
-
-        try:
-            return self._container[key]
-        except KeyError:
-            raise MissingDIObjectError()
+        return self._container.find(key)

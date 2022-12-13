@@ -10,6 +10,7 @@ from orwynn.di.collecting.provider_already_initialized_for_map_error import \
     ProviderAlreadyInitializedForMapError
 from orwynn.di.collecting.provider_dependencies_map import \
     ProvidersDependenciesMap
+from orwynn.di.collecting.provider_keyword_attribute_error import ProviderKeywordAttributeError
 from orwynn.di.collecting.provider_not_available_error import \
     ProviderNotAvailableError
 from orwynn.di.di_error import DIError
@@ -64,7 +65,7 @@ def _traverse(
 
     if P in chain:
         raise CircularDependencyError(
-            "{} occured twice in dependency chain {}"
+            "provider {} occured twice in dependency chain {}"
             .format(
                 P,
                 # Failed provider is added second time to the chain for
@@ -199,11 +200,30 @@ def _get_parameters_for_provider(
 ) -> _ProviderParameters:
     # Inspects the provider and returns requested by it parameters.
 
-    return [
-        _ProviderParameter(
-            name=inspect_parameter.name,
-            DependencyProvider=inspect_parameter.annotation
+    parameters: _ProviderParameters = []
+
+    for inspect_parameter in inspect.signature(Provider).parameters.values():
+        if (
+            inspect_parameter.kind is inspect._ParameterKind.KEYWORD_ONLY
+            and not issubclass(Provider, Config)
+        ):
+            raise ProviderKeywordAttributeError(
+                f"provider {Provider} cannot have keyword only attributes"
+            )
+
+        # Note that on this stage all config parameters (even not providers) is
+        # added, and later on additional checks is performed. Actually this
+        # doesn't have much sense to not filter such non-provider parameters
+        # here, and in future it might be refactored. But from other side it
+        # might be useful later on to perform additional logic in DI's scope
+        # on Config's non-provider fields, such as checking if it is not
+        # waiting for other providers but i'm not sure that it's the case.
+
+        parameters.append(
+            _ProviderParameter(
+                name=inspect_parameter.name,
+                DependencyProvider=inspect_parameter.annotation
+            )
         )
-        for inspect_parameter in
-        inspect.signature(Provider).parameters.values()
-    ]
+
+    return parameters

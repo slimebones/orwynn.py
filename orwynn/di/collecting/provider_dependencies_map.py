@@ -1,5 +1,5 @@
-from orwynn.di.collecting.no_dependencies_for_given_provider import \
-    NoDependenciesForGivenProvider
+from orwynn.di.collecting.no_dependencies_for_given_provider_error import \
+    NoDependenciesForGivenProviderError
 from orwynn.di.collecting.provider_already_initialized_for_map_error import \
     ProviderAlreadyInitializedForMapError
 from orwynn.di.collecting.provider_not_found_in_map_error import \
@@ -13,11 +13,6 @@ class ProvidersDependenciesMap:
     Since providers can request only other providers, it's a representation of
     Provider to Provider map.
     """
-
-    # TODO:
-    #   Rewrite to some analog in Collections module instead of this mess. Main
-    #   objective is to restrict some operations on underlying dict.
-
     def __init__(
         self
     ) -> None:
@@ -51,7 +46,7 @@ class ProvidersDependenciesMap:
         if res:
             return res
         elif res == []:
-            raise NoDependenciesForGivenProvider(P=P)
+            raise NoDependenciesForGivenProviderError(P=P)
         else:
             raise ProviderNotFoundInMapError(P=P)
 
