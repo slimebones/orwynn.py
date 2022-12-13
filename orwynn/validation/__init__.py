@@ -4,7 +4,7 @@ from typing import Any
 from pydantic import ValidationError as __PydanticValidationError
 from pydantic import validator as __pydantic_validator
 
-from orwynn.util.validation.validation_error import (ReValidationError,
+from orwynn.validation.validation_error import (ReValidationError,
                                                      ValidationError)
 
 

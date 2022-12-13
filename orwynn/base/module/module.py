@@ -8,7 +8,7 @@ from orwynn.di.di_object.is_provider import is_provider
 from orwynn.di.collecting.not_provider_error import NotProviderError
 
 from orwynn.di.di_object.provider import Provider
-from orwynn.util.validation import validate
+from orwynn.validation import validate
 
 
 class Module:

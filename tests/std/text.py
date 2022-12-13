@@ -1,3 +1,4 @@
+from pathlib import Path
 import lorem
 from orwynn.app.app_service import AppService
 from orwynn.base.config.config import Config
@@ -6,10 +7,11 @@ from orwynn.base.module.module import Module
 from orwynn.base.service.service import Service
 from tests.std.number import NumberService, number_module
 from tests.std.float import FloatService, float_module
-from orwynn.util.validation import model_validator
+from orwynn.validation import model_validator
 
 
 class TextConfig(Config):
+    SOURCE = Path("tests/std/text.yml")
     words_amount: int
 
     @model_validator("words_amount")

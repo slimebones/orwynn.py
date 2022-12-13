@@ -4,7 +4,7 @@ from typing import Callable
 from httpx import Response
 from fastapi.testclient import TestClient
 
-from orwynn.util.validation import validate
+from orwynn.validation import validate
 
 
 class HttpClient:

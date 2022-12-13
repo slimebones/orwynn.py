@@ -4,7 +4,7 @@ from orwynn.base.worker.worker import Worker
 from orwynn.di.di_error import DIError
 from orwynn.di.di_object.di_container import DIContainer
 from orwynn.di.di_object.di_object import DIObject
-from orwynn.util.validation import validate
+from orwynn.validation import validate
 
 
 class DI(Worker):

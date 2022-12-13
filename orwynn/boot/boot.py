@@ -7,7 +7,7 @@ from orwynn.base.worker.worker import Worker
 from orwynn.app.app_service import AppService
 from orwynn.boot.boot_error import BootError
 from orwynn.di.di import DI
-from orwynn.util.validation import validate, validate_each
+from orwynn.validation import validate, validate_each
 
 
 class Boot(Worker):

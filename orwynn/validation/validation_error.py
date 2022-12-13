@@ -9,7 +9,11 @@ class ValidationError(Error):
         failed_obj: Any | None = None,
         expected_type: type | list[type] | None = None,
     ) -> None:
-        if not message and failed_obj and expected_type:
+        if (
+            not message
+            and failed_obj is not None
+            and expected_type is not None
+        ):
             if isinstance(expected_type, type):
                 message = \
                     f'{repr(failed_obj)} should have type:' \
@@ -34,7 +38,7 @@ class ReValidationError(Error):
         failed_obj: Any | None = None,
         pattern: str | None = None
     ) -> None:
-        if not message and failed_obj and pattern:
+        if not message and failed_obj is not None and pattern is not None:
             message = \
                 f'{repr(failed_obj)} should implement pattern {pattern}'
 

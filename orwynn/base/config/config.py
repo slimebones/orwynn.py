@@ -1,7 +1,11 @@
 import os
+from pathlib import Path, PosixPath, WindowsPath
 from typing import Any, ClassVar, Self
+from orwynn.base.config.undefined_config_source_error import UndefinedConfigSourceError
 from orwynn.base.model.model import Model
 from orwynn.di.di_object.provider import Provider
+from orwynn.util.file.is_path import is_path
+from orwynn.util.file.yml import load_yml
 from orwynn.util.types import Source
 
 
@@ -37,13 +41,22 @@ class Config(Model):
         Returns:
             Initialized config instance.
         """
-        source_kwargs: dict[str, Any] = {}
+        if not cls.SOURCE:
+            raise UndefinedConfigSourceError(
+                f"config {cls} should define SOURCE class attribute"
+            )
+        source_kwargs: dict[str, Any] = cls._load_source(cls.SOURCE)
         return cls(**source_kwargs, **provider_kwargs)
 
     @staticmethod
     def _load_source(source: Source) -> dict[str, Any]:
         result: dict[str, Any] = {}
 
-        if os.path.exists(source):
+        if is_path(source):
+            result = load_yml(source)  # type: ignore
+        else:
+            raise NotImplementedError(
+                "non-Path sources are not supported in this version"
+            )
 
         return result

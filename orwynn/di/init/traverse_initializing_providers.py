@@ -6,6 +6,7 @@ from orwynn.di.collecting.no_dependencies_for_given_provider_error import \
 from orwynn.di.collecting.provider_dependencies_map import \
     ProvidersDependenciesMap
 from orwynn.di.di_object.di_container import DIContainer
+from orwynn.di.di_object.is_provider import is_provider
 from orwynn.di.di_object.missing_di_object_error import MissingDIObjectError
 from orwynn.di.di_object.provider import Provider
 from orwynn.util.fmt import format_chain
@@ -30,12 +31,15 @@ def traverse_initializing_providers(
     container: DIContainer = DIContainer()
 
     for P in providers_dependencies_map.Providers:
-        _traverse(
-            StarterProvider=P,
-            mp=providers_dependencies_map,
-            container=container,
-            chain=[]
-        )
+        try:
+            container.find(P.__name__)
+        except MissingDIObjectError:
+            _traverse(
+                StarterProvider=P,
+                mp=providers_dependencies_map,
+                container=container,
+                chain=[]
+            )
 
     return container
 
@@ -47,6 +51,9 @@ def _traverse(
     container: DIContainer,
     chain: list[type[Provider]]
 ) -> Provider:
+    print(StarterProvider, container.items)
+    already_initialized_dependencies: list[Provider] = []
+
     if StarterProvider in chain:
         raise CircularDependencyError(
             "provider {} occured twice in dependency chain {}"
@@ -65,39 +72,50 @@ def _traverse(
     except NoDependenciesForGivenProviderError:
         # Final point in chain, since no dependencies we can initialize
         # without any attributes
-        return StarterProvider()
+        pass
+    else:
+        chain.append(StarterProvider)
 
-    already_initialized_dependencies: list[Provider] = []
-    chain.append(StarterProvider)
-
-    for D in Dependencies:
-        try:
-            already_initialized_dependencies.append(
-                container.find(D.__name__)
-            )
-        except MissingDIObjectError:
-            already_initialized_dependencies.append(
-                _traverse(
-                    StarterProvider=D,
-                    mp=mp,
-                    container=container,
-                    chain=chain
+        for D in Dependencies:
+            try:
+                already_initialized_dependencies.append(
+                    container.find(D.__name__)
                 )
-            )
+            except MissingDIObjectError:
+                already_initialized_dependencies.append(
+                    _traverse(
+                        StarterProvider=D,
+                        mp=mp,
+                        container=container,
+                        chain=chain
+                    )
+                )
+
+        # On object initialization it should be removed from chain, but not for
+        # Config since it hasn't been appended
+        chain.pop()
 
     # All dependencies for this provider have been initialized - now initialize
     # this provider. Checks on previous phases should have validated, that
     # every provider waits only positional arguments.
+    result_provider: Provider
     if issubclass(StarterProvider, Config):
-        inspect.signature(StarterProvider).parameters
+        # For configs we need to prepare names kwargs, so we perform
+        # signaturing and container searching here once again. It's not good
+        # since we've done it before, so consider refactoring.
+        provider_kwargs: dict[str, Provider] = {}
+
+        for param in inspect.signature(StarterProvider).parameters.values():
+            if is_provider(param.annotation):
+                provider_kwargs[param.name] = container.find(
+                    param.annotation.__name__
+                )
+
+        result_provider = StarterProvider.fw_create(provider_kwargs)
     else:
-        return StarterProvider(
+        result_provider = StarterProvider(
             *already_initialized_dependencies
         )  # type: ignore
 
-
-def _init_config(
-    Config: type[Config],
-    di_dependencies: list[Provider]
-) -> Config:
-    pass
+    container.add(result_provider)
+    return result_provider

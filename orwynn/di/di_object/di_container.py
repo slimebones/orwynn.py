@@ -1,8 +1,9 @@
-from typing import get_args
 from orwynn.di.di_object.di_object import DIObject
-from orwynn.di.di_object.di_object_already_initialized_in_container_error import DIObjectAlreadyInitializedInContainerError
+from orwynn.di.di_object.di_object_already_initialized_in_container_error \
+    import \
+    DIObjectAlreadyInitializedInContainerError
 from orwynn.di.di_object.missing_di_object_error import MissingDIObjectError
-from orwynn.util.validation import validate
+from orwynn.validation import validate
 
 
 class DIContainer:
@@ -30,8 +31,6 @@ class DIContainer:
             DIObjectAlreadyInitializedError:
                 This DI object already exists in container.
         """
-        validate(obj, list(get_args(DIObject)))
-
         obj_class_name: str = obj.__class__.__name__
 
         if obj_class_name in self._data.keys():
@@ -63,4 +62,6 @@ class DIContainer:
         try:
             return self._data[key]
         except KeyError:
-            raise MissingDIObjectError()
+            raise MissingDIObjectError(
+                f"di object for key \"{key}\" is not found"
+            )
