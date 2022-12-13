@@ -1,11 +1,15 @@
+from orwynn.app.app_service import AppService
 from orwynn.base.controller.controller import Controller
 from orwynn.base.module.module import Module
 from orwynn.base.service.service import Service
+from tests.std.float import FloatService, float_module
 
 
 class NumberService(Service):
-    def __init__(self) -> None:
+    def __init__(self, app: AppService, float_service: FloatService) -> None:
         super().__init__()
+        self._app = app
+        self._float_service = float_service
 
     def find(self, id: str) -> int:
         number: int = 0
@@ -25,7 +29,7 @@ class NumberController(Controller):
 
     def find(self, id: str) -> dict:
         return {
-            "type": int,
+            "type": "int",
             "value": self.service.find(id)
         }
 
@@ -33,5 +37,6 @@ class NumberController(Controller):
 number_module = Module(
     route="/numbers",
     Providers=[NumberService],
-    Controllers=[NumberController]
+    Controllers=[NumberController],
+    imports=[float_module]
 )

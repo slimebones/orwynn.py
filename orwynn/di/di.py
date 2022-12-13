@@ -1,13 +1,11 @@
 from orwynn.app.app_service import AppService
 from orwynn.base.module.module import Module
 from orwynn.base.worker.worker import Worker
+from orwynn.di.objects.di_container import DIContainer
 from orwynn.di.di_error import DIError
 from orwynn.di.objects.di_object import DIObject
 from orwynn.di.objects.missing_di_object_error import MissingDIObjectError
 from orwynn.util.validation import validate
-
-# DIObjects by their snake_cased names.
-_DIContainer = dict[str, DIObject]
 
 
 class DI(Worker):
@@ -42,7 +40,11 @@ class DI(Worker):
         super().__init__()
         validate(root_module, Module)
 
-        self._container: _DIContainer = {}
+        # So here we have generally two phases of DI:
+        #   1. Collecting (module "di/collecting")
+        #   2. Initializing (module "di/init")
+
+        self._container: DIContainer = {}
 
     @property
     def app_service(self) -> AppService:

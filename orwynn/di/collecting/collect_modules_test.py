@@ -2,7 +2,7 @@ from pytest import fixture
 
 from orwynn.base.module.module import Module
 from orwynn.di.circular_dependency_error import CircularDependencyError
-from orwynn.di.collect_modules import collect_modules
+from orwynn.di.collecting.collect_modules import collect_modules
 from tests.std import Assertion
 
 

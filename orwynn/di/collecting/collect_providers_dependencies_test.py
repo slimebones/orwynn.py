@@ -1,11 +1,16 @@
-from pytest import fixture
-from orwynn.app.app_service import AppService
+import inspect
 
+from pytest import fixture
+
+from orwynn.app.app_service import AppService
+from orwynn.base.config.config import Config
 from orwynn.base.module.module import Module
 from orwynn.di.circular_dependency_error import CircularDependencyError
-from orwynn.di.collect_modules import collect_modules
-from orwynn.di.collect_provider_acceptors import (ProvidersAcceptorsMap,
-                                                  collect_provider_acceptors)
+from orwynn.di.collecting.collect_modules import collect_modules
+from orwynn.di.collecting.collect_providers_dependencies import (
+    ProvidersDependenciesMap, collect_providers_dependencies)
+from orwynn.di.di_object.is_provider import is_provider
+from orwynn.di.di_object.provider import Provider
 from tests.std import Assertion
 
 
@@ -42,17 +47,30 @@ def long_twice_occurence_struct() -> Module:
 
 
 def test_std(std_struct: Module):
-    metamap: ProvidersAcceptorsMap = collect_provider_acceptors(
+    metamap: ProvidersDependenciesMap = collect_providers_dependencies(
         collect_modules(std_struct),
         [AppService]
     )
 
-    assert metamap.Providers == Assertion.COLLECTED_PROVIDERS
+    # Order doesn't matter
+    assert set(metamap.Providers) == set(Assertion.COLLECTED_PROVIDERS)
+
+    for P, dependencies in metamap.mapped_items:
+        assertion_dependencies: list[type[Provider]] = []
+        for inspect_parameter in inspect.signature(P).parameters.values():
+            # Skip config's parseable parameters
+            if (
+                issubclass(P, Config)
+                and not is_provider(inspect_parameter.annotation)
+            ):
+                continue
+            assertion_dependencies.append(inspect_parameter.annotation)
+        assert dependencies == assertion_dependencies
 
 
 def test_twice_occurence(twice_occurence_struct: Module):
     try:
-        collect_provider_acceptors(
+        collect_providers_dependencies(
             collect_modules(twice_occurence_struct),
             [AppService]
         )
@@ -64,7 +82,7 @@ def test_twice_occurence(twice_occurence_struct: Module):
 
 def test_long_twice_occurence(long_twice_occurence_struct: Module):
     try:
-        collect_provider_acceptors(
+        collect_providers_dependencies(
             collect_modules(long_twice_occurence_struct),
             [AppService]
         )

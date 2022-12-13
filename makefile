@@ -1,5 +1,5 @@
 test:
-	pytest -x --ignore=tests/app -p no:warnings orwynn tests
+	pytest -x -v --ignore=tests/app -p no:warnings orwynn tests
 
 lint:
 # Ignore:

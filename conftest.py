@@ -23,7 +23,8 @@ def std_struct() -> Module:
 def boot(std_struct: Module) -> Boot:
     return Boot(
         mode=AppMode.TEST,
-        root_module=std_struct
+        root_module=std_struct,
+        FrameworkServices=[AppService]
     )
 
 

@@ -19,7 +19,8 @@ class bootlog:
         raise NotImplementedError("don't initialize this class")
 
     @classmethod
-    def _log(cls, message: str, level: _BootlogLevel) -> None:
+    def _log(cls, *args: str, level: _BootlogLevel, separator: str) -> None:
+        message: str = separator.join([str(a) for a in args])
         formatted_bracket_ctx: str = f"[{cls._BRACKET_CTX} / {level.value}]"
         # Figure out local timezone
         # https://stackoverflow.com/a/39079819/14748231
@@ -29,53 +30,63 @@ class bootlog:
         print(f"{formatted_datetime} - {formatted_bracket_ctx} {message}")
 
     @classmethod
-    def debug(cls, message: str) -> None:
+    def debug(cls, *args, separator: str = " ") -> None:
         """Logs debug message.
 
         Attributes:
-            message:
-                Message to be logged.
+            args:
+                Messages to be joined and logged.
+            separator:
+                Separation string to be joined to.
         """
-        cls._log(message, _BootlogLevel.DEBUG)
+        cls._log(*args, level=_BootlogLevel.DEBUG, separator=separator)
 
     @classmethod
-    def info(cls, message: str) -> None:
+    def info(cls, *args, separator: str = " ") -> None:
         """Logs informational message.
 
         Attributes:
-            message:
-                Message to be logged.
+            args:
+                Messages to be joined and logged.
+            separator:
+                Separation string to be joined to.
         """
-        cls._log(message, _BootlogLevel.INFO)
+        cls._log(*args, level=_BootlogLevel.INFO, separator=separator)
 
     @classmethod
-    def warning(cls, message: str) -> None:
+    def warning(cls, *args, separator: str = " ") -> None:
         """Logs warning message.
 
         Attributes:
-            message:
-                Message to be logged.
+            args:
+                Messages to be joined and logged.
+            separator:
+                Separation string to be joined to.
         """
-        cls._log(message, _BootlogLevel.WARNING)
+        cls._log(*args, level=_BootlogLevel.WARNING, separator=separator)
 
     @classmethod
-    def error(cls, message: str) -> None:
-        """Logs warning message.
+    def error(cls, *args, separator: str = " ") -> None:
+        """Logs error message.
 
         Attributes:
-            message:
-                Message to be logged.
+            args:
+                Messages to be joined and logged.
+            separator:
+                Separation string to be joined to.
         """
-        cls._log(message, _BootlogLevel.ERROR)
+        cls._log(*args, level=_BootlogLevel.ERROR, separator=separator)
 
     @classmethod
-    def critical(cls, message: str) -> None:
+    def critical(cls, *args, separator: str = " ") -> None:
         """Logs critical message.
 
         Are you sure you want to use it?
 
         Attributes:
-            message:
-                Message to be logged.
+            args:
+                Messages to be joined and logged.
+            separator:
+                Separation string to be joined to.
         """
-        cls._log(message, _BootlogLevel.CRITICAL)
+        cls._log(*args, level=_BootlogLevel.CRITICAL, separator=separator)
