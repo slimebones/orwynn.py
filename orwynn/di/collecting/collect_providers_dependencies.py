@@ -10,7 +10,8 @@ from orwynn.di.collecting.provider_already_initialized_for_map_error import \
     ProviderAlreadyInitializedForMapError
 from orwynn.di.collecting.provider_dependencies_map import \
     ProvidersDependenciesMap
-from orwynn.di.collecting.provider_keyword_attribute_error import ProviderKeywordAttributeError
+from orwynn.di.collecting.provider_keyword_attribute_error import \
+    ProviderKeywordAttributeError
 from orwynn.di.collecting.provider_not_available_error import \
     ProviderNotAvailableError
 from orwynn.di.di_error import DIError

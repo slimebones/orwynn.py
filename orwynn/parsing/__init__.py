@@ -2,7 +2,7 @@ from types import NoneType
 from typing import Any, TypeVar
 
 from orwynn.parsing.parsing_error import (KeyParsingError, ParsingError,
-                                               StrIntParsingError)
+                                          StrIntParsingError)
 from orwynn.validation import validate
 
 ParsedEntity = TypeVar('ParsedEntity', bound=Any)

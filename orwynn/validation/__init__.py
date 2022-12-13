@@ -5,7 +5,7 @@ from pydantic import ValidationError as __PydanticValidationError
 from pydantic import validator as __pydantic_validator
 
 from orwynn.validation.validation_error import (ReValidationError,
-                                                     ValidationError)
+                                                ValidationError)
 
 
 def validate(

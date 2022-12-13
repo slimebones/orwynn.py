@@ -29,8 +29,8 @@ class NotValidFileSuffixError(Exception):
 
 
 def load_yml(
-        p: Path, *, loader: YmlLoader = YmlLoader.SAFE
-    ) -> dict[str, Any]:
+    p: Path, *, loader: YmlLoader = YmlLoader.SAFE
+) -> dict[str, Any]:
     """Loads yaml from file.
 
     Args:
@@ -52,7 +52,7 @@ def load_yml(
     """
     if not is_path(p):
         raise TypeError(f"path {p} is not allowed pathlib.Path kind")
-    if not p.suffix in [".yaml", ".yml"]:
+    if p.suffix not in [".yaml", ".yml"]:
         raise NotValidFileSuffixError(f"suffix {p.suffix} is not valid suffix")
 
     with open(p, "r") as file:
