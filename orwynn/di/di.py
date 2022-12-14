@@ -1,9 +1,14 @@
 from orwynn.app.app_service import AppService
 from orwynn.base.module.module import Module
 from orwynn.base.worker.worker import Worker
-from orwynn.di.di_error import DIError
+from orwynn.di.collecting.collect_modules import collect_modules
+from orwynn.di.collecting.collect_provider_dependencies import \
+    collect_provider_dependencies
 from orwynn.di.di_container import DIContainer
+from orwynn.di.di_error import DIError
 from orwynn.di.di_object import DIObject
+from orwynn.di.init.init_other_acceptors import init_other_acceptors
+from orwynn.di.init.init_providers import init_providers
 from orwynn.validation import validate
 
 
@@ -43,7 +48,11 @@ class DI(Worker):
         #   1. Collecting (module "di/collecting")
         #   2. Initializing (module "di/init")
 
-        self._container: DIContainer
+        modules: list[Module] = collect_modules(root_module)
+        self._container: DIContainer = init_providers(
+            collect_provider_dependencies(modules)
+        )
+        init_other_acceptors(self._container, modules)
 
     @property
     def app_service(self) -> AppService:
