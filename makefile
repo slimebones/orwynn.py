@@ -1,5 +1,5 @@
 test:
-	pytest -x -v --ignore=tests/app -p no:warnings orwynn tests
+	coverage run -m pytest -x -v --ignore=tests/app -p no:warnings orwynn tests
 
 lint:
 # Ignore:
@@ -19,3 +19,9 @@ lint:
 		--max-complexity 10
 
 check: lint test
+
+coverage:
+	coverage report -m
+
+coverage-html:
+	coverage html --show-contexts && python -m http.server -d htmlcov 8000
