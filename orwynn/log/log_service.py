@@ -2,11 +2,11 @@ from datetime import time, timedelta
 from typing import Any, Callable, Self
 
 import loguru
-from orwynn.app.app_mode import AppMode
+from orwynn.base.service.framework_service import FrameworkService
+from orwynn.boot.boot_mode import BootMode
 from orwynn.app.app_service import AppService
 from orwynn.base.config.config import Config
 from orwynn.base.model.model import Model
-from orwynn.base.service.framework_service import FrameworkService
 
 
 class LogHandler(Model):
@@ -69,7 +69,7 @@ class LogService(FrameworkService):
         return self.__class__(self._config, self._app, extra=kwargs)
 
     def _add_handler(self, handler: LogHandler) -> None:
-        if self._app.mode_enum == AppMode.PROD:
+        if self._app.mode == BootMode.PROD:
             if handler.level is None:
                 handler.level = "INFO"
             if handler.serialize is None:

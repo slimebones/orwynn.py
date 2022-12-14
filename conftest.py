@@ -2,7 +2,7 @@
 """
 from pytest import fixture
 
-from orwynn.app.app_mode import AppMode
+from orwynn.boot.boot_mode import BootMode
 from orwynn.app.app_service import AppService
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
@@ -24,7 +24,7 @@ def std_struct() -> Module:
 @fixture
 def boot(std_struct: Module) -> Boot:
     return Boot(
-        mode=AppMode.TEST,
+        mode=BootMode.TEST,
         root_module=std_struct
     )
 

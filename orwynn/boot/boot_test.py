@@ -1,4 +1,4 @@
-from orwynn.app.app_mode import AppMode
+from orwynn.boot.boot_mode import BootMode
 from orwynn.base.module.module import Module
 
 from orwynn.boot.boot import Boot
@@ -6,21 +6,21 @@ from orwynn.boot.boot import Boot
 
 def test_init_mode_test(std_struct: Module):
     Boot(
-        mode=AppMode.TEST,
+        mode=BootMode.TEST,
         root_module=std_struct
     )
 
 
 def test_init_mode_dev(std_struct: Module):
     Boot(
-        mode=AppMode.DEV,
+        mode=BootMode.DEV,
         root_module=std_struct
     )
 
 
 def test_init_mode_prod(std_struct: Module):
     Boot(
-        mode=AppMode.PROD,
+        mode=BootMode.PROD,
         root_module=std_struct
     )
 

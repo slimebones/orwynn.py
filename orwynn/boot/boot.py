@@ -1,5 +1,6 @@
 import os
-from orwynn.app.app_mode import AppMode
+from orwynn.boot.boot_mode import BootMode
+from orwynn.base.controller.controller import Controller
 from orwynn.base.module.module import Module
 
 from orwynn.base.worker.worker import Worker
@@ -41,16 +42,16 @@ class Boot(Worker):
     def __init__(
         self,
         *,
-        mode: AppMode | str,
+        mode: BootMode | str,
         root_module: Module,
         root_dir: str = os.getcwd()
     ) -> None:
         super().__init__()
-        validate(mode, [AppMode, str])
+        validate(mode, [BootMode, str])
         validate(root_module, Module)
         validate(root_dir, str)
 
-        self._mode_enum: AppMode = self._parse_mode_enum(mode)
+        self._mode_enum: BootMode = self._parse_mode_enum(mode)
         self._root_dir = root_dir
 
         self._di: DI = DI(root_module)
@@ -59,22 +60,26 @@ class Boot(Worker):
     def app(self) -> AppService:
         return self._di.app_service
 
-    def _parse_mode_enum(self, mode: AppMode | str) -> AppMode:
+    def _register_controllers(self, controllers: list[Controller]) -> None:
+        for c in controllers:
+            self.app
+
+    def _parse_mode_enum(self, mode: BootMode | str) -> BootMode:
         if type(mode) is str:
             return self._parse_mode_enum_from_str(mode)
-        elif type(mode) is AppMode:
+        elif type(mode) is BootMode:
             return mode
         else:
             raise
 
     @staticmethod
-    def _parse_mode_enum_from_str(mode: str) -> AppMode:
+    def _parse_mode_enum_from_str(mode: str) -> BootMode:
         match mode:
             case "test":
-                return AppMode.TEST
+                return BootMode.TEST
             case  "dev":
-                return AppMode.DEV
+                return BootMode.DEV
             case  "prod":
-                return AppMode.PROD
+                return BootMode.PROD
             case _:
                 raise BootError("Unrecognized mode: {}".format(mode))
