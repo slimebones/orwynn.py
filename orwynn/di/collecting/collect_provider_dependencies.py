@@ -5,16 +5,16 @@ from orwynn.base.model.model import Model
 from orwynn.base.module.module import Module
 from orwynn.base.service.framework_service import FrameworkService
 from orwynn.di.circular_dependency_error import CircularDependencyError
-from orwynn.di.collecting.not_provider_error import NotProviderError
+from orwynn.di.no_annotation_error import NoAnnotaionError
+from orwynn.di.not_provider_error import NotProviderError
 from orwynn.di.collecting.provider_already_initialized_for_map_error import \
     ProviderAlreadyInitializedForMapError
 from orwynn.di.collecting.provider_dependencies_map import \
     ProviderDependenciesMap
 from orwynn.di.collecting.provider_keyword_attribute_error import \
     ProviderKeywordAttributeError
-from orwynn.di.collecting.provider_not_available_error import \
-    ProviderNotAvailableError
-from orwynn.di.di_error import DIError
+from orwynn.di.collecting.provider_availability_error import \
+    ProviderAvailabilityError
 from orwynn.di.is_provider import is_provider
 from orwynn.di.provider import Provider
 from orwynn.util.fmt import format_chain
@@ -154,13 +154,13 @@ def _check_availability(
             is_error = False
             res = found_module
     else:
-        raise DIError(
+        raise ProviderAvailabilityError(
             f"not logical to check availability between {P1} -> {P2} in"
             + " framework's scope"
         )
 
     if is_error:
-        raise ProviderNotAvailableError(Provider1=P1, Provider2=P2)
+        raise ProviderAvailabilityError(Provider1=P1, Provider2=P2)
     else:
         return res
 
@@ -194,20 +194,31 @@ def _search_matching_provider(
 
 
 def _get_parameters_for_provider(
-    Provider: type[Provider]
+    P: type[Provider]
 ) -> _ProviderParameters:
     # Inspects the provider and returns requested by it parameters.
 
     parameters: _ProviderParameters = []
 
-    for inspect_parameter in inspect.signature(Provider).parameters.values():
+    for inspect_parameter in inspect.signature(P).parameters.values():
+        if inspect_parameter.annotation is inspect._empty:
+            raise NoAnnotaionError(
+                f"provider {P} has field \"{inspect_parameter.name}\" without"
+                " annotation"
+            )
+
         if (
             inspect_parameter.kind is inspect._ParameterKind.KEYWORD_ONLY
-            and not issubclass(Provider, Config)
+            and not issubclass(P, Config)
         ):
             raise ProviderKeywordAttributeError(
-                f"provider {Provider} cannot have keyword only attributes"
+                f"provider {P} cannot have keyword only attributes"
             )
+
+        # Comply to Liskov's principle - don't raise an error for *args and
+        # **kwargs to be substitutable with base classes.
+        if inspect_parameter.name in ["args", "kwargs"]:
+            continue
 
         # Note that on this stage all config parameters (even not providers) is
         # added, and later on additional checks is performed. Actually this
@@ -222,7 +233,7 @@ def _get_parameters_for_provider(
                 "future string references,"
                 f" like \"{inspect_parameter.annotation}\""
                 f" in field \"{inspect_parameter.name}\""
-                f" of provider {Provider}"
+                f" of provider {P}"
                 " are not supported for now"
             )
 

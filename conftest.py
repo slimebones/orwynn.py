@@ -4,6 +4,7 @@ from pytest import fixture
 
 from orwynn.app.app_service import AppService
 from orwynn.base.module.module import Module
+from orwynn.base.test.test_client import TestClient
 from orwynn.boot.boot import Boot
 from orwynn.boot.boot_mode import BootMode
 from orwynn.boot.boot_test import std_boot
@@ -25,3 +26,8 @@ def std_struct() -> Module:
 @fixture
 def app(boot: Boot) -> AppService:
     return boot.app
+
+
+@fixture
+def client(app: AppService) -> TestClient:
+    return app.test_client

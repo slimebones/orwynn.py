@@ -2,7 +2,7 @@ from orwynn.base.error.error import Error
 from orwynn.di.provider import Provider
 
 
-class ProviderNotAvailableError(Error):
+class ProviderAvailabilityError(Error):
     """If some Provider2 is not visible for some Provider1."""
     def __init__(
         self,

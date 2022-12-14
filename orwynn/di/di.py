@@ -5,7 +5,6 @@ from orwynn.di.collecting.collect_modules import collect_modules
 from orwynn.di.collecting.collect_provider_dependencies import \
     collect_provider_dependencies
 from orwynn.di.di_container import DIContainer
-from orwynn.di.di_error import DIError
 from orwynn.di.di_object import DIObject
 from orwynn.di.init.init_other_acceptors import init_other_acceptors
 from orwynn.di.init.init_providers import init_providers

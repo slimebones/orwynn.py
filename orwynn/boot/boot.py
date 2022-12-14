@@ -6,8 +6,9 @@ from orwynn.base.module.module import Module
 
 from orwynn.base.worker.worker import Worker
 from orwynn.app.app_service import AppService
-from orwynn.boot.boot_error import BootError
+from orwynn.boot.unsupported_boot_mode_error import UnsupportedBootModeError
 from orwynn.di.di import DI
+from orwynn.http.http import HTTPMethod
 from orwynn.validation import validate
 
 
@@ -65,7 +66,12 @@ class Boot(Worker):
 
     def _register_controllers(self, controllers: list[Controller]) -> None:
         for c in controllers:
-            self.app
+            for method in HTTPMethod:
+                self.app.register_route_fn(
+                    route=c.ROUTE,
+                    fn=c.get_fn_by_http_method(method),
+                    method=method
+                )
 
     def _parse_mode_enum(self, mode: BootMode | str) -> BootMode:
         if type(mode) is str:
@@ -85,4 +91,4 @@ class Boot(Worker):
             case  "prod":
                 return BootMode.PROD
             case _:
-                raise BootError("Unrecognized mode: {}".format(mode))
+                raise UnsupportedBootModeError("unsupported mode {mode}")

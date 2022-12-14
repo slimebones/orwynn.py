@@ -1,14 +1,13 @@
-import re
 from types import NoneType
 from orwynn.app.empty_route_error import EmptyRouteError
-from orwynn.app.incorrect_route_error import IncorrectRouteError
 from orwynn.base.controller.controller import Controller
 from orwynn.base.middleware import middleware
 from orwynn.di.is_provider import is_provider
-from orwynn.di.collecting.not_provider_error import NotProviderError
+from orwynn.di.not_provider_error import NotProviderError
 
 from orwynn.di.provider import Provider
-from orwynn.validation import validate
+from orwynn.validation import validate, validate_route
+from orwynn.validation.validation_error import ReValidationError
 
 
 class Module:
@@ -93,8 +92,7 @@ class Module:
     @staticmethod
     def _parse_route(route: str) -> str:
         if route:
-            if not re.match(r"^\/(.+\/?)+$", route) and route != "/":
-                raise IncorrectRouteError(failed_route=route)
+            validate_route(route)
         else:
             raise EmptyRouteError()
 

@@ -1,5 +1,8 @@
+from typing import Callable
+from orwynn.base.controller.missing_controller_route import MissingControllerRoute
 from orwynn.base.middleware.middleware import Middleware
-from orwynn.http.http import Response
+from orwynn.http.http import HTTPMethod, Response
+from orwynn.validation import validate, validate_route
 
 ControllerMethodReturnedData = dict | Response
 
@@ -28,7 +31,31 @@ class Controller:
     MIDDLEWARE: list[Middleware] = []
 
     def __init__(self, *args) -> None:
-        pass
+        if self.ROUTE is None:
+            raise MissingControllerRoute(
+                "you should set class attribute ROUTE for"
+                f" controller {self.__class__}"
+            )
+        else:
+            validate(self.ROUTE, str)
+            validate_route(self.ROUTE)
+
+    def get_fn_by_http_method(self, method: HTTPMethod) -> Callable:
+        match method:
+            case HTTPMethod.GET:
+                return self.get
+            case HTTPMethod.POST:
+                return self.post
+            case HTTPMethod.PUT:
+                return self.put
+            case HTTPMethod.DELETE:
+                return self.delete
+            case HTTPMethod.PATCH:
+                return self.patch
+            case HTTPMethod.OPTIONS:
+                return self.options
+            case _:
+                raise NotImplementedError()
 
     def get(self, *args, **kwargs) -> ControllerMethodReturnedData:
         raise NotImplementedError(

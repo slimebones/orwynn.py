@@ -35,7 +35,7 @@ class AppService(FrameworkService):
         return TestClient(self._app)
 
     def register_route_fn(
-        self, route: str, fn: Callable, method: HTTPMethod
+        self, *, route: str, fn: Callable, method: HTTPMethod
     ) -> None:
         """Registers fn for route.
 

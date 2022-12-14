@@ -87,12 +87,32 @@ def validate_each(
 def validate_re(string: str, pattern: str) -> None:
     """Validates given string using re.match.
 
+    Args:
+        string:
+            String to validate.
+        pattern:
+            Regex pattern to apply.
+
     Raises:
         ReValidationError:
             String does not match given pattern.
     """
     if not re.match(pattern, string):
         raise ReValidationError(failed_obj=string, pattern=pattern)
+
+
+def validate_route(route: str) -> None:
+    """Validates route.
+
+    Args:
+        route:
+            Route to validate.
+
+    Raises:
+        ReValidationError:
+            Route does not match route pattern.
+    """
+    validate_re(route, r"^\/(.+\/?)?$")
 
 
 model_validator = __pydantic_validator
