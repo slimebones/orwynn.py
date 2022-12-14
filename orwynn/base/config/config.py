@@ -1,8 +1,7 @@
 from typing import Any, ClassVar, Self
 
-from orwynn.base.config.undefined_config_source_error import \
-    UndefinedConfigSourceError
-from orwynn.base.config.unsupported_config_source_error import UnsupportedConfigSourceError
+from orwynn.base.config.unsupported_config_source_error import \
+    UnsupportedConfigSourceError
 from orwynn.base.model.model import Model
 from orwynn.boot.BOOT_CONFIG_PROXY_DATA import BOOT_CONFIG_PROXY_DATA
 from orwynn.di.provider import Provider
@@ -63,7 +62,7 @@ class Config(Model):
         if source == "boot":
             if cls.__name__ != "BootConfig":
                 raise UnsupportedConfigSourceError(
-                    f"SOURCE=\"boot\" can be used only by framework"
+                    "SOURCE=\"boot\" can be used only by framework"
                 )
             return {
                 "root_dir": BOOT_CONFIG_PROXY_DATA.root_dir,

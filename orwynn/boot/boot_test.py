@@ -1,7 +1,16 @@
+from pytest import fixture
 from orwynn.boot.boot_mode import BootMode
 from orwynn.base.module.module import Module
 
 from orwynn.boot.boot import Boot
+
+
+@fixture
+def std_boot(std_struct: Module) -> Boot:
+    return Boot(
+        mode=BootMode.TEST,
+        root_module=std_struct
+    )
 
 
 def test_init_mode_test(std_struct: Module):

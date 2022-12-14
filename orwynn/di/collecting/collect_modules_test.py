@@ -3,6 +3,7 @@ from pytest import fixture
 from orwynn.base.module.module import Module
 from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.di.collecting.collect_modules import collect_modules
+from orwynn.util.expect import expect
 from tests.std import Assertion
 
 
@@ -18,27 +19,18 @@ def test_std(std_struct: Module):
 
 
 def test_imports_self(self_importing_module_struct: Module):
-    try:
-        collect_modules(self_importing_module_struct)
-    except CircularDependencyError:
-        pass
-    else:
-        raise AssertionError("CircularDependencyError expected")
+    expect(
+        collect_modules, CircularDependencyError, self_importing_module_struct
+    )
 
 
 def test_circular(circular_module_struct: Module):
-    try:
-        collect_modules(circular_module_struct)
-    except CircularDependencyError:
-        pass
-    else:
-        raise AssertionError("CircularDependencyError expected")
+    expect(
+        collect_modules, CircularDependencyError, circular_module_struct
+    )
 
 
 def test_long_circular(long_circular_module_struct: Module):
-    try:
-        collect_modules(long_circular_module_struct)
-    except CircularDependencyError:
-        pass
-    else:
-        raise AssertionError("CircularDependencyError expected")
+    expect(
+        collect_modules, CircularDependencyError, long_circular_module_struct
+    )

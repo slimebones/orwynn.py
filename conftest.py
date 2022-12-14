@@ -2,10 +2,11 @@
 """
 from pytest import fixture
 
-from orwynn.boot.boot_mode import BootMode
 from orwynn.app.app_service import AppService
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
+from orwynn.boot.boot_mode import BootMode
+from orwynn.boot.boot_test import std_boot
 from orwynn.di.collecting.collect_modules_test import std_modules
 from orwynn.di.collecting.collect_provider_dependencies_test import \
     std_provider_dependencies_map
@@ -19,14 +20,6 @@ from tests.structs import (circular_module_struct, long_circular_module_struct,
 def std_struct() -> Module:
     # Some predefined configuration for testing
     return std_root_module
-
-
-@fixture
-def boot(std_struct: Module) -> Boot:
-    return Boot(
-        mode=BootMode.TEST,
-        root_module=std_struct
-    )
 
 
 @fixture
