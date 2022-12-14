@@ -1,10 +1,10 @@
 from typing import Callable
 from orwynn.base.controller.missing_controller_route import MissingControllerRoute
 from orwynn.base.middleware.middleware import Middleware
-from orwynn.http.http import HTTPMethod, Response
+from orwynn.http import HTTPMethod, TestResponse
 from orwynn.validation import validate, validate_route
 
-ControllerMethodReturnedData = dict | Response
+ControllerMethodReturnedData = dict | TestResponse
 
 
 class Controller:

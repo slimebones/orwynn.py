@@ -2,6 +2,8 @@ from types import NoneType
 from orwynn.app.empty_route_error import EmptyRouteError
 from orwynn.base.controller.controller import Controller
 from orwynn.base.middleware import middleware
+from orwynn.base.module.framework_service_module_reference_error import FrameworkServiceModuleReferenceError
+from orwynn.base.service.framework_service import FrameworkService
 from orwynn.di.is_provider import is_provider
 from orwynn.di.not_provider_error import NotProviderError
 
@@ -98,8 +100,8 @@ class Module:
 
         return route
 
-    @staticmethod
     def _parse_providers(
+        self,
         Providers: list[type[Provider]] | None
     ) -> list[type[Provider]]:
         res: list[type[Provider]]
@@ -108,6 +110,11 @@ class Module:
             for P in Providers:
                 if not is_provider(P):
                     raise NotProviderError(FailedClass=P)
+                if issubclass(P, FrameworkService):
+                    raise FrameworkServiceModuleReferenceError(
+                        f"framework service {P} is referenced in"
+                        f" the module {self}"
+                    )
             res = Providers
         else:
             res = []

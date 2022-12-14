@@ -1,30 +1,19 @@
-import inspect
-
 from orwynn.base.config.config import Config
-from orwynn.base.model.model import Model
 from orwynn.base.module.module import Module
 from orwynn.base.service.framework_service import FrameworkService
 from orwynn.di.circular_dependency_error import CircularDependencyError
-from orwynn.di.no_annotation_error import NoAnnotaionError
-from orwynn.di.not_provider_error import NotProviderError
+from orwynn.di.collecting.get_parameters_for_provider import \
+    get_parameters_for_provider
 from orwynn.di.collecting.provider_already_initialized_for_map_error import \
     ProviderAlreadyInitializedForMapError
-from orwynn.di.collecting.provider_dependencies_map import \
-    ProviderDependenciesMap
-from orwynn.di.collecting.provider_keyword_attribute_error import \
-    ProviderKeywordAttributeError
 from orwynn.di.collecting.provider_availability_error import \
     ProviderAvailabilityError
+from orwynn.di.collecting.provider_dependencies_map import \
+    ProviderDependenciesMap
 from orwynn.di.is_provider import is_provider
+from orwynn.di.not_provider_error import NotProviderError
 from orwynn.di.provider import Provider
 from orwynn.util.fmt import format_chain
-
-_ProviderParameters = list["_ProviderParameter"]
-
-
-class _ProviderParameter(Model):
-    name: str
-    DependencyProvider: type[Provider]
 
 
 def collect_provider_dependencies(
@@ -78,7 +67,7 @@ def _traverse(
     except ProviderAlreadyInitializedForMapError:
         pass
     else:
-        for parameter in _get_parameters_for_provider(P):
+        for parameter in get_parameters_for_provider(P):
             if not is_provider(parameter.DependencyProvider):
                 # Config's fields are skipped since they request various other
                 # than provider objects and will be initialized in a bit
@@ -191,57 +180,3 @@ def _search_matching_provider(
                     res = m
 
     return res
-
-
-def _get_parameters_for_provider(
-    P: type[Provider]
-) -> _ProviderParameters:
-    # Inspects the provider and returns requested by it parameters.
-
-    parameters: _ProviderParameters = []
-
-    for inspect_parameter in inspect.signature(P).parameters.values():
-        if inspect_parameter.annotation is inspect._empty:
-            raise NoAnnotaionError(
-                f"provider {P} has field \"{inspect_parameter.name}\" without"
-                " annotation"
-            )
-
-        if (
-            inspect_parameter.kind is inspect._ParameterKind.KEYWORD_ONLY
-            and not issubclass(P, Config)
-        ):
-            raise ProviderKeywordAttributeError(
-                f"provider {P} cannot have keyword only attributes"
-            )
-
-        # Comply to Liskov's principle - don't raise an error for *args and
-        # **kwargs to be substitutable with base classes.
-        if inspect_parameter.name in ["args", "kwargs"]:
-            continue
-
-        # Note that on this stage all config parameters (even not providers) is
-        # added, and later on additional checks is performed. Actually this
-        # doesn't have much sense to not filter such non-provider parameters
-        # here, and in future it might be refactored. But from other side it
-        # might be useful later on to perform additional logic in DI's scope
-        # on Config's non-provider fields, such as checking if it is not
-        # waiting for other providers but i'm not sure that it's the case.
-
-        if type(inspect_parameter.annotation) is str:
-            raise NotImplementedError(
-                "future string references,"
-                f" like \"{inspect_parameter.annotation}\""
-                f" in field \"{inspect_parameter.name}\""
-                f" of provider {P}"
-                " are not supported for now"
-            )
-
-        parameters.append(
-            _ProviderParameter(
-                name=inspect_parameter.name,
-                DependencyProvider=inspect_parameter.annotation
-            )
-        )
-
-    return parameters

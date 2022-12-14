@@ -1,4 +1,5 @@
 from orwynn.app.app_service import AppService
+from orwynn.base.controller.controller import Controller
 from orwynn.base.module.module import Module
 from orwynn.base.worker.worker import Worker
 from orwynn.di.collecting.collect_modules import collect_modules
@@ -55,13 +56,23 @@ class DI(Worker):
 
     @property
     def app_service(self) -> AppService:
-        app = self.find("app_service")
+        app = self.find("AppService")
         if isinstance(app, AppService):
             return app
         else:
-            raise DIError(
+            raise TypeError(
                 f"{app} is not an AppService instance"
             )
+
+    @property
+    def controllers(self) -> list[Controller]:
+        """Fetches all controllers from container.
+
+        Returns:
+            All controllers fetched.
+        """
+        return self._container.controllers
+
 
     def find(self, key: str) -> DIObject:
         """Returns DI object by its key.

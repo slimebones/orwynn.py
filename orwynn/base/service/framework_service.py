@@ -6,5 +6,8 @@ class FrameworkService(Service):
 
     Shouldn't be subclassed in user's applications, only in the framework or
     extensions.
+
+    This service shouldn't be added in module.Providers in order to be
+    injected - it is always accessible for any Acceptor in the app.
     """
     pass

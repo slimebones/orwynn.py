@@ -11,7 +11,4 @@ def is_acceptor(Class: type) -> bool:
     Returns:
         Flag signifies if given class is an Acceptor.
     """
-    for BuiltinAcceptor in BUILTIN_ACCEPTORS:
-        if isinstance(BuiltinAcceptor, Class):
-            return True
-    return False
+    return issubclass(Class, tuple(BUILTIN_ACCEPTORS))

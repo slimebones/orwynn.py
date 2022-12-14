@@ -11,7 +11,4 @@ def is_provider(Class: type) -> bool:
     Returns:
         Flag signifies if given class is a Provider.
     """
-    for BuiltinProvider in BUILTIN_PROVIDERS:
-        if issubclass(Class, BuiltinProvider):
-            return True
-    return False
+    return issubclass(Class, tuple(BUILTIN_PROVIDERS))

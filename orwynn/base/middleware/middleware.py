@@ -1,5 +1,5 @@
 from typing import Callable
-from orwynn.http.http import Request, Response
+from orwynn.http import Request, TestResponse
 
 
 class Middleware:
@@ -13,5 +13,5 @@ class Middleware:
     def __init__(self, *args) -> None:
         pass
 
-    def process(self, request: Request, call_next: Callable) -> Response:
+    def process(self, request: Request, call_next: Callable) -> TestResponse:
         raise NotImplementedError()

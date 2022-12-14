@@ -1,6 +1,7 @@
 from enum import Enum
 from fastapi import Response as FastApiResponse
 from fastapi import Request as FastApiRequest
+import httpx
 
 
 class HTTPMethod(Enum):
@@ -12,9 +13,6 @@ class HTTPMethod(Enum):
     OPTIONS = "options"
 
 
-class Response(FastApiResponse):
-    pass
-
-
-class Request(FastApiRequest):
-    pass
+TestResponse = FastApiResponse
+Request = FastApiRequest
+TestResponse = httpx.Response

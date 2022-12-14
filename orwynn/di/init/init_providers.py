@@ -13,7 +13,7 @@ from orwynn.util.fmt import format_chain
 
 
 def init_providers(
-    providers_dependencies_map: ProviderDependenciesMap
+    provider_dependencies_map: ProviderDependenciesMap
 ) -> DIContainer:
     """Traverses through given providers and dependencies initializing them.
 
@@ -30,16 +30,18 @@ def init_providers(
 
     container: DIContainer = DIContainer()
 
-    for P in providers_dependencies_map.Providers:
+    for P in provider_dependencies_map.Providers:
         try:
             container.find(P.__name__)
         except MissingDIObjectError:
             _traverse(
                 StarterProvider=P,
-                mp=providers_dependencies_map,
+                mp=provider_dependencies_map,
                 container=container,
                 chain=[]
             )
+
+    container.finalize_provider_populating()
 
     return container
 

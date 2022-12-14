@@ -51,7 +51,9 @@ def validate(
                 is_matched_type_found = True
 
         if not is_matched_type_found:
-            raise ValidationError(failed_obj=obj, expected_type=expected_type)
+            raise ValidationError(
+                failed_obj=obj, expected_type=expected_type
+            )
     else:
         raise TypeError(
             "{} should be Type or an instance of list"

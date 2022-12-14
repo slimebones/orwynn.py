@@ -44,6 +44,10 @@ def _collect_dependencies_for_acceptor(
     result: list[Provider] = []
 
     for param in inspect.signature(A).parameters.values():
+        # See collect_provider_dependencies.py::_get_parameters_for_provider
+        if param.name in ["args", "kwargs"]:
+            continue
+
         result.append(container.find(param.annotation.__name__))
 
     return result

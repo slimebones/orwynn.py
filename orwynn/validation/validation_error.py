@@ -12,7 +12,8 @@ class ValidationError(Error):
         if (
             not message
             and failed_obj is not None
-            and expected_type is not None
+            # No need to add "expected_type is not None" here since we
+            # sometimes compare objects to None
         ):
             if isinstance(expected_type, type):
                 message = \
