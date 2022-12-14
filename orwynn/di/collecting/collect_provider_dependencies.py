@@ -220,6 +220,15 @@ def _get_parameters_for_provider(
         # on Config's non-provider fields, such as checking if it is not
         # waiting for other providers but i'm not sure that it's the case.
 
+        if type(inspect_parameter.annotation) is str:
+            raise NotImplementedError(
+                "future string references,"
+                f" like \"{inspect_parameter.annotation}\""
+                f" in field \"{inspect_parameter.name}\""
+                f" of provider {Provider}"
+                " are not supported for now"
+            )
+
         parameters.append(
             _ProviderParameter(
                 name=inspect_parameter.name,

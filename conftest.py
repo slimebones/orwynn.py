@@ -1,8 +1,4 @@
 """Main framework-only testing suite.
-
-Word "struct" used to refer to root module for the sake of descriptiveness -
-e.g. for fixtures like "self_importing_struct" to annotate that this root
-module has been built with some modules using self importing.
 """
 from pytest import fixture
 
@@ -15,6 +11,8 @@ from orwynn.di.collecting.collect_provider_dependencies_test import \
     std_provider_dependencies_map
 from orwynn.di.init.init_providers_test import std_di_container
 from tests.std import root_module as std_root_module
+from tests.structs import (circular_module_struct, long_circular_module_struct,
+                           self_importing_module_struct)
 
 
 @fixture
