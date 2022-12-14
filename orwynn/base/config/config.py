@@ -2,7 +2,9 @@ from typing import Any, ClassVar, Self
 
 from orwynn.base.config.undefined_config_source_error import \
     UndefinedConfigSourceError
+from orwynn.base.config.unsupported_config_source_error import UnsupportedConfigSourceError
 from orwynn.base.model.model import Model
+from orwynn.boot.BOOT_CONFIG_PROXY_DATA import BOOT_CONFIG_PROXY_DATA
 from orwynn.di.provider import Provider
 from orwynn.util.file.is_path import is_path
 from orwynn.util.file.yml import load_yml
@@ -40,19 +42,35 @@ class Config(Model):
 
         Returns:
             Initialized config instance.
+
+        Raises:
+            UnsupportedConfigSourceError:
+                SOURCE = "boot" can be used only by framework.
+            UnsupportedConfigSourceError:
+                Config source wasn't recognized.
         """
         if not cls.SOURCE:
-            raise UndefinedConfigSourceError(
+            raise UnsupportedConfigSourceError(
                 f"config {cls} should define SOURCE class attribute"
             )
         source_kwargs: dict[str, Any] = cls._load_source(cls.SOURCE)
         return cls(**source_kwargs, **provider_kwargs)
 
-    @staticmethod
-    def _load_source(source: Source) -> dict[str, Any]:
+    @classmethod
+    def _load_source(cls, source: Source) -> dict[str, Any]:
         result: dict[str, Any] = {}
 
-        if is_path(source):
+        if source == "boot":
+            if cls.__name__ != "BootConfig":
+                raise UnsupportedConfigSourceError(
+                    f"SOURCE=\"boot\" can be used only by framework"
+                )
+            return {
+                "root_dir": BOOT_CONFIG_PROXY_DATA.root_dir,
+                "mode": BOOT_CONFIG_PROXY_DATA.mode
+            }
+
+        elif is_path(source):
             result = load_yml(source)  # type: ignore
         else:
             raise NotImplementedError(

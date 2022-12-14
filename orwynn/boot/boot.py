@@ -1,4 +1,5 @@
 import os
+from orwynn.boot.BOOT_CONFIG_PROXY_DATA import BOOT_CONFIG_PROXY_DATA
 from orwynn.boot.boot_mode import BootMode
 from orwynn.base.controller.controller import Controller
 from orwynn.base.module.module import Module
@@ -51,8 +52,10 @@ class Boot(Worker):
         validate(root_module, Module)
         validate(root_dir, str)
 
-        self._mode_enum: BootMode = self._parse_mode_enum(mode)
+        self._mode: BootMode = self._parse_mode_enum(mode)
         self._root_dir = root_dir
+        BOOT_CONFIG_PROXY_DATA.mode = self._mode
+        BOOT_CONFIG_PROXY_DATA.root_dir = self._root_dir
 
         self._di: DI = DI(root_module)
 

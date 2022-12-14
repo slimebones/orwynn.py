@@ -7,6 +7,7 @@ from orwynn.base.config.config import Config
 from orwynn.base.controller.controller import Controller
 from orwynn.base.module.module import Module
 from orwynn.base.service.service import Service
+from orwynn.boot.boot_config import BootConfig
 from orwynn.validation import model_validator
 from tests.std.float import FloatService, float_module
 from tests.std.number import NumberService, number_module
@@ -29,13 +30,15 @@ class TextService(Service):
         config: TextConfig,
         app: AppService,
         number_service: NumberService,
-        float_service: FloatService
+        float_service: FloatService,
+        boot_config: BootConfig
     ) -> None:
         super().__init__()
         self.words_amount = config.words_amount
         self._app = app
         self._number_service = number_service
         self._float_service = float_service
+        self._mode = boot_config.mode
 
     def find(self, id: str) -> str:
         return "{}: {}".format(
@@ -59,7 +62,7 @@ class TextController(Controller):
 
 text_module = Module(
     route="/text",
-    Providers=[TextService, TextConfig],
+    Providers=[TextService, TextConfig, BootConfig],
     Controllers=[TextController],
     imports=[number_module, float_module]
 )

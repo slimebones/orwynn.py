@@ -11,7 +11,7 @@ class BootConfig(Config):
         root_dir:
             Root directory of the boot.
     """
-    SOURCE =
+    SOURCE = "boot"
 
     mode: BootMode
     root_dir: str

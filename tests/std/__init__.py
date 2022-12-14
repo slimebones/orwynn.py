@@ -2,6 +2,7 @@
 """
 from orwynn.app.app_service import AppService
 from orwynn.base.module.module import Module
+from orwynn.boot.boot_config import BootConfig
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.provider import Provider
 from tests.std.float import FloatController, FloatService, float_module
@@ -21,12 +22,15 @@ class Assertion:
         number_module,
         float_module
     ]
+    # Order of these providers doesn't matter here since set() should be
+    # performed on tests
     COLLECTED_PROVIDERS: list[type[Provider]] = [
         AppService,
         TextService,
         TextConfig,
         NumberService,
-        FloatService
+        FloatService,
+        BootConfig
     ]
     COLLECTED_OTHER_ACCEPTORS: list[type[Acceptor]] = [
         TextController,

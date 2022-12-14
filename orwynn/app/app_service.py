@@ -1,19 +1,16 @@
 from typing import Callable
 from fastapi import FastAPI
 from starlette.types import Scope, Receive, Send
-from orwynn.base.service.service import Service
-from orwynn.boot.boot_config import BootConfig
-from orwynn.boot.boot_mode import BootMode
+from orwynn.base.service.framework_service import FrameworkService
 from orwynn.base.test.test_client import TestClient
+from orwynn.boot.boot_config import BootConfig
 from orwynn.http.http import HTTPMethod
 from orwynn.http.unsupported_http_method_error import UnsupportedHTTPMethodError
 
 
-class AppService(Service):
-    def __init__(self, fw_boot_config: BootConfig) -> None:
+class AppService(FrameworkService):
+    def __init__(self) -> None:
         super().__init__()
-        self._root_dir: str
-        self._mode: BootMode
         self._app: FastAPI = FastAPI()
 
         self._HTTP_METHODS_TO_REGISTERING_FUNCTIONS: \
@@ -34,14 +31,6 @@ class AppService(Service):
     @property
     def test_client(self) -> TestClient:
         return TestClient(self._app)
-
-    @property
-    def root_dir(self) -> str:
-        return self._root_dir
-
-    @property
-    def mode(self) -> BootMode:
-        return self._mode
 
     def register_route_fn(
         self, route: str, fn: Callable, method: HTTPMethod
