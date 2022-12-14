@@ -1,6 +1,5 @@
 from typing import Callable
-from orwynn.util.request import Request
-from orwynn.util.response import Response
+from orwynn.util.http import Request, Response
 
 
 class Middleware:
