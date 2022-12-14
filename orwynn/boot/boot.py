@@ -1,13 +1,12 @@
 import os
 from orwynn.app.app_mode import AppMode
 from orwynn.base.module.module import Module
-from orwynn.base.service.framework_service import FrameworkService
 
 from orwynn.base.worker.worker import Worker
 from orwynn.app.app_service import AppService
 from orwynn.boot.boot_error import BootError
 from orwynn.di.di import DI
-from orwynn.validation import validate, validate_each
+from orwynn.validation import validate
 
 
 class Boot(Worker):
@@ -22,9 +21,6 @@ class Boot(Worker):
             simplicity.
         root_module:
             Root module of the app.
-        FrameworkServices (optional):
-            List of framework services to enable. AppService always included,
-            even if you pass an empty list.
         root_dir (optional):
             Root directory of the project. Defaults to os.getcwd().
 
@@ -38,8 +34,7 @@ class Boot(Worker):
 
     app = Boot(
         mode=AppModeEnum.DEV,
-        root_module=root_module,
-        FrameworkServices=[AppService, MongoService]
+        root_module=root_module
     ).app
     ```
     """
@@ -48,19 +43,11 @@ class Boot(Worker):
         *,
         mode: AppMode | str,
         root_module: Module,
-        FrameworkServices: list[type[FrameworkService]] | None = None,
         root_dir: str = os.getcwd()
     ) -> None:
         super().__init__()
         validate(mode, [AppMode, str])
         validate(root_module, Module)
-        if FrameworkServices:
-            validate_each(FrameworkServices, FrameworkService)
-            if AppService not in FrameworkServices:
-                # Preserve correct order
-                FrameworkServices = [AppService] + FrameworkServices
-        else:
-            FrameworkServices = [AppService]
         validate(root_dir, str)
 
         self._mode_enum: AppMode = self._parse_mode_enum(mode)

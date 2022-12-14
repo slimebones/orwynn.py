@@ -28,16 +28,13 @@ class _ProviderParameter(Model):
 
 
 def collect_provider_dependencies(
-    modules: list[Module],
-    FrameworkServices: list[type[FrameworkService]]
+    modules: list[Module]
 ) -> ProviderDependenciesMap:
     """Collects providers and their dependencies from given modules.
 
     Args:
         modules:
             List of modules to collect providers from.
-        FrameworkServices:
-            Framework-level services to collect first.
 
     Returns:
         Special structure maps providers and their dependencies.

@@ -2,14 +2,11 @@
 """
 from orwynn.app.app_service import AppService
 from orwynn.base.module.module import Module
-from orwynn.base.service.framework_service import FrameworkService
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.provider import Provider
 from tests.std.float import FloatController, FloatService, float_module
 from tests.std.number import NumberController, NumberService, number_module
 from tests.std.text import TextConfig, TextController, TextService, text_module
-
-STD_FRAMEWORK_SERVICES: list[type[FrameworkService]] = [AppService]
 
 root_module = Module(
     route="/",
