@@ -2,8 +2,8 @@ from orwynn.app.app_service import AppService
 from orwynn.base.module.module import Module
 from orwynn.base.worker.worker import Worker
 from orwynn.di.di_error import DIError
-from orwynn.di.di_object.di_container import DIContainer
-from orwynn.di.di_object.di_object import DIObject
+from orwynn.di.di_container import DIContainer
+from orwynn.di.di_object import DIObject
 from orwynn.validation import validate
 
 

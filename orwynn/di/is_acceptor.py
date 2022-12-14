@@ -1,4 +1,4 @@
-from orwynn.di.di_object.BUILTIN_ACCEPTORS import BUILTIN_ACCEPTORS
+from orwynn.di.BUILTIN_ACCEPTORS import BUILTIN_ACCEPTORS
 
 
 def is_acceptor(Class: type) -> bool:

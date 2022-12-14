@@ -4,16 +4,16 @@ from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.di.collecting.no_dependencies_for_given_provider_error import \
     NoDependenciesForGivenProviderError
 from orwynn.di.collecting.provider_dependencies_map import \
-    ProvidersDependenciesMap
-from orwynn.di.di_object.di_container import DIContainer
-from orwynn.di.di_object.is_provider import is_provider
-from orwynn.di.di_object.missing_di_object_error import MissingDIObjectError
-from orwynn.di.di_object.provider import Provider
+    ProviderDependenciesMap
+from orwynn.di.di_container import DIContainer
+from orwynn.di.is_provider import is_provider
+from orwynn.di.missing_di_object_error import MissingDIObjectError
+from orwynn.di.provider import Provider
 from orwynn.util.fmt import format_chain
 
 
-def traverse_initializing_providers(
-    providers_dependencies_map: ProvidersDependenciesMap
+def init_providers(
+    providers_dependencies_map: ProviderDependenciesMap
 ) -> DIContainer:
     """Traverses through given providers and dependencies initializing them.
 
@@ -47,11 +47,10 @@ def traverse_initializing_providers(
 def _traverse(
     *,
     StarterProvider: type[Provider],
-    mp: ProvidersDependenciesMap,
+    mp: ProviderDependenciesMap,
     container: DIContainer,
     chain: list[type[Provider]]
 ) -> Provider:
-    print(StarterProvider, container.items)
     already_initialized_dependencies: list[Provider] = []
 
     if StarterProvider in chain:

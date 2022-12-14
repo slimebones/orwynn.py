@@ -1,13 +1,15 @@
 from pathlib import Path
+
 import lorem
+
 from orwynn.app.app_service import AppService
 from orwynn.base.config.config import Config
 from orwynn.base.controller.controller import Controller
 from orwynn.base.module.module import Module
 from orwynn.base.service.service import Service
-from tests.std.number import NumberService, number_module
-from tests.std.float import FloatService, float_module
 from orwynn.validation import model_validator
+from tests.std.float import FloatService, float_module
+from tests.std.number import NumberService, number_module
 
 
 class TextConfig(Config):
@@ -48,7 +50,7 @@ class TextController(Controller):
         super().__init__()
         self.service = service
 
-    def find(self, id: str) -> dict:
+    def get(self, id: str) -> dict:
         return {
             "type": "str",
             "value": self.service.find(id)

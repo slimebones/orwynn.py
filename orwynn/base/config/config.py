@@ -3,7 +3,7 @@ from typing import Any, ClassVar, Self
 from orwynn.base.config.undefined_config_source_error import \
     UndefinedConfigSourceError
 from orwynn.base.model.model import Model
-from orwynn.di.di_object.provider import Provider
+from orwynn.di.provider import Provider
 from orwynn.util.file.is_path import is_path
 from orwynn.util.file.yml import load_yml
 from orwynn.util.types import Source

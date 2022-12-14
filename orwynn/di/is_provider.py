@@ -1,4 +1,4 @@
-from orwynn.di.di_object.BUILTIN_PROVIDERS import BUILTIN_PROVIDERS
+from orwynn.di.BUILTIN_PROVIDERS import BUILTIN_PROVIDERS
 
 
 def is_provider(Class: type) -> bool:

@@ -2,16 +2,22 @@ import inspect
 
 from pytest import fixture
 
-from orwynn.app.app_service import AppService
 from orwynn.base.config.config import Config
 from orwynn.base.module.module import Module
 from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.di.collecting.collect_modules import collect_modules
-from orwynn.di.collecting.collect_providers_dependencies import (
-    ProvidersDependenciesMap, collect_providers_dependencies)
-from orwynn.di.di_object.is_provider import is_provider
-from orwynn.di.di_object.provider import Provider
-from tests.std import Assertion
+from orwynn.di.collecting.collect_provider_dependencies import (
+    ProviderDependenciesMap, collect_provider_dependencies)
+from orwynn.di.is_provider import is_provider
+from orwynn.di.provider import Provider
+from tests.std import STD_FRAMEWORK_SERVICES, Assertion
+
+
+@fixture
+def std_provider_dependencies_map(
+    std_modules: list[Module]
+) -> ProviderDependenciesMap:
+    return collect_provider_dependencies(std_modules, STD_FRAMEWORK_SERVICES)
 
 
 @fixture
@@ -47,9 +53,9 @@ def long_twice_occurence_struct() -> Module:
 
 
 def test_std(std_struct: Module):
-    metamap: ProvidersDependenciesMap = collect_providers_dependencies(
+    metamap: ProviderDependenciesMap = collect_provider_dependencies(
         collect_modules(std_struct),
-        [AppService]
+        STD_FRAMEWORK_SERVICES
     )
 
     # Order doesn't matter
@@ -70,9 +76,9 @@ def test_std(std_struct: Module):
 
 def test_twice_occurence(twice_occurence_struct: Module):
     try:
-        collect_providers_dependencies(
+        collect_provider_dependencies(
             collect_modules(twice_occurence_struct),
-            [AppService]
+            STD_FRAMEWORK_SERVICES
         )
     except CircularDependencyError:
         pass
@@ -82,9 +88,9 @@ def test_twice_occurence(twice_occurence_struct: Module):
 
 def test_long_twice_occurence(long_twice_occurence_struct: Module):
     try:
-        collect_providers_dependencies(
+        collect_provider_dependencies(
             collect_modules(long_twice_occurence_struct),
-            [AppService]
+            STD_FRAMEWORK_SERVICES
         )
     except CircularDependencyError:
         pass

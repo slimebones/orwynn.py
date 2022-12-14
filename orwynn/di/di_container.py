@@ -1,8 +1,8 @@
-from orwynn.di.di_object.di_object import DIObject
-from orwynn.di.di_object.di_object_already_initialized_in_container_error \
+from orwynn.di.di_object import DIObject
+from orwynn.di.di_object_already_initialized_in_container_error \
     import \
     DIObjectAlreadyInitializedInContainerError
-from orwynn.di.di_object.missing_di_object_error import MissingDIObjectError
+from orwynn.di.missing_di_object_error import MissingDIObjectError
 from orwynn.validation import validate
 
 

@@ -4,10 +4,10 @@ from orwynn.app.empty_route_error import EmptyRouteError
 from orwynn.app.incorrect_route_error import IncorrectRouteError
 from orwynn.base.controller.controller import Controller
 from orwynn.base.middleware import middleware
-from orwynn.di.di_object.is_provider import is_provider
+from orwynn.di.is_provider import is_provider
 from orwynn.di.collecting.not_provider_error import NotProviderError
 
-from orwynn.di.di_object.provider import Provider
+from orwynn.di.provider import Provider
 from orwynn.validation import validate
 
 

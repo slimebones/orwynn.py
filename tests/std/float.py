@@ -25,7 +25,7 @@ class FloatController(Controller):
         super().__init__()
         self.service = service
 
-    def find(self, id: str) -> dict:
+    def get(self, id: str) -> dict:
         return {
             "type": "float",
             "value": self.service.find(id)

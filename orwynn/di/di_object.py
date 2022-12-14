@@ -1,5 +1,5 @@
-from orwynn.di.di_object.acceptor import Acceptor
-from orwynn.di.di_object.provider import Provider
+from orwynn.di.acceptor import Acceptor
+from orwynn.di.provider import Provider
 
 
 # Any object which can be stored in DI container and should be presented in

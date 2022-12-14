@@ -1,5 +1,5 @@
 from orwynn.base.error.error import Error
-from orwynn.di.di_object.provider import Provider
+from orwynn.di.provider import Provider
 
 
 class ProviderAlreadyInitializedForMapError(Error):

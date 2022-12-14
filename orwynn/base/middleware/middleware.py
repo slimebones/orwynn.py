@@ -11,7 +11,7 @@ class Middleware:
     function to call. This method should always return response in either
     modified or unmodified state.
     """
-    def __init__(self) -> None:
+    def __init__(self, *args) -> None:
         pass
 
     def process(self, request: Request, call_next: Callable) -> Response:

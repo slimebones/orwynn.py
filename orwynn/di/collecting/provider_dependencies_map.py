@@ -4,10 +4,10 @@ from orwynn.di.collecting.provider_already_initialized_for_map_error import \
     ProviderAlreadyInitializedForMapError
 from orwynn.di.collecting.provider_not_found_in_map_error import \
     ProviderNotFoundInMapError
-from orwynn.di.di_object.provider import Provider
+from orwynn.di.provider import Provider
 
 
-class ProvidersDependenciesMap:
+class ProviderDependenciesMap:
     """Maps Providers and their requested dependencies.
 
     Since providers can request only other providers, it's a representation of

@@ -7,6 +7,11 @@ from tests.std import Assertion
 
 
 @fixture
+def std_modules(std_struct: Module) -> list[Module]:
+    return collect_modules(std_struct)
+
+
+@fixture
 def self_importing_struct() -> Module:
     m1 = Module(route="/m1")
     m1.imports.append(m1)

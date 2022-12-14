@@ -9,14 +9,14 @@ from orwynn.di.collecting.not_provider_error import NotProviderError
 from orwynn.di.collecting.provider_already_initialized_for_map_error import \
     ProviderAlreadyInitializedForMapError
 from orwynn.di.collecting.provider_dependencies_map import \
-    ProvidersDependenciesMap
+    ProviderDependenciesMap
 from orwynn.di.collecting.provider_keyword_attribute_error import \
     ProviderKeywordAttributeError
 from orwynn.di.collecting.provider_not_available_error import \
     ProviderNotAvailableError
 from orwynn.di.di_error import DIError
-from orwynn.di.di_object.is_provider import is_provider
-from orwynn.di.di_object.provider import Provider
+from orwynn.di.is_provider import is_provider
+from orwynn.di.provider import Provider
 from orwynn.util.fmt import format_chain
 
 _ProviderParameters = list["_ProviderParameter"]
@@ -27,10 +27,10 @@ class _ProviderParameter(Model):
     DependencyProvider: type[Provider]
 
 
-def collect_providers_dependencies(
+def collect_provider_dependencies(
     modules: list[Module],
     FrameworkServices: list[type[FrameworkService]]
-) -> ProvidersDependenciesMap:
+) -> ProviderDependenciesMap:
     """Collects providers and their dependencies from given modules.
 
     Args:
@@ -42,7 +42,7 @@ def collect_providers_dependencies(
     Returns:
         Special structure maps providers and their dependencies.
     """
-    metamap: ProvidersDependenciesMap = ProvidersDependenciesMap()
+    metamap: ProviderDependenciesMap = ProviderDependenciesMap()
 
     # Traverse all parameters of all providers in all modules to add them in
     # united structure
@@ -56,7 +56,7 @@ def collect_providers_dependencies(
 
 def _traverse(
     P: type[Provider],
-    metamap: ProvidersDependenciesMap,
+    metamap: ProviderDependenciesMap,
     chain: list[type[Provider]],
     target_module: Module | None
 ):
