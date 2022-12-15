@@ -60,7 +60,6 @@ class Module:
         exports: list[type[Provider]] | None = None
     ) -> None:
         super().__init__()
-
         validate(route, str)
         validate(Providers, [list, NoneType])
         validate(Controllers, [list, NoneType])

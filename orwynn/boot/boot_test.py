@@ -6,11 +6,12 @@ from orwynn.boot.boot import Boot
 
 
 @fixture
-def std_boot(std_struct: Module) -> Boot:
-    return Boot(
+def std_boot(std_struct: Module):
+    yield Boot(
         mode=BootMode.TEST,
         root_module=std_struct
     )
+    Boot.discard()
 
 
 def test_init_mode_test(std_struct: Module):

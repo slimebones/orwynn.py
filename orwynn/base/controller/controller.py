@@ -1,9 +1,13 @@
 from typing import Callable
-from orwynn.base.controller.defined_twice_controller_method_error import DefinedTwiceControllerMethodError
-from orwynn.base.controller.missing_controller_class_attribute_error import MissingControllerClassAttributeError
+
+from orwynn.base.controller.defined_twice_controller_method_error import \
+    DefinedTwiceControllerMethodError
+from orwynn.base.controller.missing_controller_class_attribute_error import \
+    MissingControllerClassAttributeError
 from orwynn.base.middleware.middleware import Middleware
 from orwynn.http import HTTPMethod, TestResponse
-from orwynn.http.unsupported_http_method_error import UnsupportedHTTPMethodError
+from orwynn.http.unsupported_http_method_error import \
+    UnsupportedHTTPMethodError
 from orwynn.validation import validate, validate_each, validate_route
 
 ControllerMethodReturnedData = dict | TestResponse

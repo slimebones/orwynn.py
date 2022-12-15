@@ -2,8 +2,9 @@ from typing import Callable
 
 from fastapi import FastAPI
 from starlette.types import Receive, Scope, Send
-from orwynn.app.already_registered_route_error import AlreadyRegisteredRouteError
 
+from orwynn.app.already_registered_method_error import \
+    AlreadyRegisteredMethodError
 from orwynn.base.service.framework_service import FrameworkService
 from orwynn.base.test.test_client import TestClient
 from orwynn.http import HTTPMethod
@@ -26,7 +27,7 @@ class AppService(FrameworkService):
                 HTTPMethod.OPTIONS: self._app.options
             }
 
-        self._routes: set[str] = set()
+        self._methods_by_route: dict[str, set[HTTPMethod]] = {}
 
     async def __call__(
         self, scope: Scope, receive: Receive, send: Send
@@ -50,6 +51,7 @@ class AppService(FrameworkService):
             method:
                 HTTP method function is handling.
         """
+        print(f"{self._methods_by_route=}")
         print(f"register {route=} {fn=} {method=}")
         app_fn: Callable | None = \
             self._HTTP_METHODS_TO_REGISTERING_FUNCTIONS.get(
@@ -61,11 +63,18 @@ class AppService(FrameworkService):
                 f"HTTP method {method} is not supported"
             )
 
-        if route in self._routes:
-            raise AlreadyRegisteredRouteError(
-                f"route \"{route}\" has been already registered"
+        if (
+            route in self._methods_by_route.keys()
+            and method in self._methods_by_route[route]
+        ):
+            raise AlreadyRegisteredMethodError(
+                f"method {method} has been already registered for route"
+                f" \"{route}\""
             )
         else:
-            self._routes.add(route)
+            try:
+                self._methods_by_route[route].add(method)
+            except KeyError:
+                self._methods_by_route[route] = {method}
 
         app_fn(route)(fn)

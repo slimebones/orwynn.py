@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import TypeVar
 
+from orwynn.base.singleton.singleton_error import SingletonError
+
 
 SingletonInstance = TypeVar("SingletonInstance")
 
@@ -11,12 +13,26 @@ class SingletonMeta(type):
     See:
         https://stackoverflow.com/questions/6760685/creating-a-singleton-in-python
     """
-    instances = {}
+    __instances: dict[type, object] = {}
 
     def __call__(cls, *args, **kwargs):
-        if cls not in cls.instances:
-            cls.instances[cls] = super().__call__(*args, **kwargs)
-        return cls.instances[cls]
+        if cls not in cls.__instances:
+            cls.__instances[cls] = super().__call__(*args, **kwargs)
+        return cls.__instances[cls]
+
+    def __validate_in_instances(cls, cannot_message: str) -> None:
+        if cls not in cls.__instances.keys():
+            raise SingletonError(
+                f"{cannot_message} - class {cls} not initialized"
+            )
+
+    def discard(cls, should_validate: bool = True) -> None:
+        if should_validate:
+            cls.__validate_in_instances("cannot discard")
+        try:
+            del cls.__instances[cls]
+        except KeyError:
+            pass
 
 
 class Singleton(metaclass=SingletonMeta):

@@ -1,5 +1,4 @@
-from orwynn.app.already_registered_route_error import \
-    AlreadyRegisteredRouteError
+from orwynn.app.already_registered_method_error import AlreadyRegisteredMethodError
 from orwynn.base.controller.controller import Controller
 from orwynn.base.controller.defined_twice_controller_method_error import \
     DefinedTwiceControllerMethodError
@@ -8,11 +7,13 @@ from orwynn.base.controller.missing_controller_class_attribute_error import \
 from orwynn.base.module.module import Module
 from orwynn.base.test.http_client import HttpClient
 from orwynn.boot.boot import Boot
+from orwynn.di.di import DI
 from orwynn.http import HTTPMethod, TestResponse
 from orwynn.http.unsupported_http_method_error import \
     UnsupportedHTTPMethodError
 from orwynn.util.expect import expect
-from orwynn.validation.validation_error import ReValidationError, ValidationError
+from orwynn.validation.validation_error import (ReValidationError,
+                                                ValidationError)
 
 
 def test_http_methods():
@@ -91,9 +92,9 @@ def test_already_registered():
         METHODS = ["get"]
 
     m1 = Module(route="/", Controllers=[C1, C2])
-    expect(Boot, AlreadyRegisteredRouteError, m1)
+    expect(Boot, AlreadyRegisteredMethodError, m1)
 
 
-def test_std_routes(std_boot: Boot, std_http: HttpClient):
-    r: TestResponse = std_http.get("/text")
-    assert False, r
+def test_std_routes(std_boot: Boot):
+    # r: TestResponse = std_http.get("/text")
+    assert False

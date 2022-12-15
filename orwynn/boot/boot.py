@@ -66,7 +66,9 @@ class Boot(Worker):
         #   and is breaking many principles, so fix it ASAP
         root_module._Providers.append(AppService)
 
+        print(root_module)
         self._di: DI = DI(root_module)
+        print(root_module, self._di.modules, self._di.controllers)
 
         self._register_routes(self._di.modules, self._di.controllers)
 
@@ -104,9 +106,12 @@ class Boot(Worker):
         c: Controller,
         m: Module
     ) -> None:
-        for controller_declared_method in c.METHODS
-        for method in HTTPMethod:
-            try:
+        # At least one method found
+        is_method_found: bool = False
+        for http_method in HTTPMethod:
+            # Don't register unused methods
+            if http_method in c.methods:
+                is_method_found = True
                 if c.ROUTE is None:
                     raise MalfunctionError(
                         f"route of controller {c.__class__} is None"
@@ -124,13 +129,15 @@ class Boot(Worker):
                     # We can concatenate routes such way since routes
                     # are validated to not contain following slash
                     route=joined_route,
-                    fn=c.get_fn_by_http_method(method),
-                    method=method
+                    fn=c.get_fn_by_http_method(http_method),
+                    method=http_method
                 )
-            # To not register not implemented methods and to not
-            # confuse OPTIONS requests
-            except NotImplementedError:
-                continue
+
+        if not is_method_found:
+            raise MalfunctionError(
+                f"no http methods found for controller {c.__class__},"
+                " this shouldn't have passed validation at Controller.__init__"
+            )
 
     def _parse_mode(self, mode: BootMode | str | None) -> BootMode:
         if mode is None:

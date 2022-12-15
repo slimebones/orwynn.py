@@ -44,6 +44,12 @@ class DI(Worker):
         super().__init__()
         validate(root_module, Module)
 
+        import httpx
+        try:
+            httpx.get(f"http://localhost:8000?id={hex(id(root_module))}")
+        except Exception:
+            pass
+
         # So here we have generally two stages of DI:
         #   1. Collecting (module "di/collecting")
         #   2. Initializing (module "di/init")

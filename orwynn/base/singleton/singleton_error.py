@@ -1,5 +1,5 @@
 from orwynn.base.error.error import Error
 
 
-class AlreadyRegisteredRouteError(Error):
+class SingletonError(Error):
     pass

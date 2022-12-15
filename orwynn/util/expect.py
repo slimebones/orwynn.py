@@ -34,5 +34,5 @@ def expect(
         pass
     else:
         raise ExpectationError(
-            f"{ErrorToExpect} expected on call of function {fn}"
+            f"error {ErrorToExpect} expected on call of function {fn}"
         )
