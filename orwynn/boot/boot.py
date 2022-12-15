@@ -1,5 +1,6 @@
 import os
 from types import NoneType
+from orwynn.base.error.malfunction_error import MalfunctionError
 from orwynn.boot.BOOT_CONFIG_PROXY_DATA import BOOT_CONFIG_PROXY_DATA
 from orwynn.boot.boot_mode import BootMode
 from orwynn.base.controller.controller import Controller
@@ -63,24 +64,73 @@ class Boot(Worker):
         # TEMP:
         #   Add AppService to be always initialized - THIS IS VERY BAD approach
         #   and is breaking many principles, so fix it ASAP
-        root_module.Providers.append(AppService)
+        root_module._Providers.append(AppService)
 
         self._di: DI = DI(root_module)
 
-        self._register_controllers(self._di.controllers)
+        self._register_routes(self._di.modules, self._di.controllers)
 
     @property
     def app(self) -> AppService:
         return self._di.app_service
 
-    def _register_controllers(self, controllers: list[Controller]) -> None:
+    def _register_routes(
+        self, modules: list[Module], controllers: list[Controller]
+    ) -> None:
+        for m in modules:
+            for C in m.Controllers:
+                self._register_controller_class_for_module(m, C, controllers)
+
+    def _register_controller_class_for_module(
+        self,
+        m: Module,
+        C: type[Controller],
+        controllers: list[Controller]
+    ) -> None:
+        is_controller_found: bool = False
         for c in controllers:
-            for method in HTTPMethod:
+            if type(c) is C:
+                is_controller_found = True
+                self._register_controller_for_module(c, m)
+        if not is_controller_found:
+            raise MalfunctionError(
+                f"no initialized controller found for class {C},"
+                f" but it was declared in imported module {m},"
+                " so DI should have been initialized it"
+            )
+
+    def _register_controller_for_module(
+        self,
+        c: Controller,
+        m: Module
+    ) -> None:
+        for controller_declared_method in c.METHODS
+        for method in HTTPMethod:
+            try:
+                if c.ROUTE is None:
+                    raise MalfunctionError(
+                        f"route of controller {c.__class__} is None"
+                        " but check should have been performed at"
+                        " class instance initialization"
+                    )
+
+                joined_route: str
+                if m.ROUTE == "/":
+                    joined_route = c.ROUTE
+                else:
+                    joined_route = m.ROUTE + c.ROUTE
+
                 self.app.register_route_fn(
-                    route=c.ROUTE,
+                    # We can concatenate routes such way since routes
+                    # are validated to not contain following slash
+                    route=joined_route,
                     fn=c.get_fn_by_http_method(method),
                     method=method
                 )
+            # To not register not implemented methods and to not
+            # confuse OPTIONS requests
+            except NotImplementedError:
+                continue
 
     def _parse_mode(self, mode: BootMode | str | None) -> BootMode:
         if mode is None:

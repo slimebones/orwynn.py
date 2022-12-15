@@ -48,11 +48,11 @@ class DI(Worker):
         #   1. Collecting (module "di/collecting")
         #   2. Initializing (module "di/init")
 
-        modules: list[Module] = collect_modules(root_module)
+        self.modules: list[Module] = collect_modules(root_module)
         self._container: DIContainer = init_providers(
-            collect_provider_dependencies(modules)
+            collect_provider_dependencies(self.modules)
         )
-        init_other_acceptors(self._container, modules)
+        init_other_acceptors(self._container, self.modules)
 
     @property
     def app_service(self) -> AppService:

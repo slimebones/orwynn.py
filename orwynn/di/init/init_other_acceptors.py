@@ -20,7 +20,7 @@ def init_other_acceptors(
             List of modules to collect acceptors from.
     """
     for module in modules:
-        for C in module.Controllers:
+        for C in module._Controllers:
             validate(C, Controller)
             container.add(
                 C(
@@ -28,7 +28,7 @@ def init_other_acceptors(
                 )
             )
 
-        for M in module.Middleware:
+        for M in module._Middleware:
             validate(M, Controller)
             container.add(
                 M(

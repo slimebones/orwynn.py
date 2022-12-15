@@ -48,12 +48,12 @@ def _traverse(
     if init_module not in modules:
         if init_module not in modules:
             modules.append(init_module)
-        if init_module.imports:
-            if init_module in init_module.imports:
+        if init_module._imports:
+            if init_module in init_module._imports:
                 raise CircularDependencyError(
                     "{} imports self".format(init_module)
                 )
-            for m in init_module.imports:
+            for m in init_module._imports:
                 _traverse(m, modules, chain)
 
     # On blocking case remove recently added module since we don't want this

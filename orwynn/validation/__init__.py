@@ -9,7 +9,7 @@ from orwynn.validation.validation_error import (ReValidationError,
 
 
 def validate(
-    obj: Any, expected_type: type | list[type], is_strict: bool = False
+    obj: Any, expected_type: type | list[type], *, is_strict: bool = False
 ) -> None:
     """Validates given object against expected type.
 
@@ -64,7 +64,10 @@ def validate(
 def validate_each(
     obj: list | tuple | set | frozenset,
     expected_type: type | list[type],
-    is_strict: bool = False
+    *,
+    is_strict: bool = False,
+    expected_obj_type: type | None = None,
+    should_check_if_empty: bool = False
 ) -> None:
     """Validates each object in given array against expected type.
 
@@ -79,11 +82,28 @@ def validate_each(
             Whether strict check should be performed. If True, direct type
             comparison is made, disallowing subclasses. If False, isinstance()
             comparison is made.
+        expected_obj_type (optional):
+            To perform checking for the given object itself.
+        should_check_if_empty (optional):
+            Perform checking if given obj is empty.
     """
     validate(obj, [list, tuple, set, frozenset])
 
+    if expected_obj_type is not None:
+        if expected_obj_type not in [list, tuple, set, frozenset]:
+            raise ValidationError(
+                f"expected object type {expected_obj_type} is neither"
+                " list, tuple, set or frozen set"
+            )
+        validate(obj, expected_obj_type)
+
+    is_empty: bool = True
     for o in obj:
-        validate(o, expected_type, is_strict)
+        is_empty = False
+        validate(o, expected_type, is_strict=is_strict)
+
+    if should_check_if_empty and is_empty:
+        raise ValidationError("validated iterable shouldn't be empty")
 
 
 def validate_re(string: str, pattern: str) -> None:

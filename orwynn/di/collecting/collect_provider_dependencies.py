@@ -172,8 +172,8 @@ def _search_matching_provider(
 
     if not is_found:
         # Not available in the same module, check imported ones
-        for m in target_module.imports:
-            for P in m.exports:
+        for m in target_module._imports:
+            for P in m._exports:
                 if P is TargetProvider:
                     # Available in the exports of the imported module
                     is_found = True

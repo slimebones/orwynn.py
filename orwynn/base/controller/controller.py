@@ -1,8 +1,10 @@
 from typing import Callable
-from orwynn.base.controller.missing_controller_route import MissingControllerRoute
+from orwynn.base.controller.defined_twice_controller_method_error import DefinedTwiceControllerMethodError
+from orwynn.base.controller.missing_controller_class_attribute_error import MissingControllerClassAttributeError
 from orwynn.base.middleware.middleware import Middleware
 from orwynn.http import HTTPMethod, TestResponse
-from orwynn.validation import validate, validate_route
+from orwynn.http.unsupported_http_method_error import UnsupportedHTTPMethodError
+from orwynn.validation import validate, validate_each, validate_route
 
 ControllerMethodReturnedData = dict | TestResponse
 
@@ -24,15 +26,21 @@ class Controller:
             controller will answer to. This attribute is required to be
             defined in subclasses explicitly or an error will be raised.
             It is allowed to be "/" to handle Module's root route requests.
-        MIDDLEWARE:
+        METHODS:
+            List of supported HTTP methods to be registered. Methods here can
+            be either uppercase or lowercase, e.g. METHODS = ["get", "POST"]
+        MIDDLEWARE (optional):
             List of Middleware classes to be applied to this controller.
     """
-    ROUTE: str
-    MIDDLEWARE: list[Middleware] = []
+    ROUTE: str | None = None
+    METHODS: list[str] | None = None
+    MIDDLEWARE: list[Middleware] | None = None
 
     def __init__(self, *args) -> None:
+        self._methods: list[HTTPMethod] = []
+
         if self.ROUTE is None:
-            raise MissingControllerRoute(
+            raise MissingControllerClassAttributeError(
                 "you should set class attribute ROUTE for"
                 f" controller {self.__class__}"
             )
@@ -40,22 +48,64 @@ class Controller:
             validate(self.ROUTE, str)
             validate_route(self.ROUTE)
 
+        if self.METHODS is None:
+            raise MissingControllerClassAttributeError(
+                "you should set class attribute METHODS for"
+                f" controller {self.__class__}"
+            )
+        else:
+            validate_each(
+                self.METHODS,
+                str,
+                expected_obj_type=list,
+                should_check_if_empty=True
+            )
+            collected_methods: list[str] = []
+            for method in self.METHODS:
+                method = method.lower()
+                if method not in [e.value for e in HTTPMethod]:
+                    raise UnsupportedHTTPMethodError(
+                        f"method {method} is not supported"
+                    )
+                if method in collected_methods:
+                    raise DefinedTwiceControllerMethodError(
+                        f"method {method} defined twice in controller"
+                        f" {self.__class__}"
+                    )
+                collected_methods.append(method)
+                self._methods.append(HTTPMethod(method))
+
+        if self.MIDDLEWARE is None:
+            self.MIDDLEWARE = []
+        else:
+            validate_each(
+                self.MIDDLEWARE, Middleware, expected_obj_type=list
+            )
+
+    @property
+    def methods(self) -> list[HTTPMethod]:
+        return self._methods
+
     def get_fn_by_http_method(self, method: HTTPMethod) -> Callable:
+        fn: Callable
+
         match method:
             case HTTPMethod.GET:
-                return self.get
+                fn = self.get
             case HTTPMethod.POST:
-                return self.post
+                fn = self.post
             case HTTPMethod.PUT:
-                return self.put
+                fn = self.put
             case HTTPMethod.DELETE:
-                return self.delete
+                fn = self.delete
             case HTTPMethod.PATCH:
-                return self.patch
+                fn = self.patch
             case HTTPMethod.OPTIONS:
-                return self.options
+                fn = self.options
             case _:
-                raise NotImplementedError()
+                raise
+
+        return fn
 
     def get(self, *args, **kwargs) -> ControllerMethodReturnedData:
         raise NotImplementedError(
@@ -92,3 +142,4 @@ class Controller:
             "the method OPTIONS is not implemented for controller"
             f" {self.__class__}"
         )
+

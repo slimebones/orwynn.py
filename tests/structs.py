@@ -13,7 +13,7 @@ from orwynn.base.module.module import Module
 @fixture
 def self_importing_module_struct() -> Module:
     m1 = Module(route="/m1")
-    m1.imports.append(m1)
+    m1._imports.append(m1)
 
     return Module(
         route="/",
@@ -26,7 +26,7 @@ def circular_module_struct() -> Module:
     m1 = Module(route="/m1")
     m2 = Module(route="/m2", imports=[m1])
 
-    m1.imports.append(m2)
+    m1._imports.append(m2)
 
     rm = Module(
         route="/",
@@ -43,7 +43,7 @@ def long_circular_module_struct() -> Module:
     m3 = Module(route="/m3", imports=[m2])
     m4 = Module(route="/m4", imports=[m3])
 
-    m1.imports.append(m4)
+    m1._imports.append(m4)
 
     rm = Module(
         route="/",

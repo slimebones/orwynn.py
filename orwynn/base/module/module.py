@@ -1,15 +1,16 @@
+import copy
 from types import NoneType
+
 from orwynn.app.empty_route_error import EmptyRouteError
 from orwynn.base.controller.controller import Controller
 from orwynn.base.middleware import middleware
-from orwynn.base.module.framework_service_module_reference_error import FrameworkServiceModuleReferenceError
+from orwynn.base.module.framework_service_module_reference_error import \
+    FrameworkServiceModuleReferenceError
 from orwynn.base.service.framework_service import FrameworkService
 from orwynn.di.is_provider import is_provider
 from orwynn.di.not_provider_error import NotProviderError
-
 from orwynn.di.provider import Provider
-from orwynn.validation import validate, validate_route
-from orwynn.validation.validation_error import ReValidationError
+from orwynn.validation import validate, validate_each, validate_route
 
 
 class Module:
@@ -67,29 +68,49 @@ class Module:
         validate(imports, [list, NoneType])
         validate(exports, [list, NoneType])
 
-        self.route: str = self._parse_route(route)
+        self._ROUTE: str = self._parse_route(route)
         self._Providers: list[type[Provider]] = self._parse_providers(
             Providers
         )
-        self.Controllers: list[type[Controller]] = self._parse_controllers(
+        self._Controllers: list[type[Controller]] = self._parse_controllers(
             Controllers
         )
-        self.Middleware: list[type[middleware.Middleware]] = \
+        self._Middleware: list[type[middleware.Middleware]] = \
             self._parse_middleware(Middleware)
-        self.imports: list["Module"] = self._parse_imports(imports)
+        self._imports: list["Module"] = self._parse_imports(imports)
         # TODO: Add check if exports present in Providers
-        self.exports: list[type[Provider]] = self._parse_providers(Providers)
+        self._exports: list[type[Provider]] = self._parse_providers(Providers)
 
     def __repr__(self) -> str:
         return "<{} \"{}\" at {}>".format(
             self.__class__.__name__,
-            self.route,
+            self.ROUTE,
             hex(id(self))
         )
 
     @property
+    def ROUTE(self) -> str:
+        return self._ROUTE
+
+    @property
     def Providers(self) -> list[type[Provider]]:
-        return self._Providers
+        return copy.copy(self._Providers)
+
+    @property
+    def Controllers(self) -> list[type[Controller]]:
+        return copy.copy(self._Controllers)
+
+    @property
+    def Middleware(self) -> list[type[middleware.Middleware]]:
+        return copy.copy(self._Middleware)
+
+    @property
+    def imports(self) -> list["Module"]:
+        return copy.copy(self._imports)
+
+    @property
+    def exports(self) -> list[type[Provider]]:
+        return copy.copy(self._exports)
 
     @staticmethod
     def _parse_route(route: str) -> str:
@@ -130,6 +151,7 @@ class Module:
         if Controllers:
             for Controller_ in Controllers:
                 validate(Controller_, Controller)
+                # Rest validation done by controller itself
             res = Controllers
         else:
             res = []
