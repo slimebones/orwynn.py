@@ -51,8 +51,6 @@ class AppService(FrameworkService):
             method:
                 HTTP method function is handling.
         """
-        print(f"{self._methods_by_route=}")
-        print(f"register {route=} {fn=} {method=}")
         app_fn: Callable | None = \
             self._HTTP_METHODS_TO_REGISTERING_FUNCTIONS.get(
                 method, None

@@ -66,9 +66,7 @@ class Boot(Worker):
         #   and is breaking many principles, so fix it ASAP
         root_module._Providers.append(AppService)
 
-        print(root_module)
         self._di: DI = DI(root_module)
-        print(root_module, self._di.modules, self._di.controllers)
 
         self._register_routes(self._di.modules, self._di.controllers)
 
