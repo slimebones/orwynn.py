@@ -1,5 +1,5 @@
 import inspect
-from typing import Callable
+from typing import Any, Callable, TypeVar
 
 from orwynn.http import TestResponse
 from orwynn.base.test.test_client import TestClient
@@ -7,10 +7,94 @@ from orwynn.base.test.test_client import TestClient
 from orwynn.validation import validate
 
 
+# If ever you get to Python3.12, see if PEP 696 introduced, then apply
+# ... = TypeVar("...", default=dict)
+# but for now it is in the next form
+_JsonifyExpectedType = TypeVar("_JsonifyExpectedType")
+
+
 class HttpClient:
     """Operates with HTTP client requests for test purposes."""
     def __init__(self, client: TestClient) -> None:
         self._client: TestClient = client
+
+    def get_jsonify(
+        self,
+        url: str,
+        asserted_status_code: int = 200,
+        *,
+        expected_type: type[_JsonifyExpectedType] = dict,
+        **kwargs
+    ) -> _JsonifyExpectedType:
+        r: TestResponse = self.get(url, asserted_status_code, **kwargs)
+        data: Any = r.json()
+        validate(data, expected_type)
+        return data
+
+    def post_jsonify(
+        self,
+        url: str,
+        asserted_status_code: int = 200,
+        *,
+        expected_type: type[_JsonifyExpectedType] = dict,
+        **kwargs
+    ) -> _JsonifyExpectedType:
+        r: TestResponse = self.post(url, asserted_status_code, **kwargs)
+        data: Any = r.json()
+        validate(data, expected_type)
+        return data
+
+    def delete_jsonify(
+        self,
+        url: str,
+        asserted_status_code: int = 200,
+        *,
+        expected_type: type[_JsonifyExpectedType] = dict,
+        **kwargs
+    ) -> _JsonifyExpectedType:
+        r: TestResponse = self.delete(url, asserted_status_code, **kwargs)
+        data: Any = r.json()
+        validate(data, expected_type)
+        return data
+
+    def put_jsonify(
+        self,
+        url: str,
+        asserted_status_code: int = 200,
+        *,
+        expected_type: type[_JsonifyExpectedType] = dict,
+        **kwargs
+    ) -> _JsonifyExpectedType:
+        r: TestResponse = self.put(url, asserted_status_code, **kwargs)
+        data: Any = r.json()
+        validate(data, expected_type)
+        return data
+
+    def patch_jsonify(
+        self,
+        url: str,
+        asserted_status_code: int = 200,
+        *,
+        expected_type: type[_JsonifyExpectedType] = dict,
+        **kwargs
+    ) -> _JsonifyExpectedType:
+        r: TestResponse = self.patch(url, asserted_status_code, **kwargs)
+        data: Any = r.json()
+        validate(data, expected_type)
+        return data
+
+    def options_jsonify(
+        self,
+        url: str,
+        asserted_status_code: int = 200,
+        *,
+        expected_type: type[_JsonifyExpectedType] = dict,
+        **kwargs
+    ) -> _JsonifyExpectedType:
+        r: TestResponse = self.options(url, asserted_status_code, **kwargs)
+        data: Any = r.json()
+        validate(data, expected_type)
+        return data
 
     def get(
         self,
@@ -34,18 +118,33 @@ class HttpClient:
             inspect.stack(), url, asserted_status_code, **kwargs)
 
     def delete(
-            self, url: str, asserted_status_code: int = 200,
-            **kwargs) -> TestResponse:
-        return self._get_test_response(
-            inspect.stack(), url, asserted_status_code, **kwargs)
-
-    def patch(
-            self, url: str, asserted_status_code: int = 200,
-            **kwargs) -> TestResponse:
+        self,
+        url: str,
+        asserted_status_code: int = 200,
+        **kwargs
+    ) -> TestResponse:
         return self._get_test_response(
             inspect.stack(), url, asserted_status_code, **kwargs)
 
     def put(
+        self,
+        url: str,
+        asserted_status_code: int = 200,
+        **kwargs
+    ) -> TestResponse:
+        return self._get_test_response(
+            inspect.stack(), url, asserted_status_code, **kwargs)
+
+    def patch(
+        self,
+        url: str,
+        asserted_status_code: int = 200,
+        **kwargs
+    ) -> TestResponse:
+        return self._get_test_response(
+            inspect.stack(), url, asserted_status_code, **kwargs)
+
+    def options(
         self,
         url: str,
         asserted_status_code: int = 200,
@@ -85,21 +184,29 @@ class HttpClient:
         method = method.lower()
 
         match method:
-            case 'get':
+            case "get":
                 test_client_method = self._client.get
-            case 'post':
+            case "post":
                 test_client_method = self._client.post
-            case 'put':
-                test_client_method = self._client.put
-            case 'patch':
-                test_client_method = self._client.patch
-            case 'delete':
+            case "delete":
                 test_client_method = self._client.delete
+            case "put":
+                test_client_method = self._client.put
+            case "patch":
+                test_client_method = self._client.patch
+            case "options":
+                test_client_method = self._client.options
             case _:
                 raise ValueError(f'Method {method} is not supported')
 
         response = test_client_method(url, **request_kwargs)
 
-        assert response.status_code == asserted_status_code, response.json
+        validate(response, TestResponse, is_strict=True)
+
+        assert \
+            response.status_code == asserted_status_code, \
+            f"response status code {response.status_code}" \
+            f" != asserted status code {asserted_status_code};" \
+            f" response content is {response.content}"
 
         return response

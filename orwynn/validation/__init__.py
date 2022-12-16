@@ -137,5 +137,12 @@ def validate_route(route: str) -> None:
     validate_re(route, r"^\/(.+\/?)?$")
 
 
+def validate_api_struct(struct: dict) -> None:
+    """Validates API structure according to project's defined schema.
+
+    For now uses only the default schema.
+    """
+
+
 model_validator = __pydantic_validator
 ModelValidationError = __PydanticValidationError

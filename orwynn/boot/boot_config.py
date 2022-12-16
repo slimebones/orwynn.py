@@ -1,4 +1,5 @@
 from orwynn.base.config.config import Config
+from orwynn.base.model.model import Model
 from orwynn.boot.boot_mode import BootMode
 
 
@@ -15,3 +16,4 @@ class BootConfig(Config):
 
     mode: BootMode
     root_dir: str
+    APISchema: type[Model]

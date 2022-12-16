@@ -8,12 +8,13 @@ from orwynn.base.module.module import Module
 from orwynn.base.test.http_client import HttpClient
 from orwynn.boot.boot import Boot
 from orwynn.di.di import DI
-from orwynn.http import HTTPMethod, TestResponse
+from orwynn.http import HTTPMethod
 from orwynn.http.unsupported_http_method_error import \
     UnsupportedHTTPMethodError
 from orwynn.util.expect import expect
 from orwynn.validation.validation_error import (ReValidationError,
                                                 ValidationError)
+from tests.std.text import Text
 
 
 def test_http_methods():
@@ -95,6 +96,6 @@ def test_already_registered():
     expect(Boot, AlreadyRegisteredMethodError, m1)
 
 
-def test_std_routes(std_boot: Boot):
-    # r: TestResponse = std_http.get("/text")
-    assert False
+def test_std_routes(std_boot: Boot, std_http: HttpClient):
+    json: dict = std_http.get_jsonify("/text")
+    Text.parse_obj(json)

@@ -20,6 +20,7 @@ class FloatService(Service):
 
 class FloatController(Controller):
     ROUTE = "/"
+    METHODS = ["get"]
 
     def __init__(self, service: FloatService) -> None:
         super().__init__()

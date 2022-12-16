@@ -1,7 +1,9 @@
 import os
 from types import NoneType
 from orwynn.base.error.malfunction_error import MalfunctionError
-from orwynn.boot.BOOT_CONFIG_PROXY_DATA import BOOT_CONFIG_PROXY_DATA
+from orwynn.base.model.default_api_schema import DefaultAPISchema
+from orwynn.base.model.model import Model
+from orwynn.boot.BootConfigProxy import BootConfigProxy
 from orwynn.boot.boot_mode import BootMode
 from orwynn.base.controller.controller import Controller
 from orwynn.base.module.module import Module
@@ -29,6 +31,9 @@ class Boot(Worker):
             "dev" if such environ is not found.
         root_dir (optional):
             Root directory of the project. Defaults to os.getcwd().
+        APISchema (optional):
+            Model used to create and validate API outcoming structures.
+            Defaults to predefined by framework's schema.
 
     Usage:
     ```py
@@ -49,17 +54,21 @@ class Boot(Worker):
         root_module: Module,
         *,
         mode: BootMode | str | None = None,
-        root_dir: str = os.getcwd()
+        root_dir: str = os.getcwd(),
+        APISchema: type[Model] = DefaultAPISchema
     ) -> None:
         super().__init__()
         validate(mode, [BootMode, str, NoneType])
         validate(root_module, Module)
         validate(root_dir, str)
 
-        self._mode: BootMode = self._parse_mode(mode)
-        self._root_dir = root_dir
-        BOOT_CONFIG_PROXY_DATA.mode = self._mode
-        BOOT_CONFIG_PROXY_DATA.root_dir = self._root_dir
+        self.__mode: BootMode = self._parse_mode(mode)
+        self.__root_dir = root_dir
+        BootConfigProxy(
+            root_dir=self.__root_dir,
+            mode=self.__mode,
+            APISchema=APISchema
+        )
 
         # TEMP:
         #   Add AppService to be always initialized - THIS IS VERY BAD approach

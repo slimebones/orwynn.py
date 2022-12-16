@@ -22,6 +22,7 @@ class NumberService(Service):
 
 class NumberController(Controller):
     ROUTE = "/"
+    METHODS = ["get"]
 
     def __init__(self, service: NumberService) -> None:
         super().__init__()
