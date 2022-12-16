@@ -153,7 +153,7 @@ def validate_dict(
         strict_flags = (False, False)
 
     validate(obj, dict)
-    validate_each(expected_types, [type, list[type]])
+    validate_each(expected_types, [type, list[type], Validator])
     validate_length(strict_flags, 2)
     validate_each(strict_flags, bool)
 

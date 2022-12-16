@@ -1,7 +1,9 @@
-from orwynn.base.indication.indication import Indication
-from orwynn.base.model.model import Model
+from typing import TYPE_CHECKING
 from orwynn.base.worker.worker import Worker
 from orwynn.boot.boot_mode import BootMode
+
+if TYPE_CHECKING:
+    from orwynn.base.indication.indication import Indication
 
 
 class BootDataProxy(Worker):
@@ -13,7 +15,7 @@ class BootDataProxy(Worker):
         *,
         root_dir: str,
         mode: BootMode,
-        api_indication: Indication
+        api_indication: "Indication"
     ) -> None:
         super().__init__()
         self.__root_dir: str = root_dir
@@ -21,7 +23,7 @@ class BootDataProxy(Worker):
         self.__api_indication: Indication = api_indication
 
     @property
-    def api_indication(self) -> Indication:
+    def api_indication(self) -> "Indication":
         return self.__api_indication
 
     @property
