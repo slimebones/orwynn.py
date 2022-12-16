@@ -9,7 +9,7 @@ from typing import Any, Sized
 from pydantic import ValidationError as __PydanticValidationError
 from pydantic import validator as __pydantic_validator
 
-from orwynn.boot.BootConfigProxy import BootConfigProxy
+from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.validation.nothing_to_validate_error import NothingToValidateError
 from orwynn.validation.re_validation_error import ReValidationError
 from orwynn.validation.validation_error import ValidationError
@@ -217,7 +217,7 @@ def validate_api_struct(struct: dict) -> None:
 
     For now uses only the default schema.
     """
-    BootConfigProxy.ie().APISchema.parse_obj(struct)
+    BootDataProxy.ie().api_indication.parse_obj(struct)
 
 
 model_validator = __pydantic_validator

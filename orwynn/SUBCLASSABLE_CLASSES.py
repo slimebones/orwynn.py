@@ -1,4 +1,4 @@
-"""List of classes user can subclass from."""
+"""List of classes an user can subclass from."""
 from orwynn.base.config.config import Config
 from orwynn.base.controller.controller import Controller
 from orwynn.base.mapping.mapping import Mapping

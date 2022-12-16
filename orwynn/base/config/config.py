@@ -3,7 +3,7 @@ from typing import Any, ClassVar, Self
 from orwynn.base.config.unsupported_config_source_error import \
     UnsupportedConfigSourceError
 from orwynn.base.model.model import Model
-from orwynn.boot.BootConfigProxy import BootConfigProxy
+from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.di.provider import Provider
 from orwynn.util.file.is_path import is_path
 from orwynn.util.file.yml import load_yml
@@ -64,7 +64,7 @@ class Config(Model):
                 raise UnsupportedConfigSourceError(
                     "SOURCE=\"boot\" can be used only by framework"
                 )
-            return BootConfigProxy.ie().data
+            return BootDataProxy.ie().data
 
         elif is_path(source):
             result = load_yml(source)  # type: ignore

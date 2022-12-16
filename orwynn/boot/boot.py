@@ -1,9 +1,10 @@
 import os
 from types import NoneType
 from orwynn.base.error.malfunction_error import MalfunctionError
-from orwynn.base.model.default_api_schema import DefaultAPISchema
+from orwynn.base.indication.indication import Indication
+from orwynn.base.schema.default_api_schema import DefaultAPISchema
 from orwynn.base.model.model import Model
-from orwynn.boot.BootConfigProxy import BootConfigProxy
+from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.boot.boot_mode import BootMode
 from orwynn.base.controller.controller import Controller
 from orwynn.base.module.module import Module
@@ -31,9 +32,10 @@ class Boot(Worker):
             "dev" if such environ is not found.
         root_dir (optional):
             Root directory of the project. Defaults to os.getcwd().
-        APISchema (optional):
-            Model used to create and validate API outcoming structures.
-            Defaults to predefined by framework's schema.
+        api_indication (optional):
+            Indication object used as a convention for outcoming API
+            structures. Defaults to predefined by framework's indication
+            convention.
 
     Usage:
     ```py
@@ -55,7 +57,7 @@ class Boot(Worker):
         *,
         mode: BootMode | str | None = None,
         root_dir: str = os.getcwd(),
-        APISchema: type[Model] = DefaultAPISchema
+        api_indication: Indication | None = None
     ) -> None:
         super().__init__()
         validate(mode, [BootMode, str, NoneType])
@@ -64,7 +66,7 @@ class Boot(Worker):
 
         self.__mode: BootMode = self._parse_mode(mode)
         self.__root_dir = root_dir
-        BootConfigProxy(
+        BootDataProxy(
             root_dir=self.__root_dir,
             mode=self.__mode,
             APISchema=APISchema
