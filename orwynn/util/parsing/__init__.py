@@ -1,9 +1,9 @@
 from types import NoneType
 from typing import Any, TypeVar
 
-from orwynn.parsing.parsing_error import (KeyParsingError, ParsingError,
+from orwynn.util.parsing.parsing_error import (KeyParsingError, ParsingError,
                                           StrIntParsingError)
-from orwynn.validation import validate
+from orwynn.util.validation import validate
 
 ParsedEntity = TypeVar('ParsedEntity', bound=Any)
 

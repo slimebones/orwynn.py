@@ -4,7 +4,7 @@ from typing import Any, Callable, TypeVar
 from orwynn.http import TestResponse
 from orwynn.base.test.test_client import TestClient
 
-from orwynn.validation import validate
+from orwynn.util.validation import validate
 
 
 # If ever you get to Python3.12, see if PEP 696 introduced, then apply

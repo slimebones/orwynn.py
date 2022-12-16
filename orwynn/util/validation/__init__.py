@@ -9,11 +9,11 @@ from typing import Any, Sized
 from pydantic import ValidationError as __PydanticValidationError
 from pydantic import validator as __pydantic_validator
 
-from orwynn.validation.nothing_to_validate_error import NothingToValidateError
-from orwynn.validation.re_validation_error import ReValidationError
-from orwynn.validation.unknown_validator_error import UnknownValidatorError
-from orwynn.validation.validation_error import ValidationError
-from orwynn.validation.validator import Validator
+from orwynn.util.validation.nothing_to_validate_error import NothingToValidateError
+from orwynn.util.validation.re_validation_error import ReValidationError
+from orwynn.util.validation.unknown_validator_error import UnknownValidatorError
+from orwynn.util.validation.validation_error import ValidationError
+from orwynn.util.validation.validator import Validator
 
 
 __ExpectedType = type | list[type] | Validator

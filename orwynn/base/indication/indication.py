@@ -7,8 +7,8 @@ from orwynn.base.indication.unsupported_indicator_error import \
 from orwynn.base.model.model import Model
 from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.util.mp.find_field_location import FieldLocation
-from orwynn.validation import validate, validate_dict
-from orwynn.validation.validator import Validator
+from orwynn.util.validation import validate, validate_dict
+from orwynn.util.validation.validator import Validator
 
 
 __Locations = dict[Indicator, FieldLocation]

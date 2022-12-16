@@ -14,7 +14,7 @@ from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.boot.unsupported_boot_mode_error import UnsupportedBootModeError
 from orwynn.di.di import DI
 from orwynn.http import HTTPMethod
-from orwynn.validation import validate
+from orwynn.util.validation import validate
 
 
 class Boot(Worker):

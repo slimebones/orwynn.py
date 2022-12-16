@@ -9,7 +9,7 @@ from orwynn.base.model.model import Model
 from orwynn.base.module.module import Module
 from orwynn.base.service.service import Service
 from orwynn.boot.boot_config import BootConfig
-from orwynn.validation import model_validator
+from orwynn.util.validation import model_validator
 from tests.std.float import FloatService, float_module
 from tests.std.number import NumberService, number_module
 

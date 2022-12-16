@@ -9,7 +9,7 @@ from orwynn.di.di_container import DIContainer
 from orwynn.di.di_object import DIObject
 from orwynn.di.init.init_other_acceptors import init_other_acceptors
 from orwynn.di.init.init_providers import init_providers
-from orwynn.validation import validate
+from orwynn.util.validation import validate
 
 
 class DI(Worker):
