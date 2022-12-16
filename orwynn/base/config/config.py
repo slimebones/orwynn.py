@@ -1,4 +1,4 @@
-from typing import Any, ClassVar, Self
+from typing import Any, ClassVar, Literal, Self
 
 from orwynn.base.config.unsupported_config_source_error import \
     UnsupportedConfigSourceError
@@ -24,7 +24,7 @@ class Config(Model):
     Note that fields which is not in Providers group, are injected via DI,
     others are searched in given SOURCE.
     """
-    SOURCE: ClassVar[Source | None] = None
+    SOURCE: ClassVar[Source | Literal["boot"] | None] = None
 
     @classmethod
     def fw_create(
