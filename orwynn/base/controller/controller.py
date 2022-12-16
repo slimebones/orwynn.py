@@ -5,8 +5,8 @@ from orwynn.base.controller.defined_twice_controller_method_error import \
 from orwynn.base.controller.missing_controller_class_attribute_error import \
     MissingControllerClassAttributeError
 from orwynn.base.middleware.middleware import Middleware
-from orwynn.http import HTTPMethod, TestResponse
-from orwynn.http.unsupported_http_method_error import \
+from orwynn.util.http import HTTPMethod, TestResponse
+from orwynn.util.http.unsupported_http_method_error import \
     UnsupportedHTTPMethodError
 from orwynn.util.validation import validate, validate_each, validate_route
 

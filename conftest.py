@@ -9,7 +9,7 @@ from orwynn.base.test.test_client import TestClient
 from orwynn.base.worker.worker import Worker
 from orwynn.boot.boot import Boot
 from orwynn.boot.boot_mode import BootMode
-from orwynn.http.boot_test import std_boot
+from orwynn.util.http.boot_test import std_boot
 from orwynn.di.collecting.collect_modules_test import std_modules
 from orwynn.di.collecting.collect_provider_dependencies_test import \
     std_provider_dependencies_map
