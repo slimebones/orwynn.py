@@ -9,14 +9,18 @@ from typing import Any, Sized
 from pydantic import ValidationError as __PydanticValidationError
 from pydantic import validator as __pydantic_validator
 
-from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.validation.nothing_to_validate_error import NothingToValidateError
 from orwynn.validation.re_validation_error import ReValidationError
+from orwynn.validation.unknown_validator_error import UnknownValidatorError
 from orwynn.validation.validation_error import ValidationError
+from orwynn.validation.validator import Validator
+
+
+__ExpectedType = type | list[type] | Validator
 
 
 def validate(
-    obj: Any, expected_type: type | list[type], *, is_strict: bool = False
+    obj: Any, expected_type: __ExpectedType, *, is_strict: bool = False
 ) -> None:
     """Validates given object against expected type.
 
@@ -33,7 +37,15 @@ def validate(
         ValidationError:
             Object did not pass validation.
     """
-    if isinstance(expected_type, type):
+    if isinstance(expected_type, Validator):
+        match expected_type:
+            case Validator.SKIP:
+                return
+            case _:
+                raise UnknownValidatorError(
+                    f"unknown validator {expected_type}"
+                )
+    elif isinstance(expected_type, type):
         if is_strict:
             if (
                 type(obj) is not expected_type
@@ -63,14 +75,14 @@ def validate(
             )
     else:
         raise TypeError(
-            "{} should be Type or an instance of list"
-            .format(expected_type)
+            f"{expected_type} should be Type, an instance of list or"
+            " Validator"
         )
 
 
 def validate_each(
     obj: list | tuple | set | frozenset,
-    expected_type: type | list[type],
+    expected_type: __ExpectedType,
     *,
     is_strict: bool = False,
     expected_obj_type: type | None = None,
@@ -115,7 +127,7 @@ def validate_each(
 
 def validate_dict(
     obj: dict,
-    expected_types: tuple[type | list[type], type | list[type]],
+    expected_types: tuple[__ExpectedType, __ExpectedType],
     *,
     strict_flags: tuple[bool, bool] | None = None
 ) -> None:
@@ -210,14 +222,6 @@ def validate_route(route: str) -> None:
             Route does not match route pattern.
     """
     validate_re(route, r"^\/(.+\/?)?$")
-
-
-def validate_api_struct(struct: dict) -> None:
-    """Validates API structure according to project's defined schema.
-
-    For now uses only the default schema.
-    """
-    BootDataProxy.ie().api_indication.parse_obj(struct)
 
 
 model_validator = __pydantic_validator

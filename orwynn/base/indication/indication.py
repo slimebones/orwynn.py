@@ -3,7 +3,7 @@ from orwynn.base.indication.indicator import Indicator
 from orwynn.base.indication.unsupported_indicator_error import UnsupportedIndicatorError
 from orwynn.base.model.model import Model
 from orwynn.boot.BootDataProxy import BootDataProxy
-from orwynn.validation import validate_dict
+from orwynn.validation import validate, validate_dict
 
 
 class Indication:
@@ -13,6 +13,8 @@ class Indication:
     Each indication is simply mapping between strings and Indicators, but also
     implements special digest_* methods to transform given object applying
     defined indication rules.
+
+    Also has counter-methods recover_* to create object back from dictionary.
 
     Strings-only as keys are used for an additional constraints for objects
     building an API structures, in future it is possible to see here an
@@ -60,3 +62,21 @@ class Indication:
             result[k] = final_value
 
         return result
+
+    def recover_model(self, mp: dict, M: type[Model]) -> Model:
+        """Creates model object from given map according to indication rules.
+
+        Args:
+            mp:
+                Dictionary from which model will be recovered.
+            M:
+                Model class to recover.
+
+        Returns:
+            Recovered model.
+        """
+        validate(mp, dict)
+
+        model_kwargs: dict[str, Any]
+
+        for k, v in mp.items():

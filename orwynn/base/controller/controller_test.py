@@ -12,8 +12,8 @@ from orwynn.http import HTTPMethod
 from orwynn.http.unsupported_http_method_error import \
     UnsupportedHTTPMethodError
 from orwynn.util.expect import expect
-from orwynn.validation.validation_error import (ReValidationError,
-                                                ValidationError)
+from orwynn.validation.re_validation_error import ReValidationError
+from orwynn.validation.validation_error import ValidationError
 from tests.std.text import Text
 
 
