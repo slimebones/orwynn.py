@@ -1,16 +1,16 @@
 import os
 from types import NoneType
-from orwynn.base.error.malfunction_error import MalfunctionError
-from orwynn.base.indication.indication import Indication
-from orwynn.base.schema.default_api_schema import DefaultAPISchema
-from orwynn.base.model.model import Model
-from orwynn.boot.BootDataProxy import BootDataProxy
-from orwynn.boot.boot_mode import BootMode
-from orwynn.base.controller.controller import Controller
-from orwynn.base.module.module import Module
 
-from orwynn.base.worker.worker import Worker
 from orwynn.app.app_service import AppService
+from orwynn.base.controller.controller import Controller
+from orwynn.base.error.malfunction_error import MalfunctionError
+from orwynn.base.indication.default_api_indication import \
+    default_api_indication
+from orwynn.base.indication.indication import Indication
+from orwynn.base.module.module import Module
+from orwynn.base.worker.worker import Worker
+from orwynn.boot.boot_mode import BootMode
+from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.boot.unsupported_boot_mode_error import UnsupportedBootModeError
 from orwynn.di.di import DI
 from orwynn.http import HTTPMethod
@@ -63,13 +63,16 @@ class Boot(Worker):
         validate(mode, [BootMode, str, NoneType])
         validate(root_module, Module)
         validate(root_dir, str)
+        if not api_indication:
+            api_indication = default_api_indication
+        validate(api_indication, Indication)
 
         self.__mode: BootMode = self._parse_mode(mode)
         self.__root_dir = root_dir
         BootDataProxy(
             root_dir=self.__root_dir,
             mode=self.__mode,
-            APISchema=APISchema
+            api_indication=api_indication
         )
 
         # TEMP:
