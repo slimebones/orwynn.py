@@ -6,7 +6,8 @@ from orwynn.base.indication.recovering_error import RecoveringError
 from orwynn.base.indication.unsupported_indicator_error import \
     UnsupportedIndicatorError
 from orwynn.base.model.model import Model
-from orwynn.util.mp.location import FieldLocation, find_location_by_field
+from orwynn.util.cls import find_subclass_by_name
+from orwynn.util.mp.location import FieldLocation, find_field_by_location, find_location_by_field
 from orwynn.util.validation import validate_dict
 from orwynn.util.validation.validator import Validator
 
@@ -136,21 +137,17 @@ class Indication:
         """
         validate_dict(mp, (str, Validator.SKIP))
 
-        # Compare TYPE
+        TargetModel: type[Model] = self.__find_model_type_in_mp(mp)
+
+    def __find_model_type_in_mp(self, mp: dict) -> type[Model]:
         indication_type_field_location: FieldLocation = \
             self.__locations_by_supported_class[Model][Indicator.TYPE]
-        mp_type_field_location: FieldLocation = find_location_by_field(
-            M.__name__, mp
+        mp_type_field: str = find_field_by_location(
+            indication_type_field_location, mp
         )
-        if indication_type_field_location != mp_type_field_location:
-            raise RecoveringError(
-                "indication type field location"
-                f" {indication_type_field_location} is not matched with"
-                " given map type field location"
-                f" {mp_type_field_location}"
-            )
+        return find_subclass_by_name(mp_type_field, Model)
 
-        # Compare VALUE
+    def __find_model_value_in_mp(self, mp: dict) -> dict:
         indication_value_field_location: FieldLocation = \
             self.__locations_by_supported_class[Model][Indicator.VALUE]
         mp_value_field_location: FieldLocation = find_location_by_field(
@@ -163,5 +160,3 @@ class Indication:
                 " given map value field location"
                 f" {mp_value_field_location}"
             )
-
-        # Fetch TYPE
