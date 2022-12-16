@@ -1,11 +1,18 @@
+"""Collection of validation functions.
+
+In future the framework might introduce special flags (or read Python's
+optimization flag -O) to not execute such functions.
+"""
 import re
-from typing import Any
+from typing import Any, Sized
 
 from pydantic import ValidationError as __PydanticValidationError
 from pydantic import validator as __pydantic_validator
 
-from orwynn.validation.validation_error import (ReValidationError,
-                                                ValidationError)
+from orwynn.boot.BootConfigProxy import BootConfigProxy
+from orwynn.validation.nothing_to_validate_error import NothingToValidateError
+from orwynn.validation.re_validation_error import ReValidationError
+from orwynn.validation.validation_error import ValidationError
 
 
 def validate(
@@ -106,6 +113,46 @@ def validate_each(
         raise ValidationError("validated iterable shouldn't be empty")
 
 
+def validate_dict(
+    obj: dict,
+    expected_types: tuple[type | list[type], type | list[type]],
+    *,
+    strict_flags: tuple[bool, bool] | None = None
+) -> None:
+    """Validates each key and each value in given dict.
+
+    Args:
+        obj:
+            Dict to be validated.
+        expected_types:
+            Tuple of expected types for key and expected types for value.
+        strict_flags (optional):
+            Tuple of flags for strict validation separately for key and for
+            value. Defaults to (False, False) which means no strict validation
+            neither for key nor for value.
+
+    Raises:
+        NothingToValidateError:
+            Empty dict given.
+        ValidationError:
+            Some key or value did not passed the validation.
+    """
+    if strict_flags is None:
+        strict_flags = (False, False)
+
+    validate(obj, dict)
+    validate_each(expected_types, [type, list[type]])
+    validate_length(strict_flags, 2)
+    validate_each(strict_flags, bool)
+
+    if obj == {}:
+        raise NothingToValidateError("empty dict given for validation")
+
+    for k, v in obj.items():
+        validate(k, expected_types[0], is_strict=strict_flags[0])
+        validate(v, expected_types[1], is_strict=strict_flags[1])
+
+
 def validate_re(string: str, pattern: str) -> None:
     """Validates given string using re.match.
 
@@ -121,6 +168,34 @@ def validate_re(string: str, pattern: str) -> None:
     """
     if not re.match(pattern, string):
         raise ReValidationError(failed_obj=string, pattern=pattern)
+
+
+def validate_length(obj: Sized, expected_length: int) -> None:
+    """Validates length of the given object.
+
+    Args:
+        obj:
+            Sized object to be validated.
+        expected_length:
+            Which length is expected.
+
+    Raise:
+        ValidationError:
+            Given object is not Sized.
+        ValidationError:
+            Length expectations failed.
+    """
+    if not hasattr(obj, "__len__"):
+        raise ValidationError(
+            f"object {obj} should implement \"__len__\" method"
+        )
+
+    obj_len: int = len(obj)
+    if not obj_len == expected_length:
+        raise ValidationError(
+            f"sized object {obj} length {obj_len} != "
+            f" expected length {expected_length}"
+        )
 
 
 def validate_route(route: str) -> None:
@@ -142,6 +217,7 @@ def validate_api_struct(struct: dict) -> None:
 
     For now uses only the default schema.
     """
+    BootConfigProxy.ie().APISchema.parse_obj(struct)
 
 
 model_validator = __pydantic_validator
