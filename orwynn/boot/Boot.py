@@ -6,7 +6,7 @@ from orwynn.base.controller.controller import Controller
 from orwynn.base.error.malfunction_error import MalfunctionError
 from orwynn.base.indication.default_api_indication import \
     default_api_indication
-from orwynn.base.indication.indication import Indication
+from orwynn.base.indication.Indication import Indication
 from orwynn.base.module.module import Module
 from orwynn.base.worker.worker import Worker
 from orwynn.boot.boot_mode import BootMode

@@ -1,4 +1,4 @@
-from orwynn.base.config.config import Config
+from orwynn.base.config.Config import Config
 from orwynn.base.mapping.mapping import Mapping
 from orwynn.base.service.framework_service import FrameworkService
 from orwynn.base.service.service import Service

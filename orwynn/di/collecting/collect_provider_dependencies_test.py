@@ -2,7 +2,7 @@ import inspect
 
 from pytest import fixture
 
-from orwynn.base.config.config import Config
+from orwynn.base.config.Config import Config
 from orwynn.base.module.module import Module
 from orwynn.di.collecting.collect_modules import collect_modules
 from orwynn.di.collecting.collect_provider_dependencies import (

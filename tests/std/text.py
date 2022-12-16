@@ -3,7 +3,7 @@ from pathlib import Path
 import lorem
 
 from orwynn.app.app_service import AppService
-from orwynn.base.config.config import Config
+from orwynn.base.config.Config import Config
 from orwynn.base.controller.controller import Controller
 from orwynn.base.model.model import Model
 from orwynn.base.module.module import Module

@@ -6,7 +6,7 @@ from orwynn.base.controller.missing_controller_class_attribute_error import \
     MissingControllerClassAttributeError
 from orwynn.base.module.module import Module
 from orwynn.base.test.http_client import HttpClient
-from orwynn.boot.boot import Boot
+from orwynn.boot.Boot import Boot
 from orwynn.di.di import DI
 from orwynn.util.http import HTTPMethod
 from orwynn.util.http.unsupported_http_method_error import \

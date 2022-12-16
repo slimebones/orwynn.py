@@ -2,7 +2,7 @@ from pytest import fixture
 from orwynn.boot.boot_mode import BootMode
 from orwynn.base.module.module import Module
 
-from orwynn.boot.boot import Boot
+from orwynn.boot.Boot import Boot
 
 
 @fixture

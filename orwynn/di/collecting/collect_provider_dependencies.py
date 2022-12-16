@@ -1,4 +1,4 @@
-from orwynn.base.config.config import Config
+from orwynn.base.config.Config import Config
 from orwynn.base.module.module import Module
 from orwynn.base.service.framework_service import FrameworkService
 from orwynn.di.circular_dependency_error import CircularDependencyError

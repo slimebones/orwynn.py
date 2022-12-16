@@ -1,4 +1,4 @@
-from orwynn.base.indication.indication import Indication
+from orwynn.base.indication.Indication import Indication
 from orwynn.base.indication.indicator import Indicator
 
 
