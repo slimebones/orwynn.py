@@ -1,7 +1,8 @@
 from enum import Enum
-from fastapi import Response as FastApiResponse
-from fastapi import Request as FastApiRequest
+
 import httpx
+from fastapi import Request as FastApiRequest
+from fastapi import Response as FastApiResponse
 
 
 class HTTPMethod(Enum):

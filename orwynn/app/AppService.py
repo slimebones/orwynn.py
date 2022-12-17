@@ -7,7 +7,7 @@ from orwynn.app.already_registered_method_error import \
     AlreadyRegisteredMethodError
 from orwynn.base.service.framework_service import FrameworkService
 from orwynn.base.test.test_client import TestClient
-from orwynn.util.http import HTTPMethod
+from orwynn.util.http.http import HTTPMethod
 from orwynn.util.http.unsupported_http_method_error import \
     UnsupportedHTTPMethodError
 

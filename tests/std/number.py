@@ -1,4 +1,4 @@
-from orwynn.app.app_service import AppService
+from orwynn.app.AppService import AppService
 from orwynn.base.controller.controller import Controller
 from orwynn.base.module.module import Module
 from orwynn.base.service.service import Service

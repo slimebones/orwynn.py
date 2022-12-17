@@ -5,10 +5,10 @@ from orwynn.base.indication.indicator import Indicator
 from orwynn.base.indication.recovering_error import RecoveringError
 from orwynn.base.indication.unsupported_indicator_error import \
     UnsupportedIndicatorError
-from orwynn.base.model.model import Model
+from orwynn.base.model.Model import Model
 from orwynn.util.cls import find_subclass_by_name
 from orwynn.util.mp.location import FieldLocation, find_field_by_location, find_location_by_field
-from orwynn.util.validation import validate_dict
+from orwynn.util.validation import validate, validate_dict
 from orwynn.util.validation.validator import Validator
 
 
@@ -36,7 +36,9 @@ class Indication:
     ]
 
     def __init__(self, mp: dict[str, Indicator]) -> None:
-        validate_dict(mp, (str, Validator.SKIP))  # bad support for Enums
+        validate_dict(
+            mp, (str, Validator.SKIP)
+        )  # bad support for Enums at validation, so skip
         self.__mp: dict[str, Indicator] = mp
 
         self.__locations_by_supported_class: \
@@ -94,7 +96,7 @@ class Indication:
                     final_value = model.__class__.__name__
                     is_type_indicator_found = True
                 case Indicator.VALUE:
-                    final_value = model.dict
+                    final_value = model.dict()
                     is_value_indicator_found = True
                 case _:
                     raise UnsupportedIndicatorError(
@@ -138,6 +140,8 @@ class Indication:
         validate_dict(mp, (str, Validator.SKIP))
 
         TargetModel: type[Model] = self.__find_model_type_in_mp(mp)
+        model_value: dict = self.__find_model_value_in_mp(mp)
+        return TargetModel.parse_obj(model_value)
 
     def __find_model_type_in_mp(self, mp: dict) -> type[Model]:
         indication_type_field_location: FieldLocation = \
@@ -150,13 +154,9 @@ class Indication:
     def __find_model_value_in_mp(self, mp: dict) -> dict:
         indication_value_field_location: FieldLocation = \
             self.__locations_by_supported_class[Model][Indicator.VALUE]
-        mp_value_field_location: FieldLocation = find_location_by_field(
-            Indicator.VALUE, mp
+        mp_value: dict = find_field_by_location(
+            indication_value_field_location, mp
         )
-        if indication_value_field_location != mp_type_field_location:
-            raise RecoveringError(
-                "indication value field location"
-                f" {indication_value_field_location} is not matched with"
-                " given map value field location"
-                f" {mp_value_field_location}"
-            )
+
+        validate(mp_value, dict)
+        return mp_value

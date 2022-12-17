@@ -3,7 +3,7 @@ from typing import Any, TypeVar
 
 from orwynn.util.parsing.parsing_error import (KeyParsingError, ParsingError,
                                           StrIntParsingError)
-from orwynn.util.validation import validate
+from orwynn.util.validation import ValidationExpectedType, validate
 
 ParsedEntity = TypeVar('ParsedEntity', bound=Any)
 
@@ -78,8 +78,9 @@ def parse_int(entity: int | str) -> int:
 def parse_key(
     key: str,
     entity: dict,
+    post_validation_type: ValidationExpectedType | None = None,
+    *,
     default_value: Any = None,
-    post_validation_type: type | list[type] | None = None,
     is_post_validation_strict: bool = False
 ) -> Any:
     """Parses a value from an entity by given key.
@@ -105,9 +106,6 @@ def parse_key(
     """
     validate(entity, dict)
     validate(key, str)
-    validate(
-        post_validation_type, [type, list, NoneType], is_strict=False
-    )
 
     try:
         value: Any = entity[key]

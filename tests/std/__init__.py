@@ -1,8 +1,8 @@
 """Standard app structure made up for testing.
 """
-from orwynn.app.app_service import AppService
+from orwynn.app.AppService import AppService
 from orwynn.base.module.module import Module
-from orwynn.boot.boot_config import BootConfig
+from orwynn.boot.BootConfig import BootConfig
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.provider import Provider
 from tests.std.float import FloatController, FloatService, float_module

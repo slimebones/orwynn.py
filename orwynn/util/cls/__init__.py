@@ -18,16 +18,20 @@ def find_subclass_by_name(name: str, BaseClass: Class) -> Class:
     Returns:
         Class found.
     """
-    return __traverse_subclasses_checking_name(name, BaseClass)
+    out: Class | None = __traverse_subclasses_checking_name(name, BaseClass)
 
+    if out is None:
+        raise ClassNotFoundError(
+            f"class of supertype {BaseClass} with name {name} is not found"
+        )
+    else:
+        return out
 
-def __traverse_subclasses_checking_name(name: str, C: Class) -> Class:
+def __traverse_subclasses_checking_name(name: str, C: Class) -> Class | None:
     for SubClass in C.__subclasses__():
         if SubClass.__name__ == name:
             return SubClass
         else:
             __traverse_subclasses_checking_name(name, SubClass)
 
-    raise ClassNotFoundError(
-        f"class of supertype {C} with name {name} is not found"
-    )
+    return None

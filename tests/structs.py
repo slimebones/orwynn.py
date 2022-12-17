@@ -8,6 +8,13 @@ importing.
 from pytest import fixture
 
 from orwynn.base.module.module import Module
+from tests.std import root_module as std_root_module
+
+
+@fixture
+def std_struct() -> Module:
+    # Some predefined configuration for testing
+    return std_root_module
 
 
 @fixture

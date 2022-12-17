@@ -3,7 +3,7 @@ from orwynn.base.config.Config import Config
 from orwynn.base.controller.controller import Controller
 from orwynn.base.mapping.mapping import Mapping
 from orwynn.base.middleware.middleware import Middleware
-from orwynn.base.model.model import Model
+from orwynn.base.model.Model import Model
 from orwynn.base.service.service import Service
 
 

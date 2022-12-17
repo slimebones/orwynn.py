@@ -4,6 +4,7 @@ from pytest import fixture
 
 from orwynn.base.config.Config import Config
 from orwynn.base.module.module import Module
+from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.di.collecting.collect_modules import collect_modules
 from orwynn.di.collecting.collect_provider_dependencies import (
     ProviderDependenciesMap, collect_provider_dependencies)
@@ -14,6 +15,7 @@ from tests.std import Assertion
 
 @fixture
 def std_provider_dependencies_map(
+    std_boot_data_proxy: BootDataProxy,
     std_modules: list[Module]
 ) -> ProviderDependenciesMap:
     return collect_provider_dependencies(std_modules)

@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from orwynn.app.app_service import AppService
+from orwynn.app.AppService import AppService
 from orwynn.base.test.test_client import TestClient
 
 

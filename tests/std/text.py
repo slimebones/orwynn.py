@@ -2,13 +2,13 @@ from pathlib import Path
 
 import lorem
 
-from orwynn.app.app_service import AppService
+from orwynn.app.AppService import AppService
 from orwynn.base.config.Config import Config
 from orwynn.base.controller.controller import Controller
-from orwynn.base.model.model import Model
+from orwynn.base.model.Model import Model
 from orwynn.base.module.module import Module
 from orwynn.base.service.service import Service
-from orwynn.boot.boot_config import BootConfig
+from orwynn.boot.BootConfig import BootConfig
 from orwynn.util.validation import model_validator
 from tests.std.float import FloatService, float_module
 from tests.std.number import NumberService, number_module

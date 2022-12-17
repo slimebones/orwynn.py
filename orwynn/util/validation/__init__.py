@@ -16,11 +16,14 @@ from orwynn.util.validation.validation_error import ValidationError
 from orwynn.util.validation.validator import Validator
 
 
-__ExpectedType = type | list[type] | Validator
+ValidationExpectedType = type | list[type] | Validator
 
 
 def validate(
-    obj: Any, expected_type: __ExpectedType, *, is_strict: bool = False
+    obj: Any,
+    expected_type: ValidationExpectedType,
+    *,
+    is_strict: bool = False
 ) -> None:
     """Validates given object against expected type.
 
@@ -74,7 +77,7 @@ def validate(
                 failed_obj=obj, expected_type=expected_type
             )
     else:
-        raise TypeError(
+        raise ValidationError(
             f"{expected_type} should be Type, an instance of list or"
             " Validator"
         )
@@ -82,7 +85,7 @@ def validate(
 
 def validate_each(
     obj: list | tuple | set | frozenset,
-    expected_type: __ExpectedType,
+    expected_type: ValidationExpectedType,
     *,
     is_strict: bool = False,
     expected_obj_type: type | None = None,
@@ -127,7 +130,7 @@ def validate_each(
 
 def validate_dict(
     obj: dict,
-    expected_types: tuple[__ExpectedType, __ExpectedType],
+    expected_types: tuple[ValidationExpectedType, ValidationExpectedType],
     *,
     strict_flags: tuple[bool, bool] | None = None
 ) -> None:
@@ -153,7 +156,6 @@ def validate_dict(
         strict_flags = (False, False)
 
     validate(obj, dict)
-    validate_each(expected_types, [type, list[type], Validator])
     validate_length(strict_flags, 2)
     validate_each(strict_flags, bool)
 

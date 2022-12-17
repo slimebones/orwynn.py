@@ -1,7 +1,7 @@
 import os
 from types import NoneType
 
-from orwynn.app.app_service import AppService
+from orwynn.app.AppService import AppService
 from orwynn.base.controller.controller import Controller
 from orwynn.base.error.malfunction_error import MalfunctionError
 from orwynn.base.indication.default_api_indication import \
@@ -12,8 +12,8 @@ from orwynn.base.worker.worker import Worker
 from orwynn.boot.boot_mode import BootMode
 from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.boot.unsupported_boot_mode_error import UnsupportedBootModeError
-from orwynn.di.di import DI
-from orwynn.util.http import HTTPMethod
+from orwynn.di.DI import DI
+from orwynn.util.http.http import HTTPMethod
 from orwynn.util.validation import validate
 
 
@@ -68,11 +68,12 @@ class Boot(Worker):
         validate(api_indication, Indication)
 
         self.__mode: BootMode = self._parse_mode(mode)
-        self.__root_dir = root_dir
+        self.__root_dir: str = root_dir
+        self.__api_indication: Indication = api_indication
         BootDataProxy(
             root_dir=self.__root_dir,
             mode=self.__mode,
-            api_indication=api_indication
+            api_indication=self.__api_indication
         )
 
         # TEMP:
@@ -87,6 +88,10 @@ class Boot(Worker):
     @property
     def app(self) -> AppService:
         return self._di.app_service
+
+    @property
+    def api_indication(self) -> Indication:
+        return self.__api_indication
 
     def _register_routes(
         self, modules: list[Module], controllers: list[Controller]

@@ -7,8 +7,8 @@ from orwynn.base.controller.missing_controller_class_attribute_error import \
 from orwynn.base.module.module import Module
 from orwynn.base.test.http_client import HttpClient
 from orwynn.boot.Boot import Boot
-from orwynn.di.di import DI
-from orwynn.util.http import HTTPMethod
+from orwynn.di.DI import DI
+from orwynn.util.http.http import HTTPMethod
 from orwynn.util.http.unsupported_http_method_error import \
     UnsupportedHTTPMethodError
 from orwynn.util.expect import expect
@@ -98,4 +98,4 @@ def test_already_registered():
 
 def test_std_routes(std_boot: Boot, std_http: HttpClient):
     json: dict = std_http.get_jsonify("/text")
-    Text.parse_obj(json)
+

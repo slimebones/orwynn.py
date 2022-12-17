@@ -4,9 +4,9 @@ from typing import Any, Callable, Self
 import loguru
 from orwynn.base.service.framework_service import FrameworkService
 from orwynn.boot.boot_mode import BootMode
-from orwynn.app.app_service import AppService
+from orwynn.app.AppService import AppService
 from orwynn.base.config.Config import Config
-from orwynn.base.model.model import Model
+from orwynn.base.model.Model import Model
 
 
 class LogHandler(Model):
