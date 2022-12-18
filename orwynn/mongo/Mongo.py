@@ -1,6 +1,6 @@
 from typing import Any
 from pymongo import MongoClient
-from pymongo.database import Database
+from pymongo.database import Database as PymongoDatabase
 from pymongo.cursor import Cursor
 
 from orwynn.base.database.DatabaseEntityNotFoundError import \
@@ -15,7 +15,7 @@ class Mongo(Database):
     """Manages actions related to MongoDB."""
     def __init__(self, config: MongoConfig) -> None:
         self.__client: MongoClient = MongoClient(config.uri)
-        self.__database: Database = self.__client[config.database_name]
+        self.__database: PymongoDatabase = self.__client[config.database_name]
 
     def find_all(
         self,

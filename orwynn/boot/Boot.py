@@ -3,18 +3,21 @@ from types import NoneType
 
 from orwynn.app.AppService import AppService
 from orwynn.base.controller.Controller import Controller
+from orwynn.base.database.DatabaseKind import DatabaseKind
+from orwynn.base.database.UnknownDatabaseKindError import UnknownDatabaseKindError
 from orwynn.base.error.malfunction_error import MalfunctionError
 from orwynn.base.indication.default_api_indication import \
     default_api_indication
 from orwynn.base.indication.Indication import Indication
 from orwynn.base.module.Module import Module
 from orwynn.base.worker.Worker import Worker
-from orwynn.boot.boot_mode import BootMode
+from orwynn.boot.BootMode import BootMode
 from orwynn.boot.BootDataProxy import BootDataProxy
-from orwynn.boot.unsupported_boot_mode_error import UnsupportedBootModeError
+from orwynn.boot.UnsupportedBootModeError import UnsupportedBootModeError
 from orwynn.di.DI import DI
+from orwynn.mongo.Mongo import Mongo
 from orwynn.util.http.http import HTTPMethod
-from orwynn.util.validation import validate
+from orwynn.util.validation import validate, validate_each
 
 
 class Boot(Worker):
@@ -36,7 +39,8 @@ class Boot(Worker):
             Indication object used as a convention for outcoming API
             structures. Defaults to predefined by framework's indication
             convention.
-
+        databases (optional):
+            List of database kinds enabled.
     Usage:
     ```py
     # main.py
@@ -57,7 +61,8 @@ class Boot(Worker):
         *,
         mode: BootMode | str | None = None,
         root_dir: str = os.getcwd(),
-        api_indication: Indication | None = None
+        api_indication: Indication | None = None,
+        databases: list[DatabaseKind] | None = None
     ) -> None:
         super().__init__()
         validate(mode, [BootMode, str, NoneType])
@@ -75,6 +80,11 @@ class Boot(Worker):
             mode=self.__mode,
             api_indication=self.__api_indication
         )
+
+        if databases is None:
+            databases = []
+        else:
+            validate(databases, list)
 
         # FIXME:
         #   Add AppService to be always initialized - THIS IS VERY BAD approach
@@ -184,3 +194,17 @@ class Boot(Worker):
                 return BootMode.PROD
             case _:
                 raise UnsupportedBootModeError("unsupported mode {mode}")
+
+    def __enable_databases(self, database_kinds: list[DatabaseKind]) -> None:
+        for kind in database_kinds:
+            match kind:
+                case DatabaseKind.MONGO:
+                    Mongo(...)
+                case DatabaseKind.POSTRGRESQL:
+                    raise NotImplementedError(
+                        "postgresql database currently not supported"
+                    )
+                case _:
+                    raise UnknownDatabaseKindError(
+                        f"unknown database kind {kind}"
+                    )

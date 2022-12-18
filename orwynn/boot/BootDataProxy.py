@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 from orwynn.base.worker.Worker import Worker
-from orwynn.boot.boot_mode import BootMode
+from orwynn.boot.BootMode import BootMode
 
 if TYPE_CHECKING:
     from orwynn.base.indication.Indication import Indication

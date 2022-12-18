@@ -1,5 +1,5 @@
 from pytest import fixture
-from orwynn.boot.boot_mode import BootMode
+from orwynn.boot.BootMode import BootMode
 from orwynn.base.module.Module import Module
 
 from orwynn.boot.Boot import Boot

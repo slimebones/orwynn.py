@@ -3,7 +3,7 @@ from typing import Any, Callable, Self
 
 import loguru
 from orwynn.base.service.framework_service import FrameworkService
-from orwynn.boot.boot_mode import BootMode
+from orwynn.boot.BootMode import BootMode
 from orwynn.app.AppService import AppService
 from orwynn.base.config.Config import Config
 from orwynn.base.model.Model import Model

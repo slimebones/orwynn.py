@@ -1,6 +1,6 @@
 from orwynn.base.config.Config import Config
 from orwynn.base.indication.Indication import Indication
-from orwynn.boot.boot_mode import BootMode
+from orwynn.boot.BootMode import BootMode
 
 
 class BootConfig(Config):

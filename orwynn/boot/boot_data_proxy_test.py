@@ -3,7 +3,7 @@ import os
 from pytest import fixture
 from orwynn.base.indication.default_api_indication import \
     default_api_indication
-from orwynn.boot.boot_mode import BootMode
+from orwynn.boot.BootMode import BootMode
 from orwynn.boot.BootDataProxy import BootDataProxy
 
 

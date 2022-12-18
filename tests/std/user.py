@@ -1,29 +1,24 @@
 from orwynn.base.controller.Controller import Controller
-from orwynn.base.mapping.MongoMapping import MongoMapping
 from orwynn.base.model.Model import Model
 from orwynn.base.module.Module import Module
 from orwynn.base.service.Service import Service
+from orwynn.mongo.MongoMapping import MongoMapping
 
 
-class User(Model):
+class User(MongoMapping):
     name: str
     post_ids: list[str]
 
 
-class UserMapping(MongoMapping):
-    MODEL = User
-
-
 class UserService(Service):
-    def __init__(self, mapping: UserMapping) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self.__mapping = mapping
 
     def find(self, id: str) -> User:
-        return self.__mapping.find_one(id=id)
+        return User.find_one({"_id": id})
 
 
-class UserController(Controller):
+class UserIdController(Controller):
     ROUTE = "/{id}"
     METHODS = ["get"]
 
@@ -37,6 +32,6 @@ class UserController(Controller):
 
 user_module = Module(
     route="/user",
-    Providers=[UserService, UserMapping, UserController],
+    Providers=[UserService, UserIdController],
     Controllers=[]
 )
