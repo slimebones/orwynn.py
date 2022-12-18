@@ -1,5 +1,5 @@
 from typing import Any
-from orwynn.base.error import Error
+from orwynn.base.error.Error import Error
 
 
 class ValidationError(Error):

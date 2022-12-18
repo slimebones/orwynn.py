@@ -1,13 +1,13 @@
 import os
 from types import NoneType
 
-from orwynn.app import AppService
-from orwynn.base.controller import Controller
+from orwynn.app.AppService import AppService
+from orwynn.base.controller.Controller import Controller
 from orwynn.base.error.malfunction_error import MalfunctionError
 from orwynn.base.indication.default_api_indication import \
     default_api_indication
-from orwynn.base.indication import Indication
-from orwynn.base.module import Module
+from orwynn.base.indication.Indication import Indication
+from orwynn.base.module.Module import Module
 from orwynn.base.worker.Worker import Worker
 from orwynn.boot.boot_mode import BootMode
 from orwynn.boot.BootDataProxy import BootDataProxy

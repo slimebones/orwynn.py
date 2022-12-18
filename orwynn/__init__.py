@@ -1,13 +1,13 @@
 """Scalable web-framework with out-of-the-box architecture."""
-from orwynn.app import AppService
-from orwynn.base.config import Config
-from orwynn.base.controller import Controller
-from orwynn.base.error import Error
-from orwynn.base.indication import Indication
-from orwynn.base.middleware import Middleware
-from orwynn.base.model import Model
-from orwynn.base.module import Module
-from orwynn.base.service import Service
-from orwynn.boot import Boot
-from orwynn.mongo import Mongo
+from orwynn.app.AppService import AppService
+from orwynn.base.config.Config import Config
+from orwynn.base.controller.Controller import Controller
+from orwynn.base.error.Error import Error
+from orwynn.base.indication.Indication import Indication
+from orwynn.base.middleware.Middleware import Middleware
+from orwynn.base.model.Model import Model
+from orwynn.base.module.Module import Module
+from orwynn.base.service.Service import Service
+from orwynn.boot.Boot import Boot
+from orwynn.mongo.Mongo import Mongo
 

@@ -4,7 +4,7 @@ from orwynn.base.indication.digesting_error import DigestingError
 from orwynn.base.indication.indicator import Indicator
 from orwynn.base.indication.unsupported_indicator_error import \
     UnsupportedIndicatorError
-from orwynn.base.model import Model
+from orwynn.base.model.Model import Model
 from orwynn.util.cls.cls import find_subclass_by_name
 from orwynn.util.mp.location import (FieldLocation, find_field_by_location,
                                      find_location_by_field)

@@ -1,5 +1,5 @@
-from orwynn.base.config import Config
-from orwynn.base.indication import Indication
+from orwynn.base.config.Config import Config
+from orwynn.base.indication.Indication import Indication
 from orwynn.boot.boot_mode import BootMode
 
 

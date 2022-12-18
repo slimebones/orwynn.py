@@ -2,7 +2,7 @@ from typing import Any, Self, TypeVar
 from pydantic import BaseModel
 
 from orwynn.boot.BootDataProxy import BootDataProxy
-from orwynn.util.rnd.makeid import makeid
+from orwynn.util.rnd import makeid
 
 RecoverType = TypeVar("RecoverType", bound="Model")
 

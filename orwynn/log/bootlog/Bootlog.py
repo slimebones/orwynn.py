@@ -11,7 +11,7 @@ class _BootlogLevel(Enum):
     CRITICAL = f"{Fore.RED}CRITICAL{Fore.RESET}"
 
 
-class bootlog:
+class Bootlog:
     """Logs boottime messages."""
     _BRACKET_CTX: str = "Boot"
 

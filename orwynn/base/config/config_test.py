@@ -1,8 +1,8 @@
-from orwynn.base.config import Config
+from orwynn.base.config.Config import Config
 from orwynn.base.config.unsupported_config_source_error import \
     UnsupportedConfigSourceError
-from orwynn.base.module import Module
-from orwynn.boot import Boot
+from orwynn.base.module.Module import Module
+from orwynn.boot.Boot import Boot
 from orwynn.util.expect import expect
 
 

@@ -1,8 +1,8 @@
-from orwynn.base.controller import Controller
-from orwynn.mongo.MongoMapping import MongoMapping
-from orwynn.base.model import Model
-from orwynn.base.module import Module
-from orwynn.base.service import Service
+from orwynn.base.controller.Controller import Controller
+from orwynn.base.mapping.MongoMapping import MongoMapping
+from orwynn.base.model.Model import Model
+from orwynn.base.module.Module import Module
+from orwynn.base.service.Service import Service
 
 
 class User(Model):

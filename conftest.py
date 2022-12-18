@@ -3,12 +3,12 @@
 from pytest import fixture
 
 from orwynn.app.app_test import std_app
-from orwynn.app import AppService
-from orwynn.base.module import Module
-from orwynn.base.test.http_client import HttpClient
-from orwynn.base.test.test_client import TestClient
+from orwynn.app.AppService import AppService
+from orwynn.base.module.Module import Module
+from orwynn.base.test.HttpClient import HttpClient
+from orwynn.base.test.TestClient import TestClient
 from orwynn.base.worker.Worker import Worker
-from orwynn.boot import Boot
+from orwynn.boot.Boot import Boot
 from orwynn.boot.boot_data_proxy_test import std_boot_data_proxy
 from orwynn.boot.boot_mode import BootMode
 from orwynn.boot.boot_test import std_boot

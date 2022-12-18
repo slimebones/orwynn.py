@@ -1,6 +1,6 @@
 """Standard app structure made up for testing.
 """
-from orwynn.base.module import Module
+from orwynn.base.module.Module import Module
 from tests.std.text import text_module
 from tests.std.number import number_module
 

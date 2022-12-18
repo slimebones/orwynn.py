@@ -3,7 +3,7 @@ from orwynn.base.worker.Worker import Worker
 from orwynn.boot.boot_mode import BootMode
 
 if TYPE_CHECKING:
-    from orwynn.base.indication import Indication
+    from orwynn.base.indication.Indication import Indication
 
 
 class BootDataProxy(Worker):

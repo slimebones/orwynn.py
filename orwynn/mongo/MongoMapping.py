@@ -1,9 +1,9 @@
 from typing import Any, Iterable, Self
 from pymongo.cursor import Cursor
-from orwynn.base.mapping import Mapping
+from orwynn.base.mapping.Mapping import Mapping
 
 from orwynn.mongo.MongoDocument import MongoDocument
-from orwynn.mongo import Mongo
+from orwynn.mongo.Mongo import Mongo
 from orwynn.util import fmt
 
 

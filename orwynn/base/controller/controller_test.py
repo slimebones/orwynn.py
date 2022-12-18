@@ -2,15 +2,15 @@ from orwynn.app.already_registered_method_error import \
     AlreadyRegisteredMethodError
 from orwynn.util.validation import validate_re
 from tests.std.text import DEFAULT_ID, Text
-from orwynn.base.controller import Controller
+from orwynn.base.controller.Controller import Controller
 from orwynn.base.controller.defined_twice_controller_method_error import \
     DefinedTwiceControllerMethodError
 from orwynn.base.controller.missing_controller_class_attribute_error import \
     MissingControllerClassAttributeError
-from orwynn.base.model import Model
-from orwynn.base.module import Module
-from orwynn.base.test.http_client import HttpClient
-from orwynn.boot import Boot
+from orwynn.base.model.Model import Model
+from orwynn.base.module.Module import Module
+from orwynn.base.test.HttpClient import HttpClient
+from orwynn.boot.Boot import Boot
 from orwynn.util.expect import expect
 from orwynn.util.http.http import HTTPMethod
 from orwynn.util.http.unsupported_http_method_error import \

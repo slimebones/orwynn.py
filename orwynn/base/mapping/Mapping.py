@@ -1,5 +1,5 @@
 from typing import Any
-from orwynn.base.model import Model
+from orwynn.base.model.Model import Model
 
 
 class Mapping(Model):

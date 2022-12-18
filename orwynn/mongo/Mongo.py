@@ -1,12 +1,11 @@
 from typing import Any
-
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.cursor import Cursor
 
 from orwynn.base.database.DatabaseEntityNotFoundError import \
     DatabaseEntityNotFoundError
-from orwynn.base.database import Database
+from orwynn.base.database.Database import Database
 from orwynn.mongo.MongoConfig import MongoConfig
 from orwynn.mongo.MongoDocument import MongoDocument
 from orwynn.util import validation
@@ -45,7 +44,7 @@ class Mongo(Database):
             raise DatabaseEntityNotFoundError(
                 query=query, collection=collection
             )
-        return validation.cast(result, dict)
+        return validation.apply(result, dict)
 
     def create(
         self, collection: str, document: MongoDocument, *args, **kwargs
@@ -56,8 +55,8 @@ class Mongo(Database):
 
         return self.find_one(collection, {
             "_id": self.__database[collection].insert_one(
-                    document, *args, **kwargs
-                ).inserted_id
+                document, *args, **kwargs  # type: ignore
+            ).inserted_id
         })
 
     def remove(
@@ -67,17 +66,17 @@ class Mongo(Database):
         validation.validate(collection, str)
         validation.validate(query, dict)
 
-        removed_entity: dict | None = \
+        removed_document: Any | None = \
             self.__database[collection].find_one_and_delete(
                 query, *args, **kwargs
             )
 
-        if removed_entity is None:
+        if removed_document is None:
             raise DatabaseEntityNotFoundError(
                 collection=collection, query=query
             )
 
-        return removed_entity
+        return validation.apply(removed_document, MongoDocument)
 
     def update(
         self,
@@ -92,15 +91,14 @@ class Mongo(Database):
         validation.validate(query, dict)
         validation.validate(operation, dict)
 
-        updated_entity: MongoDocument = \
+        updated_document: Any = \
             self.__database[collection].find_one_and_update(
                 query, operation, *args, **kwargs
             )
 
-        if updated_entity is None:
+        if updated_document is None:
             raise DatabaseEntityNotFoundError(
                 collection=collection, query=query
             )
 
-        return updated_entity
-
+        return validation.apply(updated_document, MongoDocument)

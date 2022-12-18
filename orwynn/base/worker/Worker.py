@@ -1,4 +1,4 @@
-from orwynn.base.singleton import Singleton
+from orwynn.base.singleton.Singleton import Singleton
 
 
 class Worker(Singleton):

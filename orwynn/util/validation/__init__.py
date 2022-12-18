@@ -18,7 +18,7 @@ from orwynn.util.validation.validation_error import ValidationError
 from orwynn.util.validation.validator import Validator
 
 ValidationExpectedType = type | list[type] | Validator
-CastExpectedType = TypeVar("CastExpectedType")
+ApplyExpectedType = TypeVar("ApplyExpectedType")
 model_validator = __pydantic_validator
 ModelValidationError = __PydanticValidationError
 
@@ -230,7 +230,9 @@ def validate_route(route: str) -> None:
     validate_re(route, r"^\/(.+\/?)?$")
 
 
-def cast(obj: Any, expected_type: type[CastExpectedType]) -> CastExpectedType:
+def apply(
+    obj: Any, expected_type: type[ApplyExpectedType]
+) -> ApplyExpectedType:
     """Validates given object against given expected type.
 
     Args:

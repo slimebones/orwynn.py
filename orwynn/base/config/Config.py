@@ -2,7 +2,7 @@ from typing import Any, ClassVar, Literal, Self
 
 from orwynn.base.config.unsupported_config_source_error import \
     UnsupportedConfigSourceError
-from orwynn.base.model import Model
+from orwynn.base.model.Model import Model
 from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.di.provider import Provider
 from orwynn.util.file.is_path import is_path

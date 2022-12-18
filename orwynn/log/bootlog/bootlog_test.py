@@ -3,7 +3,7 @@ import re
 from contextlib import redirect_stdout
 from typing import Callable
 
-from orwynn.log.bootlog import bootlog
+from orwynn.log.bootlog.Bootlog import Bootlog
 
 _MESSAGE: str = "hello world!"
 _LOG_MATCH_PATTERN: str = \
@@ -20,29 +20,29 @@ def _get_stdout(fn: Callable, *args, **kwargs) -> str:
 
 def test_debug():
     assert \
-        re.match(_LOG_MATCH_PATTERN, _get_stdout(bootlog.debug, _MESSAGE)) \
+        re.match(_LOG_MATCH_PATTERN, _get_stdout(Bootlog.debug, _MESSAGE)) \
         is not None
 
 
 def test_info():
     assert \
-        re.match(_LOG_MATCH_PATTERN, _get_stdout(bootlog.info, _MESSAGE)) \
+        re.match(_LOG_MATCH_PATTERN, _get_stdout(Bootlog.info, _MESSAGE)) \
         is not None
 
 
 def test_warning():
     assert \
-        re.match(_LOG_MATCH_PATTERN, _get_stdout(bootlog.warning, _MESSAGE)) \
+        re.match(_LOG_MATCH_PATTERN, _get_stdout(Bootlog.warning, _MESSAGE)) \
         is not None
 
 
 def test_error():
     assert \
-        re.match(_LOG_MATCH_PATTERN, _get_stdout(bootlog.error, _MESSAGE)) \
+        re.match(_LOG_MATCH_PATTERN, _get_stdout(Bootlog.error, _MESSAGE)) \
         is not None
 
 
 def test_critical():
     assert \
-        re.match(_LOG_MATCH_PATTERN, _get_stdout(bootlog.critical, _MESSAGE)) \
+        re.match(_LOG_MATCH_PATTERN, _get_stdout(Bootlog.critical, _MESSAGE)) \
         is not None

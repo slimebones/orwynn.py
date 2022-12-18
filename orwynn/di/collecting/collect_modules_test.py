@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from orwynn.base.module import Module
+from orwynn.base.module.Module import Module
 from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.di.collecting.collect_modules import collect_modules
 from orwynn.util.expect import expect
