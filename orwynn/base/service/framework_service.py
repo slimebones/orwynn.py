@@ -1,4 +1,4 @@
-from orwynn.base.service.service import Service
+from orwynn.base.service.Service import Service
 
 
 class FrameworkService(Service):

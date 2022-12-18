@@ -5,5 +5,4 @@ class Service:
     Controllers, since Service never ever need to call a controller, so it
     doesn't have to know about them.
     """
-    def __init__(self, *args) -> None:
-        pass
+    pass

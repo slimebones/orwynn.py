@@ -1,7 +1,7 @@
 from orwynn.app.AppService import AppService
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.module.module import Module
-from orwynn.base.service.service import Service
+from orwynn.base.service.Service import Service
 
 
 class FloatService(Service):

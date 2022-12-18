@@ -14,7 +14,6 @@ from orwynn.util.http.unsupported_http_method_error import \
 
 class AppService(FrameworkService):
     def __init__(self) -> None:
-        super().__init__()
         self._app: FastAPI = FastAPI()
 
         self._HTTP_METHODS_TO_REGISTERING_FUNCTIONS: \

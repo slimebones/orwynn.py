@@ -4,7 +4,7 @@ In future the framework might introduce special flags (or read Python's
 optimization flag -O) to not execute such functions.
 """
 import re
-from typing import Any, Sized
+from typing import Any, Sized, TypeVar
 
 from pydantic import ValidationError as __PydanticValidationError
 from pydantic import validator as __pydantic_validator
@@ -18,6 +18,9 @@ from orwynn.util.validation.validation_error import ValidationError
 from orwynn.util.validation.validator import Validator
 
 ValidationExpectedType = type | list[type] | Validator
+CastExpectedType = TypeVar("CastExpectedType")
+model_validator = __pydantic_validator
+ModelValidationError = __PydanticValidationError
 
 
 def validate(
@@ -227,5 +230,21 @@ def validate_route(route: str) -> None:
     validate_re(route, r"^\/(.+\/?)?$")
 
 
-model_validator = __pydantic_validator
-ModelValidationError = __PydanticValidationError
+def cast(obj: Any, expected_type: type[CastExpectedType]) -> CastExpectedType:
+    """Validates given object against given expected type.
+
+    Args:
+        obj:
+            Object to be validated.
+        expected_type:
+            Type to check.
+
+    Returns:
+        The same object but with given type reference.
+
+    Raises:
+        ValidationError:
+            Object type is not expected type.
+    """
+    validate(obj, expected_type)
+    return obj

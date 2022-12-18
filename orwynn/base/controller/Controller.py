@@ -8,7 +8,7 @@ from orwynn.base.middleware.middleware import Middleware
 from orwynn.util.http.http import HTTPMethod, TestResponse
 from orwynn.util.http.unsupported_http_method_error import \
     UnsupportedHTTPMethodError
-from orwynn.util.validation.validation import (validate, validate_each,
+from orwynn.util.validation import (validate, validate_each,
                                                validate_route)
 
 ControllerMethodReturnedData = dict | TestResponse
@@ -41,7 +41,7 @@ class Controller:
     METHODS: list[str] | None = None
     MIDDLEWARE: list[Middleware] | None = None
 
-    def __init__(self, *args) -> None:
+    def __init__(self) -> None:
         self._methods: list[HTTPMethod] = []
 
         if self.ROUTE is None:
