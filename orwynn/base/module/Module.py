@@ -3,7 +3,7 @@ from types import NoneType
 
 from orwynn.app.empty_route_error import EmptyRouteError
 from orwynn.base.controller.Controller import Controller
-from orwynn.base.middleware import Middleware
+from orwynn.base.middleware.Middleware import Middleware as MiddlewareClass
 from orwynn.base.module.framework_service_module_reference_error import \
     FrameworkServiceModuleReferenceError
 from orwynn.base.service.framework_service import FrameworkService
@@ -55,7 +55,7 @@ class Module:
         route: str,
         Providers: list[type[Provider]] | None = None,
         Controllers: list[type[Controller]] | None = None,
-        Middleware: list[type[Middleware.Middleware]] | None = None,
+        Middleware: list[type[MiddlewareClass]] | None = None,
         imports: list["Module"] | None = None,
         exports: list[type[Provider]] | None = None
     ) -> None:
@@ -74,7 +74,7 @@ class Module:
         self._Controllers: list[type[Controller]] = self._parse_controllers(
             Controllers
         )
-        self._Middleware: list[type[Middleware.Middleware]] = \
+        self._Middleware: list[type[MiddlewareClass]] = \
             self._parse_middleware(Middleware)
         self._imports: list["Module"] = self._parse_imports(imports)
         # TODO: Add check if exports present in Providers
@@ -100,7 +100,7 @@ class Module:
         return copy.copy(self._Controllers)
 
     @property
-    def Middleware(self) -> list[type[Middleware.Middleware]]:
+    def Middleware(self) -> list[type[MiddlewareClass]]:
         return copy.copy(self._Middleware)
 
     @property
@@ -159,13 +159,13 @@ class Module:
 
     @staticmethod
     def _parse_middleware(
-        Middleware: list[type[Middleware.Middleware]] | None
-    ) -> list[type[Middleware.Middleware]]:
-        res: list[type[Middleware.Middleware]]
+        Middleware: list[type[MiddlewareClass]] | None
+    ) -> list[type[MiddlewareClass]]:
+        res: list[type[MiddlewareClass]]
 
         if Middleware:
             for Middleware_ in Middleware:
-                validate(Middleware_, Middleware.Middleware)
+                validate(Middleware_, MiddlewareClass)
             res = Middleware
         else:
             res = []

@@ -1,35 +1,35 @@
-from typing import Any, ClassVar, Literal, Self
-from orwynn.base.config.config_source.ConfigSource import ConfigSource
-from orwynn.base.config.config_source.ConfigSourceType import ConfigSourceType
-from orwynn.base.config.config_source.UnitedConfigSourceType import UnitedConfigSourceType
-
-from orwynn.base.config.UnknownConfigSourceError import \
-    UnknownConfigSourceError
+import re
+from typing import Any, Self
 from orwynn.base.model.Model import Model
+from orwynn.boot.AppRC import AppRC
 from orwynn.boot.BootDataProxy import BootDataProxy
-from orwynn.di.provider import Provider
-from orwynn.util.validation import is_path
-from orwynn.util.file.yml import load_yml
+from orwynn.util import validation
 
 
 class Config(Model):
     """Object holding configuration which can be injected to any requesting
     entity.
-
-    Config is a Provider and has highest priority to be initialized in DI
-    chain, so it makes it a perfect candidate to be requested in other entities
-    as a configuration model.
-
-    Every config should define class attribute SOURCE indicates the source to
-    load configuration fields from.
-
-    Note that fields which is not in Providers group, are injected via DI,
-    others are searched in given SOURCE.
     """
-    SOURCE: ClassVar[ConfigSource] = ConfigSource(
-        type=UnitedConfigSourceType.UNITED_PATH,
-        value=None
-    )
+    @classmethod
+    def load(cls, *, extra: dict[str, Any] | None = None) -> Self:
+        if not extra:
+            extra = {}
+
+        validation.validate_dict(extra, (str, validation.Validator.SKIP))
+
+        app_rc: AppRC = BootDataProxy.ie().apprc
+        config_kwargs: dict[str, Any] = app_rc.get(
+            cls._convert_name_to_rc_format(),
+            {}
+        )
+        return cls(**validation.apply(config_kwargs, dict), **extra)
+
+    @classmethod
+    def _convert_name_to_rc_format(cls) -> str:
+        cleaned_name: str = cls.__name__
+        if re.match(r"^.+config$", cls.__name__.lower()):
+            cleaned_name = cls.__name__[:len(cls.__name__)-6]
+        return cleaned_name
 
     class Config:
         arbitrary_types_allowed = True

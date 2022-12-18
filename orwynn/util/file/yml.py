@@ -52,7 +52,7 @@ def load_yml(
     """
     validate(p, Path)
 
-    if p.suffix not in [".yaml", ".yml"]:
+    if p.suffix.lower() not in [".yaml", ".yml"]:
         raise NotValidFileSuffixError(f"suffix {p.suffix} is not valid suffix")
 
     with open(p, "r") as file:

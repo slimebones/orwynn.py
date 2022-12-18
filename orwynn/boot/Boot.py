@@ -1,8 +1,11 @@
+from genericpath import isfile
 import os
-from types import NoneType
+from pathlib import Path
+import re
+
+import dotenv
 
 from orwynn.app.AppService import AppService
-from orwynn.base.config import fw_create_config
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.database.DatabaseKind import DatabaseKind
 from orwynn.base.database.UnknownDatabaseKindError import \
@@ -13,12 +16,17 @@ from orwynn.base.indication.default_api_indication import \
 from orwynn.base.indication.Indication import Indication
 from orwynn.base.module.Module import Module
 from orwynn.base.worker.Worker import Worker
+from orwynn.boot.AppRC import AppRC
+from orwynn.boot.ApprcSearchError import AppRCSearchError
 from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.boot.BootMode import BootMode
+from orwynn.boot.UnknownSourceError import UnknownSourceError
 from orwynn.boot.UnsupportedBootModeError import UnsupportedBootModeError
 from orwynn.di.DI import DI
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
+from orwynn.util.file.NotDirError import NotDirError
+from orwynn.util.file.yml import load_yml
 from orwynn.util.http.http import HTTPMethod
 from orwynn.util.validation import validate
 
@@ -32,6 +40,8 @@ class Boot(Worker):
     Attributes:
         root_module:
             Root module of the app.
+        dotenv_path (optional):
+            Path to .env file. Defaults to ".env".
         api_indication (optional):
             Indication object used as a convention for outcoming API
             structures. Defaults to predefined by framework's indication
@@ -41,11 +51,12 @@ class Boot(Worker):
 
     Environs:
         Orwynn_Mode:
-            Boot mode for application.
+            Boot mode for application. Defaults to DEV.
         Orwynn_RootDir:
-            Root directory for application.
-        Orwynn_UnitedSource:
-            Source for configs with united source types.
+            Root directory for application. Defaults to os.getcwd()
+        Orwynn_AppRCDir:
+            Directory where application configs is located. Defaults to root
+            directory.
 
     Usage:
     ```py
@@ -65,26 +76,34 @@ class Boot(Worker):
         self,
         root_module: Module,
         *,
-        mode: BootMode | str | None = None,
-        root_dir: str = os.getcwd(),
+        dotenv_path: Path | None = None,
         api_indication: Indication | None = None,
         databases: list[DatabaseKind] | None = None
     ) -> None:
         super().__init__()
-        validate(mode, [BootMode, str, NoneType])
+        if dotenv_path is None:
+            dotenv_path = Path(".env")
+        validate(dotenv_path, Path)
         validate(root_module, Module)
-        validate(root_dir, str)
         if not api_indication:
             api_indication = default_api_indication
         validate(api_indication, Indication)
 
-        self.__mode: BootMode = self._parse_mode(mode)
-        self.__root_dir: str = root_dir
+        dotenv.load_dotenv(dotenv_path, override=True)
+
+        self.__mode: BootMode = self.__parse_mode()
+        self.__root_dir: Path = self.__parse_root_dir()
         self.__api_indication: Indication = api_indication
+        self.__app_rc: AppRC = self.__parse_app_rc(
+            self.__root_dir,
+            self.__mode
+        )
+
         BootDataProxy(
             root_dir=self.__root_dir,
             mode=self.__mode,
-            api_indication=self.__api_indication
+            api_indication=self.__api_indication,
+            app_rc=self.__app_rc
         )
 
         if databases is None:
@@ -102,7 +121,7 @@ class Boot(Worker):
 
         self._di: DI = DI(root_module)
 
-        self._register_routes(self._di.modules, self._di.controllers)
+        self.__register_routes(self._di.modules, self._di.controllers)
 
     @property
     def app(self) -> AppService:
@@ -112,14 +131,14 @@ class Boot(Worker):
     def api_indication(self) -> Indication:
         return self.__api_indication
 
-    def _register_routes(
+    def __register_routes(
         self, modules: list[Module], controllers: list[Controller]
     ) -> None:
         for m in modules:
             for C in m.Controllers:
-                self._register_controller_class_for_module(m, C, controllers)
+                self.__register_controller_class_for_module(m, C, controllers)
 
-    def _register_controller_class_for_module(
+    def __register_controller_class_for_module(
         self,
         m: Module,
         C: type[Controller],
@@ -129,7 +148,7 @@ class Boot(Worker):
         for c in controllers:
             if type(c) is C:
                 is_controller_found = True
-                self._register_controller_for_module(c, m)
+                self.__register_controller_for_module(c, m)
         if not is_controller_found:
             raise MalfunctionError(
                 f"no initialized controller found for class {C},"
@@ -137,7 +156,7 @@ class Boot(Worker):
                 " so DI should have been initialized it"
             )
 
-    def _register_controller_for_module(
+    def __register_controller_for_module(
         self,
         c: Controller,
         m: Module
@@ -175,19 +194,68 @@ class Boot(Worker):
                 " this shouldn't have passed validation at Controller.__init__"
             )
 
-    def _parse_mode(self, mode: BootMode | str | None) -> BootMode:
-        if mode is None:
-            env_mode: str | None = os.getenv("Orwynn_Mode")
-            if not env_mode:
-                return BootMode.DEV
-            else:
-                return self._parse_mode_from_str(env_mode)
-        elif type(mode) is str:
-            return self._parse_mode_from_str(mode)
-        elif type(mode) is BootMode:
-            return mode
+    def __parse_mode(self) -> BootMode:
+        mode_env: str | None = os.getenv("Orwynn_Mode")
+
+        if not mode_env:
+            return BootMode.DEV
         else:
-            raise
+            return self._parse_mode_from_str(mode_env)
+
+    def __parse_root_dir(self) -> Path:
+        root_dir: Path
+        root_dir_env: str | None = os.getenv("Orwynn_RootDir")
+
+        if not root_dir_env:
+            root_dir = Path(os.getcwd())
+        else:
+            root_dir = Path(root_dir_env)
+
+        if not root_dir.is_dir():
+            raise NotDirError(
+                f"{root_dir} is not a directory"
+            )
+
+        return root_dir
+
+    def __parse_app_rc(self, root_dir: Path, mode: BootMode) -> AppRC:
+        rc_env: str | None = os.getenv(
+            "Orwynn_AppRCDir",
+            None
+        )
+
+        if rc_env is None:
+            return {}
+        elif Path(rc_env).exists():
+            rc_dir: Path = Path(rc_env)
+            if not rc_dir.is_dir():
+                raise NotDirError(
+                    f"{rc_dir} is not a directory"
+                )
+            return self.__load_appropriate_app_rc(rc_dir, mode)
+        elif (
+            rc_env.startswith("http://")
+            or rc_env.startswith("https://")
+        ):
+            raise NotImplementedError("URL sources are not yet implemented")
+        else:
+            raise UnknownSourceError(
+                f"unknown source {rc_env}"
+            )
+
+    def __load_appropriate_app_rc(self, rc_dir: Path, mode: BootMode) -> AppRC:
+        for f in rc_dir.iterdir():
+            prelast_suffix, last_suffix = f.suffixes[len(f.suffixes)-2:]
+            if (
+                re.match(r"^apprc\..+\..+$", f.name.lower())
+                and prelast_suffix.lower() == "." + mode.value.lower()
+                and last_suffix.lower() in [".yml", ".yaml"]
+            ):
+                return load_yml(rc_dir)
+
+        raise AppRCSearchError(
+            f"cannot find apprc in directory {rc_dir}"
+        )
 
     @staticmethod
     def _parse_mode_from_str(mode: str) -> BootMode:
@@ -206,7 +274,7 @@ class Boot(Worker):
             match kind:
                 case DatabaseKind.MONGO:
                     Mongo(
-                        config=fw_create_config(MongoConfig)
+                        config=MongoConfig.load()
                     )
                 case DatabaseKind.POSTRGRESQL:
                     raise NotImplementedError(

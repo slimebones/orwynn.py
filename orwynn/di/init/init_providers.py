@@ -115,7 +115,7 @@ def _traverse(
                     param.annotation.__name__
                 )
 
-        result_provider = StarterProvider.fw_create(provider_kwargs)
+        result_provider = StarterProvider.load(extra=provider_kwargs)
     else:
         result_provider = StarterProvider(
             *already_initialized_dependencies

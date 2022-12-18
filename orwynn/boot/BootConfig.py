@@ -1,7 +1,8 @@
+from typing import Any, Self
 from orwynn.base.config.Config import Config
-from orwynn.base.config.config_source.ConfigSource import ConfigSource
-from orwynn.base.config.config_source.ConfigSourceType import ConfigSourceType
 from orwynn.base.indication.Indication import Indication
+from orwynn.boot.AppRC import AppRC
+from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.boot.BootMode import BootMode
 
 
@@ -14,8 +15,14 @@ class BootConfig(Config):
         root_dir:
             Root directory of the boot.
     """
-    SOURCE = ConfigSource(type=ConfigSourceType._, value="boot")
-
     mode: BootMode
     root_dir: str
     api_indication: Indication
+    apprc: AppRC
+
+    @classmethod
+    def load(cls, *, extra: dict[str, Any]) -> Self:
+        proxy: BootDataProxy = BootDataProxy.ie()
+        return cls(
+            **proxy.boot_config_data, **extra
+        )

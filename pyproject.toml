@@ -17,6 +17,7 @@ httpx = "^0.23.1"
 colorama = "^0.4.6"
 coverage = "^6.5.0"
 pymongo = "^4.3.3"
+python-dotenv = "^0.21.0"
 
 [tool.poetry.group.dev.dependencies]
 lorem = "^0.1.1"
