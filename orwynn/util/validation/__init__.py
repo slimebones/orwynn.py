@@ -165,9 +165,6 @@ def validate_dict(
     validate_length(strict_flags, 2)
     validate_each(strict_flags, bool)
 
-    if obj == {}:
-        raise NothingToValidateError("empty dict given for validation")
-
     for k, v in obj.items():
         validate(k, expected_types[0], is_strict=strict_flags[0])
         validate(v, expected_types[1], is_strict=strict_flags[1])

@@ -239,8 +239,6 @@ class Boot(Worker):
                 )
             app_rc: AppRC = {}
             mode_nesting_index: int = APP_RC_MODE_NESTING.index(mode)
-            is_any_file_loaded: bool = False
-
             # Load from bottom to top updating previous one with newest one
             for nesting_mode in APP_RC_MODE_NESTING[:mode_nesting_index+1]:
                 try:
@@ -250,13 +248,13 @@ class Boot(Worker):
                             nesting_mode
                         )
                     )
-                    # At least one file was loaded, even if it could be empty
-                    is_any_file_loaded = True
                 except AppRCSearchError:
                     continue
-            if not is_any_file_loaded:
+            if app_rc == {}:
                 raise AppRCSearchError(
-                    f"at least prod apprc should present in dir {rc_dir}"
+                    f"loading rc files from dir {rc_dir} hasn't had any effect"
+                    " - no files present (at least prod config) or they are"
+                    " empty"
                 )
             return app_rc
         elif (

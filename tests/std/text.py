@@ -4,8 +4,6 @@ import lorem
 
 from orwynn.app.AppService import AppService
 from orwynn.base.config.Config import Config
-from orwynn.base.config.config_source.ConfigSource import ConfigSource
-from orwynn.base.config.config_source.ConfigSourceType import ConfigSourceType
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.model.Model import Model
 from orwynn.base.module.Module import Module
@@ -24,10 +22,6 @@ class Text(Model):
 
 
 class TextConfig(Config):
-    SOURCE = ConfigSource(
-        type=ConfigSourceType.PATH,
-        value=Path("tests/std/text.yml")
-    )
     words_amount: int = 2
 
     @model_validator("words_amount")

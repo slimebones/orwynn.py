@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Self
 from orwynn.base.config.Config import Config
 from orwynn.base.indication.Indication import Indication
@@ -16,9 +17,9 @@ class BootConfig(Config):
             Root directory of the boot.
     """
     mode: BootMode
-    root_dir: str
+    root_dir: Path
     api_indication: Indication
-    apprc: AppRC
+    app_rc: AppRC
 
     @classmethod
     def load(cls, *, extra: dict[str, Any]) -> Self:
