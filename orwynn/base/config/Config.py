@@ -1,4 +1,6 @@
 from typing import Any, ClassVar, Literal, Self
+from orwynn.base.config.config_source.ConfigSource import ConfigSource
+from orwynn.base.config.config_source.ConfigSourceType import ConfigSourceType
 
 from orwynn.base.config.unsupported_config_source_error import \
     UnsupportedConfigSourceError
@@ -7,7 +9,6 @@ from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.di.provider import Provider
 from orwynn.util.file.is_path import is_path
 from orwynn.util.file.yml import load_yml
-from orwynn.util.types import Source
 
 
 class Config(Model):
@@ -24,7 +25,10 @@ class Config(Model):
     Note that fields which is not in Providers group, are injected via DI,
     others are searched in given SOURCE.
     """
-    SOURCE: ClassVar[Source | Literal["boot"] | None] = None
+    SOURCE: ClassVar[ConfigSource] = ConfigSource(
+        type=ConfigSourceType.UNITED_PATH,
+        source=None
+    )
 
     @classmethod
     def fw_create(
@@ -56,17 +60,20 @@ class Config(Model):
         return cls(**source_kwargs, **provider_kwargs)
 
     @classmethod
-    def _load_source(cls, source: Source) -> dict[str, Any]:
+    def _load_source(cls, source: ConfigSource) -> dict[str, Any]:
         result: dict[str, Any] = {}
 
-        if source == "boot":
+        if (
+            source.type is ConfigSourceType.FWONLY
+            and source.source == "boot"
+        ):
             if cls.__name__ != "BootConfig":
                 raise UnsupportedConfigSourceError(
                     "SOURCE=\"boot\" can be used only by framework"
                 )
             return BootDataProxy.ie().data
 
-        elif is_path(source):
+        elif is_path(source.source):
             result = load_yml(source)  # type: ignore
         else:
             raise NotImplementedError(

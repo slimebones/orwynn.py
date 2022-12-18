@@ -4,6 +4,8 @@ import lorem
 
 from orwynn.app.AppService import AppService
 from orwynn.base.config.Config import Config
+from orwynn.base.config.config_source.ConfigSource import ConfigSource
+from orwynn.base.config.config_source.ConfigSourceType import ConfigSourceType
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.model.Model import Model
 from orwynn.base.module.Module import Module
@@ -22,11 +24,14 @@ class Text(Model):
 
 
 class TextConfig(Config):
-    SOURCE = Path("tests/std/text.yml")
-    words_amount: int
+    SOURCE = ConfigSource(
+        type=ConfigSourceType.PATH,
+        source=Path("tests/std/text.yml")
+    )
+    words_amount: int = 2
 
     @model_validator("words_amount")
-    def is_in_allowed_range(cls, v):
+    def validate_words_in_range(cls, v):
         if not 1 <= v <= 20:
             raise ValueError("{} must be in range 1-20".format(v))
         return v

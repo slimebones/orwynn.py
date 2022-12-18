@@ -16,6 +16,7 @@ from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.boot.UnsupportedBootModeError import UnsupportedBootModeError
 from orwynn.di.DI import DI
 from orwynn.mongo.Mongo import Mongo
+from orwynn.mongo.MongoConfig import MongoConfig
 from orwynn.util.http.http import HTTPMethod
 from orwynn.util.validation import validate, validate_each
 
@@ -29,18 +30,19 @@ class Boot(Worker):
     Attributes:
         root_module:
             Root module of the app.
-        mode (optional):
-            Selected mode for the app. It can be BootMode or just string for
-            simplicity. Defaults to environment variable ORWYNN_MODE or to
-            "dev" if such environ is not found.
-        root_dir (optional):
-            Root directory of the project. Defaults to os.getcwd().
         api_indication (optional):
             Indication object used as a convention for outcoming API
             structures. Defaults to predefined by framework's indication
             convention.
         databases (optional):
             List of database kinds enabled.
+
+    Environs:
+        Orwynn_Mode:
+            Boot mode for application.
+        Orwynn_RootDir:
+            Root directory for application.
+
     Usage:
     ```py
     # main.py
@@ -171,7 +173,7 @@ class Boot(Worker):
 
     def _parse_mode(self, mode: BootMode | str | None) -> BootMode:
         if mode is None:
-            env_mode: str | None = os.getenv("ORWYNN_MODE")
+            env_mode: str | None = os.getenv("Orwynn_Mode")
             if not env_mode:
                 return BootMode.DEV
             else:
@@ -199,7 +201,7 @@ class Boot(Worker):
         for kind in database_kinds:
             match kind:
                 case DatabaseKind.MONGO:
-                    Mongo(...)
+                    Mongo(config=MongoConfig.fw_create({}))
                 case DatabaseKind.POSTRGRESQL:
                     raise NotImplementedError(
                         "postgresql database currently not supported"
