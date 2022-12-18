@@ -2,8 +2,8 @@ import inspect
 
 from pytest import fixture
 
-from orwynn.base.config.Config import Config
-from orwynn.base.module.module import Module
+from orwynn.base.config import Config
+from orwynn.base.module import Module
 from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.di.collecting.collect_modules import collect_modules
 from orwynn.di.collecting.collect_provider_dependencies import (

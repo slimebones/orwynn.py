@@ -1,5 +1,5 @@
 from types import NoneType
-from orwynn.base.error.error import Error
+from orwynn.base.error import Error
 from orwynn.util.validation import validate
 
 

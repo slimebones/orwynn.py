@@ -1,4 +1,4 @@
-from orwynn.base.model.Model import Model
+from orwynn.base.model import Model
 
 
 def test_random_id():

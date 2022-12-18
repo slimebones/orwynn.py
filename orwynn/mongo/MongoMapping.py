@@ -1,29 +1,86 @@
+from typing import Any, Iterable, Self
 from pymongo.cursor import Cursor
+from orwynn.base.mapping import Mapping
 
-from orwynn.base.mapping.Mapping import Mapping
+from orwynn.mongo.MongoDocument import MongoDocument
+from orwynn.mongo import Mongo
+from orwynn.util import fmt
 
 
 class MongoMapping(Mapping):
     """Mapping to work with MongoDB.
 
-    You should subclass this class in your application and
-    define MODEL class attribute to choose model to work with in this mapping.
+    Itself is some model representing MongoDB document and also has some class
+    methods to manipulate with related document in DB and translate it from/to
+    mapping.
     """
+    def __init__(self, **data: Any) -> None:
+        super().__init__(**data)
 
-    def __init__(self) -> None:
-        super().__init__()
+    @classmethod
+    def _collection(cls) -> str:
+        return fmt.snakefy(cls.__name__)
 
-    def find_all(self, *args, **kwargs) -> Cursor:
-        raise NotImplementedError()
+    @classmethod
+    def _mongo(cls) -> Mongo:
+        return Mongo.ie()
 
-    def find_one(self, *args, **kwargs) -> :
-        raise NotImplementedError()
+    @classmethod
+    def find_all(
+        cls,
+        query: dict,
+        *args,
+        **kwargs
+    ) -> Iterable[Self]:
+        cursor: Cursor = cls._mongo().find_all(
+            cls._collection(), query, *args, **kwargs
+        )
 
-    def create(self, *args, **kwargs) -> Any:
-        raise NotImplementedError()
+        return map(cls._parse_document, cursor)
 
-    def update(self, *args, **kwargs) -> Any:
-        raise NotImplementedError()
+    @classmethod
+    def find_one(
+        cls, query: dict, *args, **kwargs
+    ) -> Self:
+        return cls._parse_document(
+            cls._mongo().find_one(cls._collection(), query, *args, **kwargs)
+        )
 
-    def remove(self, *args, **kwargs) -> Any:
-        raise NotImplementedError()
+    @classmethod
+    def create(
+        cls, mapping: Self, *args, **kwargs
+    ) -> Self:
+        return cls._parse_document(
+            cls._mongo().create(
+                cls._collection(), mapping.dict(), *args, **kwargs
+            )
+        )
+
+    @classmethod
+    def remove(
+        cls, query: dict, *args, **kwargs
+    ) -> Self:
+        return cls._parse_document(
+            cls._mongo().remove(
+                cls._collection(), query, *args, **kwargs
+            )
+        )
+
+    @classmethod
+    def update(
+        cls,
+        query: dict,
+        operation: dict,
+        *args,
+        **kwargs
+    ) -> Self:
+        return cls._parse_document(
+            cls._mongo().update(
+                cls._collection(), operation, query, *args, **kwargs
+            )
+        )
+
+    @classmethod
+    def _parse_document(cls, document: MongoDocument) -> Self:
+        """Parses document to specified Model."""
+        return cls.parse_obj(dict(document, id=document["_id"]))

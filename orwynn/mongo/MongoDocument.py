@@ -1,0 +1,1 @@
+MongoDocument = dict

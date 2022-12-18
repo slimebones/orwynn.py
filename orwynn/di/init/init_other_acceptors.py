@@ -1,6 +1,6 @@
 import inspect
-from orwynn.base.controller.Controller import Controller
-from orwynn.base.module.module import Module
+from orwynn.base.controller import Controller
+from orwynn.base.module import Module
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.di_container import DIContainer
 from orwynn.di.provider import Provider

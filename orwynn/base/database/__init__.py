@@ -1,8 +1,8 @@
 from typing import Any
-from orwynn.base.service.framework_service import FrameworkService
+from orwynn.base.worker.Worker import Worker
 
 
-class DatabaseService(FrameworkService):
+class Database(Worker):
     """Represents a connection to database as well as set of actions with this
     database.
 
@@ -12,8 +12,8 @@ class DatabaseService(FrameworkService):
     require specifying a collection to work with.
 
     Anyway, these methods for every service subclassing this one, will be
-    incapsulated by Mappings. So the end user will work most of the time with
-    these mappings only.
+    incapsulated by Mappings. So the end user will work only with these
+    mappings only.
     """
     def find_all(self, *args, **kwargs) -> Any:
         raise NotImplementedError()

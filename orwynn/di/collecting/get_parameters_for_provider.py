@@ -1,7 +1,7 @@
 import inspect
-from orwynn.base.config.Config import Config
+from orwynn.base.config import Config
 
-from orwynn.base.model.Model import Model
+from orwynn.base.model import Model
 from orwynn.di.NotProviderError import NotProviderError
 from orwynn.di.collecting.provider_keyword_attribute_error import \
     ProviderKeywordAttributeError

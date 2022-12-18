@@ -1,4 +1,4 @@
-from orwynn.base.module.module import Module
+from orwynn.base.module import Module
 from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.util.fmt import format_chain
 

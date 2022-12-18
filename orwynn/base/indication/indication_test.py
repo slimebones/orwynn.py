@@ -2,7 +2,7 @@ from typing import Any
 
 from pytest import fixture
 
-from orwynn.base.indication.Indication import Indication
+from orwynn.base.indication import Indication
 from orwynn.base.indication.indicator import Indicator
 from orwynn.util.parsing.parsing import parse_key
 from tests.std.text import Text

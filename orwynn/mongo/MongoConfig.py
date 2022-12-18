@@ -1,4 +1,4 @@
-from orwynn.base.config.Config import Config
+from orwynn.base.config import Config
 
 class MongoConfig(Config):
     uri: str = "mongodb://localhost:27017"

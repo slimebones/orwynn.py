@@ -1,4 +1,4 @@
-from orwynn.base.error.error import Error
+from orwynn.base.error import Error
 
 
 class NothingToValidateError(Error):
