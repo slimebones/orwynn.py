@@ -167,6 +167,8 @@ class Indication:
         validate(ModelType, Model)
         validate_dict(mp, (str, Validator.SKIP))
 
+        # Note that in this case availability of Indicator.TYPE field in given
+        # map is not checked since only Indicator.VALUE is needed.
         model_value: dict = self.__find_model_value_in_mp(mp)
 
         return ModelType.parse_obj(model_value)
