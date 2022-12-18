@@ -1,12 +1,14 @@
 from typing import Any
+
 from pymongo import MongoClient
 from pymongo.database import Database
-from pymongo.results import DeleteResult, UpdateResult
-from orwynn.base.error.malfunction_error import MalfunctionError
-from orwynn.util import validation
-from orwynn.base.database.DatabaseEntityNotFoundError import DatabaseEntityNotFoundError
+from pymongo.cursor import Cursor
+
+from orwynn.base.database.DatabaseEntityNotFoundError import \
+    DatabaseEntityNotFoundError
 from orwynn.base.database.DatabaseService import DatabaseService
 from orwynn.mongo.MongoConfig import MongoConfig
+from orwynn.util import validation
 
 
 class MongoService(DatabaseService):
@@ -15,18 +17,19 @@ class MongoService(DatabaseService):
         self.__client: MongoClient = MongoClient(config.uri)
         self.__database: Database = self.__client[config.database_name]
 
-    def find(self, collection: str, query: dict, *args, **kwargs) -> dict:
+    def find_all(
+        self,
+        collection: str,
+        query: dict,
+        *args,
+        **kwargs
+    ) -> Cursor:
         validation.validate(collection, str)
         validation.validate(query, dict)
 
-        result: Any | None = self.__database[collection].find(
+        return self.__database[collection].find(
             query, *args, **kwargs
         )
-        if result is None:
-            raise DatabaseEntityNotFoundError(
-                query=query, collection=collection
-            )
-        return validation.cast(result, dict)
 
     def find_one(self, collection: str, query: dict, *args, **kwargs) -> dict:
         validation.validate(collection, str)
@@ -41,35 +44,33 @@ class MongoService(DatabaseService):
             )
         return validation.cast(result, dict)
 
-    def create(self, collection: str, entity: dict, *args, **kwargs) -> str:
-        """Creates an entity returning it's id after creation."""
+    def create(self, collection: str, entity: dict, *args, **kwargs) -> dict:
+        """Creates an entity returning it after creation."""
         validation.validate(collection, str)
         validation.validate(entity, dict)
 
-        return validation.cast(
-            self.__database[collection].insert_one(
-                entity, *args, **kwargs
-            ).inserted_id,
-            str
-        )
+        return self.find_one(collection, {
+            "_id": self.__database[collection].insert_one(
+                    entity, *args, **kwargs
+                ).inserted_id
+        })
 
-    def remove(self, collection: str, query: dict, *args, **kwargs) -> None:
-        """Deletes an entity matching query."""
+    def remove(self, collection: str, query: dict, *args, **kwargs) -> dict:
+        """Deletes an entity matching query and returns it."""
         validation.validate(collection, str)
         validation.validate(query, dict)
 
-        result: DeleteResult = self.__database[collection].delete_one(
-            query, *args, **kwargs
-        )
+        removed_entity: dict | None = \
+            self.__database[collection].find_one_and_delete(
+                query, *args, **kwargs
+            )
 
-        if result.deleted_count == 0:
+        if removed_entity is None:
             raise DatabaseEntityNotFoundError(
-                query=query, collection=collection
+                collection=collection, query=query
             )
-        elif result.deleted_count > 1:
-            raise MalfunctionError(
-                f"on method {self.remove} only one entity should be deleted"
-            )
+
+        return removed_entity
 
     def update(
         self,
@@ -79,21 +80,19 @@ class MongoService(DatabaseService):
         *args,
         **kwargs
     ) -> None:
-        """Updates an entity matching query."""
+        """Updates an entity matching query and returns updated version."""
         validation.validate(collection, str)
         validation.validate(query, dict)
         validation.validate(operation, dict)
 
-        result: UpdateResult = self.__database[collection].update_one(
+        updated_entity = self.__database[collection].find_one_and_update(
             query, operation, *args, **kwargs
         )
 
-        if result.modified_count == 0:
+        if updated_entity is None:
             raise DatabaseEntityNotFoundError(
-                f"no entities modified for query {query}"
-                f" in collection {collection}"
+                collection=collection, query=query
             )
-        elif result.modified_count > 1:
-            raise MalfunctionError(
-                f"on method {self.update} only one entity should be modified"
-            )
+
+        return updated_entity
+

@@ -15,7 +15,7 @@ class DatabaseService(FrameworkService):
     incapsulated by Mappings. So the end user will work most of the time with
     these mappings only.
     """
-    def find(self, *args, **kwargs) -> Any:
+    def find_all(self, *args, **kwargs) -> Any:
         raise NotImplementedError()
 
     def find_one(self, *args, **kwargs) -> Any:

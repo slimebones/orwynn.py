@@ -1,5 +1,5 @@
 from orwynn.base.controller.Controller import Controller
-from orwynn.base.mapping.MongoMapping import MongoMapping
+from orwynn.mongo.MongoMapping import MongoMapping
 from orwynn.base.model.Model import Model
 from orwynn.base.module.module import Module
 from orwynn.base.service.Service import Service
@@ -20,7 +20,7 @@ class UserService(Service):
         self.__mapping = mapping
 
     def find(self, id: str) -> User:
-        return self.__mapping.find(id=id)
+        return self.__mapping.find_one(id=id)
 
 
 class UserController(Controller):
