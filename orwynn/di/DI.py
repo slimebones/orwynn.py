@@ -9,7 +9,7 @@ from orwynn.di.di_container import DIContainer
 from orwynn.di.di_object import DIObject
 from orwynn.di.init.init_other_acceptors import init_other_acceptors
 from orwynn.di.init.init_providers import init_providers
-from orwynn.util.validation import validate
+from orwynn.util.validation.validation import validate
 
 
 class DI(Worker):
@@ -78,7 +78,6 @@ class DI(Worker):
             All controllers fetched.
         """
         return self._container.controllers
-
 
     def find(self, key: str) -> DIObject:
         """Returns DI object by its key.

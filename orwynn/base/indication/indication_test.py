@@ -1,11 +1,10 @@
 from typing import Any
 
 from pytest import fixture
+
 from orwynn.base.indication.Indication import Indication
 from orwynn.base.indication.indicator import Indicator
-from orwynn.base.model.Model import Model
-from orwynn.util.cls import find_subclass_by_name
-from orwynn.util.parsing import parse_key
+from orwynn.util.parsing.parsing import parse_key
 from tests.std.text import Text
 
 
@@ -16,6 +15,7 @@ def default_indication() -> Indication:
         "value": Indicator.VALUE
     }
     return Indication(mp)
+
 
 def test_digest_default(default_indication: Indication):
     digested_mp: dict[str, Any] = default_indication.digest_model(

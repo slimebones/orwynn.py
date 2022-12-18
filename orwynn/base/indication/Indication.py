@@ -1,16 +1,15 @@
 from typing import Any, ItemsView
-from orwynn.base.indication.digesting_error import DigestingError
 
+from orwynn.base.indication.digesting_error import DigestingError
 from orwynn.base.indication.indicator import Indicator
-from orwynn.base.indication.recovering_error import RecoveringError
 from orwynn.base.indication.unsupported_indicator_error import \
     UnsupportedIndicatorError
 from orwynn.base.model.Model import Model
-from orwynn.util.cls import find_subclass_by_name
-from orwynn.util.mp.location import FieldLocation, find_field_by_location, find_location_by_field
-from orwynn.util.validation import validate, validate_dict
+from orwynn.util.cls.cls import find_subclass_by_name
+from orwynn.util.mp.location import (FieldLocation, find_field_by_location,
+                                     find_location_by_field)
+from orwynn.util.validation.validation import validate, validate_dict
 from orwynn.util.validation.validator import Validator
-
 
 _Locations = dict[Indicator, FieldLocation]
 
@@ -41,9 +40,8 @@ class Indication:
         )  # bad support for Enums at validation, so skip
         self.__mp: dict[str, Indicator] = mp
 
-        self.__locations_by_supported_class: \
-            dict[type, _Locations] = \
-                self.__find_locations_by_supported_class()
+        self.__locations_by_supported_class: dict[type, _Locations] = \
+            self.__find_locations_by_supported_class()
 
     def __find_locations_by_supported_class(
         self
@@ -113,7 +111,7 @@ class Indication:
 
         if not is_value_indicator_found:
             raise DigestingError(
-                f"wasn't able to find Indicator.VALUE related field"
+                "wasn't able to find Indicator.VALUE related field"
             )
 
         return result

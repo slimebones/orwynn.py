@@ -1,5 +1,3 @@
-from pytest import fixture
-
 from orwynn.di.collecting.provider_dependencies_map import \
     ProviderDependenciesMap
 from orwynn.di.di_container import DIContainer

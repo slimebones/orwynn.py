@@ -4,7 +4,7 @@ from orwynn.base.module.module import Module
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.di_container import DIContainer
 from orwynn.di.provider import Provider
-from orwynn.util.validation import validate
+from orwynn.util.validation.validation import validate
 
 
 def init_other_acceptors(

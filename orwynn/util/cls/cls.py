@@ -27,6 +27,7 @@ def find_subclass_by_name(name: str, BaseClass: Class) -> Class:
     else:
         return out
 
+
 def __traverse_subclasses_checking_name(name: str, C: Class) -> Class | None:
     for SubClass in C.__subclasses__():
         if SubClass.__name__ == name:
