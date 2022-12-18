@@ -141,6 +141,36 @@ class Indication:
         model_value: dict = self.__find_model_value_in_mp(mp)
         return TargetModel.parse_obj(model_value)
 
+    def recover_model_with_type(
+        self, ModelType: type[Model], mp: dict
+    ) -> Model:
+        """Creates model object of given type using given map according to
+        indication rules.
+
+        Works the same as recover_model(...), but is faster since knows which
+        model type to initialize.
+
+        Args:
+            ModelType:
+                Type to initialize.
+            mp:
+                Dictionary from which model will be recovered.
+
+        Returns:
+            Recovered model.
+
+        Raises:
+            RecoveringError:
+                TYPE or VALUE locations of given dictionary are not matched
+                with according indication data.
+        """
+        validate(ModelType, Model)
+        validate_dict(mp, (str, Validator.SKIP))
+
+        model_value: dict = self.__find_model_value_in_mp(mp)
+
+        return ModelType.parse_obj(model_value)
+
     def __find_model_type_in_mp(self, mp: dict) -> type[Model]:
         indication_type_field_location: FieldLocation = \
             self.__locations_by_supported_class[Model][Indicator.TYPE]

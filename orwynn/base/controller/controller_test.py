@@ -11,7 +11,6 @@ from orwynn.base.model.Model import Model
 from orwynn.base.module.module import Module
 from orwynn.base.test.http_client import HttpClient
 from orwynn.boot.Boot import Boot
-from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.util.expect import expect
 from orwynn.util.http.http import HTTPMethod
 from orwynn.util.http.unsupported_http_method_error import \
@@ -101,7 +100,5 @@ def test_already_registered():
 
 def test_std_routes(std_boot: Boot, std_http: HttpClient):
     json: dict = std_http.get_jsonify("/text")
-    model: Model = BootDataProxy.ie().api_indication.recover_model(json)
-
-    assert type(model) is Text
-    validate_re(model.text, DEFAULT_ID + r"\: .+")
+    text: Text = Text.recover(json)
+    validate_re(text.text, DEFAULT_ID + r"\: .+")

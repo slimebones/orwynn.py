@@ -1,8 +1,10 @@
-from typing import Any
+from typing import Any, Self, TypeVar
 from pydantic import BaseModel
 
 from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.util.rnd.makeid import makeid
+
+RecoverType = TypeVar("RecoverType", bound="Model")
 
 
 class Model(BaseModel):
@@ -20,3 +22,10 @@ class Model(BaseModel):
         indication.
         """
         return BootDataProxy.ie().api_indication.digest_model(self)
+
+    @classmethod
+    def recover(cls, mp: dict) -> Self:
+        """Recovers model of this class using dictionary."""
+        return BootDataProxy.ie().api_indication.recover_model_with_type(
+            cls, mp
+        )
