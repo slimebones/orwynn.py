@@ -1,6 +1,6 @@
 """List of classes an user can subclass from."""
 from orwynn.base.config.Config import Config
-from orwynn.base.controller.controller import Controller
+from orwynn.base.controller.Controller import Controller
 from orwynn.base.mapping.mapping import Mapping
 from orwynn.base.middleware.middleware import Middleware
 from orwynn.base.model.Model import Model

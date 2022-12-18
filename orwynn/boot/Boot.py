@@ -2,7 +2,7 @@ import os
 from types import NoneType
 
 from orwynn.app.AppService import AppService
-from orwynn.base.controller.controller import Controller
+from orwynn.base.controller.Controller import Controller
 from orwynn.base.error.malfunction_error import MalfunctionError
 from orwynn.base.indication.default_api_indication import \
     default_api_indication

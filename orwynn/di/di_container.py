@@ -2,7 +2,7 @@ import re
 from typing import TypeVar
 
 from orwynn.base.config.Config import Config
-from orwynn.base.controller.controller import Controller
+from orwynn.base.controller.Controller import Controller
 from orwynn.base.error.malfunction_error import MalfunctionError
 from orwynn.base.model.Model import Model
 from orwynn.di.di_object import DIObject

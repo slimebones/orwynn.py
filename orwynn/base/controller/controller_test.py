@@ -2,7 +2,7 @@ from orwynn.app.already_registered_method_error import \
     AlreadyRegisteredMethodError
 from orwynn.util.validation.validation import validate_re
 from tests.std.text import DEFAULT_ID, Text
-from orwynn.base.controller.controller import Controller
+from orwynn.base.controller.Controller import Controller
 from orwynn.base.controller.defined_twice_controller_method_error import \
     DefinedTwiceControllerMethodError
 from orwynn.base.controller.missing_controller_class_attribute_error import \
