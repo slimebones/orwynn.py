@@ -8,7 +8,7 @@ from orwynn.base.module.framework_service_module_reference_error import \
     FrameworkServiceModuleReferenceError
 from orwynn.base.service.framework_service import FrameworkService
 from orwynn.di.is_provider import is_provider
-from orwynn.di.not_provider_error import NotProviderError
+from orwynn.di.NotProviderError import NotProviderError
 from orwynn.di.provider import Provider
 from orwynn.util.validation.validation import validate, validate_route
 

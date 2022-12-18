@@ -35,7 +35,10 @@ def test_std(std_struct: Module):
             # Skip config's parseable parameters
             if (
                 issubclass(P, Config)
-                and not is_provider(inspect_parameter.annotation)
+                and (
+                    not inspect.isclass(inspect_parameter.annotation)
+                    or not is_provider(inspect_parameter.annotation)
+                )
             ):
                 continue
             assertion_dependencies.append(inspect_parameter.annotation)

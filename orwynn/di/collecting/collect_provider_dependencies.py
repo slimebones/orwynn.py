@@ -11,7 +11,7 @@ from orwynn.di.collecting.provider_availability_error import \
 from orwynn.di.collecting.provider_dependencies_map import \
     ProviderDependenciesMap
 from orwynn.di.is_provider import is_provider
-from orwynn.di.not_provider_error import NotProviderError
+from orwynn.di.NotProviderError import NotProviderError
 from orwynn.di.provider import Provider
 from orwynn.util.fmt import format_chain
 

@@ -2,9 +2,11 @@ import inspect
 from orwynn.base.config.Config import Config
 
 from orwynn.base.model.Model import Model
+from orwynn.di.NotProviderError import NotProviderError
 from orwynn.di.collecting.provider_keyword_attribute_error import \
     ProviderKeywordAttributeError
-from orwynn.di.no_annotation_error import NoAnnotaionError
+from orwynn.di.is_provider import is_provider
+from orwynn.di.NoAnnotationError import NoAnnotationError
 from orwynn.di.provider import Provider
 
 ProviderParameters = list["ProviderParameter"]
@@ -24,7 +26,7 @@ def get_parameters_for_provider(
 
     for inspect_parameter in inspect.signature(P).parameters.values():
         if inspect_parameter.annotation is inspect._empty:
-            raise NoAnnotaionError(
+            raise NoAnnotationError(
                 f"provider {P} has field \"{inspect_parameter.name}\" without"
                 " annotation"
             )
@@ -61,6 +63,18 @@ def get_parameters_for_provider(
                 f" of provider {P}"
                 " are not supported for now"
             )
+
+        if (
+            not inspect.isclass(inspect_parameter.annotation)
+            or not is_provider(inspect_parameter.annotation)
+        ):
+            if issubclass(P, Config):
+                continue
+            else:
+                raise NotProviderError(
+                    f"argument annotation {inspect_parameter.annotation}"
+                    f" for provider {P} should be provider"
+                )
 
         parameters.append(
             ProviderParameter(

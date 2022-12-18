@@ -107,7 +107,10 @@ def _traverse(
         provider_kwargs: dict[str, Provider] = {}
 
         for param in inspect.signature(StarterProvider).parameters.values():
-            if is_provider(param.annotation):
+            if (
+                inspect.isclass(param.annotation)
+                and is_provider(param.annotation)
+            ):
                 provider_kwargs[param.name] = container.find(
                     param.annotation.__name__
                 )
