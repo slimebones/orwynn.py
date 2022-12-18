@@ -6,6 +6,7 @@ import re
 import dotenv
 
 from orwynn.app.AppService import AppService
+from orwynn.app_rc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.database.DatabaseKind import DatabaseKind
 from orwynn.base.database.UnknownDatabaseKindError import \
@@ -16,8 +17,8 @@ from orwynn.base.indication.default_api_indication import \
 from orwynn.base.indication.Indication import Indication
 from orwynn.base.module.Module import Module
 from orwynn.base.worker.Worker import Worker
-from orwynn.boot.AppRC import AppRC
-from orwynn.boot.ApprcSearchError import AppRCSearchError
+from orwynn.app_rc.AppRC import AppRC
+from orwynn.app_rc.AppRCSearchError import AppRCSearchError
 from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.boot.BootMode import BootMode
 from orwynn.boot.UnknownSourceError import UnknownSourceError
@@ -128,6 +129,10 @@ class Boot(Worker):
         return self._di.app_service
 
     @property
+    def mode(self) -> BootMode:
+        return self.__mode
+
+    @property
     def api_indication(self) -> Indication:
         return self.__api_indication
 
@@ -232,7 +237,28 @@ class Boot(Worker):
                 raise NotDirError(
                     f"{rc_dir} is not a directory"
                 )
-            return self.__load_appropriate_app_rc(rc_dir, mode)
+            app_rc: AppRC = {}
+            mode_nesting_index: int = APP_RC_MODE_NESTING.index(mode)
+            is_any_file_loaded: bool = False
+
+            # Load from bottom to top updating previous one with newest one
+            for nesting_mode in APP_RC_MODE_NESTING[:mode_nesting_index+1]:
+                try:
+                    app_rc.update(
+                        self.__load_appropriate_app_rc(
+                            rc_dir,
+                            nesting_mode
+                        )
+                    )
+                    # At least one file was loaded, even if it could be empty
+                    is_any_file_loaded = True
+                except AppRCSearchError:
+                    continue
+            if not is_any_file_loaded:
+                raise AppRCSearchError(
+                    f"at least prod apprc should present in dir {rc_dir}"
+                )
+            return app_rc
         elif (
             rc_env.startswith("http://")
             or rc_env.startswith("https://")
@@ -254,7 +280,7 @@ class Boot(Worker):
                 return load_yml(rc_dir)
 
         raise AppRCSearchError(
-            f"cannot find apprc in directory {rc_dir}"
+            f"cannot find apprc for mode {mode} in directory {rc_dir}"
         )
 
     @staticmethod

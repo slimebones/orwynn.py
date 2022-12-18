@@ -1,3 +1,4 @@
+import os
 from pytest import fixture
 from orwynn.boot.BootMode import BootMode
 from orwynn.base.module.Module import Module
@@ -6,51 +7,31 @@ from orwynn.boot.Boot import Boot
 
 
 @fixture
-def std_boot(std_struct: Module):
-    yield Boot(
-        mode=BootMode.TEST,
+def std_boot(std_struct: Module) -> Boot:
+    return Boot(
         root_module=std_struct
     )
-    Boot.discard()
 
 
 def test_init_mode_test(std_struct: Module):
-    Boot(
-        mode=BootMode.TEST,
+    os.environ["Orwynn_Mode"] = "test"
+    boot: Boot = Boot(
         root_module=std_struct
     )
+    assert boot.mode == BootMode.TEST
 
 
 def test_init_mode_dev(std_struct: Module):
-    Boot(
-        mode=BootMode.DEV,
+    os.environ["Orwynn_Mode"] = "dev"
+    boot: Boot = Boot(
         root_module=std_struct
     )
+    assert boot.mode == BootMode.DEV
 
 
 def test_init_mode_prod(std_struct: Module):
-    Boot(
-        mode=BootMode.PROD,
+    os.environ["Orwynn_Mode"] = "prod"
+    boot: Boot = Boot(
         root_module=std_struct
     )
-
-
-def test_init_mode_test_str(std_struct: Module):
-    Boot(
-        mode="test",
-        root_module=std_struct
-    )
-
-
-def test_init_mode_dev_str(std_struct: Module):
-    Boot(
-        mode="dev",
-        root_module=std_struct
-    )
-
-
-def test_init_mode_prod_str(std_struct: Module):
-    Boot(
-        mode="prod",
-        root_module=std_struct
-    )
+    assert boot.mode == BootMode.PROD
