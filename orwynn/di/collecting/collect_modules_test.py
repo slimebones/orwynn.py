@@ -4,7 +4,7 @@ from orwynn.base.module.module import Module
 from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.di.collecting.collect_modules import collect_modules
 from orwynn.util.expect import expect
-from tests.std import Assertion
+from tests.std.Assertion import Assertion
 
 
 @fixture

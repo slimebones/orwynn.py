@@ -10,7 +10,7 @@ from orwynn.di.collecting.collect_provider_dependencies import (
     ProviderDependenciesMap, collect_provider_dependencies)
 from orwynn.di.is_provider import is_provider
 from orwynn.di.provider import Provider
-from tests.std import Assertion
+from tests.std.Assertion import Assertion
 
 
 @fixture

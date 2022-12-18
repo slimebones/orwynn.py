@@ -1,7 +1,7 @@
 from orwynn.base.module.module import Module
 from orwynn.di.di_container import DIContainer
 from orwynn.di.init.init_other_acceptors import init_other_acceptors
-from tests.std import Assertion
+from tests.std.Assertion import Assertion
 
 
 def test_std(

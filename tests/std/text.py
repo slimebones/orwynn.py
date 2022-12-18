@@ -14,6 +14,9 @@ from tests.std.float import FloatService, float_module
 from tests.std.number import NumberService, number_module
 
 
+DEFAULT_ID: str = "e55"
+
+
 class Text(Model):
     text: str
 
@@ -62,7 +65,7 @@ class TextController(Controller):
         self.service = service
 
     def get(self) -> dict:
-        return self.service.find("e55").api
+        return self.service.find(DEFAULT_ID).api
 
 
 text_module = Module(

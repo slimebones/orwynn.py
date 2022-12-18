@@ -1,20 +1,23 @@
-from orwynn.app.already_registered_method_error import AlreadyRegisteredMethodError
+from orwynn.app.already_registered_method_error import \
+    AlreadyRegisteredMethodError
+from orwynn.util.validation import validate, validate_re
+from tests.std.text import DEFAULT_ID, Text
 from orwynn.base.controller.controller import Controller
 from orwynn.base.controller.defined_twice_controller_method_error import \
     DefinedTwiceControllerMethodError
 from orwynn.base.controller.missing_controller_class_attribute_error import \
     MissingControllerClassAttributeError
+from orwynn.base.model.Model import Model
 from orwynn.base.module.module import Module
 from orwynn.base.test.http_client import HttpClient
 from orwynn.boot.Boot import Boot
-from orwynn.di.DI import DI
+from orwynn.boot.BootDataProxy import BootDataProxy
+from orwynn.util.expect import expect
 from orwynn.util.http.http import HTTPMethod
 from orwynn.util.http.unsupported_http_method_error import \
     UnsupportedHTTPMethodError
-from orwynn.util.expect import expect
 from orwynn.util.validation.re_validation_error import ReValidationError
 from orwynn.util.validation.validation_error import ValidationError
-from tests.std.text import Text
 
 
 def test_http_methods():
@@ -98,4 +101,7 @@ def test_already_registered():
 
 def test_std_routes(std_boot: Boot, std_http: HttpClient):
     json: dict = std_http.get_jsonify("/text")
+    model: Model = BootDataProxy.ie().api_indication.recover_model(json)
 
+    assert type(model) is Text
+    validate_re(model.text, DEFAULT_ID + r"\: .+")

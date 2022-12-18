@@ -1,5 +1,3 @@
-"""Standard app structure made up for testing.
-"""
 from orwynn.app.AppService import AppService
 from orwynn.base.module.module import Module
 from orwynn.boot.BootConfig import BootConfig
@@ -7,12 +5,8 @@ from orwynn.di.acceptor import Acceptor
 from orwynn.di.provider import Provider
 from tests.std.float import FloatController, FloatService, float_module
 from tests.std.number import NumberController, NumberService, number_module
+from tests.std.root_module import root_module
 from tests.std.text import TextConfig, TextController, TextService, text_module
-
-root_module = Module(
-    route="/",
-    imports=[text_module, number_module]
-)
 
 
 class Assertion:

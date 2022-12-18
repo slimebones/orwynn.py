@@ -146,4 +146,3 @@ class Controller:
             "the method OPTIONS is not implemented for controller"
             f" {self.__class__}"
         )
-
