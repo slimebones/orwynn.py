@@ -3,6 +3,7 @@
 In future the framework might introduce special flags (or read Python's
 optimization flag -O) to not execute such functions.
 """
+from pathlib import Path
 import re
 from typing import Any, Sized, TypeVar
 
@@ -16,8 +17,9 @@ from orwynn.util.validation.unknown_validator_error import \
     UnknownValidatorError
 from orwynn.util.validation.validation_error import ValidationError
 from orwynn.util.validation.validator import Validator
+from pathlib import PosixPath, WindowsPath
 
-ValidationExpectedType = type | list[type] | Validator
+ValidationExpectedType = type | list[type] | Validator | Path
 ApplyExpectedType = TypeVar("ApplyExpectedType")
 model_validator = __pydantic_validator
 ModelValidationError = __PydanticValidationError

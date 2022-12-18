@@ -6,7 +6,7 @@ from typing import Any
 
 import yaml
 
-from orwynn.util.file.is_path import is_path
+from orwynn.util.validation import validate
 
 
 class YmlLoader(Enum):
@@ -50,8 +50,8 @@ def load_yml(
         NotValidYmlError:
             Yaml file is not valid.
     """
-    if not is_path(p):
-        raise TypeError(f"path {p} is not allowed pathlib.Path kind")
+    validate(p, Path)
+
     if p.suffix not in [".yaml", ".yml"]:
         raise NotValidFileSuffixError(f"suffix {p.suffix} is not valid suffix")
 

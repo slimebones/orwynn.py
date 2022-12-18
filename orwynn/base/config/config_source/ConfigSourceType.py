@@ -5,4 +5,4 @@ class ConfigSourceType(Enum):
     ENV = auto()
     PATH = auto()
     URI = auto()
-    FWONLY = auto()
+    _FWONLY = auto()

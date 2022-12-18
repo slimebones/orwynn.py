@@ -2,23 +2,25 @@ import os
 from types import NoneType
 
 from orwynn.app.AppService import AppService
+from orwynn.base.config import fw_create_config
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.database.DatabaseKind import DatabaseKind
-from orwynn.base.database.UnknownDatabaseKindError import UnknownDatabaseKindError
+from orwynn.base.database.UnknownDatabaseKindError import \
+    UnknownDatabaseKindError
 from orwynn.base.error.malfunction_error import MalfunctionError
 from orwynn.base.indication.default_api_indication import \
     default_api_indication
 from orwynn.base.indication.Indication import Indication
 from orwynn.base.module.Module import Module
 from orwynn.base.worker.Worker import Worker
-from orwynn.boot.BootMode import BootMode
 from orwynn.boot.BootDataProxy import BootDataProxy
+from orwynn.boot.BootMode import BootMode
 from orwynn.boot.UnsupportedBootModeError import UnsupportedBootModeError
 from orwynn.di.DI import DI
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
 from orwynn.util.http.http import HTTPMethod
-from orwynn.util.validation import validate, validate_each
+from orwynn.util.validation import validate
 
 
 class Boot(Worker):
@@ -42,6 +44,8 @@ class Boot(Worker):
             Boot mode for application.
         Orwynn_RootDir:
             Root directory for application.
+        Orwynn_UnitedSource:
+            Source for configs with united source types.
 
     Usage:
     ```py
@@ -201,7 +205,9 @@ class Boot(Worker):
         for kind in database_kinds:
             match kind:
                 case DatabaseKind.MONGO:
-                    Mongo(config=MongoConfig.fw_create({}))
+                    Mongo(
+                        config=fw_create_config(MongoConfig)
+                    )
                 case DatabaseKind.POSTRGRESQL:
                     raise NotImplementedError(
                         "postgresql database currently not supported"

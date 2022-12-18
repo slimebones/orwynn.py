@@ -26,7 +26,7 @@ class Text(Model):
 class TextConfig(Config):
     SOURCE = ConfigSource(
         type=ConfigSourceType.PATH,
-        source=Path("tests/std/text.yml")
+        value=Path("tests/std/text.yml")
     )
     words_amount: int = 2
 
