@@ -76,9 +76,12 @@ class Boot(Worker):
             api_indication=self.__api_indication
         )
 
-        # TEMP:
+        # FIXME:
         #   Add AppService to be always initialized - THIS IS VERY BAD approach
-        #   and is breaking many principles, so fix it ASAP
+        #   and is breaking many principles, so fix it ASAP.
+        #
+        #   Case is, that if no acceptor/module in the app requires AppService,
+        #   it won't be included at all.
         root_module._Providers.append(AppService)
 
         self._di: DI = DI(root_module)
