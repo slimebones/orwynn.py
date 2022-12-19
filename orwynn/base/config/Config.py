@@ -17,7 +17,7 @@ class Config(Model):
 
         validation.validate_dict(extra, (str, validation.Validator.SKIP))
 
-        app_rc: AppRC = BootDataProxy.ie().apprc
+        app_rc: AppRC = BootDataProxy.ie().app_rc
         config_kwargs: dict[str, Any] = app_rc.get(
             cls._convert_name_to_rc_format(),
             {}

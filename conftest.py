@@ -1,5 +1,6 @@
 """Main framework-only testing suite.
 """
+import os
 from pytest import fixture
 
 from orwynn.app.app_test import std_app
@@ -31,3 +32,6 @@ def __discard_workers(W: type[Worker] = Worker):
     for NestedW in W.__subclasses__():
         __discard_workers(NestedW)
     W.discard(should_validate=False)
+    os.environ["Orwynn_Mode"] = ""
+    os.environ["Orwynn_RootDir"] = ""
+    os.environ["Orwynn_AppRcDir"] = ""

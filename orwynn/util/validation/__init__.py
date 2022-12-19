@@ -5,19 +5,17 @@ optimization flag -O) to not execute such functions.
 """
 from pathlib import Path
 import re
-from typing import Any, Sized, TypeVar
+from typing import Any, Callable, Sized, TypeVar
 
 from pydantic import ValidationError as __PydanticValidationError
 from pydantic import validator as __pydantic_validator
+from orwynn.util.validation.ExpectationError import ExpectationError
 
-from orwynn.util.validation.nothing_to_validate_error import \
-    NothingToValidateError
 from orwynn.util.validation.re_validation_error import ReValidationError
 from orwynn.util.validation.unknown_validator_error import \
     UnknownValidatorError
 from orwynn.util.validation.validation_error import ValidationError
 from orwynn.util.validation.validator import Validator
-from pathlib import PosixPath, WindowsPath
 
 ValidationExpectedType = type | list[type] | Validator | Path
 ApplyExpectedType = TypeVar("ApplyExpectedType")
@@ -249,3 +247,36 @@ def apply(
     """
     validate(obj, expected_type)
     return obj
+
+
+def expect(
+    fn: Callable,
+    ErrorToExpect: type[Exception],
+    *args,
+    **kwargs
+) -> None:
+    """Expects given function to raise given error if function is called with
+    given args and kwargs.
+
+    Args:
+        fn:
+            Function to call.
+        ErrorToExpect:
+            Exception class to expect.
+        args:
+            Positional arguments to pass to function call.
+        kwargs:
+            Keyword arguments to pass to function call.
+
+    Raises:
+        ExpectationError:
+            Given error has not been raised on function's call.
+    """
+    try:
+        fn(*args, **kwargs)
+    except ErrorToExpect:
+        pass
+    else:
+        raise ExpectationError(
+            f"error {ErrorToExpect} expected on call of function {fn}"
+        )

@@ -31,7 +31,7 @@ class BootDataProxy(Worker):
         return self.__api_indication
 
     @property
-    def apprc(self) -> AppRC:
+    def app_rc(self) -> AppRC:
         return self.__app_rc
 
     @property

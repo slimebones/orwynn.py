@@ -11,7 +11,7 @@ from orwynn.base.model.Model import Model
 from orwynn.base.module.Module import Module
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.boot.Boot import Boot
-from orwynn.util.expect import expect
+from orwynn.util.validation import expect
 from orwynn.util.http.http import HTTPMethod
 from orwynn.util.http.unsupported_http_method_error import \
     UnsupportedHTTPMethodError

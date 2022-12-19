@@ -1,3 +1,4 @@
+from typing import Any
 from orwynn.app.AppService import AppService
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.module.Module import Module
@@ -79,7 +80,7 @@ class DI(Worker):
         """
         return self._container.controllers
 
-    def find(self, key: str) -> DIObject:
+    def find(self, key: str) -> Any:
         """Returns DI object by its key.
 
         Note that searching is made using PascalCased keys, but actual object

@@ -1,1 +1,4 @@
-words_amount: 4
+Mongo:
+  database_name: orwynntest
+Text:
+  words_amount: 1

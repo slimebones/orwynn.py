@@ -22,7 +22,7 @@ from orwynn.app_rc.AppRCSearchError import AppRCSearchError
 from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.boot.BootMode import BootMode
 from orwynn.boot.UnknownSourceError import UnknownSourceError
-from orwynn.boot.UnsupportedBootModeError import UnsupportedBootModeError
+from orwynn.boot.UnknownBootModeError import UnknownBootModeError
 from orwynn.di.DI import DI
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
@@ -120,9 +120,9 @@ class Boot(Worker):
         #   it won't be included at all.
         root_module._Providers.append(AppService)
 
+        self.__enable_databases(databases)
         self._di: DI = DI(root_module)
         self.__register_routes(self._di.modules, self._di.controllers)
-        self.__enable_databases(databases)
 
     @property
     def app(self) -> AppService:
@@ -209,7 +209,7 @@ class Boot(Worker):
 
     def __parse_root_dir(self) -> Path:
         root_dir: Path
-        root_dir_env: str | None = os.getenv("Orwynn_RootDir")
+        root_dir_env: str = os.getenv("Orwynn_RootDir", "")
 
         if not root_dir_env:
             root_dir = Path(os.getcwd())
@@ -224,15 +224,22 @@ class Boot(Worker):
         return root_dir
 
     def __parse_app_rc(self, root_dir: Path, mode: BootMode) -> AppRC:
-        rc_env: str | None = os.getenv(
+        rc_env: str = os.getenv(
             "Orwynn_AppRCDir",
-            None
+            ""
         )
+        should_raise_search_error: bool
 
-        if rc_env is None:
-            return {}
-        elif Path(rc_env).exists():
-            rc_dir: Path = Path(rc_env)
+        rc_dir: Path
+        if not rc_env:
+            rc_dir = root_dir
+            # On default assignment no errors raised if files not found / empty
+            should_raise_search_error = False
+        else:
+            rc_dir = Path(rc_env)
+            should_raise_search_error = True
+
+        if Path(rc_env).exists():
             if not rc_dir.is_dir():
                 raise NotDirError(
                     f"{rc_dir} is not a directory"
@@ -250,7 +257,7 @@ class Boot(Worker):
                     )
                 except AppRCSearchError:
                     continue
-            if app_rc == {}:
+            if app_rc == {} and should_raise_search_error:
                 raise AppRCSearchError(
                     f"loading rc files from dir {rc_dir} hasn't had any effect"
                     " - no files present (at least prod config) or they are"
@@ -269,13 +276,18 @@ class Boot(Worker):
 
     def __load_appropriate_app_rc(self, rc_dir: Path, mode: BootMode) -> AppRC:
         for f in rc_dir.iterdir():
-            prelast_suffix, last_suffix = f.suffixes[len(f.suffixes)-2:]
+            try:
+                prelast_suffix, last_suffix = f.suffixes[len(f.suffixes)-2:]
+            except ValueError:
+                # Not enough values to unpack
+                continue
+
             if (
                 re.match(r"^apprc\..+\..+$", f.name.lower())
                 and prelast_suffix.lower() == "." + mode.value.lower()
                 and last_suffix.lower() in [".yml", ".yaml"]
             ):
-                return load_yml(rc_dir)
+                return load_yml(f)
 
         raise AppRCSearchError(
             f"cannot find apprc for mode {mode} in directory {rc_dir}"
@@ -291,7 +303,7 @@ class Boot(Worker):
             case  "prod":
                 return BootMode.PROD
             case _:
-                raise UnsupportedBootModeError("unsupported mode {mode}")
+                raise UnknownBootModeError(f"unknown mode {mode}")
 
     def __enable_databases(self, database_kinds: list[DatabaseKind]) -> None:
         for kind in database_kinds:
