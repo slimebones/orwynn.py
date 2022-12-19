@@ -29,7 +29,7 @@ from orwynn.mongo.MongoConfig import MongoConfig
 from orwynn.util.file.NotDirError import NotDirError
 from orwynn.util.file.yml import load_yml
 from orwynn.util.http.http import HTTPMethod
-from orwynn.util.validation import validate
+from orwynn.util.validation import validate, validate_each
 
 
 class Boot(Worker):
@@ -110,7 +110,7 @@ class Boot(Worker):
         if databases is None:
             databases = []
         else:
-            validate(databases, list)
+            validate_each(databases, DatabaseKind, expected_obj_type=list)
 
         # FIXME:
         #   Add AppService to be always initialized - THIS IS VERY BAD approach
@@ -121,8 +121,8 @@ class Boot(Worker):
         root_module._Providers.append(AppService)
 
         self._di: DI = DI(root_module)
-
         self.__register_routes(self._di.modules, self._di.controllers)
+        self.__enable_databases(databases)
 
     @property
     def app(self) -> AppService:

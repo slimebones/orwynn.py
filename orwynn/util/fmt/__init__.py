@@ -2,7 +2,8 @@
 
 Typically here collected functions which return string.
 """
-from curses.ascii import isupper
+from curses.ascii import isalpha, isupper
+import re
 from typing import Any
 
 
@@ -13,6 +14,8 @@ def format_chain(lst: list[Any]) -> str:
 def snakefy(name: str) -> str:
     """Converts name to snake_case.
 
+    Note that this is not reversible using camelfy()
+
     Args:
         name:
             Name to convert.
@@ -20,51 +23,43 @@ def snakefy(name: str) -> str:
     Returns:
         Name converted.
     """
-    words: list[str] = []
+    # Reference: https://stackoverflow.com/a/1176023/14748231
+    name = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
+    name = re.sub("__([A-Z])", r"_\1", name)
+    name = re.sub("([a-z0-9])([A-Z])", r"\1_\2", name)
+    return name.lower()
 
-    word: str = name[0].lower()
-    for i, char in enumerate(name[1:]):
-        if char.isupper():
-            try:
-                next_char: str = word[i+1]
-            except KeyError:
-                words.append(word)
-                words.append(char.lower())
+
+def pascalify(name: str) -> str:
+    """Converts name to PascalCase.
+
+    Args:
+        name:
+            Name to convert.
+
+    Returns:
+        Name converted.
+    """
+    result: str = ""
+    is_previous_underscore: bool = True
+
+    for i, char in enumerate(name):
+        if is_previous_underscore:
+            if char == "_":
+                result += char
             else:
-                if next_char.isupper():
-                    # Keep continuing uppers
-                    word += char
+                result += char.upper()
+        else:
+            if char != "_":
+                result += char
+            else:
+                try:
+                    next_char: str = name[i+1]
+                except IndexError:
+                    result += char
                 else:
-                    words.append(word)
-                    word = char.lower()
-        else:
-            word += char
+                    if next_char == "_":
+                        result += char
+        is_previous_underscore = char == "_"
 
-    return "_".join(words)
-
-
-def camelfy(name: str) -> str:
-    """Converts name to CamelCase.
-
-    Args:
-        name:
-            Name to convert.
-
-    Returns:
-        Name converted.
-    """
-    word: str = name[0]
-
-    # The task is typically to convert each letter after underscore to
-    # uppercase, but don't touch leading and following underscores
-    is_next_uppercase: bool = False
-    for char in name[1:]:
-        if char == "_":
-            is_next_uppercase = True
-        elif is_next_uppercase:
-            word += char.upper()
-            is_next_uppercase = False
-        else:
-            word += char
-
-    return word
+    return result
