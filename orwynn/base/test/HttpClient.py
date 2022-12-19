@@ -1,4 +1,5 @@
 import inspect
+from types import NoneType
 from typing import Any, Callable, TypeVar
 
 from orwynn.util.http.http import TestResponse
@@ -21,7 +22,7 @@ class HttpClient:
     def get_jsonify(
         self,
         url: str,
-        asserted_status_code: int = 200,
+        asserted_status_code: int | None = None,
         *,
         expected_type: type[_JsonifyExpectedType] = dict,
         **kwargs
@@ -34,7 +35,7 @@ class HttpClient:
     def post_jsonify(
         self,
         url: str,
-        asserted_status_code: int = 200,
+        asserted_status_code: int | None = None,
         *,
         expected_type: type[_JsonifyExpectedType] = dict,
         **kwargs
@@ -47,7 +48,7 @@ class HttpClient:
     def delete_jsonify(
         self,
         url: str,
-        asserted_status_code: int = 200,
+        asserted_status_code: int | None = None,
         *,
         expected_type: type[_JsonifyExpectedType] = dict,
         **kwargs
@@ -60,7 +61,7 @@ class HttpClient:
     def put_jsonify(
         self,
         url: str,
-        asserted_status_code: int = 200,
+        asserted_status_code: int | None = None,
         *,
         expected_type: type[_JsonifyExpectedType] = dict,
         **kwargs
@@ -73,7 +74,7 @@ class HttpClient:
     def patch_jsonify(
         self,
         url: str,
-        asserted_status_code: int = 200,
+        asserted_status_code: int | None = None,
         *,
         expected_type: type[_JsonifyExpectedType] = dict,
         **kwargs
@@ -86,7 +87,7 @@ class HttpClient:
     def options_jsonify(
         self,
         url: str,
-        asserted_status_code: int = 200,
+        asserted_status_code: int | None = None,
         *,
         expected_type: type[_JsonifyExpectedType] = dict,
         **kwargs
@@ -99,7 +100,7 @@ class HttpClient:
     def get(
         self,
         url: str,
-        asserted_status_code: int = 200,
+        asserted_status_code: int | None = None,
         **kwargs
     ) -> TestResponse:
         # Join method name and function to call inner resolver
@@ -111,7 +112,7 @@ class HttpClient:
     def post(
         self,
         url: str,
-        asserted_status_code: int = 200,
+        asserted_status_code: int | None = None,
         **kwargs
     ) -> TestResponse:
         return self._get_test_response(
@@ -120,7 +121,7 @@ class HttpClient:
     def delete(
         self,
         url: str,
-        asserted_status_code: int = 200,
+        asserted_status_code: int | None = None,
         **kwargs
     ) -> TestResponse:
         return self._get_test_response(
@@ -129,7 +130,7 @@ class HttpClient:
     def put(
         self,
         url: str,
-        asserted_status_code: int = 200,
+        asserted_status_code: int | None = None,
         **kwargs
     ) -> TestResponse:
         return self._get_test_response(
@@ -138,7 +139,7 @@ class HttpClient:
     def patch(
         self,
         url: str,
-        asserted_status_code: int = 200,
+        asserted_status_code: int | None = None,
         **kwargs
     ) -> TestResponse:
         return self._get_test_response(
@@ -147,7 +148,7 @@ class HttpClient:
     def options(
         self,
         url: str,
-        asserted_status_code: int = 200,
+        asserted_status_code: int | None = None,
         **kwargs
     ) -> TestResponse:
         return self._get_test_response(
@@ -157,7 +158,7 @@ class HttpClient:
         self,
         stack: list[inspect.FrameInfo],
         url: str,
-        asserted_status_code: int,
+        asserted_status_code: int | None,
         **kwargs
     ) -> TestResponse:
         request: str = ' '.join([stack[0][3], url])
@@ -166,7 +167,7 @@ class HttpClient:
     def _resolve_request(
         self,
         request: str,
-        asserted_status_code: int,
+        asserted_status_code: int | None,
         **request_kwargs
     ) -> TestResponse:
         response: TestResponse
@@ -175,7 +176,7 @@ class HttpClient:
         url: str
 
         validate(request, str)
-        validate(asserted_status_code, int)
+        validate(asserted_status_code, [int, NoneType])
 
         # Request example: 'get /users/1'
         method, url = request.split(' ')
@@ -203,10 +204,11 @@ class HttpClient:
 
         validate(response, TestResponse, is_strict=True)
 
-        assert \
-            response.status_code == asserted_status_code, \
-            f"response status code {response.status_code}" \
-            f" != asserted status code {asserted_status_code};" \
-            f" response content is {response.content}"
+        if asserted_status_code is not None:
+            assert \
+                response.status_code == asserted_status_code, \
+                f"response status code {response.status_code}" \
+                f" != asserted status code {asserted_status_code};" \
+                f" response content is {response.content}"
 
         return response

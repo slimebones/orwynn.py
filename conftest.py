@@ -12,7 +12,7 @@ from orwynn.base.worker.Worker import Worker
 from orwynn.boot.Boot import Boot
 from orwynn.boot.boot_data_proxy_test import std_boot_data_proxy
 from orwynn.boot.BootMode import BootMode
-from orwynn.boot.boot_test import std_boot
+from orwynn.boot.boot_test import std_boot, std_mongo_boot
 from orwynn.di.collecting.collect_modules_test import std_modules
 from orwynn.di.collecting.collect_provider_dependencies_test import \
     std_provider_dependencies_map
@@ -20,7 +20,6 @@ from orwynn.di.di_test import std_di_container
 from orwynn.util.http.http_test import std_http
 from tests.structs import (circular_module_struct, long_circular_module_struct,
                            self_importing_module_struct, std_struct)
-
 
 @fixture(autouse=True)
 def run_around_tests():

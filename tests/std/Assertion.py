@@ -7,6 +7,7 @@ from tests.std.float import FloatController, FloatService, float_module
 from tests.std.number import NumberController, NumberService, number_module
 from tests.std.root_module import root_module
 from tests.std.text import TextConfig, TextController, TextService, text_module
+from tests.std.user import UserIdController, UserService, user_module
 
 
 class Assertion:
@@ -14,7 +15,8 @@ class Assertion:
         root_module,
         text_module,
         number_module,
-        float_module
+        float_module,
+        user_module
     ]
     # Order of these providers doesn't matter here since set() should be
     # performed on tests
@@ -24,10 +26,12 @@ class Assertion:
         TextConfig,
         NumberService,
         FloatService,
-        BootConfig
+        BootConfig,
+        UserService
     ]
     COLLECTED_OTHER_ACCEPTORS: list[type[Acceptor]] = [
         TextController,
         NumberController,
-        FloatController
+        FloatController,
+        UserIdController
     ]
