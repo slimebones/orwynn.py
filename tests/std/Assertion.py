@@ -7,7 +7,7 @@ from tests.std.float import FloatController, FloatService, float_module
 from tests.std.number import NumberController, NumberService, number_module
 from tests.std.root_module import root_module
 from tests.std.text import TextConfig, TextController, TextService, text_module
-from tests.std.user import UserIdController, UserService, user_module
+from tests.std.user import UsersIdController, UserService, user_module
 
 
 class Assertion:
@@ -33,5 +33,5 @@ class Assertion:
         TextController,
         NumberController,
         FloatController,
-        UserIdController
+        UsersIdController
     ]

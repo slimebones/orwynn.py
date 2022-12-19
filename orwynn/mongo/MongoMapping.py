@@ -1,4 +1,5 @@
 from typing import Any, Iterable, Self
+from bson import ObjectId
 from pymongo.cursor import Cursor
 from orwynn.base.mapping.Mapping import Mapping
 
@@ -46,41 +47,59 @@ class MongoMapping(Mapping):
             cls._mongo().find_one(cls._collection(), query, *args, **kwargs)
         )
 
-    @classmethod
     def create(
-        cls, mapping: Self, *args, **kwargs
+        self, *args, **kwargs
     ) -> Self:
-        return cls._parse_document(
-            cls._mongo().create(
-                cls._collection(), mapping.dict(), *args, **kwargs
+        data: dict = self._adjust_id_to_mongo(self.dict())
+
+        return self._parse_document(
+            self._mongo().create(
+                self._collection(), data, *args, **kwargs
             )
         )
 
-    @classmethod
     def remove(
-        cls, query: dict, *args, **kwargs
+        self, *args, **kwargs
     ) -> Self:
-        return cls._parse_document(
-            cls._mongo().remove(
-                cls._collection(), query, *args, **kwargs
+        return self._parse_document(
+            self._mongo().remove(
+                self._collection(), {"_id": self.id}, *args, **kwargs
             )
         )
 
-    @classmethod
     def update(
-        cls,
-        query: dict,
+        self,
         operation: dict,
         *args,
         **kwargs
     ) -> Self:
-        return cls._parse_document(
-            cls._mongo().update(
-                cls._collection(), operation, query, *args, **kwargs
+        return self._parse_document(
+            self._mongo().update(
+                self._collection(),
+                {"_id": self.id},
+                operation,
+                *args,
+                **kwargs
             )
         )
+
+    @staticmethod
+    def _adjust_id_to_mongo(data: dict) -> dict:
+        if "id" in data:
+            if data["id"] is not None:
+                data["_id"] = ObjectId(data["id"])
+            del data["id"]
+        return data
+
+    @staticmethod
+    def _adjust_id_from_mongo(data: dict) -> dict:
+        if "_id" in data:
+            if data["_id"] is not None:
+                data["id"] = str(data["_id"])
+            del data["_id"]
+        return data
 
     @classmethod
     def _parse_document(cls, document: MongoDocument) -> Self:
         """Parses document to specified Model."""
-        return cls.parse_obj(dict(document, id=document["_id"]))
+        return cls.parse_obj(cls._adjust_id_from_mongo(document))

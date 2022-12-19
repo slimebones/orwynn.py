@@ -9,8 +9,7 @@ class Mapping(Model):
     database kind. End framework user should create their own Mapping
     subclasses and define MODEL and other required class attributes.
     """
-    def __init__(self, **data: Any) -> None:
-        super().__init__(**data)
+    id: str | None = None
 
     @classmethod
     def find_all(cls, *args, **kwargs) -> Any:

@@ -17,6 +17,7 @@ from orwynn.di.collecting.collect_modules_test import std_modules
 from orwynn.di.collecting.collect_provider_dependencies_test import \
     std_provider_dependencies_map
 from orwynn.di.di_test import std_di_container
+from orwynn.mongo.Mongo import Mongo
 from orwynn.util.http.http_test import std_http
 from tests.structs import (circular_module_struct, long_circular_module_struct,
                            self_importing_module_struct, std_struct)
@@ -24,6 +25,11 @@ from tests.structs import (circular_module_struct, long_circular_module_struct,
 @fixture(autouse=True)
 def run_around_tests():
     yield
+    try:
+        Mongo.ie().drop_database()
+    except TypeError:
+        # Mongo is not initialized, skip
+        pass
     __discard_workers()
 
 

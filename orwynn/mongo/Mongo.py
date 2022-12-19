@@ -17,6 +17,9 @@ class Mongo(Database):
         self.__client: MongoClient = MongoClient(config.uri)
         self.__database: PymongoDatabase = self.__client[config.database_name]
 
+    def drop_database(self) -> None:
+        self.__client.drop_database(self.__database)
+
     def find_all(
         self,
         collection: str,
