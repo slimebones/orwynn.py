@@ -1,4 +1,3 @@
-from genericpath import isfile
 import os
 from pathlib import Path
 import re
@@ -247,7 +246,7 @@ class Boot(Worker):
             app_rc: AppRC = {}
             mode_nesting_index: int = APP_RC_MODE_NESTING.index(mode)
             # Load from bottom to top updating previous one with newest one
-            for nesting_mode in APP_RC_MODE_NESTING[:mode_nesting_index+1]:
+            for nesting_mode in APP_RC_MODE_NESTING[:mode_nesting_index + 1]:
                 try:
                     app_rc.update(
                         self.__load_appropriate_app_rc(
@@ -277,7 +276,7 @@ class Boot(Worker):
     def __load_appropriate_app_rc(self, rc_dir: Path, mode: BootMode) -> AppRC:
         for f in rc_dir.iterdir():
             try:
-                prelast_suffix, last_suffix = f.suffixes[len(f.suffixes)-2:]
+                prelast_suffix, last_suffix = f.suffixes[len(f.suffixes) - 2:]
             except ValueError:
                 # Not enough values to unpack
                 continue

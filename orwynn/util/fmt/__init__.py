@@ -2,7 +2,6 @@
 
 Typically here collected functions which return string.
 """
-from curses.ascii import isalpha, isupper
 import re
 from typing import Any
 
@@ -54,7 +53,7 @@ def pascalify(name: str) -> str:
                 result += char
             else:
                 try:
-                    next_char: str = name[i+1]
+                    next_char: str = name[i + 1]
                 except IndexError:
                     result += char
                 else:

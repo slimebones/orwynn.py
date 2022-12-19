@@ -7,7 +7,6 @@ from orwynn.base.controller.defined_twice_controller_method_error import \
     DefinedTwiceControllerMethodError
 from orwynn.base.controller.missing_controller_class_attribute_error import \
     MissingControllerClassAttributeError
-from orwynn.base.model.Model import Model
 from orwynn.base.module.Module import Module
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.boot.Boot import Boot

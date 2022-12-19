@@ -1,5 +1,3 @@
-from pytest import fixture
-
 from orwynn.base.module.Module import Module
 
 

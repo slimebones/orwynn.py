@@ -28,7 +28,7 @@ class Config(Model):
     def _convert_name_to_rc_format(cls) -> str:
         cleaned_name: str = cls.__name__
         if re.match(r"^.+config$", cls.__name__.lower()):
-            cleaned_name = cls.__name__[:len(cls.__name__)-6]
+            cleaned_name = cls.__name__[:len(cls.__name__) - 6]
         return cleaned_name
 
     class Config:

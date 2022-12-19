@@ -1,5 +1,4 @@
 from orwynn.base.controller.Controller import Controller
-from orwynn.base.model.Model import Model
 from orwynn.base.module.Module import Module
 from orwynn.base.service.Service import Service
 from orwynn.mongo.MongoMapping import MongoMapping

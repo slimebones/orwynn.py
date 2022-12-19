@@ -17,4 +17,3 @@ def test_custom_id():
     m: Model = M1(id="helloworld", number=1)
 
     assert m.id == "helloworld"
-

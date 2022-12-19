@@ -1,4 +1,3 @@
-from typing import Any
 from orwynn.app.AppService import AppService
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.module.Module import Module
@@ -7,7 +6,7 @@ from orwynn.di.collecting.collect_modules import collect_modules
 from orwynn.di.collecting.collect_provider_dependencies import \
     collect_provider_dependencies
 from orwynn.di.di_container import DIContainer
-from orwynn.di.di_object import DIObject
+from orwynn.di.DIObject import DIObject
 from orwynn.di.init.init_other_acceptors import init_other_acceptors
 from orwynn.di.init.init_providers import init_providers
 from orwynn.util.validation import validate
@@ -80,7 +79,7 @@ class DI(Worker):
         """
         return self._container.controllers
 
-    def find(self, key: str) -> Any:
+    def find(self, key: str) -> DIObject:
         """Returns DI object by its key.
 
         Note that searching is made using PascalCased keys, but actual object

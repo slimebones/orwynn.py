@@ -8,8 +8,7 @@ from orwynn.base.middleware.Middleware import Middleware
 from orwynn.util.http.http import HTTPMethod, TestResponse
 from orwynn.util.http.unsupported_http_method_error import \
     UnsupportedHTTPMethodError
-from orwynn.util.validation import (validate, validate_each,
-                                               validate_route)
+from orwynn.util.validation import validate, validate_each, validate_route
 
 ControllerMethodReturnedData = dict | TestResponse
 
