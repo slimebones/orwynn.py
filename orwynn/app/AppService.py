@@ -1,10 +1,13 @@
-from typing import Callable
+from typing import Any, Callable
 
 from fastapi import FastAPI
 from starlette.types import Receive, Scope, Send
 
 from orwynn.app.already_registered_method_error import \
     AlreadyRegisteredMethodError
+from orwynn.base.controller.EndpointSpec import EndpointSpec
+from orwynn.base.controller.EndpointSpecNotFoundError import EndpointSpecNotFoundError
+from orwynn.base.controller.EndpointSpecsProxy import EndpointSpecsProxy
 from orwynn.base.service.framework_service import FrameworkService
 from orwynn.base.test.TestClient import TestClient
 from orwynn.util.http.http import HTTPMethod
@@ -74,4 +77,28 @@ class AppService(FrameworkService):
             except KeyError:
                 self._methods_by_route[route] = {method}
 
-        app_fn(route)(fn)
+        spec: EndpointSpec | None
+        try:
+            spec = EndpointSpecsProxy.ie().find_spec(fn)
+        except EndpointSpecNotFoundError:
+            spec = None
+
+        app_fn(route, **self.__parse_endpoint_spec_kwargs(spec))(fn)
+
+    def __parse_endpoint_spec_kwargs(
+        self, spec: EndpointSpec | None
+    ) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+
+        if spec is not None:
+            # TODO:
+            #   Add response model to framework middleware to call indications.
+            #   Others remain as it is.
+            result["status_code"] = spec.default_status_code
+            result["summary"] = spec.summary
+            result["tags"] = spec.tags
+            result["response_description"] = spec.response_description
+            result["is_deprecated"] = spec.is_deprecated
+            result["responses"] = spec.responses
+
+        return result

@@ -52,6 +52,16 @@ def validate(
                 raise UnknownValidatorError(
                     f"unknown validator {expected_type}"
                 )
+    elif expected_type is Callable:
+        if is_strict:
+            raise ValueError(
+                "expected type is Callable and strict flag is true"
+                " which is not logical"
+            )
+        elif not callable(obj):
+            raise ValidationError(
+                f"{obj} is not Callable"
+            )
     elif isinstance(expected_type, type):
         if is_strict:
             if (
@@ -73,7 +83,7 @@ def validate(
         is_matched_type_found: bool = False
 
         for type_ in expected_type:
-            if type(obj) is type_:
+            if (type_ is Callable and callable(obj)) or type(obj) is type_:
                 is_matched_type_found = True
 
         if not is_matched_type_found:
