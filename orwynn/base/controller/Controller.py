@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Any, Callable
 
 from orwynn.base.controller.defined_twice_controller_method_error import \
     DefinedTwiceControllerMethodError
@@ -9,8 +9,6 @@ from orwynn.util.http.http import HTTPMethod
 from orwynn.util.http.unsupported_http_method_error import \
     UnsupportedHTTPMethodError
 from orwynn.util.validation import validate, validate_each, validate_route
-
-ControllerMethodReturnedData = dict
 
 
 class Controller:
@@ -111,37 +109,37 @@ class Controller:
 
         return fn
 
-    def get(self, *args, **kwargs) -> ControllerMethodReturnedData:
+    def get(self, *args, **kwargs) -> Any:
         raise NotImplementedError(
             "the method GET is not implemented for controller"
             f" {self.__class__}"
         )
 
-    def post(self, *args, **kwargs) -> ControllerMethodReturnedData:
+    def post(self, *args, **kwargs) -> Any:
         raise NotImplementedError(
             "the method POST is not implemented for controller"
             f" {self.__class__}"
         )
 
-    def put(self, *args, **kwargs) -> ControllerMethodReturnedData:
+    def put(self, *args, **kwargs) -> Any:
         raise NotImplementedError(
             "the method PUT is not implemented for controller"
             f" {self.__class__}"
         )
 
-    def delete(self, *args, **kwargs) -> ControllerMethodReturnedData:
+    def delete(self, *args, **kwargs) -> Any:
         raise NotImplementedError(
             "the method DELETE is not implemented for controller"
             f" {self.__class__}"
         )
 
-    def patch(self, *args, **kwargs) -> ControllerMethodReturnedData:
+    def patch(self, *args, **kwargs) -> Any:
         raise NotImplementedError(
             "the method PATCH is not implemented for controller"
             f" {self.__class__}"
         )
 
-    def options(self, *args, **kwargs) -> ControllerMethodReturnedData:
+    def options(self, *args, **kwargs) -> Any:
         raise NotImplementedError(
             "the method OPTIONS is not implemented for controller"
             f" {self.__class__}"
