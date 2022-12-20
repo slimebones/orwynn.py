@@ -1,10 +1,13 @@
 from typing import Any, Iterable, Self
+
 from bson import ObjectId
 from pymongo.cursor import Cursor
-from orwynn.base.mapping.Mapping import Mapping
 
-from orwynn.mongo.MongoDocument import MongoDocument
+from orwynn.base.mapping.Mapping import Mapping
+from orwynn.mongo.CustomUseOfReservedFieldError import \
+    CustomUseOfReservedFieldError
 from orwynn.mongo.Mongo import Mongo
+from orwynn.mongo.MongoDocument import MongoDocument
 from orwynn.util import fmt
 
 
@@ -16,6 +19,12 @@ class MongoMapping(Mapping):
     mapping.
     """
     def __init__(self, **data: Any) -> None:
+        for k in data.keys():
+            if k.startswith("mongo_"):
+                raise CustomUseOfReservedFieldError(
+                    f"field {k} for mapping {self.__class__} is reserved,"
+                    " your field keys shouldn't be prefixed with \"mongo_\""
+                )
         super().__init__(**data)
 
     @classmethod
@@ -29,32 +38,34 @@ class MongoMapping(Mapping):
     @classmethod
     def find_all(
         cls,
-        query: dict,
-        *args,
         **kwargs
     ) -> Iterable[Self]:
         cursor: Cursor = cls._mongo().find_all(
-            cls._collection(), query, *args, **kwargs
+            cls._collection(),
+            cls._adjust_id_to_mongo(kwargs),
         )
 
         return map(cls._parse_document, cursor)
 
     @classmethod
     def find_one(
-        cls, query: dict, *args, **kwargs
+        cls, **kwargs
     ) -> Self:
         return cls._parse_document(
-            cls._mongo().find_one(cls._collection(), query, *args, **kwargs)
+            cls._mongo().find_one(
+                cls._collection(),
+                cls._adjust_id_to_mongo(kwargs),
+            )
         )
 
     def create(
-        self, *args, **kwargs
+        self
     ) -> Self:
         data: dict = self._adjust_id_to_mongo(self.dict())
 
         return self._parse_document(
             self._mongo().create(
-                self._collection(), data, *args, **kwargs
+                self._collection(), data
             )
         )
 

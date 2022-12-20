@@ -14,7 +14,7 @@ class UserService(Service):
         super().__init__()
 
     def find(self, id: str) -> User:
-        return User.find_one({"_id": id})
+        return User.find_one(id=id)
 
     def create(self, user: User) -> User:
         return user.create()
