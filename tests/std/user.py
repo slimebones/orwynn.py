@@ -17,7 +17,9 @@ class UserService(Service):
         return User.find_one(id=id)
 
     def create(self, user: User) -> User:
-        return user.create()
+        a = user.create()
+        print(a.id)
+        return a
 
 
 class UsersController(Controller):

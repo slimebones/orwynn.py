@@ -1,7 +1,7 @@
 from orwynn.base.mapping.Mapping import Mapping
 
 
-def test_custom_id():
+def test_try_set_id():
     class M1(Mapping):
         number: int
 

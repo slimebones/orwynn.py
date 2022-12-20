@@ -3,12 +3,12 @@ from typing import Any, Iterable, Self
 from bson import ObjectId
 from pymongo.cursor import Cursor
 
-from orwynn.base.mapping.Mapping import Mapping
-from orwynn.mongo.CustomUseOfReservedFieldError import \
-    CustomUseOfReservedFieldError
+from orwynn.base.mapping.Mapping import Mapping, if_linked
+from orwynn.base.mapping.CustomUseOfMappingReservedFieldError import \
+    CustomUseOfMappingReservedFieldError
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoDocument import MongoDocument
-from orwynn.util import fmt
+from orwynn.util import fmt, validation
 
 
 class MongoMapping(Mapping):
@@ -21,7 +21,7 @@ class MongoMapping(Mapping):
     def __init__(self, **data: Any) -> None:
         for k in data.keys():
             if k.startswith("mongo_"):
-                raise CustomUseOfReservedFieldError(
+                raise CustomUseOfMappingReservedFieldError(
                     f"field {k} for mapping {self.__class__} is reserved,"
                     " your field keys shouldn't be prefixed with \"mongo_\""
                 )
@@ -58,6 +58,7 @@ class MongoMapping(Mapping):
             )
         )
 
+    @if_linked
     def create(
         self
     ) -> Self:
@@ -69,25 +70,29 @@ class MongoMapping(Mapping):
             )
         )
 
+    @if_linked
     def remove(
         self, *args, **kwargs
     ) -> Self:
+        id: str = validation.apply(self.id, str)
         return self._parse_document(
             self._mongo().remove(
-                self._collection(), {"_id": self.id}, *args, **kwargs
+                self._collection(), {"_id": id}, *args, **kwargs
             )
         )
 
+    @if_linked
     def update(
         self,
         operation: dict,
         *args,
         **kwargs
     ) -> Self:
+        id: str = validation.apply(self.id, str)
         return self._parse_document(
             self._mongo().update(
                 self._collection(),
-                {"_id": self.id},
+                {"_id": id},
                 operation,
                 *args,
                 **kwargs
@@ -98,7 +103,8 @@ class MongoMapping(Mapping):
     def _adjust_id_to_mongo(data: dict) -> dict:
         if "id" in data:
             if data["id"] is not None:
-                data["_id"] = ObjectId(data["id"])
+                id: str = validation.apply(data["id"], str)
+                data["_id"] = ObjectId(id)
             del data["id"]
         return data
 
