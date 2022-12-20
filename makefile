@@ -15,7 +15,7 @@ lint:
 		--disable-noqa \
 		--ignore=W503 \
 		--isolated \
-		--exclude .git,__pycache__,docs/source/conf.py,old,build,dist,.venv,.pytest_cache,.vscode,orwynn/__init__.py,conftest.py \
+		--exclude .git,__pycache__,docs/source/conf.py,old,build,dist,.venv,.pytest_cache,.vscode,conftest.py \
 		--max-complexity 10
 
 check: lint test
