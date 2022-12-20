@@ -1,5 +1,4 @@
 from orwynn.base.mapping.Mapping import Mapping
-from orwynn.base.model.Model import Model
 
 
 def test_custom_id():

@@ -47,5 +47,5 @@ class UsersIdController(Controller):
 user_module = Module(
     route="/users",
     Providers=[UserService],
-    Controllers=[UsersController,UsersIdController]
+    Controllers=[UsersController, UsersIdController]
 )
