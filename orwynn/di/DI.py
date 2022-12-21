@@ -1,5 +1,6 @@
 from orwynn.app.AppService import AppService
 from orwynn.base.controller.Controller import Controller
+from orwynn.base.middleware.Middleware import Middleware
 from orwynn.base.module.Module import Module
 from orwynn.base.worker.Worker import Worker
 from orwynn.di.collecting.collect_modules import collect_modules
@@ -44,21 +45,15 @@ class DI(Worker):
         super().__init__()
         validate(root_module, Module)
 
-        import httpx
-        try:
-            httpx.get(f"http://localhost:8000?id={hex(id(root_module))}")
-        except Exception:
-            pass
-
         # So here we have generally two stages of DI:
         #   1. Collecting (module "di/collecting")
         #   2. Initializing (module "di/init")
 
         self.modules: list[Module] = collect_modules(root_module)
-        self._container: DIContainer = init_providers(
+        self.__container: DIContainer = init_providers(
             collect_provider_dependencies(self.modules)
         )
-        init_other_acceptors(self._container, self.modules)
+        init_other_acceptors(self.__container, self.modules)
 
     @property
     def app_service(self) -> AppService:
@@ -77,7 +72,16 @@ class DI(Worker):
         Returns:
             All controllers fetched.
         """
-        return self._container.controllers
+        return self.__container.controllers
+
+    @property
+    def all_middleware(self) -> list[Middleware]:
+        """Fetches all middleware from container.
+
+        Returns:
+            All middleware fetched.
+        """
+        return self.__container.all_middleware
 
     def find(self, key: str) -> DIObject:
         """Returns DI object by its key.
@@ -96,4 +100,4 @@ class DI(Worker):
             MissingDIObjectError:
                 DIObject with given key is not found.
         """
-        return self._container.find(key)
+        return self.__container.find(key)

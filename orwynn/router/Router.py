@@ -4,7 +4,6 @@ from orwynn.app.AlreadyRegisteredMethodError import \
     AlreadyRegisteredMethodError
 from orwynn.app.AppService import AppService
 from orwynn.base.controller import endpoint
-from orwynn.base.middleware.MainDispatcher import MainDispatcher
 from orwynn.base.worker.Worker import Worker
 from orwynn.util import validation
 from orwynn.util.http import HTTPMethod
@@ -16,15 +15,11 @@ class Router(Worker):
     """Responsible of ways how request and responses flows through the app."""
     def __init__(
         self,
-        app: AppService,
-        MainDispatcher_: MainDispatcher
+        app: AppService
     ) -> None:
         super().__init__()
-        validation.validate(MainDispatcher_, MainDispatcher)
-
         self.__app: AppService = app
         self.__methods_by_route: dict[str, set[HTTPMethod]] = {}
-        self.__app.add_middleware(MainDispatcher_)
 
     def register_route_fn(
         self, *, route: str, fn: Callable, method: HTTPMethod
@@ -38,6 +33,10 @@ class Router(Worker):
             method:
                 HTTP method function is handling.
         """
+        validation.validate(route, str)
+        validation.validate(fn, Callable)
+        validation.validate(method, HTTPMethod)
+
         app_fn: Callable | None = \
             self.__app.HTTP_METHODS_TO_REGISTERING_FUNCTIONS.get(
                 method, None

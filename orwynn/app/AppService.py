@@ -6,6 +6,7 @@ from starlette.middleware.base import BaseHTTPMiddleware \
     as StarletteBaseHTTPMiddleware
 
 from orwynn.base.service.framework_service import FrameworkService
+from orwynn.base.test.HttpClient import HttpClient
 from orwynn.base.test.TestClient import TestClient
 from orwynn.util import validation
 from orwynn.util.http import HTTPMethod
@@ -34,9 +35,16 @@ class AppService(FrameworkService):
     def test_client(self) -> TestClient:
         return TestClient(self.__app)
 
+    @property
+    def http_client(self) -> HttpClient:
+        return HttpClient(self.test_client)
+
     def add_middleware(self, middleware: Middleware) -> None:
         validation.validate(middleware, Middleware)
+        # Note that dispatch(...) method is linked to be as entrypoint to
+        # middleware. This will be a place where a middleware takes decision
+        # to not process request to certain endpoint or not.
         self.__app.add_middleware(
             StarletteBaseHTTPMiddleware,
-            dispatch=middleware.process
+            dispatch=middleware.dispatch
         )

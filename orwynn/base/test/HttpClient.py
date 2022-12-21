@@ -200,7 +200,7 @@ class HttpClient:
             case _:
                 raise ValueError(f'Method {method} is not supported')
 
-        response = test_client_method(url, **request_kwargs)
+        response: TestResponse = test_client_method(url, **request_kwargs)
 
         validate(response, TestResponse, is_strict=True)
 

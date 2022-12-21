@@ -45,6 +45,7 @@ class Controller:
         else:
             validate(self.ROUTE, str)
             validate_route(self.ROUTE)
+            self._route: str = self.ROUTE
 
         if self.METHODS is None:
             raise MissingControllerClassAttributeError(
@@ -72,6 +73,10 @@ class Controller:
                     )
                 collected_methods.append(method)
                 self._methods.append(HTTPMethod(method))
+
+    @property
+    def route(self) -> str:
+        return self._route
 
     @property
     def methods(self) -> list[HTTPMethod]:

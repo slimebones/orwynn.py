@@ -4,7 +4,6 @@ import re
 
 import dotenv
 
-from orwynn.base.middleware.MainDispatcher import MainDispatcher
 from orwynn.app.AppService import AppService
 from orwynn.app_rc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from orwynn.base.controller.Controller import Controller
@@ -16,6 +15,7 @@ from orwynn.base.error.MalfunctionError import MalfunctionError
 from orwynn.base.indication.default_api_indication import \
     default_api_indication
 from orwynn.base.indication.Indication import Indication
+from orwynn.base.middleware.Middleware import Middleware
 from orwynn.base.module.Module import Module
 from orwynn.base.worker.Worker import Worker
 from orwynn.app_rc.AppRC import AppRC
@@ -29,6 +29,7 @@ from orwynn.di.missing_di_object_error import MissingDIObjectError
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
 from orwynn.router.Router import Router
+from orwynn.util import http
 from orwynn.util.file.NotDirError import NotDirError
 from orwynn.util.file.yml import load_yml
 from orwynn.util.http import HTTPMethod
@@ -119,14 +120,12 @@ class Boot(Worker):
 
         # Add crucial builtin objects
         root_module.add_provider_or_skip(AppService)
-        root_module.add_middleware_or_skip(MainDispatcher)
 
         self.__enable_databases(databases)
         self.__di: DI = DI(root_module)
 
         self.__router: Router = Router(
-            self.app,
-            self.__di.find("MainDispatcher")
+            self.app
         )
 
         try:
@@ -135,6 +134,14 @@ class Boot(Worker):
             raise ValueError(
                 "no controllers defined for this application"
             )
+        try:
+            self.__register_middleware(
+                self.__di.all_middleware
+            )
+        except MissingDIObjectError:
+            # No middleware defined, it's ok
+            pass
+
 
     @property
     def app(self) -> AppService:
@@ -154,6 +161,10 @@ class Boot(Worker):
         for m in modules:
             for C in m.Controllers:
                 self.__register_controller_class_for_module(m, C, controllers)
+
+    def __register_middleware(self, middleware: list[Middleware]) -> None:
+        for m in middleware:
+            self.app.add_middleware(m)
 
     def __register_controller_class_for_module(
         self,
@@ -184,23 +195,11 @@ class Boot(Worker):
             # Don't register unused methods
             if http_method in c.methods:
                 is_method_found = True
-                if c.ROUTE is None:
-                    raise MalfunctionError(
-                        f"route of controller {c.__class__} is None"
-                        " but check should have been performed at"
-                        " class instance initialization"
-                    )
-
-                joined_route: str
-                if m.ROUTE == "/":
-                    joined_route = c.ROUTE
-                else:
-                    joined_route = m.ROUTE + c.ROUTE
 
                 self.__router.register_route_fn(
                     # We can concatenate routes such way since routes
                     # are validated to not contain following slash
-                    route=joined_route,
+                    route=http.join_routes(m.route, c.route),
                     fn=c.get_fn_by_http_method(http_method),
                     method=http_method
                 )

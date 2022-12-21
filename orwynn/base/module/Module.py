@@ -67,7 +67,7 @@ class Module:
         validate(imports, [list, NoneType])
         validate(exports, [list, NoneType])
 
-        self._ROUTE: str = self._parse_route(route)
+        self._route: str = self._parse_route(route)
         self._Providers: list[type[Provider]] = self._parse_providers(
             Providers
         )
@@ -83,13 +83,13 @@ class Module:
     def __repr__(self) -> str:
         return "<{} \"{}\" at {}>".format(
             self.__class__.__name__,
-            self.ROUTE,
+            self.route,
             hex(id(self))
         )
 
     @property
-    def ROUTE(self) -> str:
-        return self._ROUTE
+    def route(self) -> str:
+        return self._route
 
     @property
     def Providers(self) -> list[type[Provider]]:

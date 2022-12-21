@@ -4,6 +4,7 @@ from typing import TypeVar
 from orwynn.base.config.Config import Config
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.error.MalfunctionError import MalfunctionError
+from orwynn.base.middleware.Middleware import Middleware
 from orwynn.base.model.Model import Model
 from orwynn.di.DIObject import DIObject
 from orwynn.di.di_object_already_initialized_in_container_error import \
@@ -45,7 +46,16 @@ class DIContainer:
             All controllers fetched.
         """
         result: list[Controller] = self._find_objects_for_class(Controller)
+        return result
 
+    @property
+    def all_middleware(self) -> list[Middleware]:
+        """Fetches all middleware from container.
+
+        Returns:
+            All middleware fetched.
+        """
+        result: list[Middleware] = self._find_objects_for_class(Middleware)
         return result
 
     def add(self, obj: DIObject) -> None:
@@ -165,7 +175,7 @@ class DIContainer:
         is_missing: bool = False
 
         try:
-            result = self._objects_by_base_class[C]  # type: ignore
+            result = self._objects_by_base_class[C]
         except KeyError:
             is_missing = True
         else:
