@@ -5,7 +5,7 @@ from orwynn.base.worker.Worker import Worker
 from orwynn.di.collecting.collect_modules import collect_modules
 from orwynn.di.collecting.collect_provider_dependencies import \
     collect_provider_dependencies
-from orwynn.di.di_container import DIContainer
+from orwynn.di.DIContainer import DIContainer
 from orwynn.di.DIObject import DIObject
 from orwynn.di.init.init_other_acceptors import init_other_acceptors
 from orwynn.di.init.init_providers import init_providers

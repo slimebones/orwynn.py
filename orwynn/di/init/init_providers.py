@@ -5,7 +5,7 @@ from orwynn.di.collecting.no_dependencies_for_given_provider_error import \
     NoDependenciesForGivenProviderError
 from orwynn.di.collecting.provider_dependencies_map import \
     ProviderDependenciesMap
-from orwynn.di.di_container import DIContainer
+from orwynn.di.DIContainer import DIContainer
 from orwynn.di.is_provider import is_provider
 from orwynn.di.missing_di_object_error import MissingDIObjectError
 from orwynn.di.provider import Provider

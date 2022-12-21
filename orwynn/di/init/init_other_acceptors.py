@@ -2,7 +2,7 @@ import inspect
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.module.Module import Module
 from orwynn.di.acceptor import Acceptor
-from orwynn.di.di_container import DIContainer
+from orwynn.di.DIContainer import DIContainer
 from orwynn.di.provider import Provider
 from orwynn.util.validation import validate
 

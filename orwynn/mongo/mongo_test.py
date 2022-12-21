@@ -6,12 +6,12 @@ from orwynn.base.mapping.CustomUseOfMappingReservedFieldError import \
     CustomUseOfMappingReservedFieldError
 from orwynn.mongo.MongoMapping import MongoMapping
 from orwynn.util import validation
-from orwynn.util.http.http import TestResponse
+from orwynn.util.http import Response
 from tests.std.user import User
 
 
 def test_user_create(std_mongo_boot: Boot, std_http: HttpClient):
-    r: TestResponse = std_http.post(
+    r: Response = std_http.post(
         "/users",
         200,
         json={
@@ -30,7 +30,7 @@ def test_reserved_mapping_field(std_mongo_boot, std_http: HttpClient):
 
 
 def test_same_id_creation(std_mongo_boot: Boot, std_http: HttpClient):
-    r: TestResponse = std_http.post(
+    r: Response = std_http.post(
         "/users",
         200,
         json={

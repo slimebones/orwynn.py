@@ -3,7 +3,7 @@ from pytest import fixture
 from orwynn.boot.BootDataProxy import BootDataProxy
 from orwynn.di.collecting.provider_dependencies_map import \
     ProviderDependenciesMap
-from orwynn.di.di_container import DIContainer
+from orwynn.di.DIContainer import DIContainer
 from orwynn.di.init.init_providers import init_providers
 
 

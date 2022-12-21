@@ -11,7 +11,7 @@ from orwynn.base.controller.endpoint._SpecsProxy import SpecsProxy
 from orwynn.base.database.DatabaseKind import DatabaseKind
 from orwynn.base.database.UnknownDatabaseKindError import \
     UnknownDatabaseKindError
-from orwynn.base.error.malfunction_error import MalfunctionError
+from orwynn.base.error.MalfunctionError import MalfunctionError
 from orwynn.base.indication.default_api_indication import \
     default_api_indication
 from orwynn.base.indication.Indication import Indication
@@ -28,7 +28,7 @@ from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
 from orwynn.util.file.NotDirError import NotDirError
 from orwynn.util.file.yml import load_yml
-from orwynn.util.http.http import HTTPMethod
+from orwynn.util.http import HTTPMethod
 from orwynn.util.validation import validate, validate_each
 
 

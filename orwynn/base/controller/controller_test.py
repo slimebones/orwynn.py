@@ -8,7 +8,7 @@ from orwynn.base.controller.missing_controller_class_attribute_error import \
 from orwynn.base.module.Module import Module
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.boot.Boot import Boot
-from orwynn.util.http.http import HTTPMethod
+from orwynn.util.http import HTTPMethod
 from orwynn.util.http.unsupported_http_method_error import \
     UnsupportedHTTPMethodError
 from orwynn.util.validation import expect, validate_re
