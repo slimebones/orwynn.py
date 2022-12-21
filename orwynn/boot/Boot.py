@@ -133,7 +133,7 @@ class Boot(Worker):
             self.__register_routes(self.__di.modules, self.__di.controllers)
         except MissingDIObjectError:
             raise ValueError(
-                f"no controllers defined for this application"
+                "no controllers defined for this application"
             )
 
     @property

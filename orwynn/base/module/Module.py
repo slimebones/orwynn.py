@@ -122,7 +122,7 @@ class Module:
 
     def add_provider_or_skip(self, P: type[Provider]) -> None:
         if not is_provider(P):
-            raise TypeError(f"should receive provider")
+            raise TypeError("should receive provider")
         if P not in self._Providers:
             self._Providers.append(P)
 

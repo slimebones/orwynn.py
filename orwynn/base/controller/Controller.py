@@ -4,7 +4,6 @@ from orwynn.base.controller.DefinedTwiceControllerMethodError import \
     DefinedTwiceControllerMethodError
 from orwynn.base.controller.missing_controller_class_attribute_error import \
     MissingControllerClassAttributeError
-from orwynn.base.middleware.Middleware import Middleware
 from orwynn.util.http import HTTPMethod
 from orwynn.util.http.UnsupportedHTTPMethodError import \
     UnsupportedHTTPMethodError
