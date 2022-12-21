@@ -43,4 +43,4 @@ def run_spec():
 
 
 def test_spec(run_spec):
-    pass
+    assert True
