@@ -142,7 +142,6 @@ class Boot(Worker):
             # No middleware defined, it's ok
             pass
 
-
     @property
     def app(self) -> AppService:
         return self.__di.app_service

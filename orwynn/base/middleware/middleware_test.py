@@ -4,15 +4,17 @@ from orwynn.base.middleware.Middleware import Middleware
 from orwynn.base.module.Module import Module
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.boot.Boot import Boot
-from orwynn.util.http import Request, Response
+from orwynn.util.http import Request, Response, TestResponse
 
 
-def test_tmp():
+def test_basic():
     class Mw1(Middleware):
         async def process(
             self, request: Request, call_next: Callable
         ) -> Response:
-            return await super().process(request, call_next)
+            response: Response = await call_next(request)
+            response.headers["x-test"] = "hello"
+            return response
 
     class C1(Controller):
         ROUTE = "/"
@@ -27,6 +29,6 @@ def test_tmp():
         Middleware=[Mw1]
     ))
     http: HttpClient = boot.app.http_client
-    http.get_jsonify("/hello/world")
+    response: TestResponse = http.get("/hello/world")
 
-    assert False
+    assert response.headers["x-test"] == "hello"

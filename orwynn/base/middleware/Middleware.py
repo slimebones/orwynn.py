@@ -31,7 +31,10 @@ class Middleware:
         request: Request,
         call_next: Callable
     ) -> Response:
-        return await call_next(request)
+        if self.__should_process(request.url.path):
+            return await self.process(request, call_next)
+        else:
+            return await call_next(request)
 
     async def process(
         self,
