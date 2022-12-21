@@ -3,9 +3,11 @@
 In future the framework might introduce special flags (or read Python's
 optimization flag -O) to not execute such functions.
 """
+from inspect import isclass
 from pathlib import Path
 import re
 from typing import Any, Callable, Sized, TypeVar
+import typing
 
 from pydantic import ValidationError as __PydanticValidationError
 from pydantic import validator as __pydantic_validator
@@ -45,45 +47,20 @@ def validate(
             Object did not pass validation.
     """
     if isinstance(expected_type, Validator):
-        match expected_type:
-            case Validator.SKIP:
-                return
-            case _:
-                raise UnknownValidatorError(
-                    f"unknown validator {expected_type}"
-                )
+        __check_validator(obj, expected_type)
     elif expected_type is Callable:
-        if is_strict:
-            raise ValueError(
-                "expected type is Callable and strict flag is true"
-                " which is not logical"
-            )
-        elif not callable(obj):
-            raise ValidationError(
-                f"{obj} is not Callable"
-            )
+        __check_callable(obj, typing.cast(Callable, expected_type), is_strict)
     elif isinstance(expected_type, type):
-        if is_strict:
-            if (
-                type(obj) is not expected_type
-                and not issubclass(obj, expected_type)
-            ):
-                raise ValidationError(
-                    failed_obj=obj, expected_type=expected_type
-                )
-        else:
-            if (
-                not isinstance(obj, expected_type)
-                and not issubclass(obj, expected_type)
-            ):
-                raise ValidationError(
-                    failed_obj=obj, expected_type=expected_type
-                )
+        __check_type(obj, expected_type, is_strict)
     elif type(expected_type) is list:
         is_matched_type_found: bool = False
 
         for type_ in expected_type:
-            if (type_ is Callable and callable(obj)) or type(obj) is type_:
+            try:
+                validate(obj, type_, is_strict=is_strict)
+            except ValidationError:
+                continue
+            else:
                 is_matched_type_found = True
 
         if not is_matched_type_found:
@@ -123,7 +100,7 @@ def validate_each(
         should_check_if_empty (optional):
             Perform checking if given obj is empty.
     """
-    validate(obj, [list, tuple, set, frozenset])
+    validate(obj, [list, tuple, set, frozenset], is_strict=True)
 
     if expected_obj_type is not None:
         if expected_obj_type not in [list, tuple, set, frozenset]:
@@ -290,3 +267,44 @@ def expect(
         raise ExpectationError(
             f"error {ErrorToExpect} expected on call of function {fn}"
         )
+
+
+def __check_validator(obj: Any, validator: Validator) -> None:
+    match validator:
+        case Validator.SKIP:
+            return
+        case _:
+            raise UnknownValidatorError(
+                f"unknown validator {validator}"
+            )
+
+
+def __check_callable(obj: Any, c: Callable, is_strict: bool) -> None:
+    if is_strict:
+        raise ValueError(
+            "expected type is Callable and strict flag is true"
+            " which is not logical"
+        )
+    elif not callable(obj):
+        raise ValidationError(
+            f"{obj} is not Callable"
+        )
+
+
+def __check_type(obj: Any, t: type, is_strict: bool) -> None:
+    if is_strict:
+        if (
+            type(obj) is not t
+            and not isclass(obj)
+        ):
+            raise ValidationError(
+                failed_obj=obj, expected_type=t
+            )
+    else:
+        if (
+            not isinstance(obj, t)
+            and not isclass(obj)
+        ):
+            raise ValidationError(
+                failed_obj=obj, expected_type=t
+            )

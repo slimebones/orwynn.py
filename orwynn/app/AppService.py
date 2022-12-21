@@ -6,7 +6,8 @@ from starlette.types import Receive, Scope, Send
 from orwynn.app.already_registered_method_error import \
     AlreadyRegisteredMethodError
 from orwynn.base.controller.EndpointSpec import EndpointSpec
-from orwynn.base.controller.EndpointSpecNotFoundError import EndpointSpecNotFoundError
+from orwynn.base.controller.EndpointSpecNotFoundError import \
+    EndpointSpecNotFoundError
 from orwynn.base.controller.EndpointSpecsProxy import EndpointSpecsProxy
 from orwynn.base.service.framework_service import FrameworkService
 from orwynn.base.test.TestClient import TestClient

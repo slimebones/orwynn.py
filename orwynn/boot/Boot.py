@@ -100,7 +100,7 @@ class Boot(Worker):
             self.__mode
         )
 
-        #-- Init proxies --#
+        # Init proxies
         BootDataProxy(
             root_dir=self.__root_dir,
             mode=self.__mode,
@@ -108,7 +108,6 @@ class Boot(Worker):
             app_rc=self.__app_rc
         )
         EndpointSpecsProxy()
-        #----#
 
         if databases is None:
             databases = []

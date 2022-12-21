@@ -1,6 +1,8 @@
 from typing import Callable, ItemsView
+
 from orwynn.base.controller.EndpointSpec import EndpointSpec
-from orwynn.base.controller.EndpointSpecNotFoundError import EndpointSpecNotFoundError
+from orwynn.base.controller.EndpointSpecNotFoundError import \
+    EndpointSpecNotFoundError
 from orwynn.base.worker.Worker import Worker
 from orwynn.util import validation
 
@@ -29,7 +31,7 @@ class EndpointSpecsProxy(Worker):
         validation.validate(fn, Callable)
         try:
             return self.__spec_by_fn[fn]
-        except IndexError:
+        except KeyError:
             raise EndpointSpecNotFoundError(
                 f"{fn} not found in proxy"
             )
