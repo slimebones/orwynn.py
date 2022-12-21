@@ -3,7 +3,7 @@ from orwynn.app._AppService import AppService
 from orwynn.base.config.Config import Config
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.error.Error import Error
-from orwynn.base.indication.Indication import Indication
+from orwynn.base.indication._Indication import Indication
 from orwynn.base.middleware._Middleware import Middleware
 from orwynn.base.model.Model import Model
 from orwynn.base.module.Module import Module

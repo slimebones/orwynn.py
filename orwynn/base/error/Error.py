@@ -1,3 +1,6 @@
+from orwynn.boot.BootDataProxy import BootDataProxy
+
+
 class Error(Exception):
     """Base error class of the app.
 
@@ -8,3 +11,13 @@ class Error(Exception):
     def __init__(self, message: str = "") -> None:
         super().__init__(message)
         self.message = message
+
+    @property
+    def api(self) -> dict:
+        """Generates API-complying object using project's defined API
+        indication.
+        """
+        return BootDataProxy.ie().api_indication.digest(self)
+
+    def dict(self, *args, **kwargs) -> dict:
+        return {"message": self.message}

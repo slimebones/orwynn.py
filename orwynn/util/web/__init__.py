@@ -26,7 +26,7 @@ TestResponse = httpx.Response
 
 def join_routes(*routes: str) -> str:
     """Joins all given routes and normalize final result."""
-    validation.validate_each(routes, str, expected_obj_type=tuple)
+    validation.validate_each(routes, str, expected_sequence_type=tuple)
 
     result: str = ""
 
@@ -42,5 +42,8 @@ def join_routes(*routes: str) -> str:
         else:
             result += route
         result.removesuffix("/")
+
+    if result == "":
+        result = "/"
 
     return result

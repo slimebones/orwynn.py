@@ -1,12 +1,14 @@
 from typing import Any, Callable
 from fastapi import FastAPI
 from starlette.types import Receive, Scope, Send
+from orwynn.base.error.Error import Error
 from orwynn.base.middleware._Middleware import Middleware
 from starlette.middleware.base import BaseHTTPMiddleware \
     as StarletteBaseHTTPMiddleware
 from fastapi.middleware.cors import CORSMiddleware as FastAPI_CORSMiddleware
 
 from orwynn.base.service.framework_service import FrameworkService
+from orwynn.app._ErrorHandler import ErrorHandler
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.base.test.TestClient import TestClient
 from orwynn.util import validation
@@ -69,3 +71,9 @@ class AppService(FrameworkService):
             **kwargs
         )
         self.__is_cors_configured = True
+
+    def add_error_handler(self, error_handler: ErrorHandler) -> None:
+        self.__app.add_exception_handler(
+            error_handler.E,
+            error_handler.handler
+        )

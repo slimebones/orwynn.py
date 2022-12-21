@@ -56,7 +56,7 @@ class Controller:
             validate_each(
                 self.METHODS,
                 str,
-                expected_obj_type=list,
+                expected_sequence_type=list,
                 should_check_if_empty=True
             )
             collected_methods: list[str] = []

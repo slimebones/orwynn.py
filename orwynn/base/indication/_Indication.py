@@ -1,7 +1,8 @@
 from typing import Any, ItemsView
 
+from orwynn.base.indication._Indicator import Indicator
 from orwynn.base.indication.digesting_error import DigestingError
-from orwynn.base.indication.indicator import Indicator
+from orwynn.base.indication._Digestable import Digestable
 from orwynn.base.indication.unsupported_indicator_error import \
     UnsupportedIndicatorError
 from orwynn.base.model.Model import Model
@@ -67,13 +68,13 @@ class Indication:
     def items(self) -> ItemsView[str, Indicator]:
         return self.__mp.items()
 
-    def digest_model(self, model: Model) -> dict:
-        """Traverses the given model to create dictionary based on defined
+    def digest(self, obj: Digestable) -> dict:
+        """Traverses object to create dictionary based on defined
         indicators.
 
         Args:
-            model:
-                Model to be digested.
+            obj:
+                Object to be digested.
 
         Returns:
             Dictionary with keys and values complying this indication.
@@ -91,14 +92,14 @@ class Indication:
             final_value: Any
             match v:
                 case Indicator.TYPE:
-                    final_value = model.__class__.__name__
+                    final_value = obj.__class__.__name__
                     is_type_indicator_found = True
                 case Indicator.VALUE:
-                    final_value = model.dict()
+                    final_value = obj.dict()
                     is_value_indicator_found = True
                 case _:
                     raise UnsupportedIndicatorError(
-                        f"indicator {v} is not supported in model digesting"
+                        f"indicator {v} is not supported"
                     )
             result[k] = final_value
 

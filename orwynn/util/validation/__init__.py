@@ -79,7 +79,7 @@ def validate_each(
     expected_type: ValidationExpectedType,
     *,
     is_strict: bool = False,
-    expected_obj_type: type | None = None,
+    expected_sequence_type: type | None = None,
     should_check_if_empty: bool = False
 ) -> None:
     """Validates each object in given array against expected type.
@@ -95,20 +95,20 @@ def validate_each(
             Whether strict check should be performed. If True, direct type
             comparison is made, disallowing subclasses. If False, isinstance()
             comparison is made.
-        expected_obj_type (optional):
-            To perform checking for the given object itself.
+        expected_sequence_type (optional):
+            To perform checking for the given sequence itself.
         should_check_if_empty (optional):
             Perform checking if given obj is empty.
     """
     validate(obj, [list, tuple, set, frozenset], is_strict=True)
 
-    if expected_obj_type is not None:
-        if expected_obj_type not in [list, tuple, set, frozenset]:
+    if expected_sequence_type is not None:
+        if expected_sequence_type not in [list, tuple, set, frozenset]:
             raise ValidationError(
-                f"expected object type {expected_obj_type} is neither"
+                f"expected object type {expected_sequence_type} is neither"
                 " list, tuple, set or frozen set"
             )
-        validate(obj, expected_obj_type)
+        validate(obj, expected_sequence_type)
 
     is_empty: bool = True
     for o in obj:
@@ -292,19 +292,13 @@ def __check_callable(obj: Any, c: Callable, is_strict: bool) -> None:
 
 
 def __check_type(obj: Any, t: type, is_strict: bool) -> None:
-    if is_strict:
-        if (
-            type(obj) is not t
-            and not isclass(obj)
-        ):
-            raise ValidationError(
-                failed_obj=obj, expected_type=t
-            )
-    else:
-        if (
-            not isinstance(obj, t)
-            and not isclass(obj)
-        ):
-            raise ValidationError(
-                failed_obj=obj, expected_type=t
-            )
+    if is_strict and type(obj) is t:
+        return
+    elif isinstance(obj, t):
+        return
+    elif isclass(obj) and issubclass(obj, t):
+        return
+
+    raise ValidationError(
+        failed_obj=obj, expected_type=t
+    )

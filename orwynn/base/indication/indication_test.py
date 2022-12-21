@@ -2,8 +2,8 @@ from typing import Any
 
 from pytest import fixture
 
-from orwynn.base.indication.Indication import Indication
-from orwynn.base.indication.indicator import Indicator
+from orwynn.base.indication._Indication import Indication
+from orwynn.base.indication._Indicator import Indicator
 from orwynn.util.parsing.parsing import parse_key
 from tests.std.text import Text
 
@@ -18,7 +18,7 @@ def default_indication() -> Indication:
 
 
 def test_digest_default(default_indication: Indication):
-    digested_mp: dict[str, Any] = default_indication.digest_model(
+    digested_mp: dict[str, Any] = default_indication.digest(
         Text(text="hello")
     )
 

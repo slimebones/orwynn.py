@@ -6,6 +6,7 @@ from types import NoneType
 import dotenv
 
 from orwynn.app._AppService import AppService
+from orwynn.app._ErrorHandler import ErrorHandler
 from orwynn.app_rc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.controller.endpoint._SpecsProxy import SpecsProxy
@@ -15,7 +16,7 @@ from orwynn.base.database.UnknownDatabaseKindError import \
 from orwynn.base.error.MalfunctionError import MalfunctionError
 from orwynn.base.indication.default_api_indication import \
     default_api_indication
-from orwynn.base.indication.Indication import Indication
+from orwynn.base.indication._Indication import Indication
 from orwynn.base.middleware._Middleware import Middleware
 from orwynn.base.module.Module import Module
 from orwynn.base.worker.Worker import Worker
@@ -53,9 +54,13 @@ class Boot(Worker):
             structures. Defaults to predefined by framework's indication
             convention.
         databases (optional):
-            List of database kinds enabled.
+            List of database kinds enabled. No databases enabled by default.
         cors (optional):
-            CORS policy applied to the whole application.
+            CORS policy applied to the whole application. No CORS applied by
+            default.
+        error_handlers (optional)
+            List of error handlers to add. By default framework adds builtin
+            Exception and orwynn.Error handlers.
 
     Environs:
         Orwynn_Mode:
@@ -87,17 +92,23 @@ class Boot(Worker):
         dotenv_path: Path | None = None,
         api_indication: Indication | None = None,
         databases: list[DatabaseKind] | None = None,
-        cors: CORS | None = None
+        cors: CORS | None = None,
+        error_handlers: list[ErrorHandler] | None = None
     ) -> None:
         super().__init__()
         if dotenv_path is None:
             dotenv_path = Path(".env")
         validate(dotenv_path, Path)
         validate(root_module, Module)
-        if not api_indication:
+        if api_indication is None:
             api_indication = default_api_indication
         validate(api_indication, Indication)
         validate(cors, [CORS, NoneType])
+        if error_handlers is None:
+            error_handlers = []
+        validate_each(
+            error_handlers, ErrorHandler, expected_sequence_type=list
+        )
 
         dotenv.load_dotenv(dotenv_path, override=True)
 
@@ -121,7 +132,7 @@ class Boot(Worker):
         if databases is None:
             databases = []
         else:
-            validate_each(databases, DatabaseKind, expected_obj_type=list)
+            validate_each(databases, DatabaseKind, expected_sequence_type=list)
 
         # Add crucial builtin objects
         root_module.add_provider_or_skip(AppService)
@@ -161,6 +172,15 @@ class Boot(Worker):
     @property
     def api_indication(self) -> Indication:
         return self.__api_indication
+
+    def __register_error_handlers(
+        self, error_handlers: list[ErrorHandler]
+    ) -> None:
+        is_default_exception_handled: bool = False
+        is_default_error_handled: bool = False
+
+        for error_handler in error_handlers:
+            self.app.add_error_handler(error_handler)
 
     def __register_routes(
         self, modules: list[Module], controllers: list[Controller]

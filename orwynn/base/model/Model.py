@@ -19,7 +19,7 @@ class Model(BaseModel):
         """Generates API-complying object using project's defined API
         indication.
         """
-        return BootDataProxy.ie().api_indication.digest_model(self)
+        return BootDataProxy.ie().api_indication.digest(self)
 
     @classmethod
     def recover(cls, mp: dict) -> Self:
