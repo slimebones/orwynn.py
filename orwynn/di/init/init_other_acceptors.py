@@ -1,5 +1,6 @@
 import inspect
 from orwynn.base.controller.Controller import Controller
+from orwynn.base.middleware.Middleware import Middleware
 from orwynn.base.module.Module import Module
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.DIContainer import DIContainer
@@ -20,7 +21,7 @@ def init_other_acceptors(
             List of modules to collect acceptors from.
     """
     for module in modules:
-        for C in module._Controllers:
+        for C in module.Controllers:
             validate(C, Controller)
             container.add(
                 C(
@@ -28,11 +29,11 @@ def init_other_acceptors(
                 )
             )
 
-        for M in module._Middleware:
-            validate(M, Controller)
+        for Mw in module.Middleware:
+            validate(Mw, Middleware)
             container.add(
-                M(
-                    *_collect_dependencies_for_acceptor(M, container)
+                Mw(
+                    *_collect_dependencies_for_acceptor(Mw, container)
                 )
             )
 

@@ -4,6 +4,7 @@ import re
 
 import dotenv
 
+from orwynn.base.middleware.MainDispatcher import MainDispatcher
 from orwynn.app.AppService import AppService
 from orwynn.app_rc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from orwynn.base.controller.Controller import Controller
@@ -24,8 +25,10 @@ from orwynn.boot.BootMode import BootMode
 from orwynn.boot.UnknownSourceError import UnknownSourceError
 from orwynn.boot.UnknownBootModeError import UnknownBootModeError
 from orwynn.di.DI import DI
+from orwynn.di.missing_di_object_error import MissingDIObjectError
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
+from orwynn.router.Router import Router
 from orwynn.util.file.NotDirError import NotDirError
 from orwynn.util.file.yml import load_yml
 from orwynn.util.http import HTTPMethod
@@ -114,21 +117,28 @@ class Boot(Worker):
         else:
             validate_each(databases, DatabaseKind, expected_obj_type=list)
 
-        # FIXME:
-        #   Add AppService to be always initialized - THIS IS VERY BAD approach
-        #   and is breaking many principles, so fix it ASAP.
-        #
-        #   Case is, that if no acceptor/module in the app requires AppService,
-        #   it won't be included at all.
-        root_module._Providers.append(AppService)
+        # Add crucial builtin objects
+        root_module.add_provider_or_skip(AppService)
+        root_module.add_middleware_or_skip(MainDispatcher)
 
         self.__enable_databases(databases)
-        self._di: DI = DI(root_module)
-        self.__register_routes(self._di.modules, self._di.controllers)
+        self.__di: DI = DI(root_module)
+
+        self.__router: Router = Router(
+            self.app,
+            self.__di.find("MainDispatcher")
+        )
+
+        try:
+            self.__register_routes(self.__di.modules, self.__di.controllers)
+        except MissingDIObjectError:
+            raise ValueError(
+                f"no controllers defined for this application"
+            )
 
     @property
     def app(self) -> AppService:
-        return self._di.app_service
+        return self.__di.app_service
 
     @property
     def mode(self) -> BootMode:
@@ -187,7 +197,7 @@ class Boot(Worker):
                 else:
                     joined_route = m.ROUTE + c.ROUTE
 
-                self.app.register_route_fn(
+                self.__router.register_route_fn(
                     # We can concatenate routes such way since routes
                     # are validated to not contain following slash
                     route=joined_route,

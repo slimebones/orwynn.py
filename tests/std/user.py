@@ -18,7 +18,6 @@ class UserService(Service):
 
     def create(self, user: User) -> User:
         a = user.create()
-        print(a.id)
         return a
 
 

@@ -120,6 +120,22 @@ class Module:
 
         return route
 
+    def add_provider_or_skip(self, P: type[Provider]) -> None:
+        if not is_provider(P):
+            raise TypeError(f"should receive provider")
+        if P not in self._Providers:
+            self._Providers.append(P)
+
+    def add_controller_or_skip(self, C: type[Controller]) -> None:
+        validate(C, Controller)
+        if C not in self._Controllers:
+            self._Controllers.append(C)
+
+    def add_middleware_or_skip(self, Mw: type[MiddlewareClass]) -> None:
+        validate(Mw, MiddlewareClass)
+        if Mw not in self._Middleware:
+            self._Middleware.append(Mw)
+
     def _parse_providers(
         self,
         Providers: list[type[Provider]] | None

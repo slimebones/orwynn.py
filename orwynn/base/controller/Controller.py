@@ -6,7 +6,7 @@ from orwynn.base.controller.missing_controller_class_attribute_error import \
     MissingControllerClassAttributeError
 from orwynn.base.middleware.Middleware import Middleware
 from orwynn.util.http import HTTPMethod
-from orwynn.util.http.unsupported_http_method_error import \
+from orwynn.util.http.UnsupportedHTTPMethodError import \
     UnsupportedHTTPMethodError
 from orwynn.util.validation import validate, validate_each, validate_route
 
@@ -31,12 +31,9 @@ class Controller:
         METHODS:
             List of supported HTTP methods to be registered. Methods here can
             be either uppercase or lowercase, e.g. METHODS = ["get", "POST"]
-        MIDDLEWARE (optional):
-            List of Middleware classes to be applied to this controller.
     """
     ROUTE: str | None = None
     METHODS: list[str] | None = None
-    MIDDLEWARE: list[Middleware] | None = None
 
     def __init__(self) -> None:
         self._methods: list[HTTPMethod] = []
@@ -76,13 +73,6 @@ class Controller:
                     )
                 collected_methods.append(method)
                 self._methods.append(HTTPMethod(method))
-
-        if self.MIDDLEWARE is None:
-            self.MIDDLEWARE = []
-        else:
-            validate_each(
-                self.MIDDLEWARE, Middleware, expected_obj_type=list
-            )
 
     @property
     def methods(self) -> list[HTTPMethod]:

@@ -22,6 +22,11 @@ def std_boot(std_struct: Module) -> Boot:
 
 
 @fixture
+def run_std_boot(std_struct: Module):
+    Boot(std_struct)
+
+
+@fixture
 def std_mongo_boot(std_struct: Module) -> Boot:
     os.environ["Orwynn_AppRCDir"] = os.path.join(os.getcwd(), "tests/std")
     return Boot(
