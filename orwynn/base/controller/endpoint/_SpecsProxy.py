@@ -1,25 +1,25 @@
 from typing import Callable, ItemsView
 
-from orwynn.base.controller.EndpointSpec import EndpointSpec
-from orwynn.base.controller.EndpointSpecNotFoundError import \
-    EndpointSpecNotFoundError
+from orwynn.base.controller.endpoint._Spec import Spec
+from orwynn.base.controller.endpoint._SpecNotFoundError import \
+    SpecNotFoundError
 from orwynn.base.worker.Worker import Worker
 from orwynn.util import validation
 
 
-class EndpointSpecsProxy(Worker):
+class SpecsProxy(Worker):
     """Collects endpoint specs to be used on routes registering."""
     def __init__(self) -> None:
         super().__init__()
-        self.__spec_by_fn: dict[Callable, EndpointSpec] = {}
+        self.__spec_by_fn: dict[Callable, Spec] = {}
 
     @property
-    def items(self) -> ItemsView[Callable, EndpointSpec]:
+    def items(self) -> ItemsView[Callable, Spec]:
         return self.__spec_by_fn.items()
 
-    def add(self, fn: Callable, spec: EndpointSpec) -> None:
+    def add(self, fn: Callable, spec: Spec) -> None:
         validation.validate(fn, Callable)
-        validation.validate(spec, EndpointSpec)
+        validation.validate(spec, Spec)
 
         if fn in self.__spec_by_fn:
             raise ValueError(
@@ -27,11 +27,11 @@ class EndpointSpecsProxy(Worker):
             )
         self.__spec_by_fn[fn] = spec
 
-    def find_spec(self, fn: Callable) -> EndpointSpec:
+    def find_spec(self, fn: Callable) -> Spec:
         validation.validate(fn, Callable)
         try:
             return self.__spec_by_fn[fn]
         except KeyError:
-            raise EndpointSpecNotFoundError(
+            raise SpecNotFoundError(
                 f"{fn} not found in proxy"
             )

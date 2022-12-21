@@ -5,10 +5,10 @@ from starlette.types import Receive, Scope, Send
 
 from orwynn.app.already_registered_method_error import \
     AlreadyRegisteredMethodError
-from orwynn.base.controller.EndpointSpec import EndpointSpec
-from orwynn.base.controller.EndpointSpecNotFoundError import \
-    EndpointSpecNotFoundError
-from orwynn.base.controller.EndpointSpecsProxy import EndpointSpecsProxy
+from orwynn.base.controller.endpoint._Spec import Spec
+from orwynn.base.controller.endpoint._SpecNotFoundError import \
+    SpecNotFoundError
+from orwynn.base.controller.endpoint._SpecsProxy import SpecsProxy
 from orwynn.base.service.framework_service import FrameworkService
 from orwynn.base.test.TestClient import TestClient
 from orwynn.util.http.http import HTTPMethod
@@ -46,8 +46,7 @@ class AppService(FrameworkService):
     ) -> None:
         """Registers fn for route.
 
-        Attributes:
-            route:
+        Attributes: route:
                 Route to register to.
             fn:
                 Function to register.
@@ -78,16 +77,16 @@ class AppService(FrameworkService):
             except KeyError:
                 self._methods_by_route[route] = {method}
 
-        spec: EndpointSpec | None
+        spec: Spec | None
         try:
-            spec = EndpointSpecsProxy.ie().find_spec(fn)
-        except EndpointSpecNotFoundError:
+            spec = SpecsProxy.ie().find_spec(fn)
+        except SpecNotFoundError:
             spec = None
 
         app_fn(route, **self.__parse_endpoint_spec_kwargs(spec))(fn)
 
     def __parse_endpoint_spec_kwargs(
-        self, spec: EndpointSpec | None
+        self, spec: Spec | None
     ) -> dict[str, Any]:
         result: dict[str, Any] = {}
 

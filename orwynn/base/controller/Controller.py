@@ -1,6 +1,6 @@
 from typing import Any, Callable
 
-from orwynn.base.controller.defined_twice_controller_method_error import \
+from orwynn.base.controller.DefinedTwiceControllerMethodError import \
     DefinedTwiceControllerMethodError
 from orwynn.base.controller.missing_controller_class_attribute_error import \
     MissingControllerClassAttributeError

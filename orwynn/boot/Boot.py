@@ -7,7 +7,7 @@ import dotenv
 from orwynn.app.AppService import AppService
 from orwynn.app_rc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from orwynn.base.controller.Controller import Controller
-from orwynn.base.controller.EndpointSpecsProxy import EndpointSpecsProxy
+from orwynn.base.controller.endpoint._SpecsProxy import SpecsProxy
 from orwynn.base.database.DatabaseKind import DatabaseKind
 from orwynn.base.database.UnknownDatabaseKindError import \
     UnknownDatabaseKindError
@@ -107,7 +107,7 @@ class Boot(Worker):
             api_indication=self.__api_indication,
             app_rc=self.__app_rc
         )
-        EndpointSpecsProxy()
+        SpecsProxy()
 
         if databases is None:
             databases = []

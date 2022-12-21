@@ -10,4 +10,3 @@ from orwynn.base.module.Module import Module
 from orwynn.base.service.Service import Service
 from orwynn.boot.Boot import Boot
 from orwynn.mongo.Mongo import Mongo
-
