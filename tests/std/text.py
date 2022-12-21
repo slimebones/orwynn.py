@@ -1,6 +1,6 @@
 import lorem
 
-from orwynn.app.AppService import AppService
+from orwynn.app._AppService import AppService
 from orwynn.base.config.Config import Config
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.model.Model import Model

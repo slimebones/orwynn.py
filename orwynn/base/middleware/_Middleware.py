@@ -1,7 +1,7 @@
 from typing import Callable
 from orwynn.util import validation
 
-from orwynn.util.http import Request, Response
+from orwynn.util.web import Request, Response
 
 
 class Middleware:
@@ -17,20 +17,29 @@ class Middleware:
 
     Attributes:
         covered_routes:
-            List of routes covered by this middleware.
+            List of routes covered by this middleware. You can pass ["*"] to
+            process all routes.
     """
     def __init__(self, covered_routes: list[str]) -> None:
         validation.validate_each(covered_routes, str, expected_obj_type=list)
-        self.__covered_roures: list[str] = covered_routes
+        self.__covered_routes: list[str] = covered_routes
+        self.__is_all_routes_allowed: bool = "*" in covered_routes
+
+        if self.__is_all_routes_allowed and len(covered_routes) != 1:
+            raise ValueError(
+                "if you pass \"*\" to covered routes, don't add any other"
+                " values"
+            )
 
     def __should_process(self, route: str) -> bool:
-        return route in self.__covered_roures
+        return self.__is_all_routes_allowed or route in self.__covered_routes
 
     async def dispatch(
         self,
         request: Request,
         call_next: Callable
     ) -> Response:
+        print(request.client)
         if self.__should_process(request.url.path):
             return await self.process(request, call_next)
         else:

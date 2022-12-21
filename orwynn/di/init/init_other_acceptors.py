@@ -1,11 +1,11 @@
 import inspect
 from orwynn.base.controller.Controller import Controller
-from orwynn.base.middleware.Middleware import Middleware
+from orwynn.base.middleware._Middleware import Middleware
 from orwynn.base.module.Module import Module
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.DIContainer import DIContainer
 from orwynn.di.provider import Provider
-from orwynn.util import http
+from orwynn.util import web
 from orwynn.util.validation import validate
 
 
@@ -33,7 +33,7 @@ def init_other_acceptors(
             container.add(
                 controller
             )
-            module_covered_routes.append(http.join_routes(
+            module_covered_routes.append(web.join_routes(
                 module.route, controller.route
             ))
 

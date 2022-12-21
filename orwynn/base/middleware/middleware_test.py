@@ -1,10 +1,10 @@
 from typing import Callable
 from orwynn.base.controller.Controller import Controller
-from orwynn.base.middleware.Middleware import Middleware
+from orwynn.base.middleware._Middleware import Middleware
 from orwynn.base.module.Module import Module
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.boot.Boot import Boot
-from orwynn.util.http import Request, Response, TestResponse
+from orwynn.util.web import Request, Response, TestResponse
 
 
 def test_basic():

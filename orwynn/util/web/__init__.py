@@ -4,6 +4,7 @@ import httpx
 from fastapi import Request as FastAPIRequest
 from fastapi import Response as FastAPIResponse
 from fastapi.responses import JSONResponse as FastAPI_JSONResponse
+from orwynn.util.web._CORS import CORS
 
 from orwynn.util import validation
 

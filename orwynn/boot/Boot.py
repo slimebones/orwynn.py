@@ -1,10 +1,11 @@
 import os
 from pathlib import Path
 import re
+from types import NoneType
 
 import dotenv
 
-from orwynn.app.AppService import AppService
+from orwynn.app._AppService import AppService
 from orwynn.app_rc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.controller.endpoint._SpecsProxy import SpecsProxy
@@ -15,7 +16,7 @@ from orwynn.base.error.MalfunctionError import MalfunctionError
 from orwynn.base.indication.default_api_indication import \
     default_api_indication
 from orwynn.base.indication.Indication import Indication
-from orwynn.base.middleware.Middleware import Middleware
+from orwynn.base.middleware._Middleware import Middleware
 from orwynn.base.module.Module import Module
 from orwynn.base.worker.Worker import Worker
 from orwynn.app_rc.AppRC import AppRC
@@ -29,10 +30,10 @@ from orwynn.di.missing_di_object_error import MissingDIObjectError
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
 from orwynn.router.Router import Router
-from orwynn.util import http
+from orwynn.util import web
 from orwynn.util.file.NotDirError import NotDirError
 from orwynn.util.file.yml import load_yml
-from orwynn.util.http import HTTPMethod
+from orwynn.util.web import CORS, HTTPMethod
 from orwynn.util.validation import validate, validate_each
 
 
@@ -53,6 +54,8 @@ class Boot(Worker):
             convention.
         databases (optional):
             List of database kinds enabled.
+        cors (optional):
+            CORS policy applied to the whole application.
 
     Environs:
         Orwynn_Mode:
@@ -83,7 +86,8 @@ class Boot(Worker):
         *,
         dotenv_path: Path | None = None,
         api_indication: Indication | None = None,
-        databases: list[DatabaseKind] | None = None
+        databases: list[DatabaseKind] | None = None,
+        cors: CORS | None = None
     ) -> None:
         super().__init__()
         if dotenv_path is None:
@@ -93,6 +97,7 @@ class Boot(Worker):
         if not api_indication:
             api_indication = default_api_indication
         validate(api_indication, Indication)
+        validate(cors, [CORS, NoneType])
 
         dotenv.load_dotenv(dotenv_path, override=True)
 
@@ -141,6 +146,9 @@ class Boot(Worker):
         except MissingDIObjectError:
             # No middleware defined, it's ok
             pass
+
+        if cors:
+            self.app.configure_cors(cors)
 
     @property
     def app(self) -> AppService:
@@ -198,7 +206,7 @@ class Boot(Worker):
                 self.__router.register_route_fn(
                     # We can concatenate routes such way since routes
                     # are validated to not contain following slash
-                    route=http.join_routes(m.route, c.route),
+                    route=web.join_routes(m.route, c.route),
                     fn=c.get_fn_by_http_method(http_method),
                     method=http_method
                 )

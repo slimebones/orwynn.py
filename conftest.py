@@ -5,7 +5,7 @@ import os
 from pytest import fixture
 
 from orwynn.app.app_test import std_app
-from orwynn.app.AppService import AppService
+from orwynn.app._AppService import AppService
 from orwynn.base.module.Module import Module
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.base.test.TestClient import TestClient
@@ -19,9 +19,9 @@ from orwynn.di.collecting.collect_provider_dependencies_test import \
     std_provider_dependencies_map
 from orwynn.di.di_test import std_di_container
 from orwynn.mongo.Mongo import Mongo
+from orwynn.util.web.http_test import std_http
 from tests.structs import (circular_module_struct, long_circular_module_struct,
                            self_importing_module_struct, std_struct)
-
 
 @fixture(autouse=True)
 def run_around_tests():
@@ -32,12 +32,6 @@ def run_around_tests():
         # Mongo is not initialized, skip
         pass
     __discard_workers()
-
-# By some strange reason this fixture placed in util.http.http_test is not
-# importable, so it is here
-@fixture
-def std_http(std_app) -> HttpClient:
-    return HttpClient(std_app.test_client)
 
 
 def __discard_workers(W: type[Worker] = Worker):

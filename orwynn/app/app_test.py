@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from orwynn.app.AppService import AppService
+from orwynn.app._AppService import AppService
 from orwynn.boot.Boot import Boot
 
 

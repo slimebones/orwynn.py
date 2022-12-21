@@ -2,7 +2,7 @@ import inspect
 from types import NoneType
 from typing import Any, Callable, TypeVar
 
-from orwynn.util.http import TestResponse
+from orwynn.util.web import TestResponse
 from orwynn.base.test.TestClient import TestClient
 
 from orwynn.util.validation import validate

@@ -1,15 +1,16 @@
-from typing import Callable
+from typing import Any, Callable
 from fastapi import FastAPI
 from starlette.types import Receive, Scope, Send
-from orwynn.base.middleware.Middleware import Middleware
+from orwynn.base.middleware._Middleware import Middleware
 from starlette.middleware.base import BaseHTTPMiddleware \
     as StarletteBaseHTTPMiddleware
+from fastapi.middleware.cors import CORSMiddleware as FastAPI_CORSMiddleware
 
 from orwynn.base.service.framework_service import FrameworkService
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.base.test.TestClient import TestClient
 from orwynn.util import validation
-from orwynn.util.http import HTTPMethod
+from orwynn.util.web import CORS, HTTPMethod
 
 
 class AppService(FrameworkService):
@@ -25,6 +26,8 @@ class AppService(FrameworkService):
                 HTTPMethod.PATCH: self.__app.patch,
                 HTTPMethod.OPTIONS: self.__app.options
             }
+
+        self.__is_cors_configured: bool = False
 
     async def __call__(
         self, scope: Scope, receive: Receive, send: Send
@@ -48,3 +51,21 @@ class AppService(FrameworkService):
             StarletteBaseHTTPMiddleware,
             dispatch=middleware.dispatch
         )
+
+    def configure_cors(self, cors: CORS) -> None:
+        """Configures CORS policy used for the whole app."""
+        if self.__is_cors_configured:
+            raise ValueError("CORS has been already configured")
+
+        validation.validate(cors, CORS)
+
+        kwargs: dict[str, Any] = {}
+        for k, v in cors.dict().items():
+            if v:
+                kwargs[k] = v
+
+        self.__app.add_middleware(
+            FastAPI_CORSMiddleware,
+            **kwargs
+        )
+        self.__is_cors_configured = True

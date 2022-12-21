@@ -1,13 +1,13 @@
 from typing import Any, Callable
 
-from orwynn.app.AlreadyRegisteredMethodError import \
+from orwynn.app._AlreadyRegisteredMethodError import \
     AlreadyRegisteredMethodError
-from orwynn.app.AppService import AppService
+from orwynn.app._AppService import AppService
 from orwynn.base.controller import endpoint
 from orwynn.base.worker.Worker import Worker
 from orwynn.util import validation
-from orwynn.util.http import HTTPMethod
-from orwynn.util.http.UnsupportedHTTPMethodError import \
+from orwynn.util.web import HTTPMethod
+from orwynn.util.web.UnsupportedHTTPMethodError import \
     UnsupportedHTTPMethodError
 
 

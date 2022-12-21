@@ -1,5 +1,5 @@
 from orwynn.base.controller.Controller import Controller
-from orwynn.base.middleware.Middleware import Middleware
+from orwynn.base.middleware._Middleware import Middleware
 from orwynn.di.BUILTIN_PROVIDERS import BUILTIN_PROVIDERS
 from orwynn.di.acceptor import Acceptor
 

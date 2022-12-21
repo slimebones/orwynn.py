@@ -4,7 +4,7 @@ from typing import TypeVar
 from orwynn.base.config.Config import Config
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.error.MalfunctionError import MalfunctionError
-from orwynn.base.middleware.Middleware import Middleware
+from orwynn.base.middleware._Middleware import Middleware
 from orwynn.base.model.Model import Model
 from orwynn.di.DIObject import DIObject
 from orwynn.di.di_object_already_initialized_in_container_error import \

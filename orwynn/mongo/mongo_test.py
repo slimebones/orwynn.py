@@ -6,7 +6,7 @@ from orwynn.base.mapping.CustomUseOfMappingReservedFieldError import \
     CustomUseOfMappingReservedFieldError
 from orwynn.mongo.MongoMapping import MongoMapping
 from orwynn.util import validation
-from orwynn.util.http import Response
+from orwynn.util.web import Response
 from tests.std.user import User
 
 

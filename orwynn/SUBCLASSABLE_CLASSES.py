@@ -2,7 +2,7 @@
 from orwynn.base.config.Config import Config
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.mapping.Mapping import Mapping
-from orwynn.base.middleware.Middleware import Middleware
+from orwynn.base.middleware._Middleware import Middleware
 from orwynn.base.model.Model import Model
 from orwynn.base.service.Service import Service
 

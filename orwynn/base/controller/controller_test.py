@@ -1,4 +1,4 @@
-from orwynn.app.AlreadyRegisteredMethodError import \
+from orwynn.app._AlreadyRegisteredMethodError import \
     AlreadyRegisteredMethodError
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.controller.DefinedTwiceControllerMethodError import \
@@ -8,8 +8,8 @@ from orwynn.base.controller.missing_controller_class_attribute_error import \
 from orwynn.base.module.Module import Module
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.boot.Boot import Boot
-from orwynn.util.http import HTTPMethod
-from orwynn.util.http.UnsupportedHTTPMethodError import \
+from orwynn.util.web import HTTPMethod
+from orwynn.util.web.UnsupportedHTTPMethodError import \
     UnsupportedHTTPMethodError
 from orwynn.util.validation import expect, validate_re
 from orwynn.util.validation.re_validation_error import ReValidationError

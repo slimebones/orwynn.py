@@ -4,8 +4,8 @@ from orwynn.base.controller.DefinedTwiceControllerMethodError import \
     DefinedTwiceControllerMethodError
 from orwynn.base.controller.missing_controller_class_attribute_error import \
     MissingControllerClassAttributeError
-from orwynn.util.http import HTTPMethod
-from orwynn.util.http.UnsupportedHTTPMethodError import \
+from orwynn.util.web import HTTPMethod
+from orwynn.util.web.UnsupportedHTTPMethodError import \
     UnsupportedHTTPMethodError
 from orwynn.util.validation import validate, validate_each, validate_route
 
