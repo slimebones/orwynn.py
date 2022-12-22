@@ -161,9 +161,11 @@ class DIContainer:
         # Find out object's base class
         for C in SUBCLASSABLE_CLASSES:
             if issubclass(ObjCls, C):
-                # Choose more specific base class Config instead of Model
+                # Choose more specific base classes for subclasses of Model
                 if C is Model and issubclass(ObjCls, Config):
                     BaseCls = Config
+                elif C is Model and issubclass(ObjCls, app.ErrorHandler):
+                    BaseCls = app.ErrorHandler
                 else:
                     BaseCls = C
 

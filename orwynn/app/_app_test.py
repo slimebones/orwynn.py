@@ -21,14 +21,13 @@ def test_error_handler():
         METHODS = ["get"]
 
         def get(self):
-            raise ValueError("wow")
-            # raise Error("whoops!")
+            raise Error("whoops!")
 
     class EH1(ErrorHandler):
         E = Error
 
         def handle(self, request: Request, error: Error):
-            return JSONResponse({"message": "error"}, 400)
+            return JSONResponse(error.api, 400)
 
     boot: Boot = Boot(
         Module(route="/", Controllers=[C1]),
