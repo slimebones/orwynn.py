@@ -2,6 +2,7 @@ import inspect
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.middleware._Middleware import Middleware
 from orwynn.base.module.Module import Module
+from orwynn.boot._BootDataProxy import BootDataProxy
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.DIContainer import DIContainer
 from orwynn.di.provider import Provider
@@ -28,7 +29,7 @@ def init_other_acceptors(
             validate(C, Controller)
 
             controller: Controller = C(
-                *_collect_dependencies_for_acceptor(C, container)
+                **__collect_dependencies_for_acceptor(C, container)
             )
             container.add(
                 controller
@@ -42,16 +43,20 @@ def init_other_acceptors(
             container.add(
                 Mw(
                     covered_routes=module_covered_routes,
-                    *_collect_dependencies_for_acceptor(Mw, container)
+                    **__collect_dependencies_for_acceptor(Mw, container)
                 )
             )
 
+        for EH in BootDataProxy.ie().ErrorHandlers:
+            container.add(
+                EH(**__collect_dependencies_for_acceptor(EH, container))
+            )
 
-def _collect_dependencies_for_acceptor(
+def __collect_dependencies_for_acceptor(
     A: type[Acceptor],
     container: DIContainer
-) -> list[Provider]:
-    result: list[Provider] = []
+) -> dict[str, Provider]:
+    result: dict[str, Provider] = {}
 
     for param in inspect.signature(A).parameters.values():
         if param.name == "covered_routes":
@@ -61,6 +66,6 @@ def _collect_dependencies_for_acceptor(
         if param.name in ["args", "kwargs"]:
             continue
 
-        result.append(container.find(param.annotation.__name__))
+        result[param.name] = container.find(param.annotation.__name__)
 
     return result

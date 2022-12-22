@@ -1,3 +1,4 @@
+from orwynn import app
 from orwynn.app._AppService import AppService
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.middleware._Middleware import Middleware
@@ -82,6 +83,10 @@ class DI(Worker):
             All middleware fetched.
         """
         return self.__container.all_middleware
+
+    @property
+    def error_handlers(self) -> list[app.ErrorHandler]:
+        return self.__container.error_handlers
 
     def find(self, key: str) -> DIObject:
         """Returns DI object by its key.

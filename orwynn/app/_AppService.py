@@ -1,18 +1,19 @@
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any, Callable
 from fastapi import FastAPI
 from starlette.types import Receive, Scope, Send
-from orwynn.base.error.Error import Error
 from orwynn.base.middleware._Middleware import Middleware
 from starlette.middleware.base import BaseHTTPMiddleware \
     as StarletteBaseHTTPMiddleware
 from fastapi.middleware.cors import CORSMiddleware as FastAPI_CORSMiddleware
 
 from orwynn.base.service.framework_service import FrameworkService
-from orwynn.app._ErrorHandler import ErrorHandler
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.base.test.TestClient import TestClient
 from orwynn.util import validation
 from orwynn.util.web import CORS, HTTPMethod
+
+if TYPE_CHECKING:
+    from orwynn.app._ErrorHandler import ErrorHandler
 
 
 class AppService(FrameworkService):
@@ -72,8 +73,10 @@ class AppService(FrameworkService):
         )
         self.__is_cors_configured = True
 
-    def add_error_handler(self, error_handler: ErrorHandler) -> None:
+    def add_error_handler(self, error_handler: "ErrorHandler") -> None:
+        if error_handler.E is None:
+            raise TypeError(f"{error_handler} should define class attribute E")
         self.__app.add_exception_handler(
             error_handler.E,
-            error_handler.handler
+            error_handler.handle
         )

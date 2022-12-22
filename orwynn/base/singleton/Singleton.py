@@ -1,8 +1,6 @@
 from __future__ import annotations
 from typing import TypeVar
 
-from orwynn.base.singleton.singleton_error import SingletonError
-
 
 SingletonInstance = TypeVar("SingletonInstance")
 
@@ -22,7 +20,7 @@ class SingletonMeta(type):
 
     def __validate_in_instances(cls, cannot_message: str) -> None:
         if cls not in cls.__instances.keys():
-            raise SingletonError(
+            raise ValueError(
                 f"{cannot_message} - class {cls} not initialized"
             )
 

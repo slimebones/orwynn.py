@@ -1,14 +1,13 @@
 from pytest import fixture
-from orwynn import app
+from orwynn.app import ErrorHandler
 
 from orwynn.app._AppService import AppService
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.error.Error import Error
 from orwynn.base.module.Module import Module
 from orwynn.base.test.HttpClient import HttpClient
-from orwynn.boot.Boot import Boot
-from orwynn.util import validation
-from orwynn.util.web import JSONResponse, Request, Response, TestResponse
+from orwynn.boot._Boot import Boot
+from orwynn.util.web import JSONResponse, Request, TestResponse
 
 
 @fixture
@@ -25,12 +24,15 @@ def test_error_handler():
             raise ValueError("wow")
             # raise Error("whoops!")
 
-    def handle_error(request: Request, error: Error):
-        return JSONResponse({"message": "error"}, 400)
+    class EH1(ErrorHandler):
+        E = Error
+
+        def handle(self, request: Request, error: Error):
+            return JSONResponse({"message": "error"}, 400)
 
     boot: Boot = Boot(
         Module(route="/", Controllers=[C1]),
-        error_handlers=[app.ErrorHandler(E=Error, handler=handle_error)]
+        ErrorHandlers=[EH1]
     )
     http: HttpClient = boot.app.http_client
 

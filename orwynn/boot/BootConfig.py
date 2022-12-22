@@ -3,7 +3,7 @@ from typing import Any, Self
 from orwynn.base.config.Config import Config
 from orwynn.base.indication._Indication import Indication
 from orwynn.app_rc.AppRC import AppRC
-from orwynn.boot.BootDataProxy import BootDataProxy
+from orwynn.boot._BootDataProxy import BootDataProxy
 from orwynn.boot.BootMode import BootMode
 
 

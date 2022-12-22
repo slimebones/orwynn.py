@@ -1,4 +1,4 @@
-from orwynn.boot.BootDataProxy import BootDataProxy
+from orwynn.boot._BootDataProxy import BootDataProxy
 
 
 class Error(Exception):

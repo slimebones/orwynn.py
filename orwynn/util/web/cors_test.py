@@ -1,7 +1,7 @@
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.module.Module import Module
 from orwynn.base.test.HttpClient import HttpClient
-from orwynn.boot.Boot import Boot
+from orwynn.boot._Boot import Boot
 from orwynn.util.web._CORS import CORS
 
 

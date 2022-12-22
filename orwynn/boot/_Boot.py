@@ -22,7 +22,7 @@ from orwynn.base.module.Module import Module
 from orwynn.base.worker.Worker import Worker
 from orwynn.app_rc.AppRC import AppRC
 from orwynn.app_rc.AppRCSearchError import AppRCSearchError
-from orwynn.boot.BootDataProxy import BootDataProxy
+from orwynn.boot._BootDataProxy import BootDataProxy
 from orwynn.boot.BootMode import BootMode
 from orwynn.boot.UnknownSourceError import UnknownSourceError
 from orwynn.boot.UnknownBootModeError import UnknownBootModeError
@@ -58,7 +58,7 @@ class Boot(Worker):
         cors (optional):
             CORS policy applied to the whole application. No CORS applied by
             default.
-        error_handlers (optional)
+        ErrorHandlers (optional)
             List of error handlers to add. By default framework adds builtin
             Exception and orwynn.Error handlers.
 
@@ -93,7 +93,7 @@ class Boot(Worker):
         api_indication: Indication | None = None,
         databases: list[DatabaseKind] | None = None,
         cors: CORS | None = None,
-        error_handlers: list[ErrorHandler] | None = None
+        ErrorHandlers: list[type[ErrorHandler]] | None = None
     ) -> None:
         super().__init__()
         if dotenv_path is None:
@@ -104,10 +104,10 @@ class Boot(Worker):
             api_indication = default_api_indication
         validate(api_indication, Indication)
         validate(cors, [CORS, NoneType])
-        if error_handlers is None:
-            error_handlers = []
+        if ErrorHandlers is None:
+            ErrorHandlers = []
         validate_each(
-            error_handlers, ErrorHandler, expected_sequence_type=list
+            ErrorHandlers, ErrorHandler, expected_sequence_type=list
         )
 
         dotenv.load_dotenv(dotenv_path, override=True)
@@ -125,7 +125,8 @@ class Boot(Worker):
             root_dir=self.__root_dir,
             mode=self.__mode,
             api_indication=self.__api_indication,
-            app_rc=self.__app_rc
+            app_rc=self.__app_rc,
+            ErrorHandlers=ErrorHandlers
         )
         SpecsProxy()
 
@@ -158,8 +159,11 @@ class Boot(Worker):
             # No middleware defined, it's ok
             pass
 
-        if cors:
+        if cors is not None:
             self.app.configure_cors(cors)
+
+        if ErrorHandlers != []:
+            self.__register_error_handlers(self.__di.error_handlers)
 
     @property
     def app(self) -> AppService:

@@ -1,14 +1,15 @@
 import re
 from typing import TypeVar
 
+from orwynn import app
 from orwynn.base.config.Config import Config
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.error.MalfunctionError import MalfunctionError
 from orwynn.base.middleware._Middleware import Middleware
 from orwynn.base.model.Model import Model
-from orwynn.di.DIObject import DIObject
 from orwynn.di.di_object_already_initialized_in_container_error import \
     DIObjectAlreadyInitializedInContainerError
+from orwynn.di.DIObject import DIObject
 from orwynn.di.finalized_di_container_error import FinalizedDIContainerError
 from orwynn.di.is_provider import is_provider
 from orwynn.di.missing_di_object_error import MissingDIObjectError
@@ -56,6 +57,13 @@ class DIContainer:
             All middleware fetched.
         """
         result: list[Middleware] = self._find_objects_for_class(Middleware)
+        return result
+
+    @property
+    def error_handlers(self) -> list[app.ErrorHandler]:
+        result: list[app.ErrorHandler] = self._find_objects_for_class(
+            app.ErrorHandler
+        )
         return result
 
     def add(self, obj: DIObject) -> None:

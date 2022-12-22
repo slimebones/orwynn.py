@@ -1,7 +1,7 @@
 from pymongo.errors import DuplicateKeyError
 
 from orwynn.base.test.HttpClient import HttpClient
-from orwynn.boot.Boot import Boot
+from orwynn.boot._Boot import Boot
 from orwynn.base.mapping.CustomUseOfMappingReservedFieldError import \
     CustomUseOfMappingReservedFieldError
 from orwynn.mongo.MongoMapping import MongoMapping

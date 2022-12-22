@@ -6,6 +6,7 @@ from orwynn.boot.BootMode import BootMode
 
 if TYPE_CHECKING:
     from orwynn.base.indication._Indication import Indication
+    from orwynn.app import ErrorHandler
 
 
 class BootDataProxy(Worker):
@@ -18,13 +19,15 @@ class BootDataProxy(Worker):
         root_dir: Path,
         mode: BootMode,
         api_indication: "Indication",
-        app_rc: AppRC
+        app_rc: AppRC,
+        ErrorHandlers: list[type["ErrorHandler"]]
     ) -> None:
         super().__init__()
         self.__root_dir: Path = root_dir
         self.__mode: BootMode = mode
         self.__api_indication: Indication = api_indication
         self.__app_rc: AppRC = app_rc
+        self.__ErrorHandlers: list[type["ErrorHandler"]] = ErrorHandlers
 
     @property
     def api_indication(self) -> "Indication":
@@ -35,12 +38,17 @@ class BootDataProxy(Worker):
         return self.__app_rc
 
     @property
+    def ErrorHandlers(self) -> list[type["ErrorHandler"]]:
+        return self.__ErrorHandlers
+
+    @property
     def boot_config_data(self) -> dict:
         return {
             "root_dir": self.__root_dir,
             "mode": self.__mode,
             "api_indication": self.__api_indication,
-            "app_rc": self.__app_rc
+            "app_rc": self.__app_rc,
+            "ErrorHandlers": self.__ErrorHandlers
         }
 
     @property

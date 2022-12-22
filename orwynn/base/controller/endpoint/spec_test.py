@@ -3,7 +3,7 @@ from orwynn.base.controller.Controller import Controller
 from orwynn.base.controller import endpoint
 from orwynn.base.model.Model import Model
 from orwynn.base.module.Module import Module
-from orwynn.boot.Boot import Boot
+from orwynn.boot._Boot import Boot
 
 
 @fixture
