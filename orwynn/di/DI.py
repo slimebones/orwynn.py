@@ -1,6 +1,6 @@
 from orwynn import app
 from orwynn.app._AppService import AppService
-from orwynn.base.controller.Controller import Controller
+from orwynn.base.controller._Controller import Controller
 from orwynn.base.middleware._Middleware import Middleware
 from orwynn.base.module.Module import Module
 from orwynn.base.worker.Worker import Worker

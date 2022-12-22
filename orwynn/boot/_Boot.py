@@ -2,17 +2,18 @@ import os
 from pathlib import Path
 import re
 from types import NoneType
+from typing import TYPE_CHECKING
 
 import dotenv
 
-from orwynn.app._AppService import AppService
-from orwynn.app._ErrorHandler import ErrorHandler
 from orwynn.app_rc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
-from orwynn.base.controller.Controller import Controller
 from orwynn.base.controller.endpoint._SpecsProxy import SpecsProxy
 from orwynn.base.database.DatabaseKind import DatabaseKind
 from orwynn.base.database.UnknownDatabaseKindError import \
     UnknownDatabaseKindError
+from orwynn.app._DefaultExceptionHandler import DefaultExceptionHandler
+from orwynn.app._DefaultErrorHandler import DefaultErrorHandler
+from orwynn.base.error._Error import Error
 from orwynn.base.error.MalfunctionError import MalfunctionError
 from orwynn.base.indication.default_api_indication import \
     default_api_indication
@@ -22,8 +23,8 @@ from orwynn.base.module.Module import Module
 from orwynn.base.worker.Worker import Worker
 from orwynn.app_rc.AppRC import AppRC
 from orwynn.app_rc.AppRCSearchError import AppRCSearchError
-from orwynn.boot._BootDataProxy import BootDataProxy
-from orwynn.boot.BootMode import BootMode
+from orwynn.boot._BootProxy import BootProxy
+from orwynn.boot._BootMode import BootMode
 from orwynn.boot.UnknownSourceError import UnknownSourceError
 from orwynn.boot.UnknownBootModeError import UnknownBootModeError
 from orwynn.di.DI import DI
@@ -36,6 +37,9 @@ from orwynn.util.file.NotDirError import NotDirError
 from orwynn.util.file.yml import load_yml
 from orwynn.util.web import CORS, HTTPMethod
 from orwynn.util.validation import validate, validate_each
+from orwynn.app._AppService import AppService
+from orwynn.app._ErrorHandler import ErrorHandler
+from orwynn.base.controller._Controller import Controller
 
 
 class Boot(Worker):
@@ -121,7 +125,7 @@ class Boot(Worker):
         )
 
         # Init proxies
-        BootDataProxy(
+        BootProxy(
             root_dir=self.__root_dir,
             mode=self.__mode,
             api_indication=self.__api_indication,
@@ -162,8 +166,7 @@ class Boot(Worker):
         if cors is not None:
             self.app.configure_cors(cors)
 
-        if ErrorHandlers != []:
-            self.__register_error_handlers(self.__di.error_handlers)
+        self.__register_error_handlers()
 
     @property
     def app(self) -> AppService:
@@ -178,10 +181,57 @@ class Boot(Worker):
         return self.__api_indication
 
     def __register_error_handlers(
-        self, error_handlers: list[ErrorHandler]
+        self
     ) -> None:
-        is_default_exception_handled: bool = False
+        error_handlers: list[ErrorHandler]
+        try:
+            error_handlers = self.__di.error_handlers
+        except MissingDIObjectError:
+            error_handlers = []
+
+        HandledBuiltinExceptions: list[type[Exception]] = []
         is_default_error_handled: bool = False
+
+        # Checking loop
+        for error_handler in error_handlers:
+            if error_handler.E is None:
+                raise MalfunctionError()
+            elif isinstance(error_handler.E, list):
+                for E in error_handler.E:
+                    if (
+                        issubclass(E, Exception)
+                        and not issubclass(E, Error)
+                    ):
+                        HandledBuiltinExceptions.append(E)
+                    elif E is Error:
+                        is_default_error_handled = True
+            else:
+                if (
+                    issubclass(error_handler.E, Exception)
+                    and not issubclass(error_handler.E, Error)
+                ):
+                    HandledBuiltinExceptions.append(error_handler.E)
+                elif error_handler.E is Error:
+                    is_default_error_handled = True
+
+        # For any unhandled builtin exception add default handler
+        RemainingExceptionSubclasses = Exception.__subclasses__()
+        for HandledException in HandledBuiltinExceptions:
+            try:
+                RemainingExceptionSubclasses.remove(HandledException)
+            except ValueError:
+                raise MalfunctionError()
+
+        if RemainingExceptionSubclasses:
+            default_exception_handler: DefaultExceptionHandler = \
+                DefaultExceptionHandler()
+            default_exception_handler.set_handled_exception(
+                RemainingExceptionSubclasses
+            )
+            self.app.add_error_handler(default_exception_handler)
+
+        if not is_default_error_handled:
+            self.app.add_error_handler(DefaultErrorHandler())
 
         for error_handler in error_handlers:
             self.app.add_error_handler(error_handler)

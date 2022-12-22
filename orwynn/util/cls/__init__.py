@@ -1,5 +1,5 @@
 from orwynn.util.types import Class
-from orwynn.base.error.Error import Error
+from orwynn.base.error._Error import Error
 
 
 class ClassNotFoundError(Error):
@@ -18,6 +18,10 @@ def find_subclass_by_name(name: str, BaseClass: Class) -> Class:
     Returns:
         Class found.
     """
+    # Maybe given class has correct name
+    if BaseClass.__name__ == name:
+        return BaseClass
+
     out: Class | None = __traverse_subclasses_checking_name(name, BaseClass)
 
     if out is None:

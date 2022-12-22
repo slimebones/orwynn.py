@@ -2,14 +2,14 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from orwynn.base.worker.Worker import Worker
 from orwynn.app_rc.AppRC import AppRC
-from orwynn.boot.BootMode import BootMode
+from orwynn.boot._BootMode import BootMode
 
 if TYPE_CHECKING:
     from orwynn.base.indication._Indication import Indication
     from orwynn.app import ErrorHandler
 
 
-class BootDataProxy(Worker):
+class BootProxy(Worker):
     """Proxy data to prevent DI importing Boot worker directly (and avoid
     circular imports by this) to build BootConfig.
     """

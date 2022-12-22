@@ -1,17 +1,16 @@
-from pymongo.errors import DuplicateKeyError
-
-from orwynn.base.test.HttpClient import HttpClient
-from orwynn.boot._Boot import Boot
+import orwynn
+from orwynn import boot
 from orwynn.base.mapping.CustomUseOfMappingReservedFieldError import \
     CustomUseOfMappingReservedFieldError
+from orwynn.base.test.HttpClient import HttpClient
 from orwynn.mongo.MongoMapping import MongoMapping
 from orwynn.util import validation
-from orwynn.util.web import Response
+from orwynn.util.web import TestResponse
 from tests.std.user import User
 
 
-def test_user_create(std_mongo_boot: Boot, std_http: HttpClient):
-    r: Response = std_http.post(
+def test_user_create(std_mongo_boot, std_http: HttpClient):
+    r: TestResponse = std_http.post(
         "/users",
         200,
         json={
@@ -29,21 +28,24 @@ def test_reserved_mapping_field(std_mongo_boot, std_http: HttpClient):
     validation.expect(M, CustomUseOfMappingReservedFieldError, mongo_filter=1)
 
 
-def test_same_id_creation(std_mongo_boot: Boot, std_http: HttpClient):
-    r: Response = std_http.post(
+def test_same_id_creation(std_mongo_boot, std_http: HttpClient):
+    r: TestResponse = std_http.post(
         "/users",
         200,
         json={
             "name": "Mark Watney"
         }
     )
-    validation.expect(
-        std_http.post,
-        DuplicateKeyError,
+    r2: TestResponse = std_http.post(
         "/users",
-        200,
+        400,
         json={
             "id": r.json()["value"]["id"],
             "name": "Mark Watney"
         }
+    )
+
+    error: orwynn.Error = validation.apply(
+        boot.BootProxy.ie().api_indication.recover(r.json()),
+        orwynn.Error
     )

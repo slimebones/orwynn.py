@@ -37,6 +37,6 @@ def test_recover_default(default_indication: Indication):
         }
     }
 
-    recovered_model = default_indication.recover_model(recovering_mp)
+    recovered_model = default_indication.recover(recovering_mp)
     assert type(recovered_model) is Text
     assert recovered_model.text == "hello"

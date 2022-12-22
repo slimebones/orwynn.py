@@ -3,7 +3,7 @@ from typing import TypeVar
 
 from orwynn import app
 from orwynn.base.config.Config import Config
-from orwynn.base.controller.Controller import Controller
+from orwynn.base.controller._Controller import Controller
 from orwynn.base.error.MalfunctionError import MalfunctionError
 from orwynn.base.middleware._Middleware import Middleware
 from orwynn.base.model.Model import Model
@@ -13,7 +13,7 @@ from orwynn.di.DIObject import DIObject
 from orwynn.di.finalized_di_container_error import FinalizedDIContainerError
 from orwynn.di.is_provider import is_provider
 from orwynn.di.missing_di_object_error import MissingDIObjectError
-from orwynn.SUBCLASSABLE_CLASSES import SUBCLASSABLE_CLASSES
+from orwynn.base._SUBCLASSABLES import SUBCLASSABLES
 from orwynn.util.validation import validate
 
 _InnerObj = TypeVar("_InnerObj")
@@ -159,7 +159,7 @@ class DIContainer:
         BaseCls: type[DIObject] | None = None
 
         # Find out object's base class
-        for C in SUBCLASSABLE_CLASSES:
+        for C in SUBCLASSABLES:
             if issubclass(ObjCls, C):
                 # Choose more specific base classes for subclasses of Model
                 if C is Model and issubclass(ObjCls, Config):

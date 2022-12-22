@@ -1,8 +1,8 @@
 import inspect
-from orwynn.base.controller.Controller import Controller
+from orwynn.base.controller._Controller import Controller
 from orwynn.base.middleware._Middleware import Middleware
 from orwynn.base.module.Module import Module
-from orwynn.boot._BootDataProxy import BootDataProxy
+from orwynn.boot._BootProxy import BootProxy
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.DIContainer import DIContainer
 from orwynn.di.provider import Provider
@@ -47,7 +47,7 @@ def init_other_acceptors(
                 )
             )
 
-        for EH in BootDataProxy.ie().ErrorHandlers:
+        for EH in BootProxy.ie().ErrorHandlers:
             container.add(
                 EH(**__collect_dependencies_for_acceptor(EH, container))
             )

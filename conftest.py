@@ -13,7 +13,7 @@ from orwynn.base.worker.Worker import Worker
 from orwynn.boot._Boot import Boot
 from orwynn.boot.boot_data_proxy_test import std_boot_data_proxy
 from orwynn.boot.boot_test import run_std_boot, std_boot, std_mongo_boot
-from orwynn.boot.BootMode import BootMode
+from orwynn.boot._BootMode import BootMode
 from orwynn.di.collecting.collect_modules_test import std_modules
 from orwynn.di.collecting.collect_provider_dependencies_test import \
     std_provider_dependencies_map

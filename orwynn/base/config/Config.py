@@ -2,7 +2,7 @@ import re
 from typing import Any, Self
 from orwynn.base.model.Model import Model
 from orwynn.app_rc.AppRC import AppRC
-from orwynn.boot._BootDataProxy import BootDataProxy
+from orwynn.boot._BootProxy import BootProxy
 from orwynn.util import validation
 
 
@@ -17,7 +17,7 @@ class Config(Model):
 
         validation.validate_dict(extra, (str, validation.Validator.SKIP))
 
-        app_rc: AppRC = BootDataProxy.ie().app_rc
+        app_rc: AppRC = BootProxy.ie().app_rc
         config_kwargs: dict[str, Any] = app_rc.get(
             cls._convert_name_to_rc_format(),
             {}

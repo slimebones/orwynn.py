@@ -76,7 +76,15 @@ class AppService(FrameworkService):
     def add_error_handler(self, error_handler: "ErrorHandler") -> None:
         if error_handler.E is None:
             raise TypeError(f"{error_handler} should define class attribute E")
-        self.__app.add_exception_handler(
-            error_handler.E,
-            error_handler.handle
-        )
+
+        if isinstance(error_handler.E, list):
+            for E in error_handler.E:
+                self.__app.add_exception_handler(
+                    E,
+                    error_handler.handle
+                )
+        else:
+            self.__app.add_exception_handler(
+                error_handler.E,
+                error_handler.handle
+            )

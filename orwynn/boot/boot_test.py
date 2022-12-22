@@ -2,8 +2,8 @@ import os
 from pytest import fixture
 from orwynn.app_rc.AppRC import AppRC
 from orwynn.base.database.DatabaseKind import DatabaseKind
-from orwynn.boot._BootDataProxy import BootDataProxy
-from orwynn.boot.BootMode import BootMode
+from orwynn.boot._BootProxy import BootProxy
+from orwynn.boot._BootMode import BootMode
 from orwynn.base.module.Module import Module
 
 from orwynn.boot._Boot import Boot
@@ -109,7 +109,7 @@ def test_nested_configs_prod(
     Boot(
         root_module=std_struct
     )
-    app_rc: AppRC = BootDataProxy.ie().app_rc
+    app_rc: AppRC = BootProxy.ie().app_rc
     text_config: TextConfig = DI.ie().find("TextConfig")
 
     assert app_rc["Text"]["words_amount"] == text_config.words_amount == 1
@@ -123,7 +123,7 @@ def test_nested_configs_dev(
     Boot(
         root_module=std_struct
     )
-    app_rc: AppRC = BootDataProxy.ie().app_rc
+    app_rc: AppRC = BootProxy.ie().app_rc
     text_config: TextConfig = DI.ie().find("TextConfig")
 
     assert app_rc["Text"]["words_amount"] == text_config.words_amount == 2
@@ -137,7 +137,7 @@ def test_nested_configs_test(
     Boot(
         root_module=std_struct
     )
-    app_rc: AppRC = BootDataProxy.ie().app_rc
+    app_rc: AppRC = BootProxy.ie().app_rc
     text_config: TextConfig = DI.ie().find("TextConfig")
 
     assert app_rc["Text"]["words_amount"] == text_config.words_amount == 3

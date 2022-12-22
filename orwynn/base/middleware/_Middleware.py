@@ -21,7 +21,9 @@ class Middleware:
             process all routes.
     """
     def __init__(self, covered_routes: list[str]) -> None:
-        validation.validate_each(covered_routes, str, expected_sequence_type=list)
+        validation.validate_each(
+            covered_routes, str, expected_sequence_type=list
+        )
         self.__covered_routes: list[str] = covered_routes
         self.__is_all_routes_allowed: bool = "*" in covered_routes
 
