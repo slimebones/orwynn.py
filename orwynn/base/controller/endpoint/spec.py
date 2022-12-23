@@ -1,7 +1,7 @@
 import functools
 from typing import Callable
 from orwynn.base.controller.endpoint.EndpointSpec import EndpointSpec
-from orwynn.proxy.SpecsProxy import SpecsProxy
+from orwynn.proxy.EndpointSpecsProxy import EndpointSpecsProxy
 
 
 def spec(
@@ -14,7 +14,7 @@ def spec(
         def inner(*args, **kwargs) -> Callable:
             return fn(*args, **kwargs)
 
-        SpecsProxy.ie().add(fn, spec)
+        EndpointSpecsProxy.ie().add(fn, spec)
 
         return inner
 

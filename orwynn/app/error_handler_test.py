@@ -1,5 +1,4 @@
-from orwynn.app import ErrorHandler
-
+from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.error.Error import Error
 from orwynn.base.module.Module import Module

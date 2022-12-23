@@ -1,5 +1,5 @@
 from orwynn.base.error.Error import Error
 
 
-class SpecNotFoundError(Error):
+class EndpointSpecNotFoundError(Error):
     pass

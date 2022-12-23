@@ -1,9 +1,9 @@
 import orwynn
-from orwynn import boot
 from orwynn.base.mapping.CustomUseOfMappingReservedFieldError import \
     CustomUseOfMappingReservedFieldError
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.mongo.MongoMapping import MongoMapping
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.util import validation
 from orwynn.util.web import TestResponse
 from tests.std.user import User
@@ -45,7 +45,8 @@ def test_same_id_creation(std_mongo_boot, std_http: HttpClient):
         }
     )
 
+    print(r.json())
     error: orwynn.Error = validation.apply(
-        boot.BootProxy.ie().api_indication.recover(r.json()),
+        BootProxy.ie().api_indication.recover(r.json()),
         orwynn.Error
     )

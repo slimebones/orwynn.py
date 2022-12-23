@@ -1,10 +1,10 @@
-from orwynn import app
+from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.util import validation
 from orwynn.util.web import JSONResponse, Request, Response
 from orwynn.proxy.BootProxy import BootProxy
 
 
-class DefaultExceptionHandler(app.ErrorHandler):
+class DefaultExceptionHandler(ErrorHandler):
     E = Exception.__subclasses__()
 
     def handle(self, request: Request, error: Exception) -> Response:

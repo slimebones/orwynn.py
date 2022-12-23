@@ -3,8 +3,10 @@ from typing import Any, Callable
 from orwynn.app.AlreadyRegisteredMethodError import \
     AlreadyRegisteredMethodError
 from orwynn.app.AppService import AppService
-from orwynn.base.controller import endpoint
+from orwynn.base.controller.endpoint.EndpointSpec import EndpointSpec
+from orwynn.base.controller.endpoint.EndpointSpecNotFoundError import EndpointSpecNotFoundError
 from orwynn.base.worker._Worker import Worker
+from orwynn.proxy.EndpointSpecsProxy import EndpointSpecsProxy
 from orwynn.util import validation
 from orwynn.util.web import HTTPMethod
 from orwynn.util.web.UnsupportedHTTPMethodError import \
@@ -61,16 +63,16 @@ class Router(Worker):
             except KeyError:
                 self.__methods_by_route[route] = {method}
 
-        spec: endpoint.Spec | None
+        spec: EndpointSpec | None
         try:
-            spec = endpoint.SpecsProxy.ie().find_spec(fn)
-        except endpoint.SpecNotFoundError:
+            spec = EndpointSpecsProxy.ie().find_spec(fn)
+        except EndpointSpecNotFoundError:
             spec = None
 
         app_fn(route, **self.__parse_endpoint_spec_kwargs(spec))(fn)
 
     def __parse_endpoint_spec_kwargs(
-        self, spec: endpoint.Spec | None
+        self, spec: EndpointSpec | None
     ) -> dict[str, Any]:
         result: dict[str, Any] = {}
 

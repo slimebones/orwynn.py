@@ -1,6 +1,7 @@
 from pytest import fixture
 from orwynn.base.controller.Controller import Controller
-from orwynn.base.controller import endpoint
+from orwynn.base.controller.endpoint.EndpointSpec import EndpointSpec
+from orwynn.base.controller.endpoint.spec import spec
 from orwynn.base.model.Model import Model
 from orwynn.base.module.Module import Module
 from orwynn.boot.Boot import Boot
@@ -20,7 +21,7 @@ def run_spec():
         ROUTE = "/"
         METHODS = ["get"]
 
-        @endpoint.spec(endpoint.Spec(
+        @spec(EndpointSpec(
             ResponseModel=Item, default_status_code=201,
             summary="Returns the best item!",
             tags=["best items"],
