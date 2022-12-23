@@ -1,9 +1,9 @@
 from orwynn import app
-from orwynn.app._AppService import AppService
+from orwynn.app.AppService import AppService
 from orwynn.base.controller._Controller import Controller
 from orwynn.base.middleware._Middleware import Middleware
 from orwynn.base.module.Module import Module
-from orwynn.base.worker.Worker import Worker
+from orwynn.base.worker._Worker import Worker
 from orwynn.di.collecting.collect_modules import collect_modules
 from orwynn.di.collecting.collect_provider_dependencies import \
     collect_provider_dependencies

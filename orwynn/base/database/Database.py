@@ -1,5 +1,5 @@
 from typing import Any
-from orwynn.base.worker.Worker import Worker
+from orwynn.base.worker._Worker import Worker
 
 
 class Database(Worker):

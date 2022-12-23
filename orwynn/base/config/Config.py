@@ -2,7 +2,7 @@ import re
 from typing import Any, Self
 from orwynn.base.model.Model import Model
 from orwynn.app_rc.AppRC import AppRC
-from orwynn.boot._BootProxy import BootProxy
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.util import validation
 
 

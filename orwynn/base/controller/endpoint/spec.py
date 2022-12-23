@@ -1,7 +1,7 @@
 import functools
 from typing import Callable
 from orwynn.base.controller.endpoint._Spec import Spec
-from orwynn.base.controller.endpoint._SpecsProxy import SpecsProxy
+from orwynn.proxy.SpecsProxy import SpecsProxy
 
 
 def spec(

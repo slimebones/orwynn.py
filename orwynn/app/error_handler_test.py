@@ -4,10 +4,10 @@ from orwynn.base.controller._Controller import Controller
 from orwynn.base.error._Error import Error
 from orwynn.base.module.Module import Module
 from orwynn.base.test.HttpClient import HttpClient
-from orwynn.boot._BootProxy import BootProxy
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.util import validation
 from orwynn.util.web import JSONResponse, Request, TestResponse
-from orwynn.boot._Boot import Boot
+from orwynn.boot.Boot import Boot
 
 
 def test_basic():

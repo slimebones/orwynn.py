@@ -7,12 +7,13 @@ from typing import TYPE_CHECKING
 import dotenv
 
 from orwynn.app_rc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
-from orwynn.base.controller.endpoint._SpecsProxy import SpecsProxy
+from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
+from orwynn.proxy.SpecsProxy import SpecsProxy
 from orwynn.base.database.DatabaseKind import DatabaseKind
 from orwynn.base.database.UnknownDatabaseKindError import \
     UnknownDatabaseKindError
-from orwynn.app._DefaultExceptionHandler import DefaultExceptionHandler
-from orwynn.app._DefaultErrorHandler import DefaultErrorHandler
+from orwynn.app.DefaultExceptionHandler import DefaultExceptionHandler
+from orwynn.app.DefaultErrorHandler import DefaultErrorHandler
 from orwynn.base.error._Error import Error
 from orwynn.base.error.MalfunctionError import MalfunctionError
 from orwynn.base.indication.default_api_indication import \
@@ -20,10 +21,10 @@ from orwynn.base.indication.default_api_indication import \
 from orwynn.base.indication._Indication import Indication
 from orwynn.base.middleware._Middleware import Middleware
 from orwynn.base.module.Module import Module
-from orwynn.base.worker.Worker import Worker
+from orwynn.base.worker._Worker import Worker
 from orwynn.app_rc.AppRC import AppRC
 from orwynn.app_rc.AppRCSearchError import AppRCSearchError
-from orwynn.boot._BootProxy import BootProxy
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.boot._BootMode import BootMode
 from orwynn.boot.UnknownSourceError import UnknownSourceError
 from orwynn.boot.UnknownBootModeError import UnknownBootModeError
@@ -37,8 +38,8 @@ from orwynn.util.file.NotDirError import NotDirError
 from orwynn.util.file.yml import load_yml
 from orwynn.util.web import CORS, HTTPMethod
 from orwynn.util.validation import validate, validate_each
-from orwynn.app._AppService import AppService
-from orwynn.app._ErrorHandler import ErrorHandler
+from orwynn.app.AppService import AppService
+from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.base.controller._Controller import Controller
 
 
@@ -133,6 +134,7 @@ class Boot(Worker):
             ErrorHandlers=ErrorHandlers
         )
         SpecsProxy()
+        APIIndicationOnlyProxy(api_indication)
 
         if databases is None:
             databases = []

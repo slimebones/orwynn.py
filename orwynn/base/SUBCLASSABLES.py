@@ -5,7 +5,7 @@ from orwynn.base.mapping.Mapping import Mapping
 from orwynn.base.middleware._Middleware import Middleware
 from orwynn.base.model.Model import Model
 from orwynn.base.service.Service import Service
-from orwynn.base._BaseSubclassable import BaseSubclassable
+from orwynn.base.BaseSubclassable import BaseSubclassable
 
 
 # Note that here listed the most basic classes. E.g. Config and ErrorHandler

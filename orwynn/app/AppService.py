@@ -13,7 +13,7 @@ from orwynn.util import validation
 from orwynn.util.web import CORS, HTTPMethod
 
 if TYPE_CHECKING:
-    from orwynn.app._ErrorHandler import ErrorHandler
+    from orwynn.app.ErrorHandler import ErrorHandler
 
 
 class AppService(FrameworkService):

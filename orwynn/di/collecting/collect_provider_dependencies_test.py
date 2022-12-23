@@ -4,7 +4,7 @@ from pytest import fixture
 
 from orwynn.base.config.Config import Config
 from orwynn.base.module.Module import Module
-from orwynn.boot._BootProxy import BootProxy
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.di.collecting.collect_modules import collect_modules
 from orwynn.di.collecting.collect_provider_dependencies import (
     ProviderDependenciesMap, collect_provider_dependencies)

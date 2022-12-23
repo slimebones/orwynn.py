@@ -4,7 +4,7 @@ from pytest import fixture
 from orwynn.base.indication.default_api_indication import \
     default_api_indication
 from orwynn.boot._BootMode import BootMode
-from orwynn.boot._BootProxy import BootProxy
+from orwynn.proxy.BootProxy import BootProxy
 
 
 @fixture

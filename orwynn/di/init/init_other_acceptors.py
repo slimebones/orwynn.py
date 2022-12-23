@@ -2,7 +2,7 @@ import inspect
 from orwynn.base.controller._Controller import Controller
 from orwynn.base.middleware._Middleware import Middleware
 from orwynn.base.module.Module import Module
-from orwynn.boot._BootProxy import BootProxy
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.DIContainer import DIContainer
 from orwynn.di.provider import Provider

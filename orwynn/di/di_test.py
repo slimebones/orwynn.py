@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from orwynn.boot._BootProxy import BootProxy
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.di.collecting.provider_dependencies_map import \
     ProviderDependenciesMap
 from orwynn.di.DIContainer import DIContainer

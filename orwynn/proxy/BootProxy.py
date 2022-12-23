@@ -1,12 +1,12 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
-from orwynn.base.worker.Worker import Worker
+from orwynn.base.worker._Worker import Worker
 from orwynn.app_rc.AppRC import AppRC
-from orwynn.boot._BootMode import BootMode
 
 if TYPE_CHECKING:
     from orwynn.base.indication._Indication import Indication
     from orwynn.app import ErrorHandler
+    from orwynn.boot._BootMode import BootMode
 
 
 class BootProxy(Worker):
@@ -17,7 +17,7 @@ class BootProxy(Worker):
         self,
         *,
         root_dir: Path,
-        mode: BootMode,
+        mode: "BootMode",
         api_indication: "Indication",
         app_rc: AppRC,
         ErrorHandlers: list[type["ErrorHandler"]]

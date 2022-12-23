@@ -1,10 +1,10 @@
 from typing import Any, Callable
 
-from orwynn.app._AlreadyRegisteredMethodError import \
+from orwynn.app.AlreadyRegisteredMethodError import \
     AlreadyRegisteredMethodError
-from orwynn.app._AppService import AppService
+from orwynn.app.AppService import AppService
 from orwynn.base.controller import endpoint
-from orwynn.base.worker.Worker import Worker
+from orwynn.base.worker._Worker import Worker
 from orwynn.util import validation
 from orwynn.util.web import HTTPMethod
 from orwynn.util.web.UnsupportedHTTPMethodError import \

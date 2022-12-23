@@ -1,9 +1,9 @@
-from typing import Callable, ItemsView
+from typing import TYPE_CHECKING, Callable, ItemsView
 
 from orwynn.base.controller.endpoint._Spec import Spec
 from orwynn.base.controller.endpoint._SpecNotFoundError import \
     SpecNotFoundError
-from orwynn.base.worker.Worker import Worker
+from orwynn.base.worker._Worker import Worker
 from orwynn.util import validation
 
 

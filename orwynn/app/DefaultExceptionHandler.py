@@ -1,7 +1,7 @@
 from orwynn import app
 from orwynn.util import validation
 from orwynn.util.web import JSONResponse, Request, Response
-from orwynn.boot._BootProxy import BootProxy
+from orwynn.proxy.BootProxy import BootProxy
 
 
 class DefaultExceptionHandler(app.ErrorHandler):

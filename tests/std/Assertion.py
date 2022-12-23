@@ -1,4 +1,4 @@
-from orwynn.app._AppService import AppService
+from orwynn.app.AppService import AppService
 from orwynn.base.module.Module import Module
 from orwynn.boot.BootConfig import BootConfig
 from orwynn.di.acceptor import Acceptor

@@ -2,8 +2,8 @@ from typing import Any, ItemsView, Type
 from orwynn.base.error._Error import Error
 
 from orwynn.base.indication._Indicator import Indicator
-from orwynn.base._SUBCLASSABLES import SUBCLASSABLES
-from orwynn.base._BaseSubclassable import BaseSubclassable
+from orwynn.base.SUBCLASSABLES import SUBCLASSABLES
+from orwynn.base.BaseSubclassable import BaseSubclassable
 from orwynn.base.indication.digesting_error import DigestingError
 from orwynn.base.indication._Digestable import Digestable
 from orwynn.base.indication.unsupported_indicator_error import \

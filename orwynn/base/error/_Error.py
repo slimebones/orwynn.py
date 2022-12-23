@@ -1,4 +1,4 @@
-from orwynn.boot._BootProxy import BootProxy
+from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
 
 
 class Error(Exception):
@@ -17,7 +17,7 @@ class Error(Exception):
         """Generates API-complying object using project's defined API
         indication.
         """
-        return BootProxy.ie().api_indication.digest(self)
+        return APIIndicationOnlyProxy.ie().api_indication.digest(self)
 
     def dict(self, *args, **kwargs) -> dict:
         return {"message": self.message}

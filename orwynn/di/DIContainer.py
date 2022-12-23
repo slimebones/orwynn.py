@@ -13,7 +13,7 @@ from orwynn.di.DIObject import DIObject
 from orwynn.di.finalized_di_container_error import FinalizedDIContainerError
 from orwynn.di.is_provider import is_provider
 from orwynn.di.missing_di_object_error import MissingDIObjectError
-from orwynn.base._SUBCLASSABLES import SUBCLASSABLES
+from orwynn.base.SUBCLASSABLES import SUBCLASSABLES
 from orwynn.util.validation import validate
 
 _InnerObj = TypeVar("_InnerObj")

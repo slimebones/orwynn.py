@@ -1,7 +1,7 @@
 from typing import Any, Self, TypeVar
 from pydantic import BaseModel
 
-from orwynn.boot._BootProxy import BootProxy
+from orwynn.proxy.BootProxy import BootProxy
 
 RecoverType = TypeVar("RecoverType", bound="Model")
 

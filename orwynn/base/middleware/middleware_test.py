@@ -3,7 +3,7 @@ from orwynn.base.controller._Controller import Controller
 from orwynn.base.middleware._Middleware import Middleware
 from orwynn.base.module.Module import Module
 from orwynn.base.test.HttpClient import HttpClient
-from orwynn.boot._Boot import Boot
+from orwynn.boot.Boot import Boot
 from orwynn.util.web import Request, Response, TestResponse
 
 
