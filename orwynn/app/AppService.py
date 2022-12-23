@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 class AppService(FrameworkService):
     def __init__(self) -> None:
-        self.__app: FastAPI = FastAPI()
+        self.__app: FastAPI = FastAPI(docs_url="/doc")
 
         self.HTTP_METHODS_TO_REGISTERING_FUNCTIONS: \
             dict[HTTPMethod, Callable] = {
@@ -36,6 +36,10 @@ class AppService(FrameworkService):
         self, scope: Scope, receive: Receive, send: Send
     ) -> None:
         await self.__app(scope, receive, send)
+
+    @property
+    def tmp(self) -> FastAPI:
+        return self.__app
 
     @property
     def test_client(self) -> TestClient:

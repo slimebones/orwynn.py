@@ -4,7 +4,7 @@ from orwynn.base.controller.endpoint.EndpointSpec import EndpointSpec
 from orwynn.proxy.EndpointSpecsProxy import EndpointSpecsProxy
 
 
-def spec(
+def endpoint(
     spec: EndpointSpec
 ) -> Callable:
     """Attaches spec for endpoint.

@@ -25,6 +25,13 @@ model_validator = __pydantic_validator
 ModelValidationError = __PydanticValidationError
 
 
+# See in the next series...
+# def optimize(...) -> Any:
+#   def inner(...) -> Any:
+#       ...
+#   return inner
+
+
 def validate(
     obj: Any,
     expected_type: ValidationExpectedType,

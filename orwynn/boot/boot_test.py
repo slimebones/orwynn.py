@@ -22,7 +22,7 @@ def std_boot(std_struct: Module) -> Boot:
 
 
 @fixture
-def run_std_boot(std_struct: Module):
+def run_std(std_struct: Module):
     Boot(std_struct)
 
 

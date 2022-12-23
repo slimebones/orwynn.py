@@ -16,6 +16,7 @@ from orwynn.base.service.Service import Service
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.base.test.Test import Test
 from orwynn.base.test.TestClient import TestClient
+from orwynn.base.controller.endpoint import endpoint, EndpointSpec
 
 # Crucial workers and services #
 from orwynn.boot.Boot import Boot
@@ -26,4 +27,4 @@ from orwynn.app.AppService import AppService
 from orwynn.proxy.BootProxy import BootProxy
 
 # Utils #
-from orwynn.util import validation, web
+from orwynn.util import validation, web, crypto

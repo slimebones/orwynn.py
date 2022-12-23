@@ -29,6 +29,7 @@ class EndpointSpecsProxy(Worker):
 
     def find_spec(self, fn: Callable) -> EndpointSpec:
         validation.validate(fn, Callable)
+
         try:
             return self.__spec_by_fn[fn]
         except KeyError:
