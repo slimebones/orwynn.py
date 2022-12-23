@@ -1,8 +1,8 @@
 """List of classes an user can subclass from."""
-from orwynn.base.controller._Controller import Controller
-from orwynn.base.error._Error import Error
+from orwynn.base.controller.Controller import Controller
+from orwynn.base.error.Error import Error
 from orwynn.base.mapping.Mapping import Mapping
-from orwynn.base.middleware._Middleware import Middleware
+from orwynn.base.middleware.Middleware import Middleware
 from orwynn.base.model.Model import Model
 from orwynn.base.service.Service import Service
 from orwynn.base.BaseSubclassable import BaseSubclassable

@@ -4,8 +4,8 @@ from orwynn.base.worker._Worker import Worker
 from orwynn.app_rc.AppRC import AppRC
 
 if TYPE_CHECKING:
-    from orwynn.base.indication._Indication import Indication
-    from orwynn.app import ErrorHandler
+    from orwynn.base.indication.Indication import Indication
+    from orwynn.app.ErrorHandler import ErrorHandler
     from orwynn.boot._BootMode import BootMode
 
 

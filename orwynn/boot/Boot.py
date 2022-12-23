@@ -14,12 +14,12 @@ from orwynn.base.database.UnknownDatabaseKindError import \
     UnknownDatabaseKindError
 from orwynn.app.DefaultExceptionHandler import DefaultExceptionHandler
 from orwynn.app.DefaultErrorHandler import DefaultErrorHandler
-from orwynn.base.error._Error import Error
+from orwynn.base.error.Error import Error
 from orwynn.base.error.MalfunctionError import MalfunctionError
 from orwynn.base.indication.default_api_indication import \
     default_api_indication
-from orwynn.base.indication._Indication import Indication
-from orwynn.base.middleware._Middleware import Middleware
+from orwynn.base.indication.Indication import Indication
+from orwynn.base.middleware.Middleware import Middleware
 from orwynn.base.module.Module import Module
 from orwynn.base.worker._Worker import Worker
 from orwynn.app_rc.AppRC import AppRC
@@ -40,7 +40,7 @@ from orwynn.util.web import CORS, HTTPMethod
 from orwynn.util.validation import validate, validate_each
 from orwynn.app.AppService import AppService
 from orwynn.app.ErrorHandler import ErrorHandler
-from orwynn.base.controller._Controller import Controller
+from orwynn.base.controller.Controller import Controller
 
 
 class Boot(Worker):

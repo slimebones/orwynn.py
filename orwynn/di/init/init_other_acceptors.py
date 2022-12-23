@@ -1,6 +1,6 @@
 import inspect
-from orwynn.base.controller._Controller import Controller
-from orwynn.base.middleware._Middleware import Middleware
+from orwynn.base.controller.Controller import Controller
+from orwynn.base.middleware.Middleware import Middleware
 from orwynn.base.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.di.acceptor import Acceptor

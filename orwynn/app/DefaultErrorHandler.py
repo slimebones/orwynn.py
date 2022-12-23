@@ -1,5 +1,5 @@
 from orwynn import app
-from orwynn.base.error._Error import Error
+from orwynn.base.error.Error import Error
 from orwynn.util.web import JSONResponse, Request, Response
 
 

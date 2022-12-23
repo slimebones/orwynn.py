@@ -1,8 +1,8 @@
-from orwynn.base.controller.endpoint._SpecResponses import SpecResponses
+from orwynn.base.controller.endpoint.EndpointSpecResponses import EndpointSpecResponses
 from orwynn.base.model.Model import Model
 
 
-class Spec(Model):
+class EndpointSpec(Model):
     """Specification of endpoint.
 
     Attributes:
@@ -37,4 +37,4 @@ class Spec(Model):
     tags: list[str] | None = None
     response_description: str = "Successful response"
     is_deprecated: bool = False
-    responses: SpecResponses | None = None
+    responses: EndpointSpecResponses | None = None

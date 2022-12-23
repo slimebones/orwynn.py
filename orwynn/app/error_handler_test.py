@@ -1,7 +1,7 @@
 from orwynn.app import ErrorHandler
 
-from orwynn.base.controller._Controller import Controller
-from orwynn.base.error._Error import Error
+from orwynn.base.controller.Controller import Controller
+from orwynn.base.error.Error import Error
 from orwynn.base.module.Module import Module
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.proxy.BootProxy import BootProxy

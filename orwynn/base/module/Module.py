@@ -2,8 +2,8 @@ import copy
 from types import NoneType
 
 from orwynn.app.EmptyRouteError import EmptyRouteError
-from orwynn.base.controller._Controller import Controller
-from orwynn.base.middleware._Middleware import Middleware as MiddlewareClass
+from orwynn.base.controller.Controller import Controller
+from orwynn.base.middleware.Middleware import Middleware as MiddlewareClass
 from orwynn.base.module.framework_service_module_reference_error import \
     FrameworkServiceModuleReferenceError
 from orwynn.base.service.framework_service import FrameworkService

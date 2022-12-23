@@ -1,6 +1,6 @@
 from orwynn.app.AlreadyRegisteredMethodError import \
     AlreadyRegisteredMethodError
-from orwynn.base.controller._Controller import Controller
+from orwynn.base.controller.Controller import Controller
 from orwynn.base.controller.DefinedTwiceControllerMethodError import \
     DefinedTwiceControllerMethodError
 from orwynn.base.controller.missing_controller_class_attribute_error import \

@@ -1,11 +1,11 @@
 import re
 from typing import TypeVar
+from orwynn.app.ErrorHandler import ErrorHandler
 
-from orwynn import app
 from orwynn.base.config.Config import Config
-from orwynn.base.controller._Controller import Controller
+from orwynn.base.controller.Controller import Controller
 from orwynn.base.error.MalfunctionError import MalfunctionError
-from orwynn.base.middleware._Middleware import Middleware
+from orwynn.base.middleware.Middleware import Middleware
 from orwynn.base.model.Model import Model
 from orwynn.di.di_object_already_initialized_in_container_error import \
     DIObjectAlreadyInitializedInContainerError
@@ -60,9 +60,9 @@ class DIContainer:
         return result
 
     @property
-    def error_handlers(self) -> list[app.ErrorHandler]:
-        result: list[app.ErrorHandler] = self._find_objects_for_class(
-            app.ErrorHandler
+    def error_handlers(self) -> list[ErrorHandler]:
+        result: list[ErrorHandler] = self._find_objects_for_class(
+            ErrorHandler
         )
         return result
 
@@ -164,8 +164,8 @@ class DIContainer:
                 # Choose more specific base classes for subclasses of Model
                 if C is Model and issubclass(ObjCls, Config):
                     BaseCls = Config
-                elif C is Model and issubclass(ObjCls, app.ErrorHandler):
-                    BaseCls = app.ErrorHandler
+                elif C is Model and issubclass(ObjCls, ErrorHandler):
+                    BaseCls = ErrorHandler
                 else:
                     BaseCls = C
 
