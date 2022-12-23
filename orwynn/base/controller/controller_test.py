@@ -3,6 +3,7 @@ from orwynn.app.AlreadyRegisteredMethodError import \
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.controller.DefinedTwiceControllerMethodError import \
     DefinedTwiceControllerMethodError
+from orwynn.base.controller.endpoint import Endpoint
 from orwynn.base.controller.missing_controller_class_attribute_error import \
     MissingControllerClassAttributeError
 from orwynn.base.module.Module import Module
@@ -24,7 +25,7 @@ def test_http_methods():
 
 def test_undefined_route():
     class C1(Controller):
-        METHODS = ["get"]
+        ENDPOINTS = [Endpoint(method="get")]
 
     m1 = Module(route="/", Controllers=[C1])
     expect(Boot, MissingControllerClassAttributeError, m1)
@@ -33,13 +34,13 @@ def test_undefined_route():
 def test_invalid_route():
     class C1(Controller):
         ROUTE = "i don't like rules"
-        METHODS = ["get"]
+        ENDPOINTS = [Endpoint(method="get")]
 
     m1 = Module(route="/", Controllers=[C1])
     expect(Boot, ReValidationError, m1)
 
 
-def test_undefined_methods():
+def test_undefined_endpoints():
     class C1(Controller):
         ROUTE = "/c1"
 
@@ -47,10 +48,10 @@ def test_undefined_methods():
     expect(Boot, MissingControllerClassAttributeError, m1)
 
 
-def test_empty_methods():
+def test_empty_endpoints():
     class C1(Controller):
         ROUTE = "/c1"
-        METHODS = []
+        ENDPOINTS = []
 
     m1 = Module(route="/", Controllers=[C1])
     expect(Boot, ValidationError, m1)
@@ -59,7 +60,7 @@ def test_empty_methods():
 def test_unsupported_method():
     class C1(Controller):
         ROUTE = "/c1"
-        METHODS = ["donuts"]
+        ENDPOINTS = [Endpoint(method="donuts")]
 
     m1 = Module(route="/", Controllers=[C1])
     expect(Boot, UnsupportedHTTPMethodError, m1)
@@ -68,7 +69,7 @@ def test_unsupported_method():
 def test_defined_twice_method():
     class C1(Controller):
         ROUTE = "/c1"
-        METHODS = ["get", "post", "get"]
+        ENDPOINTS = [Endpoint(method="get"), Endpoint(method="get")]
 
     m1 = Module(route="/", Controllers=[C1])
     expect(Boot, DefinedTwiceControllerMethodError, m1)
@@ -77,7 +78,10 @@ def test_defined_twice_method():
 def test_uppercase_methods():
     class C1(Controller):
         ROUTE = "/c1"
-        METHODS = ["GET", "POST"]
+        ENDPOINTS = [
+            Endpoint(method="GET"),
+            Endpoint(method="POST")
+        ]
 
     m1 = Module(route="/", Controllers=[C1])
     Boot(m1)
@@ -86,11 +90,11 @@ def test_uppercase_methods():
 def test_already_registered():
     class C1(Controller):
         ROUTE = "/hello"
-        METHODS = ["get"]
+        ENDPOINTS = [Endpoint(method="get")]
 
     class C2(Controller):
         ROUTE = "/hello"
-        METHODS = ["get"]
+        ENDPOINTS = [Endpoint(method="get")]
 
     m1 = Module(route="/", Controllers=[C1, C2])
     expect(Boot, AlreadyRegisteredMethodError, m1)

@@ -1,5 +1,6 @@
 from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.base.controller.Controller import Controller
+from orwynn.base.controller.endpoint import Endpoint
 from orwynn.base.error.Error import Error
 from orwynn.base.module.Module import Module
 from orwynn.base.test.HttpClient import HttpClient
@@ -12,7 +13,7 @@ from orwynn.boot.Boot import Boot
 def test_basic():
     class C1(Controller):
         ROUTE = "/"
-        METHODS = ["get"]
+        ENDPOINTS = [Endpoint(method="get")]
 
         def get(self):
             raise Error("whoops!")
@@ -42,7 +43,7 @@ def test_basic():
 def test_default_exception():
     class C1(Controller):
         ROUTE = "/"
-        METHODS = ["get"]
+        ENDPOINTS = [Endpoint(method="get")]
 
         def get(self):
             raise TypeError("whoops!")
@@ -65,7 +66,7 @@ def test_default_exception():
 def test_identical_error_handlers():
     class C1(Controller):
         ROUTE = "/"
-        METHODS = ["get"]
+        ENDPOINTS = [Endpoint(method="get")]
 
         def get(self):
             raise Error("whoops!")

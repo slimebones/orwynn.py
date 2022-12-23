@@ -1,2 +1,1 @@
-from .EndpointSpec import EndpointSpec
-from .endpoint import endpoint
+from .Endpoint import Endpoint

@@ -3,11 +3,11 @@ from typing import Any, Callable
 from orwynn.app.AlreadyRegisteredMethodError import \
     AlreadyRegisteredMethodError
 from orwynn.app.AppService import AppService
-from orwynn.base.controller.endpoint.EndpointSpec import EndpointSpec
-from orwynn.base.controller.endpoint.EndpointSpecNotFoundError import \
-    EndpointSpecNotFoundError
+from orwynn.base.controller.endpoint.Endpoint import Endpoint
+from orwynn.base.controller.endpoint.EndpointNotFoundError import \
+    EndpointNotFoundError
 from orwynn.base.worker._Worker import Worker
-from orwynn.proxy.EndpointSpecsProxy import EndpointSpecsProxy
+from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn.util import validation
 from orwynn.util.web import HTTPMethod
 from orwynn.util.web.UnsupportedHTTPMethodError import \
@@ -24,12 +24,13 @@ class Router(Worker):
         self.__app: AppService = app
         self.__methods_by_route: dict[str, set[HTTPMethod]] = {}
 
-    def register_route_fn(
+    def register_route(
         self, *, route: str, fn: Callable, method: HTTPMethod
     ) -> None:
         """Registers fn for route.
 
-        Attributes: route:
+        Attributes:
+            route:
                 Route to register to.
             fn:
                 Function to register.
@@ -58,22 +59,22 @@ class Router(Worker):
                 f"method {method} has been already registered for route"
                 f" \"{route}\""
             )
-        else:
-            try:
-                self.__methods_by_route[route].add(method)
-            except KeyError:
-                self.__methods_by_route[route] = {method}
 
-        spec: EndpointSpec | None
         try:
-            spec = EndpointSpecsProxy.ie().find_spec(fn)
-        except EndpointSpecNotFoundError:
+            self.__methods_by_route[route].add(method)
+        except KeyError:
+            self.__methods_by_route[route] = {method}
+
+        spec: Endpoint | None
+        try:
+            spec = EndpointProxy.ie().find_spec(fn)
+        except EndpointNotFoundError:
             spec = None
 
         app_fn(route, **self.__parse_endpoint_spec_kwargs(spec))(fn)
 
     def __parse_endpoint_spec_kwargs(
-        self, spec: EndpointSpec | None
+        self, spec: Endpoint | None
     ) -> dict[str, Any]:
         result: dict[str, Any] = {}
 
@@ -81,11 +82,12 @@ class Router(Worker):
             # TODO:
             #   Add response model to framework middleware to call indications.
             #   Others remain as it is.
+            result["response_model"] = spec.ResponseModel
             result["status_code"] = spec.default_status_code
             result["summary"] = spec.summary
             result["tags"] = spec.tags
             result["response_description"] = spec.response_description
-            result["is_deprecated"] = spec.is_deprecated
+            result["deprecated"] = spec.is_deprecated
             result["responses"] = spec.responses
 
         return result

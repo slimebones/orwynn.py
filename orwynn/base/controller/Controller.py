@@ -1,13 +1,15 @@
-from typing import Any, Callable
+from typing import Any, Callable, ClassVar
 
 from orwynn.base.controller.DefinedTwiceControllerMethodError import \
     DefinedTwiceControllerMethodError
+from orwynn.base.controller.endpoint import Endpoint
 from orwynn.base.controller.missing_controller_class_attribute_error import \
     MissingControllerClassAttributeError
+from orwynn.proxy.EndpointProxy import EndpointProxy
+from orwynn.util.validation import validate, validate_each, validate_route
 from orwynn.util.web import HTTPMethod
 from orwynn.util.web.UnsupportedHTTPMethodError import \
     UnsupportedHTTPMethodError
-from orwynn.util.validation import validate, validate_each, validate_route
 
 
 class Controller:
@@ -27,12 +29,11 @@ class Controller:
             controller will answer to. This attribute is required to be
             defined in subclasses explicitly or an error will be raised.
             It is allowed to be "/" to handle Module's root route requests.
-        METHODS:
-            List of supported HTTP methods to be registered. Methods here can
-            be either uppercase or lowercase, e.g. METHODS = ["get", "POST"]
+        ENDPOINTS:
+            List of endpoints enabled in this controller.
     """
-    ROUTE: str | None = None
-    METHODS: list[str] | None = None
+    ROUTE: ClassVar[str | None] = None
+    ENDPOINTS: ClassVar[list[Endpoint] | None] = None
 
     def __init__(self) -> None:
         self._methods: list[HTTPMethod] = []
@@ -47,32 +48,40 @@ class Controller:
             validate_route(self.ROUTE)
             self._route: str = self.ROUTE
 
-        if self.METHODS is None:
+        if self.ENDPOINTS is None:
             raise MissingControllerClassAttributeError(
-                "you should set class attribute METHODS for"
+                "you should set class attribute ENDPOINTS for"
                 f" controller {self.__class__}"
             )
         else:
             validate_each(
-                self.METHODS,
-                str,
+                self.ENDPOINTS,
+                Endpoint,
                 expected_sequence_type=list,
                 should_check_if_empty=True
             )
-            collected_methods: list[str] = []
-            for method in self.METHODS:
-                method = method.lower()
-                if method not in [e.value for e in HTTPMethod]:
+            collected_str_methods: list[str] = []
+            for endpoint in self.ENDPOINTS:
+                str_method = endpoint.method.lower()
+
+                if str_method not in [e.value for e in HTTPMethod]:
                     raise UnsupportedHTTPMethodError(
-                        f"method {method} is not supported"
+                        f"method {str_method} is not supported"
                     )
-                if method in collected_methods:
+                if str_method in collected_str_methods:
                     raise DefinedTwiceControllerMethodError(
-                        f"method {method} defined twice in controller"
-                        f" {self.__class__}"
+                        f"method {str_method} is defined twice for"
+                        f" controller {self.__class__}"
                     )
-                collected_methods.append(method)
-                self._methods.append(HTTPMethod(method))
+
+                collected_str_methods.append(str_method)
+                http_method: HTTPMethod = HTTPMethod(str_method)
+                self._methods.append(http_method)
+
+                EndpointProxy.ie().add(
+                    self.get_fn_by_http_method(http_method),
+                    endpoint
+                )
 
     @property
     def route(self) -> str:

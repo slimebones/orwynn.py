@@ -33,7 +33,7 @@ from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.proxy.EndpointSpecsProxy import EndpointSpecsProxy
+from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn.router.Router import Router
 from orwynn.util import web
 from orwynn.util.file.NotDirError import NotDirError
@@ -132,7 +132,7 @@ class Boot(Worker):
             app_rc=self.__app_rc,
             ErrorHandlers=ErrorHandlers
         )
-        EndpointSpecsProxy()
+        EndpointProxy()
         APIIndicationOnlyProxy(api_indication)
 
         if databases is None:
@@ -302,7 +302,7 @@ class Boot(Worker):
             if http_method in c.methods:
                 is_method_found = True
 
-                self.__router.register_route_fn(
+                self.__router.register_route(
                     # We can concatenate routes such way since routes
                     # are validated to not contain following slash
                     route=web.join_routes(m.route, c.route),

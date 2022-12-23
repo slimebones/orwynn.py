@@ -1,5 +1,6 @@
 from orwynn.app.AppService import AppService
 from orwynn.base.controller.Controller import Controller
+from orwynn.base.controller.endpoint import Endpoint
 from orwynn.base.module.Module import Module
 from orwynn.base.service.Service import Service
 
@@ -20,7 +21,7 @@ class FloatService(Service):
 
 class FloatController(Controller):
     ROUTE = "/"
-    METHODS = ["get"]
+    ENDPOINTS = [Endpoint(method="get")]
 
     def __init__(self, service: FloatService) -> None:
         super().__init__()

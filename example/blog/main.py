@@ -1,7 +1,7 @@
 from typing import Iterable
 
 from orwynn import (Boot, Controller, Model, Module, Service, crypto,
-                    validation, endpoint, EndpointSpec)
+                    validation, Endpoint)
 from orwynn.mongo import MongoMapping
 
 
@@ -39,38 +39,29 @@ class UserService(Service):
 
 class UsersIdController(Controller):
     ROUTE = "/users/{id}"
-    METHODS = ["get"]
+    ENDPOINTS = [Endpoint(method="get")]
 
     def __init__(self, sv: UserService) -> None:
         super().__init__()
         self.sv = sv
 
-    @endpoint(EndpointSpec(
-        ResponseModel=User
-    ))
     def get(self, id: str) -> User:
         return self.sv.find(id)
 
 
 class UsersController(Controller):
     ROUTE = "/users"
-    METHODS = ["get", "post"]
+    ENDPOINTS = [Endpoint(method="get"), Endpoint(method="post")]
 
     def __init__(self, sv: UserService) -> None:
         super().__init__()
         self.sv = sv
 
-    @endpoint(EndpointSpec(
-        ResponseModel=Users
-    ))
     def get(self) -> Users:
         return Users(
             users=list(self.sv.find_all())
         )
 
-    @endpoint(EndpointSpec(
-        ResponseModel=User
-    ))
     def post(self, user: UserCreate) -> User:
         return self.sv.create(user)
 

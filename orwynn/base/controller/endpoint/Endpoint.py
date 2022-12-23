@@ -1,12 +1,14 @@
-from orwynn.base.controller.endpoint.EndpointSpecResponses import \
-    EndpointSpecResponses
+from orwynn.base.controller.endpoint.EndpointResponses import \
+    EndpointResponses
 from orwynn.base.model.Model import Model
 
 
-class EndpointSpec(Model):
+class Endpoint(Model):
     """Specification of endpoint.
 
     Attributes:
+        method:
+            Method to be used for this endpoint.
         ResponseModel (optional):
             Model to expect to be returned from this endpoint. Final content
             returned will be api-indication based data created from this model.
@@ -32,10 +34,11 @@ class EndpointSpec(Model):
             Map with responses representations by their status codes. Defaults
             to built in framework basic responses.
     """
+    method: str
     ResponseModel: type[Model] | None = None
     default_status_code: int = 200
     summary: str | None = None
     tags: list[str] | None = None
     response_description: str = "Successful response"
     is_deprecated: bool = False
-    responses: EndpointSpecResponses | None = None
+    responses: EndpointResponses | None = None

@@ -38,10 +38,6 @@ class AppService(FrameworkService):
         await self.__app(scope, receive, send)
 
     @property
-    def tmp(self) -> FastAPI:
-        return self.__app
-
-    @property
     def test_client(self) -> TestClient:
         return TestClient(self.__app)
 

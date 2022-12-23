@@ -6,6 +6,7 @@ from pytest import fixture
 
 from orwynn.app.app_test import std_app
 from orwynn.app.AppService import AppService
+from orwynn.base.controller.endpoint.endpoint_test import run_endpoint
 from orwynn.base.module.Module import Module
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.base.test.TestClient import TestClient
@@ -32,7 +33,6 @@ def run_around_tests():
         # Mongo is not initialized, skip
         pass
     __discard_workers()
-
 
 def __discard_workers(W: type[Worker] = Worker):
     for NestedW in W.__subclasses__():

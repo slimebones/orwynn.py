@@ -1,4 +1,5 @@
 from orwynn.base.controller.Controller import Controller
+from orwynn.base.controller.endpoint import Endpoint
 from orwynn.base.module.Module import Module
 from orwynn.base.service.Service import Service
 from orwynn.mongo._MongoMapping import MongoMapping
@@ -22,7 +23,7 @@ class UserService(Service):
 
 class UsersController(Controller):
     ROUTE = "/"
-    METHODS = ["post"]
+    ENDPOINTS = [Endpoint(method="post")]
 
     def __init__(self, sv: UserService) -> None:
         super().__init__()
@@ -34,7 +35,7 @@ class UsersController(Controller):
 
 class UsersIdController(Controller):
     ROUTE = "/{id}"
-    METHODS = ["get"]
+    ENDPOINTS = [Endpoint(method="get")]
 
     def __init__(self, sv: UserService) -> None:
         super().__init__()
