@@ -3,7 +3,7 @@ from pytest import fixture
 from orwynn.app_rc.AppRC import AppRC
 from orwynn.base.database.DatabaseKind import DatabaseKind
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.boot._BootMode import BootMode
+from orwynn.boot.BootMode import BootMode
 from orwynn.base.module.Module import Module
 
 from orwynn.boot.Boot import Boot

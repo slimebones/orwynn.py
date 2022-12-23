@@ -3,10 +3,11 @@ from typing import Any, Callable, Self
 
 import loguru
 from orwynn.base.service.framework_service import FrameworkService
-from orwynn.boot._BootMode import BootMode
+from orwynn.boot.BootMode import BootMode
 from orwynn.app.AppService import AppService
 from orwynn.base.config.Config import Config
 from orwynn.base.model.Model import Model
+from orwynn.proxy.BootProxy import BootProxy
 
 
 class LogHandler(Model):
@@ -69,7 +70,7 @@ class LogService(FrameworkService):
         return self.__class__(self._config, self._app, extra=kwargs)
 
     def _add_handler(self, handler: LogHandler) -> None:
-        if self._app.mode == BootMode.PROD:
+        if BootProxy.ie().mode == BootMode.PROD:
             if handler.level is None:
                 handler.level = "INFO"
             if handler.serialize is None:

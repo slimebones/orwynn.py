@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Callable, ItemsView
+from typing import Callable, ItemsView
 
 from orwynn.base.controller.endpoint.EndpointSpec import EndpointSpec
 from orwynn.base.controller.endpoint.EndpointSpecNotFoundError import \

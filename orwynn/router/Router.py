@@ -4,7 +4,8 @@ from orwynn.app.AlreadyRegisteredMethodError import \
     AlreadyRegisteredMethodError
 from orwynn.app.AppService import AppService
 from orwynn.base.controller.endpoint.EndpointSpec import EndpointSpec
-from orwynn.base.controller.endpoint.EndpointSpecNotFoundError import EndpointSpecNotFoundError
+from orwynn.base.controller.endpoint.EndpointSpecNotFoundError import \
+    EndpointSpecNotFoundError
 from orwynn.base.worker._Worker import Worker
 from orwynn.proxy.EndpointSpecsProxy import EndpointSpecsProxy
 from orwynn.util import validation

@@ -1,4 +1,5 @@
-from orwynn.base.controller.endpoint.EndpointSpecResponses import EndpointSpecResponses
+from orwynn.base.controller.endpoint.EndpointSpecResponses import \
+    EndpointSpecResponses
 from orwynn.base.model.Model import Model
 
 

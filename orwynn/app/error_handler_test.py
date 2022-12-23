@@ -60,4 +60,3 @@ def test_default_exception():
     )
 
     assert recovered_exception.args[0] == "whoops!"
-

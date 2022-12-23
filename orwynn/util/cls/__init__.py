@@ -37,6 +37,9 @@ def __traverse_subclasses_checking_name(name: str, C: Class) -> Class | None:
         if SubClass.__name__ == name:
             return SubClass
         else:
-            __traverse_subclasses_checking_name(name, SubClass)
+            result: Class | None = \
+                __traverse_subclasses_checking_name(name, SubClass)
+            if result is not None:
+                return result
 
     return None

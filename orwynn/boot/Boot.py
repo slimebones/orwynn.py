@@ -2,7 +2,6 @@ import os
 import re
 from pathlib import Path
 from types import NoneType
-from typing import TYPE_CHECKING
 
 import dotenv
 
@@ -25,7 +24,7 @@ from orwynn.base.indication.Indication import Indication
 from orwynn.base.middleware.Middleware import Middleware
 from orwynn.base.module.Module import Module
 from orwynn.base.worker._Worker import Worker
-from orwynn.boot._BootMode import BootMode
+from orwynn.boot.BootMode import BootMode
 from orwynn.boot.UnknownBootModeError import UnknownBootModeError
 from orwynn.boot.UnknownSourceError import UnknownSourceError
 from orwynn.di.DI import DI
@@ -194,7 +193,22 @@ class Boot(Worker):
         HandledBuiltinExceptions: list[type[Exception]] = []
         is_default_error_handled: bool = False
 
-        # Checking loop
+        HandledBuiltinExceptions, is_default_error_handled = \
+            self.__collect_error_handlers_data(error_handlers)
+
+        self.__add_error_handlers(
+            error_handlers=error_handlers,
+            HandledBuiltinExceptions=HandledBuiltinExceptions,
+            is_default_error_handled=is_default_error_handled
+        )
+
+    def __collect_error_handlers_data(
+        self,
+        error_handlers: list[ErrorHandler]
+    ) -> tuple[list[type[Exception]], bool]:
+        HandledBuiltinExceptions: list[type[Exception]] = []
+        is_default_error_handled: bool = False
+
         for error_handler in error_handlers:
             if error_handler.E is None:
                 raise MalfunctionError()
@@ -216,6 +230,15 @@ class Boot(Worker):
                 elif error_handler.E is Error:
                     is_default_error_handled = True
 
+        return HandledBuiltinExceptions, is_default_error_handled
+
+    def __add_error_handlers(
+        self,
+        *,
+        error_handlers: list[ErrorHandler],
+        HandledBuiltinExceptions: list[type[Exception]],
+        is_default_error_handled: bool
+    ) -> None:
         # For any unhandled builtin exception add default handler
         RemainingExceptionSubclasses = Exception.__subclasses__()
         for HandledException in HandledBuiltinExceptions:

@@ -1,4 +1,4 @@
-from orwynn.boot._BootMode import BootMode
+from orwynn.boot.BootMode import BootMode
 
 
 # Items with higher index will update resources from lower ones.

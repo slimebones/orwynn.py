@@ -52,6 +52,7 @@ def init_other_acceptors(
                 EH(**__collect_dependencies_for_acceptor(EH, container))
             )
 
+
 def __collect_dependencies_for_acceptor(
     A: type[Acceptor],
     container: DIContainer

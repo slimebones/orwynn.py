@@ -4,8 +4,10 @@ from bson import ObjectId
 from pymongo.cursor import Cursor
 
 from orwynn.base.mapping.Mapping import Mapping, if_linked
+from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
 from orwynn.base.mapping.CustomUseOfMappingReservedFieldError import \
     CustomUseOfMappingReservedFieldError
+from orwynn.mongo.DuplicateKeyError import DuplicateKeyError
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoDocument import MongoDocument
 from orwynn.util import fmt, validation
@@ -64,11 +66,14 @@ class MongoMapping(Mapping):
     ) -> Self:
         data: dict = self._adjust_id_to_mongo(self.dict())
 
-        return self._parse_document(
-            self._mongo().create(
-                self._collection(), data
+        try:
+            return self._parse_document(
+                self._mongo().create(
+                    self._collection(), data
+                )
             )
-        )
+        except PymongoDuplicateKeyError as error:
+            raise DuplicateKeyError(original_error=error)
 
     @if_linked
     def remove(
