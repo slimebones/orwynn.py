@@ -1,4 +1,8 @@
+import typing
+from inspect import isclass
 from typing import Any, Callable
+
+import pydantic
 
 from orwynn.app.AlreadyRegisteredMethodError import \
     AlreadyRegisteredMethodError
@@ -6,7 +10,10 @@ from orwynn.app.AppService import AppService
 from orwynn.base.controller.endpoint.Endpoint import Endpoint
 from orwynn.base.controller.endpoint.EndpointNotFoundError import \
     EndpointNotFoundError
+from orwynn.base.indication.Indication import Indication
+from orwynn.base.model.Model import Model
 from orwynn.base.worker._Worker import Worker
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn.util import validation
 from orwynn.util.web import HTTPMethod
@@ -71,23 +78,83 @@ class Router(Worker):
         except EndpointNotFoundError:
             spec = None
 
-        app_fn(route, **self.__parse_endpoint_spec_kwargs(spec))(fn)
+        app_fn(
+            route,
+            **self.__parse_endpoint_spec_kwargs(
+                spec,
+                fn
+            )
+        )(fn)
 
     def __parse_endpoint_spec_kwargs(
-        self, spec: Endpoint | None
+        self, spec: Endpoint | None, fn: Callable
     ) -> dict[str, Any]:
         result: dict[str, Any] = {}
+        fn_return_typehint: Any | None = typing.get_type_hints(fn).get(
+            "return", None
+        )
 
         if spec is not None:
             # TODO:
             #   Add response model to framework middleware to call indications.
             #   Others remain as it is.
-            result["response_model"] = spec.ResponseModel
+            if fn_return_typehint is None:
+                result["response_model"] = spec.ResponseModel
+            elif not isclass(fn_return_typehint):
+                raise TypeError(
+                    "fn return typehint should be a Class or None,"
+                    f" {fn_return_typehint} got instead"
+                )
+            elif (
+                not issubclass(fn_return_typehint, Model)
+                and not issubclass(fn_return_typehint, dict)
+                and fn_return_typehint is not typing.Any
+            ):
+                raise TypeError(
+                    f"endpoint shouldn't return {fn_return_typehint}"
+                )
+            elif (
+                spec.ResponseModel is None
+                and issubclass(fn_return_typehint, Model)
+            ):
+                result["response_model"] = fn_return_typehint
+            else:
+                result["response_model"] = spec.ResponseModel
+
             result["status_code"] = spec.default_status_code
             result["summary"] = spec.summary
             result["tags"] = spec.tags
             result["response_description"] = spec.response_description
             result["deprecated"] = spec.is_deprecated
-            result["responses"] = spec.responses
+
+            api_indication: Indication = BootProxy.ie().api_indication
+            final_responses: dict[int, dict[str, Any]] = {}
+            if spec.responses:
+                for response in spec.responses:
+                    final_responses[response.status_code] = {
+                        "model": api_indication.gen_schema(response.Entity)
+                    }
+            # Add default pydantic validation error
+            if (
+                414 not in final_responses
+                and self.__is_pydantic_validation_error_can_occur_in_fn(fn)
+            ):
+                final_responses[414] = {
+                    "model": api_indication.gen_schema(
+                        pydantic.ValidationError
+                    )
+                }
+            result["responses"] = final_responses
 
         return result
+
+    def __is_pydantic_validation_error_can_occur_in_fn(
+        self,
+        fn: Callable
+    ) -> bool:
+        for typehint in typing.get_type_hints(fn).values():
+            # Check pydantic base models in case user used them instead of
+            # orwynn.Model
+            if issubclass(typehint, pydantic.BaseModel):
+                return True
+        return False

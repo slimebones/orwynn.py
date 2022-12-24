@@ -1,5 +1,4 @@
-from orwynn.base.controller.endpoint.EndpointResponses import \
-    EndpointResponses
+from orwynn.base.controller.endpoint.EndpointResponse import EndpointResponse
 from orwynn.base.model.Model import Model
 
 
@@ -41,4 +40,4 @@ class Endpoint(Model):
     tags: list[str] | None = None
     response_description: str = "Successful response"
     is_deprecated: bool = False
-    responses: EndpointResponses | None = None
+    responses: list[EndpointResponse] | None = None

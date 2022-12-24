@@ -29,6 +29,7 @@ from orwynn.boot.UnknownBootModeError import UnknownBootModeError
 from orwynn.boot.UnknownSourceError import UnknownSourceError
 from orwynn.di.DI import DI
 from orwynn.di.missing_di_object_error import MissingDIObjectError
+from orwynn.log.LogService import LogService
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
@@ -142,6 +143,7 @@ class Boot(Worker):
 
         # Add crucial builtin objects
         root_module.add_provider_or_skip(AppService)
+        root_module.add_provider_or_skip(LogService)
 
         self.__enable_databases(databases)
         self.__di: DI = DI(root_module)
@@ -249,14 +251,16 @@ class Boot(Worker):
 
         if RemainingExceptionSubclasses:
             default_exception_handler: DefaultExceptionHandler = \
-                DefaultExceptionHandler()
+                DefaultExceptionHandler(log=self.__di.find("LogService"))
             default_exception_handler.set_handled_exception(
                 RemainingExceptionSubclasses
             )
             self.app.add_error_handler(default_exception_handler)
 
         if not is_default_error_handled:
-            self.app.add_error_handler(DefaultErrorHandler())
+            self.app.add_error_handler(DefaultErrorHandler(
+                log=self.__di.find("LogService")
+            ))
 
         for error_handler in error_handlers:
             self.app.add_error_handler(error_handler)

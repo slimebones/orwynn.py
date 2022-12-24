@@ -45,8 +45,9 @@ class UsersIdController(Controller):
         super().__init__()
         self.sv = sv
 
-    def get(self, id: str) -> User:
-        return self.sv.find(id)
+    def get(self, id: str) -> dict:
+        # return self.sv.find(id)
+        return {"hello": 1}
 
 
 class UsersController(Controller):

@@ -19,3 +19,5 @@ def test_openapi(run_endpoint):
         path["responses"]["201"]["description"] == "Best response description"
     assert \
         path["responses"]["201"]["description"] == "Best response description"
+
+    assert False

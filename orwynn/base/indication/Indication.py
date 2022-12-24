@@ -1,11 +1,13 @@
-from typing import ItemsView
+from curses.ascii import isalpha
+from typing import Any, ItemsView
 from orwynn.base.error.Error import Error
+from orwynn.base.error.ErrorSchemaValue import ErrorSchemaValue
 
 from orwynn.base.indication.Indicator import Indicator
 from orwynn.base.SUBCLASSABLES import SUBCLASSABLES
 from orwynn.base.BaseSubclassable import BaseSubclassable
 from orwynn.base.indication.digesting_error import DigestingError
-from orwynn.base.indication.Digestable import Digestable
+from orwynn.base.indication.Indicatable import Indicatable, IndicatableClass
 from orwynn.base.indication.unsupported_indicator_error import \
     UnsupportedIndicatorError
 from orwynn.base.model.Model import Model
@@ -34,13 +36,65 @@ class Indication:
 
     For the list of applicable types see Indicator.
     """
-    def __init__(self, mp: dict[str, Indicator]) -> None:
+    def __init__(
+        self,
+        indication_name: str,
+        mp: dict[str, Indicator]
+    ) -> None:
+        validate(indication_name, str)
+        if " " in indication_name:
+            raise ValueError(
+                f"indication name shouldn't contain whitespaces"
+            )
+        elif not indication_name.isalpha():
+            raise ValueError(
+                f"only full alpha indication names are accepted"
+            )
+        # FIXME: Temporarily indicators should be placed at highest dictionary
+        #   level
         validate_dict(
-            mp, (str, Validator.SKIP)
-        )  # bad support for Enums at validation, so skip
-        self.__mp: dict[str, Indicator] = mp
+            mp, (str, Indicator)
+        )
 
+        self.__indication_name: str = indication_name
+        self.__mp: dict[str, Indicator] = mp
         self.__locations: _Locations = self.__find_locations()
+
+    def gen_schema(
+        self,
+        Entity: IndicatableClass
+    ) -> type[Model]:
+        schema_kwargs: dict[str, Any] = {}
+
+        for k, v in self.items:
+            final_field: str | type
+            match v:
+                case Indicator.TYPE:
+                    final_field = Entity.__name__
+                case Indicator.VALUE:
+                    if (
+                        issubclass(Entity, Exception)
+                        and not issubclass(Entity, Error)
+                    ):
+                        final_field = str
+                    elif isinstance(Entity, Error):
+                        final_field = ErrorSchemaValue
+                    elif isinstance(Entity, Model):
+                        final_field = Entity
+                    else:
+                        raise TypeError(
+                            f"unsupported obj type {type(Entity)}"
+                        )
+                case _:
+                    raise UnsupportedIndicatorError(
+                        f"indicator {v} is not supported"
+                    )
+            schema_kwargs[k] = final_field
+
+        return Model.create_dynamic(
+            name=self.__indication_name + "IndicationData",
+            **schema_kwargs
+        )
 
     def __find_locations(self) -> _Locations:
         return {
@@ -52,7 +106,7 @@ class Indication:
     def items(self) -> ItemsView[str, Indicator]:
         return self.__mp.items()
 
-    def digest(self, obj: Digestable) -> dict:
+    def digest(self, obj: Indicatable) -> dict:
         """Traverses object to create dictionary based on defined
         indicators.
 
@@ -84,7 +138,7 @@ class Indication:
                         and not isinstance(obj, Error)
                     ):
                         final_field = {
-                            "message": "; ".join(obj.args)
+                            "message": "; ".join([str(x) for x in obj.args])
                         }
                     elif isinstance(obj, Error) or isinstance(obj, Model):
                         final_field = obj.dict()

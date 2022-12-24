@@ -1,5 +1,6 @@
 from pytest import fixture
 from orwynn.base.controller.Controller import Controller
+from orwynn.base.controller.endpoint import EndpointResponse
 from orwynn.base.controller.endpoint.Endpoint import Endpoint
 from orwynn.base.model.Model import Model
 from orwynn.base.module.Module import Module
@@ -27,12 +28,12 @@ def run_endpoint():
                 tags=["best-item", "buy-now"],
                 response_description="Best response description",
                 is_deprecated=True,
-                responses={
-                    400: {
-                        "model": Response400,
-                        "description": "Bad things happened!"
-                    }
-                }
+                responses=[
+                    EndpointResponse(
+                        status_code=400,
+                        Entity=ValueError
+                    )
+                ]
             )
         ]
 

@@ -37,15 +37,13 @@ class LogService(FrameworkService):
         self,
         config: LogConfig,
         app: AppService,
-        extra: dict[str, Any] | None = None
+        **kwargs: dict[str, Any]
     ) -> None:
         super().__init__()
         self._config = config
         self._app = app
 
-        if not extra:
-            extra = {}
-        self._extra: dict[str, Any] = extra
+        self._extra: dict[str, Any] = kwargs
 
         for handler in config.handlers:
             self._add_handler(handler)
@@ -64,10 +62,13 @@ class LogService(FrameworkService):
         Attributes:
             kwargs:
                 Extra parameters to apply.
+
+        Returns:
+            New log.
         """
         # No need to validate kwargs keys since Python does it for us if input
         # is like `bind(**{1: "str1", 2: "str2"})` - TypeError is raised
-        return self.__class__(self._config, self._app, extra=kwargs)
+        return self.__class__(self._config, self._app, **kwargs)
 
     def _add_handler(self, handler: LogHandler) -> None:
         if BootProxy.ie().mode == BootMode.PROD:
