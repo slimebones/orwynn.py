@@ -1,4 +1,4 @@
-from orwynn.app.AppService import AppService
+from orwynn.app.App import App
 from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.middleware.Middleware import Middleware
@@ -57,13 +57,13 @@ class DI(Worker):
         init_other_acceptors(self.__container, self.modules)
 
     @property
-    def app_service(self) -> AppService:
-        app = self.find("AppService")
-        if isinstance(app, AppService):
+    def app_service(self) -> App:
+        app = self.find("App")
+        if isinstance(app, App):
             return app
         else:
             raise TypeError(
-                f"{app} is not an AppService instance"
+                f"{app} is not an App instance"
             )
 
     @property

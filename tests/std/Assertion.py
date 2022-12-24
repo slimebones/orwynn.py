@@ -1,8 +1,10 @@
-from orwynn.app.AppService import AppService
+from orwynn.app.App import App
 from orwynn.base.module.Module import Module
 from orwynn.boot.BootConfig import BootConfig
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.provider import Provider
+from orwynn.log.Log import Log
+from orwynn.log.LogConfig import LogConfig
 from tests.std.float import FloatController, FloatService, float_module
 from tests.std.number import NumberController, NumberService, number_module
 from tests.std.root_module import root_module
@@ -21,7 +23,9 @@ class Assertion:
     # Order of these providers doesn't matter here since set() should be
     # performed on tests
     COLLECTED_PROVIDERS: list[type[Provider]] = [
-        AppService,
+        App,
+        Log,
+        LogConfig,
         TextService,
         TextConfig,
         NumberService,

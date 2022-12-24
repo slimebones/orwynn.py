@@ -1,6 +1,6 @@
 import lorem
 
-from orwynn.app.AppService import AppService
+from orwynn.app.App import App
 from orwynn.base.config.Config import Config
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.controller.endpoint import Endpoint
@@ -35,7 +35,7 @@ class TextService(Service):
     def __init__(
         self,
         config: TextConfig,
-        app: AppService,
+        app: App,
         number_service: NumberService,
         float_service: FloatService,
         boot_config: BootConfig

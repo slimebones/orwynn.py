@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from orwynn.app.ErrorHandler import ErrorHandler
 
 
-class AppService(FrameworkService):
+class App(FrameworkService):
     def __init__(self) -> None:
         self.__app: FastAPI = FastAPI(docs_url="/doc")
 

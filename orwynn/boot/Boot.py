@@ -5,7 +5,7 @@ from types import NoneType
 
 import dotenv
 
-from orwynn.app.AppService import AppService
+from orwynn.app.App import App
 from orwynn.app.DefaultErrorHandler import DefaultErrorHandler
 from orwynn.app.DefaultExceptionHandler import DefaultExceptionHandler
 from orwynn.app.ErrorHandler import ErrorHandler
@@ -29,7 +29,7 @@ from orwynn.boot.UnknownBootModeError import UnknownBootModeError
 from orwynn.boot.UnknownSourceError import UnknownSourceError
 from orwynn.di.DI import DI
 from orwynn.di.missing_di_object_error import MissingDIObjectError
-from orwynn.log.LogService import LogService
+from orwynn.log.Log import LogConfig, Log
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
@@ -79,17 +79,17 @@ class Boot(Worker):
     Usage:
     ```py
     # main.py
-    from orwynn import Boot, AppModeEnum, AppService, MongoService
+    from orwynn import Boot, App
 
     # Import root module from your location
     from .myproject.root_module import root_module
 
-    app = Boot(
-        mode=AppModeEnum.DEV,
+    app: App = Boot(
         root_module=root_module
     ).app
     ```
     """
+    @Log.catch(reraise=True)
     def __init__(
         self,
         root_module: Module,
@@ -142,8 +142,9 @@ class Boot(Worker):
             validate_each(databases, DatabaseKind, expected_sequence_type=list)
 
         # Add crucial builtin objects
-        root_module.add_provider_or_skip(AppService)
-        root_module.add_provider_or_skip(LogService)
+        root_module.add_provider_or_skip(App)
+        root_module.add_provider_or_skip(LogConfig)
+        root_module.add_provider_or_skip(Log)
 
         self.__enable_databases(databases)
         self.__di: DI = DI(root_module)
@@ -172,7 +173,7 @@ class Boot(Worker):
         self.__register_error_handlers()
 
     @property
-    def app(self) -> AppService:
+    def app(self) -> App:
         return self.__di.app_service
 
     @property
@@ -251,7 +252,7 @@ class Boot(Worker):
 
         if RemainingExceptionSubclasses:
             default_exception_handler: DefaultExceptionHandler = \
-                DefaultExceptionHandler(log=self.__di.find("LogService"))
+                DefaultExceptionHandler(log=self.__di.find("Log"))
             default_exception_handler.set_handled_exception(
                 RemainingExceptionSubclasses
             )
@@ -259,7 +260,7 @@ class Boot(Worker):
 
         if not is_default_error_handled:
             self.app.add_error_handler(DefaultErrorHandler(
-                log=self.__di.find("LogService")
+                log=self.__di.find("Log")
             ))
 
         for error_handler in error_handlers:

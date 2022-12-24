@@ -14,7 +14,7 @@ def default_indication() -> Indication:
         "type": Indicator.TYPE,
         "value": Indicator.VALUE
     }
-    return Indication("Default", mp)
+    return Indication(mp)
 
 
 def test_digest_default(default_indication: Indication):

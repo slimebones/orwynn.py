@@ -1,60 +1,48 @@
-from datetime import time, timedelta
-from typing import Any, Callable, Self
+from typing import Any, ClassVar, Self
 
 import loguru
+
+from orwynn.app.App import App
 from orwynn.base.service.framework_service import FrameworkService
 from orwynn.boot.BootMode import BootMode
-from orwynn.app.AppService import AppService
-from orwynn.base.config.Config import Config
-from orwynn.base.model.Model import Model
+from orwynn.log.LogConfig import LogConfig
+from orwynn.log.LogHandler import LogHandler
 from orwynn.proxy.BootProxy import BootProxy
 
 
-class LogHandler(Model):
-    # Only mattering for default values fields are added from loguru, others
-    # are moved to kwargs dict. Fields set to None by default will be assigned
-    # at runtime depending on some conditions
-    sink: Any
-    level: int | str | None = None
-    format: str | Callable = \
-        "{time:%Y.%m.%d at %H:%M:%S.%f%z}" \
-        + " | {level} | {extra} >> {message}"
-    # Callable here used instead of loguru.RotationFunction since it has
-    # problems with importing
-    rotation: str | int | time | timedelta | Callable = "10 MB"
-    serialize: bool | None = None
-    kwargs: dict
-
-
-class LogConfig(Config):
-    handlers: list[LogHandler]
-
-
-class LogService(FrameworkService):
+class Log(FrameworkService):
     """Logs messages across the app.
     """
+    _logger: ClassVar = loguru.logger
+
     def __init__(
         self,
         config: LogConfig,
-        app: AppService,
+        app: App,
         **kwargs: dict[str, Any]
     ) -> None:
         super().__init__()
+
         self._config = config
         self._app = app
 
         self._extra: dict[str, Any] = kwargs
 
-        for handler in config.handlers:
-            self._add_handler(handler)
+        if config.handlers:
+            for handler in config.handlers:
+                self._add_handler(handler)
 
-        self._logger = loguru.logger
         self.debug = self._logger.bind(**self._extra).debug
         self.info = self._logger.bind(**self._extra).info
         self.warning = self._logger.bind(**self._extra).warning
         self.error = self._logger.bind(**self._extra).error
         self.critical = self._logger.bind(**self._extra).critical
         self.ctx = self._logger.bind(**self._extra).contextualize
+        self._catch = self._logger.catch
+
+    @classmethod
+    def catch(cls, *args, **kwargs):
+        return cls._logger.catch(*args, **kwargs)
 
     def bind(self, **kwargs) -> Self:
         """Creates a new log service with extra parameters.

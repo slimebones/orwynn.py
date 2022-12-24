@@ -5,7 +5,7 @@ import os
 from pytest import fixture
 
 from orwynn.app.app_test import std_app
-from orwynn.app.AppService import AppService
+from orwynn.app.App import App
 from orwynn.base.controller.endpoint.endpoint_test import run_endpoint
 from orwynn.base.module.Module import Module
 from orwynn.base.test.HttpClient import HttpClient

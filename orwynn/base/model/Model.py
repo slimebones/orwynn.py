@@ -31,6 +31,3 @@ class Model(pydantic.BaseModel):
     @classmethod
     def create_dynamic(cls, name: str, **kwargs) -> type[Self]:
         return pydantic.create_model(name, __base__=cls, **kwargs)
-
-    class Config:
-        underscore_attrs_are_private = True

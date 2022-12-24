@@ -1,4 +1,3 @@
-from curses.ascii import isalpha
 from typing import Any, ItemsView
 from orwynn.base.error.Error import Error
 from orwynn.base.error.ErrorSchemaValue import ErrorSchemaValue
@@ -38,25 +37,14 @@ class Indication:
     """
     def __init__(
         self,
-        indication_name: str,
         mp: dict[str, Indicator]
     ) -> None:
-        validate(indication_name, str)
-        if " " in indication_name:
-            raise ValueError(
-                f"indication name shouldn't contain whitespaces"
-            )
-        elif not indication_name.isalpha():
-            raise ValueError(
-                f"only full alpha indication names are accepted"
-            )
         # FIXME: Temporarily indicators should be placed at highest dictionary
         #   level
         validate_dict(
             mp, (str, Indicator)
         )
 
-        self.__indication_name: str = indication_name
         self.__mp: dict[str, Indicator] = mp
         self.__locations: _Locations = self.__find_locations()
 
@@ -92,7 +80,7 @@ class Indication:
             schema_kwargs[k] = final_field
 
         return Model.create_dynamic(
-            name=self.__indication_name + "IndicationData",
+            name=Entity.__name__ + "IndicationSchema",
             **schema_kwargs
         )
 

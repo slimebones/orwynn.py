@@ -118,19 +118,13 @@ def _check_availability(
     # be possible.
 
     # Resolve cases with frameworks services right away:
-    #   - P1 cannot be a FrameworkService, since nothing is available for it in
-    #       user's scope
     #   - If P2 is a FrameworkService, we can be assured that it is available
     #       for any other requested Provider, except for cases, if requested
-    #       Provider is a Config.
-    #
-    # In all other cases raise a ProviderNotAvailableError.
+    #       Provider is a Config. -> Why?
     is_error: bool
     res: Module | None = None
 
-    if issubclass(P1, FrameworkService):
-        is_error = True
-    elif issubclass(P2, FrameworkService) and not issubclass(P1, Config):
+    if issubclass(P2, FrameworkService) and not issubclass(P1, Config):
         is_error = False
     elif P1_module is not None:
         found_module = _search_matching_provider(

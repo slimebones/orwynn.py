@@ -6,7 +6,7 @@ import pydantic
 
 from orwynn.app.AlreadyRegisteredMethodError import \
     AlreadyRegisteredMethodError
-from orwynn.app.AppService import AppService
+from orwynn.app.App import App
 from orwynn.base.controller.endpoint.Endpoint import Endpoint
 from orwynn.base.controller.endpoint.EndpointNotFoundError import \
     EndpointNotFoundError
@@ -25,10 +25,10 @@ class Router(Worker):
     """Responsible of ways how request and responses flows through the app."""
     def __init__(
         self,
-        app: AppService
+        app: App
     ) -> None:
         super().__init__()
-        self.__app: AppService = app
+        self.__app: App = app
         self.__methods_by_route: dict[str, set[HTTPMethod]] = {}
 
     def register_route(

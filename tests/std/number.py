@@ -1,4 +1,4 @@
-from orwynn.app.AppService import AppService
+from orwynn.app.App import App
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.controller.endpoint import Endpoint
 from orwynn.base.module.Module import Module
@@ -7,7 +7,7 @@ from tests.std.float import FloatService, float_module
 
 
 class NumberService(Service):
-    def __init__(self, app: AppService, float_service: FloatService) -> None:
+    def __init__(self, app: App, float_service: FloatService) -> None:
         super().__init__()
         self._app = app
         self._float_service = float_service
