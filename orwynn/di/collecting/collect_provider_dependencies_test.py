@@ -44,5 +44,4 @@ def test_std(std_struct: Module):
             if inspect_parameter.name in ["args", "kwargs"]:
                 continue
             assertion_dependencies.append(inspect_parameter.annotation)
-        print(P, dependencies, assertion_dependencies)
         assert dependencies == assertion_dependencies

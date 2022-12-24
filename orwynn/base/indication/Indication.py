@@ -47,27 +47,29 @@ class Indication:
 
         self.__mp: dict[str, Indicator] = mp
         self.__locations: _Locations = self.__find_locations()
+        self.__created_schema_by_name: dict[str, type[Model]] = {}
 
     def gen_schema(
         self,
         Entity: IndicatableClass
     ) -> type[Model]:
+        schema_name: str = Entity.__name__ + "IndicationSchema"
         schema_kwargs: dict[str, Any] = {}
 
         for k, v in self.items:
             final_field: str | type
             match v:
                 case Indicator.TYPE:
-                    final_field = Entity.__name__
+                    final_field = str
                 case Indicator.VALUE:
                     if (
                         issubclass(Entity, Exception)
                         and not issubclass(Entity, Error)
                     ):
-                        final_field = str
-                    elif isinstance(Entity, Error):
                         final_field = ErrorSchemaValue
-                    elif isinstance(Entity, Model):
+                    elif issubclass(Entity, Error):
+                        final_field = ErrorSchemaValue
+                    elif issubclass(Entity, Model):
                         final_field = Entity
                     else:
                         raise TypeError(
@@ -77,12 +79,17 @@ class Indication:
                     raise UnsupportedIndicatorError(
                         f"indicator {v} is not supported"
                     )
-            schema_kwargs[k] = final_field
+            schema_kwargs[k] = (final_field, ...)
 
-        return Model.create_dynamic(
-            name=Entity.__name__ + "IndicationSchema",
-            **schema_kwargs
-        )
+        try:
+            return self.__created_schema_by_name[schema_name]
+        except KeyError:
+            CreatedModel: type[Model] = Model.create_dynamic(
+                schema_name,
+                **schema_kwargs
+            )
+            self.__created_schema_by_name[schema_name] = CreatedModel
+            return CreatedModel
 
     def __find_locations(self) -> _Locations:
         return {

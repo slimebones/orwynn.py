@@ -1,4 +1,4 @@
-from typing import Any, Callable, ClassVar
+from typing import Callable, ClassVar
 
 from orwynn.base.controller.DefinedTwiceControllerMethodError import \
     DefinedTwiceControllerMethodError
@@ -112,37 +112,37 @@ class Controller:
 
         return fn
 
-    def get(self, *args, **kwargs) -> Any:
+    def get(self, *args, **kwargs) -> dict:
         raise NotImplementedError(
             "the method GET is not implemented for controller"
             f" {self.__class__}"
         )
 
-    def post(self, *args, **kwargs) -> Any:
+    def post(self, *args, **kwargs) -> dict:
         raise NotImplementedError(
             "the method POST is not implemented for controller"
             f" {self.__class__}"
         )
 
-    def put(self, *args, **kwargs) -> Any:
+    def put(self, *args, **kwargs) -> dict:
         raise NotImplementedError(
             "the method PUT is not implemented for controller"
             f" {self.__class__}"
         )
 
-    def delete(self, *args, **kwargs) -> Any:
+    def delete(self, *args, **kwargs) -> dict:
         raise NotImplementedError(
             "the method DELETE is not implemented for controller"
             f" {self.__class__}"
         )
 
-    def patch(self, *args, **kwargs) -> Any:
+    def patch(self, *args, **kwargs) -> dict:
         raise NotImplementedError(
             "the method PATCH is not implemented for controller"
             f" {self.__class__}"
         )
 
-    def options(self, *args, **kwargs) -> Any:
+    def options(self, *args, **kwargs) -> dict:
         raise NotImplementedError(
             "the method OPTIONS is not implemented for controller"
             f" {self.__class__}"

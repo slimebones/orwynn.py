@@ -1,7 +1,7 @@
 from typing import Iterable
 
-from orwynn import (Boot, Controller, Model, Module, Service, crypto,
-                    validation, Endpoint)
+from orwynn import (Boot, Controller, Endpoint, Model, Module, Service, crypto,
+                    validation)
 from orwynn.mongo import MongoMapping
 
 
@@ -45,9 +45,8 @@ class UsersIdController(Controller):
         super().__init__()
         self.sv = sv
 
-    def get(self, id: str) -> dict:
-        # return self.sv.find(id)
-        return {"hello": 1}
+    def get(self, id: str) -> User:
+        return self.sv.find(id)
 
 
 class UsersController(Controller):

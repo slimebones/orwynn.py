@@ -4,6 +4,7 @@ from pytest import fixture
 
 from orwynn.base.indication.Indication import Indication
 from orwynn.base.indication.Indicator import Indicator
+from orwynn.base.model.Model import Model
 from orwynn.util.parsing.parsing import parse_key
 from tests.std.text import Text
 
@@ -40,3 +41,16 @@ def test_recover_default(default_indication: Indication):
     recovered_model = default_indication.recover(recovering_mp)
     assert type(recovered_model) is Text
     assert recovered_model.text == "hello"
+
+
+def test_multiple_schemas():
+    class Item(Model):
+        name: str
+        price: float
+
+    i: Indication = Indication({
+        "type": Indicator.TYPE,
+        "value": Indicator.VALUE
+    })
+
+    assert i.gen_schema(Item) == i.gen_schema(Item)

@@ -15,6 +15,10 @@ from orwynn.base.model.Model import Model
 from orwynn.base.worker._Worker import Worker
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.proxy.EndpointProxy import EndpointProxy
+from orwynn.router.UnmatchedEndpointEntityError import \
+    UnmatchedEndpointEntityError
+from orwynn.router.WrongHandlerReturnTypeError import \
+    WrongHandlerReturnTypeError
 from orwynn.util import validation
 from orwynn.util.web import HTTPMethod
 from orwynn.util.web.UnsupportedHTTPMethodError import \
@@ -95,54 +99,59 @@ class Router(Worker):
         )
 
         if spec is not None:
-            # TODO:
-            #   Add response model to framework middleware to call indications.
-            #   Others remain as it is.
-            if fn_return_typehint is None:
-                result["response_model"] = spec.ResponseModel
-            elif not isclass(fn_return_typehint):
-                raise TypeError(
-                    "fn return typehint should be a Class or None,"
-                    f" {fn_return_typehint} got instead"
-                )
-            elif (
-                not issubclass(fn_return_typehint, Model)
-                and not issubclass(fn_return_typehint, dict)
-                and fn_return_typehint is not typing.Any
-            ):
-                raise TypeError(
-                    f"endpoint shouldn't return {fn_return_typehint}"
-                )
-            elif (
-                spec.ResponseModel is None
-                and issubclass(fn_return_typehint, Model)
-            ):
-                result["response_model"] = fn_return_typehint
-            else:
-                result["response_model"] = spec.ResponseModel
-
             result["status_code"] = spec.default_status_code
             result["summary"] = spec.summary
             result["tags"] = spec.tags
-            result["response_description"] = spec.response_description
             result["deprecated"] = spec.is_deprecated
 
             api_indication: Indication = BootProxy.ie().api_indication
             final_responses: dict[int, dict[str, Any]] = {}
             if spec.responses:
                 for response in spec.responses:
+                    if response.status_code == spec.default_status_code:
+                        if response.Entity is not fn_return_typehint:
+                            raise UnmatchedEndpointEntityError(
+                                f"route handler {fn} response endpoint entity"
+                                f" {response.Entity} is not match returned"
+                                f" typehint {fn_return_typehint}"
+                            )
+
                     final_responses[response.status_code] = {
-                        "model": api_indication.gen_schema(response.Entity)
+                        "model": api_indication.gen_schema(response.Entity),
+                        "description": response.description
                     }
+
+            # Add default status code response AKA response_model
+            if spec.default_status_code not in final_responses:
+                if (
+                    fn_return_typehint is not None
+                    and isclass(fn_return_typehint)
+                    and issubclass(fn_return_typehint, Model)
+                ):
+                    final_responses[spec.default_status_code] = {
+                        "model": api_indication.gen_schema(
+                            fn_return_typehint
+                        )
+                    }
+                elif fn_return_typehint not in [dict, None]:
+                    raise WrongHandlerReturnTypeError(
+                        f"route handler {fn} should have either Model, dict"
+                        f" or None return type, got {fn_return_typehint}"
+                        " instead"
+                    )
+                else:
+                    result["response_model"] = None
+
             # Add default pydantic validation error
             if (
-                414 not in final_responses
+                422 not in final_responses
                 and self.__is_pydantic_validation_error_can_occur_in_fn(fn)
             ):
-                final_responses[414] = {
+                final_responses[422] = {
                     "model": api_indication.gen_schema(
                         pydantic.ValidationError
-                    )
+                    ),
+                    "description": "Validation Error"
                 }
             result["responses"] = final_responses
 
