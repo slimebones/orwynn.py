@@ -1,4 +1,5 @@
 from pytest import fixture
+
 from orwynn.base.database.DatabaseKind import DatabaseKind
 from orwynn.base.module import Module
 from orwynn.boot.Boot import Boot
@@ -13,6 +14,7 @@ class Item(Document):
 @fixture
 def run_mongo_boot():
     Boot(Module(route="/"), databases=[DatabaseKind.MONGO])
+
 
 @fixture
 def create_item(run_mongo_boot) -> Item:
@@ -48,7 +50,7 @@ def test_remove(create_two_items: list[Item]):
 
 
 def test_update(create_item: Item):
-   assert create_item.update(set={"name": "beer"}).name == "beer"
+    assert create_item.update(set={"name": "beer"}).name == "beer"
 
 
 def test_update_two_fields(create_item: Item):
