@@ -8,6 +8,7 @@ import dotenv
 from orwynn.app.App import App
 from orwynn.app.DefaultErrorHandler import DefaultErrorHandler
 from orwynn.app.DefaultExceptionHandler import DefaultExceptionHandler
+from orwynn.app.DefaultHTTPExceptionHandler import DefaultHTTPExceptionHandler
 from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.app_rc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from orwynn.app_rc.AppRC import AppRC
@@ -17,6 +18,8 @@ from orwynn.base.database.DatabaseKind import DatabaseKind
 from orwynn.base.database.UnknownDatabaseKindError import \
     UnknownDatabaseKindError
 from orwynn.base.error.Error import Error
+from orwynn.base.error.get_non_framework_exceptions import \
+    get_non_framework_exceptions
 from orwynn.base.error.MalfunctionError import MalfunctionError
 from orwynn.base.indication.default_api_indication import \
     default_api_indication
@@ -29,7 +32,7 @@ from orwynn.boot.UnknownBootModeError import UnknownBootModeError
 from orwynn.boot.UnknownSourceError import UnknownSourceError
 from orwynn.di.DI import DI
 from orwynn.di.missing_di_object_error import MissingDIObjectError
-from orwynn.log.Log import LogConfig, Log
+from orwynn.log.Log import Log, LogConfig
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
@@ -40,7 +43,7 @@ from orwynn.util import web
 from orwynn.util.file.NotDirError import NotDirError
 from orwynn.util.file.yml import load_yml
 from orwynn.util.validation import validate, validate_each
-from orwynn.util.web import CORS, HTTPMethod
+from orwynn.util.web import CORS, HTTPException, HTTPMethod
 
 
 class Boot(Worker):
@@ -242,17 +245,24 @@ class Boot(Worker):
         HandledBuiltinExceptions: list[type[Exception]],
         is_default_error_handled: bool
     ) -> None:
+        log_provider: Log = self.__di.find("Log")
+
         # For any unhandled builtin exception add default handler
-        RemainingExceptionSubclasses = Exception.__subclasses__()
+        RemainingExceptionSubclasses = get_non_framework_exceptions()
         for HandledException in HandledBuiltinExceptions:
             try:
                 RemainingExceptionSubclasses.remove(HandledException)
             except ValueError:
                 raise MalfunctionError()
 
+        if HTTPException in RemainingExceptionSubclasses:
+            RemainingExceptionSubclasses.remove(HTTPException)
+            self.app.add_error_handler(DefaultHTTPExceptionHandler(
+                log=log_provider
+            ))
         if RemainingExceptionSubclasses:
             default_exception_handler: DefaultExceptionHandler = \
-                DefaultExceptionHandler(log=self.__di.find("Log"))
+                DefaultExceptionHandler(log=log_provider)
             default_exception_handler.set_handled_exception(
                 RemainingExceptionSubclasses
             )
@@ -260,7 +270,7 @@ class Boot(Worker):
 
         if not is_default_error_handled:
             self.app.add_error_handler(DefaultErrorHandler(
-                log=self.__di.find("Log")
+                log=log_provider
             ))
 
         for error_handler in error_handlers:

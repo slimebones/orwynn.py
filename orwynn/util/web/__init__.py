@@ -4,6 +4,7 @@ import httpx
 from fastapi import Request as FastAPIRequest
 from fastapi import Response as FastAPIResponse
 from fastapi.responses import JSONResponse as FastAPI_JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from orwynn.util.web.CORS import CORS
 
 from orwynn.util import validation
@@ -22,6 +23,7 @@ Response = FastAPIResponse
 JSONResponse = FastAPI_JSONResponse
 Request = FastAPIRequest
 TestResponse = httpx.Response
+HTTPException = StarletteHTTPException
 
 
 def join_routes(*routes: str) -> str:

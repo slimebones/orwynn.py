@@ -9,7 +9,9 @@ from orwynn.base.controller.missing_controller_class_attribute_error import \
 from orwynn.base.module.Module import Module
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.boot.Boot import Boot
-from orwynn.util.web import HTTPMethod
+from orwynn.proxy.BootProxy import BootProxy
+from orwynn.util import validation
+from orwynn.util.web import HTTPException, HTTPMethod
 from orwynn.util.web.UnsupportedHTTPMethodError import \
     UnsupportedHTTPMethodError
 from orwynn.util.validation import expect, validate_re
@@ -104,3 +106,26 @@ def test_std_routes(std_boot: Boot, std_http: HttpClient):
     json: dict = std_http.get_jsonify("/text")
     text: Text = Text.recover(json)
     validate_re(text.text, DEFAULT_ID + r"\: .+")
+
+
+def test_default_404():
+    class C1(Controller):
+        ROUTE = "/hello"
+        ENDPOINTS = [Endpoint(method="get")]
+
+    data: dict = Boot(
+        Module(route="/", Controllers=[C1])
+    ).app.http_client.get_jsonify(
+        "/pizza",
+        404
+    )
+
+    recovered_exception: HTTPException = validation.apply(
+        BootProxy.ie().api_indication.recover(
+            data
+        ),
+        HTTPException
+    )
+
+    assert recovered_exception.status_code == 404
+    assert recovered_exception.detail == "Not Found"

@@ -38,7 +38,7 @@ def run_endpoint():
                     ),
                     EndpointResponse(
                         status_code=400,
-                        Entity=ValueError
+                        Entity=Response400
                     )
                 ]
             )
