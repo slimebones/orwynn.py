@@ -2,7 +2,7 @@ from typing import Iterable
 
 from orwynn import (Boot, Controller, Endpoint, Model, Module, Service, crypto,
                     validation)
-from orwynn.mongo import MongoMapping
+from orwynn.mongo import Document
 
 
 class UserCreate(Model):
@@ -10,7 +10,7 @@ class UserCreate(Model):
     ppassword: str
 
 
-class User(MongoMapping):
+class User(Document):
     username: str
     hpassword: str
 

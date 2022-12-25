@@ -9,11 +9,11 @@ from orwynn.base.mapping.CustomUseOfMappingReservedFieldError import \
     CustomUseOfMappingReservedFieldError
 from orwynn.mongo.DuplicateKeyError import DuplicateKeyError
 from orwynn.mongo.Mongo import Mongo
-from orwynn.mongo.MongoDocument import MongoDocument
+from orwynn.mongo.MongoEntity import MongoEntity
 from orwynn.util import fmt, validation
 
 
-class MongoMapping(Mapping):
+class Document(Mapping):
     """Mapping to work with MongoDB.
 
     Itself is some model representing MongoDB document and also has some class
@@ -122,6 +122,6 @@ class MongoMapping(Mapping):
         return data
 
     @classmethod
-    def _parse_document(cls, document: MongoDocument) -> Self:
+    def _parse_document(cls, document: MongoEntity) -> Self:
         """Parses document to specified Model."""
         return cls.parse_obj(cls._adjust_id_from_mongo(document))

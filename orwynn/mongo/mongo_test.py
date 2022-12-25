@@ -2,7 +2,7 @@ from orwynn.base.mapping.CustomUseOfMappingReservedFieldError import \
     CustomUseOfMappingReservedFieldError
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.mongo.DuplicateKeyError import DuplicateKeyError
-from orwynn.mongo._MongoMapping import MongoMapping
+from orwynn.mongo.Document import Document
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.util import validation
 from orwynn.util.web import TestResponse
@@ -22,7 +22,7 @@ def test_user_create(std_mongo_boot, std_http: HttpClient):
 
 
 def test_reserved_mapping_field(std_mongo_boot, std_http: HttpClient):
-    class M(MongoMapping):
+    class M(Document):
         mongo_filter: int
 
     validation.expect(M, CustomUseOfMappingReservedFieldError, mongo_filter=1)

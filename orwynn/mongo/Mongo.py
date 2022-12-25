@@ -7,7 +7,7 @@ from orwynn.base.database.DatabaseEntityNotFoundError import \
     DatabaseEntityNotFoundError
 from orwynn.base.database.Database import Database
 from orwynn.mongo.MongoConfig import MongoConfig
-from orwynn.mongo.MongoDocument import MongoDocument
+from orwynn.mongo.MongoEntity import MongoEntity
 from orwynn.util import validation
 
 
@@ -36,7 +36,7 @@ class Mongo(Database):
 
     def find_one(
         self, collection: str, query: dict, *args, **kwargs
-    ) -> MongoDocument:
+    ) -> MongoEntity:
         validation.validate(collection, str)
         validation.validate(query, dict)
 
@@ -50,8 +50,8 @@ class Mongo(Database):
         return validation.apply(result, dict)
 
     def create(
-        self, collection: str, document: MongoDocument, *args, **kwargs
-    ) -> MongoDocument:
+        self, collection: str, document: MongoEntity, *args, **kwargs
+    ) -> MongoEntity:
         """Creates a document returning it after creation."""
         validation.validate(collection, str)
         validation.validate(document, dict)
@@ -64,7 +64,7 @@ class Mongo(Database):
 
     def remove(
         self, collection: str, query: dict, *args, **kwargs
-    ) -> MongoDocument:
+    ) -> MongoEntity:
         """Deletes a document matching query and returns it."""
         validation.validate(collection, str)
         validation.validate(query, dict)
@@ -79,7 +79,7 @@ class Mongo(Database):
                 collection=collection, query=query
             )
 
-        return validation.apply(removed_document, MongoDocument)
+        return validation.apply(removed_document, MongoEntity)
 
     def update(
         self,
@@ -88,7 +88,7 @@ class Mongo(Database):
         operation: dict,
         *args,
         **kwargs
-    ) -> MongoDocument:
+    ) -> MongoEntity:
         """Updates a document matching query and returns updated version."""
         validation.validate(collection, str)
         validation.validate(query, dict)
@@ -104,4 +104,4 @@ class Mongo(Database):
                 collection=collection, query=query
             )
 
-        return validation.apply(updated_document, MongoDocument)
+        return validation.apply(updated_document, MongoEntity)

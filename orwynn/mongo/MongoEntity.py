@@ -1,0 +1,1 @@
+MongoEntity = dict

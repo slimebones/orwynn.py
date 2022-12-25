@@ -1,1 +1,1 @@
-from ._MongoMapping import MongoMapping
+from .Document import Document
