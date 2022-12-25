@@ -167,4 +167,30 @@ def test_default_request_validation_error():
 
 
 def test_default_method_not_allowed():
-    pass
+    class Item(Model):
+        name: str
+        price: float
+
+    class C1(Controller):
+        ROUTE = "/"
+        ENDPOINTS = [Endpoint(method="get")]
+
+        def get(self) -> dict:
+            return {}
+
+    data: dict = Boot(
+        Module(route="/", Controllers=[C1])
+    ).app.http_client.post_jsonify(
+        "/",
+        405
+    )
+
+    recovered_exception: HTTPException = validation.apply(
+        BootProxy.ie().api_indication.recover(
+            data
+        ),
+        HTTPException
+    )
+
+    assert recovered_exception.status_code == 405
+    assert recovered_exception.detail == "Method Not Allowed"
