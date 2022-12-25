@@ -6,17 +6,19 @@ from orwynn.base.controller.DefinedTwiceControllerMethodError import \
 from orwynn.base.controller.endpoint import Endpoint
 from orwynn.base.controller.missing_controller_class_attribute_error import \
     MissingControllerClassAttributeError
+from orwynn.base.model.Model import Model
 from orwynn.base.module.Module import Module
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.boot.Boot import Boot
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.util import validation
+from orwynn.util.validation import (RequestValidationException, expect,
+                                    validate_re)
+from orwynn.util.validation.re_validation_error import ReValidationError
+from orwynn.util.validation.validation_error import ValidationError
 from orwynn.util.web import HTTPException, HTTPMethod
 from orwynn.util.web.UnsupportedHTTPMethodError import \
     UnsupportedHTTPMethodError
-from orwynn.util.validation import expect, validate_re
-from orwynn.util.validation.re_validation_error import ReValidationError
-from orwynn.util.validation.validation_error import ValidationError
 from tests.std.text import DEFAULT_ID, Text
 
 
@@ -110,7 +112,7 @@ def test_std_routes(std_boot: Boot, std_http: HttpClient):
 
 def test_default_404():
     class C1(Controller):
-        ROUTE = "/hello"
+        ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 
     data: dict = Boot(
@@ -129,3 +131,40 @@ def test_default_404():
 
     assert recovered_exception.status_code == 404
     assert recovered_exception.detail == "Not Found"
+
+
+def test_default_request_validation_error():
+    class Item(Model):
+        name: str
+        price: float
+
+    class C1(Controller):
+        ROUTE = "/"
+        ENDPOINTS = [Endpoint(method="post")]
+
+        def post(self, item: Item) -> dict:
+            return {}
+
+    data: dict = Boot(
+        Module(route="/", Controllers=[C1])
+    ).app.http_client.post_jsonify(
+        "/",
+        422,
+        json={
+            "name": 222,
+            "price": "hello"
+        }
+    )
+
+    # Temporarily content of this exception is not checked since is not filled
+    # back in indication
+    validation.apply(
+        BootProxy.ie().api_indication.recover(
+            data
+        ),
+        RequestValidationException
+    )
+
+
+def test_default_method_not_allowed():
+    pass

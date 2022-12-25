@@ -9,6 +9,8 @@ from orwynn.app.App import App
 from orwynn.app.DefaultErrorHandler import DefaultErrorHandler
 from orwynn.app.DefaultExceptionHandler import DefaultExceptionHandler
 from orwynn.app.DefaultHTTPExceptionHandler import DefaultHTTPExceptionHandler
+from orwynn.app.DefaultRequestValidationExceptionHandler import \
+    DefaultRequestValidationExceptionHandler
 from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.app_rc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from orwynn.app_rc.AppRC import AppRC
@@ -42,7 +44,8 @@ from orwynn.router.Router import Router
 from orwynn.util import web
 from orwynn.util.file.NotDirError import NotDirError
 from orwynn.util.file.yml import load_yml
-from orwynn.util.validation import validate, validate_each
+from orwynn.util.validation import (RequestValidationException, validate,
+                                    validate_each)
 from orwynn.util.web import CORS, HTTPException, HTTPMethod
 
 
@@ -247,19 +250,31 @@ class Boot(Worker):
     ) -> None:
         log_provider: Log = self.__di.find("Log")
 
-        # For any unhandled builtin exception add default handler
-        RemainingExceptionSubclasses = get_non_framework_exceptions()
+        # For any unhandled builtin exception add default handler,
+        # also add special RequestValidationException since it's not direct
+        # subclass of exception
+        RemainingExceptionSubclasses = \
+            get_non_framework_exceptions() + [RequestValidationException]
         for HandledException in HandledBuiltinExceptions:
             try:
                 RemainingExceptionSubclasses.remove(HandledException)
             except ValueError:
                 raise MalfunctionError()
 
+        # Handle special exceptions
         if HTTPException in RemainingExceptionSubclasses:
             RemainingExceptionSubclasses.remove(HTTPException)
             self.app.add_error_handler(DefaultHTTPExceptionHandler(
                 log=log_provider
             ))
+        if RequestValidationException in RemainingExceptionSubclasses:
+            RemainingExceptionSubclasses.remove(RequestValidationException)
+            self.app.add_error_handler(
+                DefaultRequestValidationExceptionHandler(
+                    log=log_provider
+                )
+            )
+
         if RemainingExceptionSubclasses:
             default_exception_handler: DefaultExceptionHandler = \
                 DefaultExceptionHandler(log=log_provider)

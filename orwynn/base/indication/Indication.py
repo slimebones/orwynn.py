@@ -1,19 +1,23 @@
 from typing import Any, ItemsView
-from orwynn.base.error.Error import Error
-from orwynn.base.error.ErrorSchemaValue import ErrorSchemaValue
 
-from orwynn.base.indication.Indicator import Indicator
-from orwynn.base.SUBCLASSABLES import SUBCLASSABLES
 from orwynn.base.BaseSubclassable import BaseSubclassable
+from orwynn.base.error import (HTTPExceptionValueSchema,
+                               RequestValidationExceptionValueSchema)
+from orwynn.base.error.Error import Error
+from orwynn.base.error.ErrorValueSchema import ErrorValueSchema
 from orwynn.base.indication.digesting_error import DigestingError
 from orwynn.base.indication.Indicatable import Indicatable, IndicatableClass
+from orwynn.base.indication.Indicator import Indicator
 from orwynn.base.indication.unsupported_indicator_error import \
     UnsupportedIndicatorError
 from orwynn.base.model.Model import Model
+from orwynn.base.SUBCLASSABLES import SUBCLASSABLES
+from orwynn.util import validation
 from orwynn.util.cls import ClassNotFoundError, find_subclass_by_name
 from orwynn.util.mp.location import (FieldLocation, find_field_by_location,
                                      find_location_by_field)
-from orwynn.util.validation import validate, validate_dict
+from orwynn.util.validation import (RequestValidationException, validate,
+                                    validate_dict)
 from orwynn.util.validation.validator import Validator
 from orwynn.util.web import HTTPException
 
@@ -63,13 +67,19 @@ class Indication:
                 case Indicator.TYPE:
                     final_field = str
                 case Indicator.VALUE:
-                    if (
+                    if issubclass(Entity, HTTPException):
+                        final_field = HTTPExceptionValueSchema
+                    elif issubclass(
+                        Entity, RequestValidationExceptionValueSchema
+                    ):
+                        final_field = RequestValidationExceptionValueSchema
+                    elif (
                         issubclass(Entity, Exception)
                         and not issubclass(Entity, Error)
                     ):
-                        final_field = ErrorSchemaValue
+                        final_field = ErrorValueSchema
                     elif issubclass(Entity, Error):
-                        final_field = ErrorSchemaValue
+                        final_field = ErrorValueSchema
                     elif issubclass(Entity, Model):
                         final_field = Entity
                     else:
@@ -133,6 +143,33 @@ class Indication:
                         final_field = {
                             "status_code": obj.status_code,
                             "message": obj.detail
+                        }
+                    elif isinstance(obj, RequestValidationException):
+                        message: str = ""
+                        locations: list[list[str]] = []
+                        validation_errors = obj.errors()
+
+                        for err in validation_errors:
+                            if err.get("msg", None):
+                                # In case of several errors separate their
+                                # messages all in one
+                                if message:
+                                    message += " ;; "
+                                message += err["msg"]
+                            err_loc: tuple[str | int] = err["loc"]
+                            validation.validate_each(
+                                err_loc,
+                                [str, int],
+                                expected_sequence_type=tuple
+                            )
+                            locations.append(list(validation.apply(
+                                err_loc,
+                                tuple
+                            )))
+
+                        final_field = {
+                            "message": message,
+                            "locations": locations
                         }
                     elif (
                         isinstance(obj, Exception)
@@ -202,6 +239,13 @@ class Indication:
             return TargetClass(
                 status_code=value["status_code"],
                 detail=value["message"]
+            )
+        elif (
+            issubclass(TargetClass, RequestValidationException)
+        ):
+            # Temporarily RequestValidationException data is not recovered
+            return TargetClass(
+                errors=[]
             )
         elif (
             issubclass(TargetClass, Exception)

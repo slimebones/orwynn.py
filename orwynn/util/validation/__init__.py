@@ -3,17 +3,19 @@
 In future the framework might introduce special flags (or read Python's
 optimization flag -O) to not execute such functions.
 """
+import re
+import typing
 from inspect import isclass
 from pathlib import Path
-import re
 from typing import Any, Callable, Sized, TypeVar
-import typing
 
 from pydantic import ValidationError as __PydanticValidationError
 from pydantic import validator as __pydantic_validator
-from orwynn.util.validation.ExpectationError import ExpectationError
 
+from orwynn.util.validation.ExpectationError import ExpectationError
 from orwynn.util.validation.re_validation_error import ReValidationError
+from orwynn.util.validation.RequestValidationException import \
+    RequestValidationException
 from orwynn.util.validation.unknown_validator_error import \
     UnknownValidatorError
 from orwynn.util.validation.validation_error import ValidationError
