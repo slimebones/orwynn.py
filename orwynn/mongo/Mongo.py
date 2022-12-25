@@ -1,7 +1,8 @@
-from typing import Any
+from typing import Any, Callable
 from pymongo import MongoClient, ReturnDocument
 from pymongo.database import Database as PymongoDatabase
 from pymongo.cursor import Cursor
+from pymongo.client_session import ClientSession
 
 from orwynn.base.database.DatabaseEntityNotFoundError import \
     DatabaseEntityNotFoundError
@@ -16,6 +17,8 @@ class Mongo(Database):
     def __init__(self, config: MongoConfig) -> None:
         self.__client: MongoClient = MongoClient(config.uri)
         self.__database: PymongoDatabase = self.__client[config.database_name]
+        self.start_session: Callable[[], ClientSession] = \
+            self.__client.start_session
 
     def drop_database(self) -> None:
         self.__client.drop_database(self.__database)

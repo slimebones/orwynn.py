@@ -12,7 +12,6 @@ lint:
 	flake8 \
 		--count \
 		--max-line-length=79 \
-		--disable-noqa \
 		--ignore=W503 \
 		--isolated \
 		--max-complexity 10 \

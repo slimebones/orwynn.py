@@ -4,11 +4,15 @@ from orwynn.base.database.DatabaseKind import DatabaseKind
 from orwynn.base.module import Module
 from orwynn.boot.Boot import Boot
 from orwynn.mongo import Document
+from orwynn.mongo.ClientSession import ClientSession
+from orwynn.mongo.DocumentUpdateError import DocumentUpdateError
+from orwynn.util import validation
 
 
 class Item(Document):
     name: str
     price: float
+    priority: int = 5
 
 
 @fixture
@@ -49,11 +53,76 @@ def test_remove(create_two_items: list[Item]):
     assert len(list(Item.find_all())) == 1
 
 
-def test_update(create_item: Item):
+def test_set(create_item: Item):
     assert create_item.update(set={"name": "beer"}).name == "beer"
 
 
-def test_update_two_fields(create_item: Item):
+def test_set_two_fields(create_item: Item):
     item: Item = create_item.update(set={"name": "beer", "price": 2.5})
     assert item.name == "beer"
     assert item.price == 2.5
+
+
+def test_inc(create_item: Item):
+    item: Item = create_item.update(inc={"price": 2.5})
+    assert item.price == 3.7
+
+
+def test_set_wrong_type(create_item: Item):
+    validation.expect(
+        create_item.update,
+        DocumentUpdateError,
+        set={"price": "sold out"}
+    )
+
+
+def test_inc_wrong_type(create_item: Item):
+    validation.expect(
+        create_item.update,
+        DocumentUpdateError,
+        inc={"priority": 5.5}
+    )
+
+
+def test_set_unexistent(create_item: Item):
+    validation.expect(
+        create_item.update,
+        DocumentUpdateError,
+        set={"wow": "post malone"}
+    )
+
+
+def test_inc_unexistent(create_item: Item):
+    validation.expect(
+        create_item.update,
+        DocumentUpdateError,
+        inc={"wow": "post malone"}
+    )
+
+
+# FIXME: Temporarily transactions are not supported due to requirement of
+#   installing replica set, which i don't want to adapt right now,
+#   see https://www.mongodb.com/community/forums/t/why-replica-set-is-mandatory-for-transactions-in-mongodb/9533  # noqa: E501
+# def test_success_transaction(create_item: Item):
+#     def __create_item(s):
+#         create_item.update(set={"name": "hello"})
+
+#     with Item.start_session() as session:
+#         session.with_transaction(__create_item)
+
+
+# def test_failed_transaction(create_item: Item):
+#     def __create_item(s: ClientSession):
+#         Item(name="kebab", price=2.1).create(session=s)
+#         create_item.update(set={"name": 50})
+
+#     with Item.start_session() as session:
+#         validation.expect(
+#             session.with_transaction,
+#             DocumentUpdateError,
+#             __create_item
+#         )
+
+#     # Original name should be unchanged, new item not created
+#     assert Item.find_one().name == "pizza"
+#     assert len(list(Item.find_all())) == 1
