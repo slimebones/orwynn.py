@@ -1,3 +1,4 @@
+from types import NoneType
 from typing import Any, Iterable, Self
 
 from bson import ObjectId
@@ -68,7 +69,7 @@ class Document(Mapping):
 
         try:
             return self._parse_document(
-                self._mongo().create(
+                self._mongo().create_one(
                     self._collection(), data
                 )
             )
@@ -77,29 +78,41 @@ class Document(Mapping):
 
     @if_linked
     def remove(
-        self, *args, **kwargs
+        self, **kwargs
     ) -> Self:
         id: str = validation.apply(self.id, str)
         return self._parse_document(
-            self._mongo().remove(
-                self._collection(), {"_id": id}, *args, **kwargs
+            self._mongo().remove_one(
+                self._collection(), {"_id": ObjectId(id)}, **kwargs
             )
         )
 
     @if_linked
     def update(
         self,
-        operation: dict,
-        *args,
+        *,
+        set: dict | None = None,
+        inc: dict | None = None,
         **kwargs
     ) -> Self:
+        # Optimization tip: Consider adapting $inc in future for appropriate
+        #   cases
+        validation.validate(set, [dict, NoneType])
+        validation.validate(inc, [dict, NoneType])
+
         id: str = validation.apply(self.id, str)
+
+        operation: dict = {}
+        if set is not None:
+            operation["$set"] = set
+        if inc is not None:
+            operation["$inc"] = inc
+
         return self._parse_document(
-            self._mongo().update(
+            self._mongo().update_one(
                 self._collection(),
-                {"_id": id},
+                {"_id": ObjectId(id)},
                 operation,
-                *args,
                 **kwargs
             )
         )

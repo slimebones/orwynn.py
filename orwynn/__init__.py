@@ -20,7 +20,7 @@ from orwynn.base.test.HttpClient import HttpClient
 from orwynn.base.test.Test import Test
 from orwynn.base.test.TestClient import TestClient
 # Crucial workers and services #
-from orwynn.boot.Boot import Boot
+from orwynn.boot import Boot, BootMode
 from orwynn.log import Log
 # Proxies #
 from orwynn.proxy.BootProxy import BootProxy

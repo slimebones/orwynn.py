@@ -1,19 +1,21 @@
-import functools
-from typing import Any, Callable
+from typing import Any
+import typing
 from orwynn.base.mapping.MappingNotLinkedError import MappingNotLinkedError
 
 from orwynn.base.model.Model import Model
+from orwynn.util.types import DecoratedCallable
 
 
-def if_linked(fn: Callable) -> Callable:
-    @functools.wraps(fn)
-    def inner(mapping: Mapping, *args, **kwargs) -> Any:
-        if not mapping.is_linked:
+def if_linked(
+    fn: DecoratedCallable
+) -> DecoratedCallable:
+    def inner(self: Mapping, *args, **kwargs):
+        if not self.is_linked:
             raise MappingNotLinkedError(
-                f"{mapping} is not linked to database yet"
+                f"{self} is not linked to database yet"
             )
-        return fn(mapping, *args, **kwargs)
-    return inner
+        return fn(self, *args, **kwargs)
+    return typing.cast(DecoratedCallable, inner)
 
 
 class Mapping(Model):

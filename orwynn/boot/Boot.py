@@ -162,9 +162,8 @@ class Boot(Worker):
         try:
             self.__register_routes(self.__di.modules, self.__di.controllers)
         except MissingDIObjectError:
-            raise ValueError(
-                "no controllers defined for this application"
-            )
+            # Don't raise error to ease test writings
+            pass
         try:
             self.__register_middleware(
                 self.__di.all_middleware

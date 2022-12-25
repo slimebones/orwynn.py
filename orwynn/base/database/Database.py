@@ -21,11 +21,11 @@ class Database(Worker):
     def find_one(self, *args, **kwargs) -> Any:
         raise NotImplementedError()
 
-    def create(self, *args, **kwargs) -> Any:
+    def create_one(self, *args, **kwargs) -> Any:
         raise NotImplementedError()
 
-    def update(self, *args, **kwargs) -> Any:
+    def update_one(self, *args, **kwargs) -> Any:
         raise NotImplementedError()
 
-    def remove(self, *args, **kwargs) -> Any:
+    def remove_one(self, *args, **kwargs) -> Any:
         raise NotImplementedError()
