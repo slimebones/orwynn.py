@@ -34,14 +34,15 @@ from orwynn.boot.UnknownBootModeError import UnknownBootModeError
 from orwynn.boot.UnknownSourceError import UnknownSourceError
 from orwynn.di.DI import DI
 from orwynn.di.missing_di_object_error import MissingDIObjectError
-from orwynn.log.Log import Log, LogConfig
+from orwynn.log import log
+from orwynn.log.configure_log import LogConfig, configure_log
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn.router.Router import Router
-from orwynn.util import web
+from orwynn.util import validation, web
 from orwynn.util.file.NotDirError import NotDirError
 from orwynn.util.file.yml import load_yml
 from orwynn.util.validation import (RequestValidationException, validate,
@@ -95,7 +96,7 @@ class Boot(Worker):
     ).app
     ```
     """
-    @Log.catch(reraise=True)
+    @log.catch(reraise=True)
     def __init__(
         self,
         root_module: Module,
@@ -150,7 +151,6 @@ class Boot(Worker):
         # Add crucial builtin objects
         root_module.add_provider_or_skip(App)
         root_module.add_provider_or_skip(LogConfig)
-        root_module.add_provider_or_skip(Log)
 
         self.__enable_databases(databases)
         self.__di: DI = DI(root_module)
@@ -158,6 +158,8 @@ class Boot(Worker):
         self.__router: Router = Router(
             self.app
         )
+
+        self.__configure_log()
 
         try:
             self.__register_routes(self.__di.modules, self.__di.controllers)
@@ -188,6 +190,13 @@ class Boot(Worker):
     @property
     def api_indication(self) -> Indication:
         return self.__api_indication
+
+    def __configure_log(self) -> None:
+        log_config: LogConfig = validation.apply(
+            self.__di.find("LogConfig"),
+            LogConfig
+        )
+        configure_log(log_config)
 
     def __register_error_handlers(
         self
@@ -247,7 +256,8 @@ class Boot(Worker):
         HandledBuiltinExceptions: list[type[Exception]],
         is_default_error_handled: bool
     ) -> None:
-        log_provider: Log = self.__di.find("Log")
+        # FIXME: Here default exception handlers are created without DI
+        #   notifying which may raise confusion.
 
         # For any unhandled builtin exception add default handler,
         # also add special RequestValidationException since it's not direct
@@ -263,29 +273,23 @@ class Boot(Worker):
         # Handle special exceptions
         if HTTPException in RemainingExceptionSubclasses:
             RemainingExceptionSubclasses.remove(HTTPException)
-            self.app.add_error_handler(DefaultHTTPExceptionHandler(
-                log=log_provider
-            ))
+            self.app.add_error_handler(DefaultHTTPExceptionHandler())
         if RequestValidationException in RemainingExceptionSubclasses:
             RemainingExceptionSubclasses.remove(RequestValidationException)
             self.app.add_error_handler(
-                DefaultRequestValidationExceptionHandler(
-                    log=log_provider
-                )
+                DefaultRequestValidationExceptionHandler()
             )
 
         if RemainingExceptionSubclasses:
             default_exception_handler: DefaultExceptionHandler = \
-                DefaultExceptionHandler(log=log_provider)
+                DefaultExceptionHandler()
             default_exception_handler.set_handled_exception(
                 RemainingExceptionSubclasses
             )
             self.app.add_error_handler(default_exception_handler)
 
         if not is_default_error_handled:
-            self.app.add_error_handler(DefaultErrorHandler(
-                log=log_provider
-            ))
+            self.app.add_error_handler(DefaultErrorHandler())
 
         for error_handler in error_handlers:
             self.app.add_error_handler(error_handler)

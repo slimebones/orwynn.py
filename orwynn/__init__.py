@@ -22,7 +22,7 @@ from orwynn.base.test.TestClient import TestClient
 # Crucial workers and services #
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
-from orwynn.log import Log
+from orwynn.log import log
 # Proxies #
 from orwynn.proxy.BootProxy import BootProxy
 # Utils #
