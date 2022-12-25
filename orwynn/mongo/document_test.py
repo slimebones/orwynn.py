@@ -4,7 +4,6 @@ from orwynn.base.database.DatabaseKind import DatabaseKind
 from orwynn.base.module import Module
 from orwynn.boot.Boot import Boot
 from orwynn.mongo import Document
-from orwynn.mongo.ClientSession import ClientSession
 from orwynn.mongo.DocumentUpdateError import DocumentUpdateError
 from orwynn.util import validation
 
@@ -45,7 +44,7 @@ def test_find_all(create_two_items: list[Item]):
 
 
 def test_find_one(create_item: Item):
-    assert Item.find_one(id=create_item.id) == create_item
+    assert Item.find_one({"id": create_item.id}) == create_item
 
 
 def test_remove(create_two_items: list[Item]):
@@ -98,6 +97,10 @@ def test_inc_unexistent(create_item: Item):
         DocumentUpdateError,
         inc={"wow": "post malone"}
     )
+
+
+def test_find_all_limited(create_two_items):
+    assert len(list(Item.find_all(limit=1))) == 1
 
 
 # FIXME: Temporarily transactions are not supported due to requirement of

@@ -50,23 +50,36 @@ class Document(Mapping):
     @classmethod
     def find_all(
         cls,
+        query: dict | None = None,
         **kwargs
     ) -> Iterable[Self]:
+        if query is None:
+            query = {}
+        validation.validate(query, dict)
+
         cursor: Cursor = cls._get_mongo().find_all(
             cls._get_collection(),
-            cls._adjust_id_to_mongo(kwargs),
+            cls._adjust_id_to_mongo(query),
+            **kwargs
         )
 
         return map(cls._parse_document, cursor)
 
     @classmethod
     def find_one(
-        cls, **kwargs
+        cls,
+        query: dict | None = None,
+        **kwargs
     ) -> Self:
+        if query is None:
+            query = {}
+        validation.validate(query, dict)
+
         return cls._parse_document(
             cls._get_mongo().find_one(
                 cls._get_collection(),
-                cls._adjust_id_to_mongo(kwargs),
+                cls._adjust_id_to_mongo(query),
+                **kwargs
             )
         )
 
@@ -93,7 +106,8 @@ class Document(Mapping):
         id: str = validation.apply(self.id, str)
         return self._parse_document(
             self._get_mongo().remove_one(
-                self._get_collection(), {"_id": ObjectId(id)}, **kwargs
+                self._get_collection(), {"_id": ObjectId(id)},
+                **kwargs
             )
         )
 

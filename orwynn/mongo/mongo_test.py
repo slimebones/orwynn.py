@@ -18,7 +18,7 @@ def test_user_create(std_mongo_boot, std_http: HttpClient):
         }
     )
     created_user: User = User.recover(r.json())
-    User.find_one(id=created_user.id)
+    User.find_one({"id": created_user.id})
 
 
 def test_reserved_mapping_field(std_mongo_boot, std_http: HttpClient):

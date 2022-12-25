@@ -5,7 +5,7 @@ from orwynn import (Boot, Controller, Endpoint, Model, Module, Service, crypto,
 from orwynn.mongo import Document
 
 
-class UserCreate(Model):
+class UserIn(Model):
     username: str
     ppassword: str
 
@@ -23,15 +23,15 @@ class UserService(Service):
     def __init__(self) -> None:
         super().__init__()
 
-    def create(self, user: UserCreate) -> User:
-        return User.create(
+    def create(self, user: UserIn) -> User:
+        return User(
             username=user.username,
             hpassword=crypto.hash_password(user.ppassword)
-        )
+        ).create()
 
     def find(self, id: str) -> User:
         validation.validate(id, str)
-        return User.find_one(id=id)
+        return User.find_one({"id": id})
 
     def find_all(self) -> Iterable[User]:
         return User.find_all()
@@ -62,7 +62,7 @@ class UsersController(Controller):
             users=list(self.sv.find_all())
         )
 
-    def post(self, user: UserCreate) -> User:
+    def post(self, user: UserIn) -> User:
         return self.sv.create(user)
 
 
