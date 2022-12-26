@@ -1,7 +1,9 @@
 from typing import Callable, ClassVar
+
 from orwynn.base.controller import MissingControllerClassAttributeError
 from orwynn.base.controller.Controller import Controller
-from orwynn.base.controller.http_controller.DefinedTwiceControllerMethodError import DefinedTwiceControllerMethodError
+from orwynn.base.controller.http_controller.DefinedTwiceControllerMethodError import \
+    DefinedTwiceControllerMethodError
 from orwynn.base.controller.http_controller.endpoint.Endpoint import Endpoint
 from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn.util import validation

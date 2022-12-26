@@ -1,4 +1,5 @@
 from typing import Any, ClassVar
+
 from orwynn.base.model.Model import Model
 from orwynn.util import validation
 from orwynn.util.web import Request, Response

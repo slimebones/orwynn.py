@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from pytest import fixture
+
 from orwynn.base.indication.default_api_indication import \
     default_api_indication
 from orwynn.boot.BootMode import BootMode

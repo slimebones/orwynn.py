@@ -1,7 +1,7 @@
 import pydantic
+
 from orwynn.base.error.Error import Error
 from orwynn.base.model.Model import Model
-
 
 IndicatableClass = \
     type[Model] \

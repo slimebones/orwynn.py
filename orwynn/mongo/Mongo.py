@@ -1,12 +1,13 @@
 from typing import Any, Callable
-from pymongo import MongoClient, ReturnDocument
-from pymongo.database import Database as PymongoDatabase
-from pymongo.cursor import Cursor
-from pymongo.client_session import ClientSession
 
+from pymongo import MongoClient, ReturnDocument
+from pymongo.client_session import ClientSession
+from pymongo.cursor import Cursor
+from pymongo.database import Database as PymongoDatabase
+
+from orwynn.base.database.Database import Database
 from orwynn.base.database.DatabaseEntityNotFoundError import \
     DatabaseEntityNotFoundError
-from orwynn.base.database.Database import Database
 from orwynn.mongo.MongoConfig import MongoConfig
 from orwynn.mongo.MongoEntity import MongoEntity
 from orwynn.util import validation

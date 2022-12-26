@@ -13,7 +13,6 @@ from tests.std.float import FloatService, float_module
 from tests.std.number import NumberService, number_module
 from tests.std.user import user_module
 
-
 DEFAULT_ID: str = "e55"
 
 

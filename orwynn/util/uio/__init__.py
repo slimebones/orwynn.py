@@ -1,5 +1,5 @@
-from contextlib import redirect_stdout
 import io
+from contextlib import redirect_stdout
 from typing import Callable
 
 

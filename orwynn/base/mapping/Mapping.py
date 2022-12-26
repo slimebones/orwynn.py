@@ -1,7 +1,7 @@
-from typing import Any
 import typing
-from orwynn.base.mapping.MappingNotLinkedError import MappingNotLinkedError
+from typing import Any
 
+from orwynn.base.mapping.MappingNotLinkedError import MappingNotLinkedError
 from orwynn.base.model.Model import Model
 from orwynn.util.types import DecoratedCallable
 

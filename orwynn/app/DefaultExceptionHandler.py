@@ -1,9 +1,10 @@
 from orwynn.app.ErrorHandler import ErrorHandler
-from orwynn.base.error import get_non_framework_exceptions
-from orwynn.log import Log
+from orwynn.base.error.get_non_framework_exceptions import \
+    get_non_framework_exceptions
+from orwynn.log.Log import Log
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.util import validation
 from orwynn.util.web import JSONResponse, Request, Response
-from orwynn.proxy.BootProxy import BootProxy
 
 
 class DefaultExceptionHandler(ErrorHandler):

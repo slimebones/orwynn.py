@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+
 from orwynn.base.worker._Worker import Worker
 
 if TYPE_CHECKING:

@@ -1,4 +1,5 @@
 from typing import Callable
+
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.controller.endpoint import Endpoint
 from orwynn.base.middleware.Middleware import Middleware

@@ -1,7 +1,7 @@
 test:
 	coverage run -m pytest -x -v --ignore=tests/app -p no:warnings orwynn tests
 
-lint:
+lint: sort-imports
 # Ignore:
 #		- W503:
 #				Obsolete. Line breaks should occure before binary operator according to
@@ -25,3 +25,6 @@ coverage:
 
 coverage-html:
 	coverage html --show-contexts && python -m http.server -d htmlcov 8000
+
+sort-imports:
+	isort -l 79 .

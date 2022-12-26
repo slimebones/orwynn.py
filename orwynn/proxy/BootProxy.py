@@ -1,12 +1,13 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
-from orwynn.base.worker._Worker import Worker
+
 from orwynn.app_rc.AppRC import AppRC
+from orwynn.base.worker._Worker import Worker
 from orwynn.boot.BootMode import BootMode
 
 if TYPE_CHECKING:
-    from orwynn.base.indication.Indication import Indication
     from orwynn.app.ErrorHandler import ErrorHandler
+    from orwynn.base.indication.Indication import Indication
 
 
 class BootProxy(Worker):

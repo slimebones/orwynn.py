@@ -1,5 +1,5 @@
-from orwynn.util.types import Class
 from orwynn.base.error.Error import Error
+from orwynn.util.types import Class
 
 
 class ClassNotFoundError(Error):

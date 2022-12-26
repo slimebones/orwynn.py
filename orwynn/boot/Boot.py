@@ -6,9 +6,6 @@ from types import NoneType
 import dotenv
 
 from orwynn.app.App import App
-from orwynn.base.controller.http_controller.HTTPController import HTTPController
-from orwynn.log.Log import Log
-from orwynn.log.LogConfig import LogConfig
 from orwynn.app.DefaultErrorHandler import DefaultErrorHandler
 from orwynn.app.DefaultExceptionHandler import DefaultExceptionHandler
 from orwynn.app.DefaultHTTPExceptionHandler import DefaultHTTPExceptionHandler
@@ -19,6 +16,8 @@ from orwynn.app_rc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from orwynn.app_rc.AppRC import AppRC
 from orwynn.app_rc.AppRCSearchError import AppRCSearchError
 from orwynn.base.controller.Controller import Controller
+from orwynn.base.controller.http_controller.HTTPController import \
+    HTTPController
 from orwynn.base.controller.websocket.WebsocketController import \
     WebsocketController
 from orwynn.base.database.DatabaseKind import DatabaseKind
@@ -40,6 +39,8 @@ from orwynn.boot.UnknownSourceError import UnknownSourceError
 from orwynn.di.DI import DI
 from orwynn.di.missing_di_object_error import MissingDIObjectError
 from orwynn.log.configure_log import configure_log
+from orwynn.log.Log import Log
+from orwynn.log.LogConfig import LogConfig
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy

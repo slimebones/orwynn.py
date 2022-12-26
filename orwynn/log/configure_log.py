@@ -1,5 +1,5 @@
 from orwynn.boot.BootMode import BootMode
-from orwynn.log import Log
+from orwynn.log.Log import Log
 from orwynn.log.LogConfig import LogConfig
 from orwynn.log.LogHandler import LogHandler
 from orwynn.proxy.BootProxy import BootProxy

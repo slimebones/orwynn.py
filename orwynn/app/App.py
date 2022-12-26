@@ -1,11 +1,12 @@
 from typing import TYPE_CHECKING, Any, Callable
-from fastapi import FastAPI
-from starlette.types import Receive, Scope, Send
-from orwynn.base.middleware.Middleware import Middleware
-from starlette.middleware.base import BaseHTTPMiddleware \
-    as StarletteBaseHTTPMiddleware
-from fastapi.middleware.cors import CORSMiddleware as FastAPI_CORSMiddleware
 
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware as FastAPI_CORSMiddleware
+from starlette.middleware.base import \
+    BaseHTTPMiddleware as StarletteBaseHTTPMiddleware
+from starlette.types import Receive, Scope, Send
+
+from orwynn.base.middleware.Middleware import Middleware
 from orwynn.base.service.framework_service import FrameworkService
 from orwynn.base.test.HttpClient import HttpClient
 from orwynn.base.test.TestClient import TestClient

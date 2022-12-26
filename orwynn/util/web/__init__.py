@@ -2,14 +2,15 @@ from enum import Enum
 
 import httpx
 from fastapi import Request as FastAPIRequest
-from .UnsupportedHTTPMethodError import UnsupportedHTTPMethodError
 from fastapi import Response as FastAPIResponse
-from fastapi.responses import JSONResponse as FastAPI_JSONResponse
 from fastapi.responses import HTMLResponse as FastAPI_HTMLResponse
+from fastapi.responses import JSONResponse as FastAPI_JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from orwynn.util.web.CORS import CORS
 
 from orwynn.util import validation
+from orwynn.util.web.CORS import CORS
+
+from .UnsupportedHTTPMethodError import UnsupportedHTTPMethodError
 
 
 class HTTPMethod(Enum):

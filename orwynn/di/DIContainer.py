@@ -1,19 +1,19 @@
 import re
 from typing import TypeVar
-from orwynn.app.ErrorHandler import ErrorHandler
 
+from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.base.config.Config import Config
 from orwynn.base.controller.Controller import Controller
 from orwynn.base.error.MalfunctionError import MalfunctionError
 from orwynn.base.middleware.Middleware import Middleware
 from orwynn.base.model.Model import Model
+from orwynn.base.SUBCLASSABLES import SUBCLASSABLES
 from orwynn.di.di_object_already_initialized_in_container_error import \
     DIObjectAlreadyInitializedInContainerError
 from orwynn.di.DIObject import DIObject
 from orwynn.di.finalized_di_container_error import FinalizedDIContainerError
 from orwynn.di.is_provider import is_provider
 from orwynn.di.missing_di_object_error import MissingDIObjectError
-from orwynn.base.SUBCLASSABLES import SUBCLASSABLES
 from orwynn.util.validation import validate
 
 _InnerObj = TypeVar("_InnerObj")

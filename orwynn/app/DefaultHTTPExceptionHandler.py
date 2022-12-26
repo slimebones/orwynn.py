@@ -1,5 +1,5 @@
 from orwynn.app.ErrorHandler import ErrorHandler
-from orwynn.log import Log
+from orwynn.log.Log import Log
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.util.web import HTTPException, JSONResponse, Request, Response
 

@@ -1,4 +1,5 @@
 from typing import Any, Self, TypeVar
+
 import pydantic
 
 from orwynn.proxy.BootProxy import BootProxy

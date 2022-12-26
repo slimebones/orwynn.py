@@ -1,6 +1,6 @@
 from typing import ClassVar
-from orwynn.base.controller.Controller import Controller
 
+from orwynn.base.controller.Controller import Controller
 from orwynn.base.controller.websocket.Websocket import Websocket
 
 

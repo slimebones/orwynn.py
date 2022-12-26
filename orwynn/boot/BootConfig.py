@@ -1,10 +1,11 @@
 from pathlib import Path
 from typing import Any, Self
+
+from orwynn.app_rc.AppRC import AppRC
 from orwynn.base.config.Config import Config
 from orwynn.base.indication.Indication import Indication
-from orwynn.app_rc.AppRC import AppRC
-from orwynn.proxy.BootProxy import BootProxy
 from orwynn.boot.BootMode import BootMode
+from orwynn.proxy.BootProxy import BootProxy
 
 
 class BootConfig(Config):
