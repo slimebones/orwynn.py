@@ -38,6 +38,10 @@ class App(FrameworkService):
         await self.__app(scope, receive, send)
 
     @property
+    def websocket_handler(self) -> Callable:
+        return self.__app.websocket
+
+    @property
     def test_client(self) -> TestClient:
         return TestClient(self.__app)
 

@@ -7,8 +7,8 @@ import pydantic
 from orwynn.app.AlreadyRegisteredMethodError import \
     AlreadyRegisteredMethodError
 from orwynn.app.App import App
-from orwynn.base.controller.endpoint.Endpoint import Endpoint
-from orwynn.base.controller.endpoint.EndpointNotFoundError import \
+from orwynn.base.controller.http_controller.endpoint.Endpoint import Endpoint
+from orwynn.base.controller.http_controller.endpoint.EndpointNotFoundError import \
     EndpointNotFoundError
 from orwynn.base.indication.Indication import Indication
 from orwynn.base.model.Model import Model
@@ -34,6 +34,22 @@ class Router(Worker):
         super().__init__()
         self.__app: App = app
         self.__methods_by_route: dict[str, set[HTTPMethod]] = {}
+
+    def register_websocket(
+        self, *, route: str, fn: Callable
+    ) -> None:
+        """Registers websocket for route.
+
+        Attributes:
+            route:
+                Route to register to.
+            fn:
+                Function to register.
+        """
+        validation.validate(route, str)
+        validation.validate(fn, Callable)
+
+        self.__app.websocket_handler(route)(fn)
 
     def register_route(
         self, *, route: str, fn: Callable, method: HTTPMethod

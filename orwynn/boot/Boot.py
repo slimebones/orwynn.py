@@ -6,6 +6,9 @@ from types import NoneType
 import dotenv
 
 from orwynn.app.App import App
+from orwynn.base.controller.http_controller.HTTPController import HTTPController
+from orwynn.log.Log import Log
+from orwynn.log.LogConfig import LogConfig
 from orwynn.app.DefaultErrorHandler import DefaultErrorHandler
 from orwynn.app.DefaultExceptionHandler import DefaultExceptionHandler
 from orwynn.app.DefaultHTTPExceptionHandler import DefaultHTTPExceptionHandler
@@ -16,6 +19,8 @@ from orwynn.app_rc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from orwynn.app_rc.AppRC import AppRC
 from orwynn.app_rc.AppRCSearchError import AppRCSearchError
 from orwynn.base.controller.Controller import Controller
+from orwynn.base.controller.websocket.WebsocketController import \
+    WebsocketController
 from orwynn.base.database.DatabaseKind import DatabaseKind
 from orwynn.base.database.UnknownDatabaseKindError import \
     UnknownDatabaseKindError
@@ -34,8 +39,7 @@ from orwynn.boot.UnknownBootModeError import UnknownBootModeError
 from orwynn.boot.UnknownSourceError import UnknownSourceError
 from orwynn.di.DI import DI
 from orwynn.di.missing_di_object_error import MissingDIObjectError
-from orwynn.log import log
-from orwynn.log.configure_log import LogConfig, configure_log
+from orwynn.log.configure_log import configure_log
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
@@ -93,10 +97,10 @@ class Boot(Worker):
 
     app: App = Boot(
         root_module=root_module
-    ).app
+    )app
     ```
     """
-    @log.catch(reraise=True)
+    @Log.catch(reraise=True)
     def __init__(
         self,
         root_module: Module,
@@ -315,7 +319,15 @@ class Boot(Worker):
         for c in controllers:
             if type(c) is C:
                 is_controller_found = True
-                self.__register_controller_for_module(c, m)
+
+                if isinstance(c, HTTPController):
+                    self.__register_http_controller_for_module(c, m)
+                elif isinstance(c, WebsocketController):
+                    self.__register_websocket_controller_for_module(c, m)
+                else:
+                    raise TypeError(
+                        f"controller unsupported type {type(c)}"
+                    )
         if not is_controller_found:
             raise MalfunctionError(
                 f"no initialized controller found for class {C},"
@@ -323,9 +335,9 @@ class Boot(Worker):
                 " so DI should have been initialized it"
             )
 
-    def __register_controller_for_module(
+    def __register_http_controller_for_module(
         self,
-        c: Controller,
+        c: HTTPController,
         m: Module
     ) -> None:
         # At least one method found
@@ -338,6 +350,7 @@ class Boot(Worker):
                 self.__router.register_route(
                     # We can concatenate routes such way since routes
                     # are validated to not contain following slash
+                    # -> But join_routes() handles this situation, doesn't it?
                     route=web.join_routes(m.route, c.route),
                     fn=c.get_fn_by_http_method(http_method),
                     method=http_method
@@ -348,6 +361,16 @@ class Boot(Worker):
                 f"no http methods found for controller {c.__class__},"
                 " this shouldn't have passed validation at Controller.__init__"
             )
+
+    def __register_websocket_controller_for_module(
+        self,
+        c: WebsocketController,
+        m: Module
+    ) -> None:
+        self.__router.register_websocket(
+            route=web.join_routes(m.route, c.route),
+            fn=c.process
+        )
 
     def __parse_mode(self) -> BootMode:
         mode_env: str | None = os.getenv("Orwynn_Mode")

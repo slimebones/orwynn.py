@@ -1,5 +1,5 @@
 from orwynn.boot.BootMode import BootMode
-from orwynn.log import log
+from orwynn.log import Log
 from orwynn.log.LogConfig import LogConfig
 from orwynn.log.LogHandler import LogHandler
 from orwynn.proxy.BootProxy import BootProxy
@@ -26,7 +26,7 @@ def __add_handler(handler: LogHandler) -> None:
         if handler.serialize is None:
             handler.serialize = False
 
-    log.add(
+    Log.add(
         handler.sink,
         level=handler.level,
         format=handler.format,

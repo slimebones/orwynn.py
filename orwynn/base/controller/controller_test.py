@@ -1,10 +1,10 @@
 from orwynn.app.AlreadyRegisteredMethodError import \
     AlreadyRegisteredMethodError
 from orwynn.base.controller.Controller import Controller
-from orwynn.base.controller.DefinedTwiceControllerMethodError import \
+from orwynn.base.controller.http_controller.DefinedTwiceControllerMethodError import \
     DefinedTwiceControllerMethodError
-from orwynn.base.controller.endpoint import Endpoint
-from orwynn.base.controller.missing_controller_class_attribute_error import \
+from orwynn.base.controller.http_controller.endpoint.Endpoint import Endpoint
+from orwynn.base.controller.MissingControllerClassAttributeError import \
     MissingControllerClassAttributeError
 from orwynn.base.model.Model import Model
 from orwynn.base.module.Module import Module

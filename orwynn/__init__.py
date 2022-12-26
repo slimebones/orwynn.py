@@ -5,8 +5,11 @@ from orwynn.app.App import App
 from orwynn.app.ErrorHandler import ErrorHandler
 # Base classes #
 from orwynn.base.config.Config import Config
-from orwynn.base.controller.Controller import Controller
-from orwynn.base.controller.endpoint import Endpoint
+from orwynn.base.controller.http_controller.endpoint import Endpoint
+from orwynn.base.controller.http_controller.HTTPController import \
+    HTTPController
+from orwynn.base.controller.websocket.WebsocketController import \
+    WebsocketController
 from orwynn.base.database.DatabaseKind import DatabaseKind
 from orwynn.base.error.Error import Error
 from orwynn.base.indication.Indication import Indication
@@ -22,8 +25,8 @@ from orwynn.base.test.TestClient import TestClient
 # Crucial workers and services #
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
-from orwynn.log import log
+from orwynn.log.Log import Log
 # Proxies #
 from orwynn.proxy.BootProxy import BootProxy
 # Utils #
-from orwynn.util import crypto, validation, web, rnd
+from orwynn.util import crypto, rnd, validation, web
