@@ -4,7 +4,8 @@ from orwynn.BaseSubclassable import BaseSubclassable
 from orwynn.error.Error import Error
 from orwynn.error.ErrorValueSchema import ErrorValueSchema
 from orwynn.error.HTTPExceptionValueSchema import HTTPExceptionValueSchema
-from orwynn.error.RequestValidationExceptionValueSchema import RequestValidationExceptionValueSchema
+from orwynn.error.RequestValidationExceptionValueSchema import \
+    RequestValidationExceptionValueSchema
 from orwynn.indication.digesting_error import DigestingError
 from orwynn.indication.Indicatable import Indicatable, IndicatableClass
 from orwynn.indication.Indicator import Indicator

@@ -1,6 +1,6 @@
 from orwynn.app.App import App
-from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.controller.endpoint.Endpoint import Endpoint
+from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.module.Module import Module
 from orwynn.service.Service import Service
 

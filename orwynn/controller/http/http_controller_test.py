@@ -4,9 +4,9 @@ from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.DefinedTwiceControllerMethodError import \
     DefinedTwiceControllerMethodError
+from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.controller.MissingControllerClassAttributeError import \
     MissingControllerClassAttributeError
-from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.model.Model import Model
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy

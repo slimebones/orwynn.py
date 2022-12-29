@@ -1,8 +1,8 @@
 from pytest import fixture
 
 from orwynn.boot.Boot import Boot
-from orwynn.controller.endpoint.EndpointResponse import EndpointResponse
 from orwynn.controller.endpoint.Endpoint import Endpoint
+from orwynn.controller.endpoint.EndpointResponse import EndpointResponse
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.model.Model import Model
 from orwynn.module.Module import Module

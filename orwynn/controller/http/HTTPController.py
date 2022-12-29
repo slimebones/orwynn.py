@@ -1,10 +1,11 @@
 from typing import Callable, ClassVar
 
-from orwynn.controller.MissingControllerClassAttributeError import MissingControllerClassAttributeError
 from orwynn.controller.Controller import Controller
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.DefinedTwiceControllerMethodError import \
     DefinedTwiceControllerMethodError
+from orwynn.controller.MissingControllerClassAttributeError import \
+    MissingControllerClassAttributeError
 from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn.util import validation
 from orwynn.util.web import HTTPMethod, UnsupportedHTTPMethodError
