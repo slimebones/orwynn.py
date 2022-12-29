@@ -1,13 +1,13 @@
 import lorem
 
 from orwynn.app.App import App
-from orwynn.base.config.Config import Config
-from orwynn.base.controller.Controller import Controller
-from orwynn.base.controller.endpoint import Endpoint
-from orwynn.base.model.Model import Model
-from orwynn.base.module.Module import Module
-from orwynn.base.service.Service import Service
 from orwynn.boot.BootConfig import BootConfig
+from orwynn.config.Config import Config
+from orwynn.controller.endpoint.Endpoint import Endpoint
+from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.model.Model import Model
+from orwynn.module.Module import Module
+from orwynn.service.Service import Service
 from orwynn.util.validation import model_validator
 from tests.std.float import FloatService, float_module
 from tests.std.number import NumberService, number_module
@@ -54,7 +54,7 @@ class TextService(Service):
         )
 
 
-class TextController(Controller):
+class TextController(HTTPController):
     ROUTE = "/"
     ENDPOINTS = [Endpoint(method="get")]
 

@@ -1,17 +1,17 @@
 from orwynn.app.ErrorHandler import ErrorHandler
-from orwynn.base.controller.Controller import Controller
-from orwynn.base.controller.endpoint import Endpoint
-from orwynn.base.error.Error import Error
-from orwynn.base.module.Module import Module
-from orwynn.base.test.HttpClient import HttpClient
 from orwynn.boot.Boot import Boot
+from orwynn.controller.endpoint.Endpoint import Endpoint
+from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.error.Error import Error
+from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
+from orwynn.test.HttpClient import HttpClient
 from orwynn.util import validation
 from orwynn.util.web import JSONResponse, Request, TestResponse
 
 
 def test_basic():
-    class C1(Controller):
+    class C1(HTTPController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 
@@ -41,7 +41,7 @@ def test_basic():
 
 
 def test_default_exception():
-    class C1(Controller):
+    class C1(HTTPController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 
@@ -64,7 +64,7 @@ def test_default_exception():
 
 
 def test_identical_error_handlers():
-    class C1(Controller):
+    class C1(HTTPController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 

@@ -1,4 +1,4 @@
-from orwynn.base.model.Model import Model
+from orwynn.model.Model import Model
 
 
 class CORS(Model):

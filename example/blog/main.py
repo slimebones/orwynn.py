@@ -1,8 +1,7 @@
 from typing import Iterable
 
-from orwynn import (Boot, Controller, Endpoint, Model, Module, Service, crypto,
-                    validation)
-from orwynn.mongo import Document
+from orwynn import (Boot, Endpoint, Model, Module, Service, crypto,
+                    validation, Document, HTTPController)
 
 
 class UserIn(Model):
@@ -37,7 +36,7 @@ class UserService(Service):
         return User.find_all()
 
 
-class UsersIdController(Controller):
+class UsersIdController(HTTPController):
     ROUTE = "/users/{id}"
     ENDPOINTS = [Endpoint(method="get")]
 
@@ -49,7 +48,7 @@ class UsersIdController(Controller):
         return self.sv.find(id)
 
 
-class UsersController(Controller):
+class UsersController(HTTPController):
     ROUTE = "/users"
     ENDPOINTS = [Endpoint(method="get"), Endpoint(method="post")]
 

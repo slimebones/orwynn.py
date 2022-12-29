@@ -1,9 +1,9 @@
 from orwynn.app.App import App
-from orwynn.base.module.Module import Module
 from orwynn.boot.BootConfig import BootConfig
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.provider import Provider
 from orwynn.log.LogConfig import LogConfig
+from orwynn.module.Module import Module
 from tests.std.float import FloatController, FloatService, float_module
 from tests.std.number import NumberController, NumberService, number_module
 from tests.std.root_module import root_module

@@ -3,12 +3,12 @@ import os
 from pytest import fixture
 
 from orwynn.app_rc.AppRC import AppRC
-from orwynn.base.database.DatabaseKind import DatabaseKind
-from orwynn.base.module.Module import Module
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
 from orwynn.boot.UnknownBootModeError import UnknownBootModeError
+from orwynn.database.DatabaseKind import DatabaseKind
 from orwynn.di.DI import DI
+from orwynn.module.Module import Module
 from orwynn.mongo.Mongo import Mongo
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.util import validation

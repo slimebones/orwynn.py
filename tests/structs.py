@@ -7,7 +7,7 @@ importing.
 """
 from pytest import fixture
 
-from orwynn.base.module.Module import Module
+from orwynn.module.Module import Module
 from tests.std.root_module import root_module as std_root_module
 
 

@@ -1,8 +1,8 @@
 from orwynn.app.ErrorHandler import ErrorHandler
-from orwynn.base.controller.Controller import Controller
-from orwynn.base.middleware.Middleware import Middleware
+from orwynn.controller.Controller import Controller
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.BUILTIN_PROVIDERS import BUILTIN_PROVIDERS
+from orwynn.middleware.Middleware import Middleware
 
 """List of builtin classes are able to accept Providers.
 """

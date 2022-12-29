@@ -1,8 +1,8 @@
-from orwynn.base.controller.Controller import Controller
-from orwynn.base.controller.endpoint import Endpoint
-from orwynn.base.module.Module import Module
-from orwynn.base.service.Service import Service
+from orwynn.controller.endpoint.Endpoint import Endpoint
+from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.module.Module import Module
 from orwynn.mongo.Document import Document
+from orwynn.service.Service import Service
 
 
 class User(Document):
@@ -21,7 +21,7 @@ class UserService(Service):
         return user.create()
 
 
-class UsersController(Controller):
+class UsersController(HTTPController):
     ROUTE = "/"
     ENDPOINTS = [Endpoint(method="post")]
 
@@ -33,7 +33,7 @@ class UsersController(Controller):
         return self.sv.create(user).api
 
 
-class UsersIdController(Controller):
+class UsersIdController(HTTPController):
     ROUTE = "/{id}"
     ENDPOINTS = [Endpoint(method="get")]
 

@@ -1,6 +1,6 @@
 from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
 
-from orwynn.base.error.Error import Error
+from orwynn.error.Error import Error
 
 
 class DuplicateKeyError(Error):

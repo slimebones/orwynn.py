@@ -1,10 +1,10 @@
 from typing import Callable, ItemsView
 
-from orwynn.base.controller.endpoint.Endpoint import Endpoint
-from orwynn.base.controller.endpoint.EndpointNotFoundError import \
+from orwynn.controller.endpoint.Endpoint import Endpoint
+from orwynn.controller.endpoint.EndpointNotFoundError import \
     EndpointNotFoundError
-from orwynn.base.worker._Worker import Worker
 from orwynn.util import validation
+from orwynn.worker.Worker import Worker
 
 
 class EndpointProxy(Worker):

@@ -1,7 +1,7 @@
 from datetime import time, timedelta
 from typing import Any, Callable
 
-from orwynn.base.model.Model import Model
+from orwynn.model.Model import Model
 
 
 class LogHandler(Model):

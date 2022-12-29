@@ -6,10 +6,10 @@ from starlette.middleware.base import \
     BaseHTTPMiddleware as StarletteBaseHTTPMiddleware
 from starlette.types import Receive, Scope, Send
 
-from orwynn.base.middleware.Middleware import Middleware
-from orwynn.base.service.framework_service import FrameworkService
-from orwynn.base.test.HttpClient import HttpClient
-from orwynn.base.test.TestClient import TestClient
+from orwynn.middleware.Middleware import Middleware
+from orwynn.service.framework_service import FrameworkService
+from orwynn.test.HttpClient import HttpClient
+from orwynn.test.TestClient import TestClient
 from orwynn.util import validation
 from orwynn.util.web import CORS, HTTPMethod
 

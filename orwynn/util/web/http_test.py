@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from orwynn.base.test.HttpClient import HttpClient
+from orwynn.test.HttpClient import HttpClient
 
 
 @fixture

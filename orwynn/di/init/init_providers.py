@@ -1,6 +1,6 @@
 import inspect
 
-from orwynn.base.config.Config import Config
+from orwynn.config.Config import Config
 from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.di.collecting.no_dependencies_for_given_provider_error import \
     NoDependenciesForGivenProviderError

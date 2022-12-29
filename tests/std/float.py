@@ -1,8 +1,8 @@
 from orwynn.app.App import App
-from orwynn.base.controller.Controller import Controller
-from orwynn.base.controller.endpoint import Endpoint
-from orwynn.base.module.Module import Module
-from orwynn.base.service.Service import Service
+from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.controller.endpoint.Endpoint import Endpoint
+from orwynn.module.Module import Module
+from orwynn.service.Service import Service
 
 
 class FloatService(Service):
@@ -19,7 +19,7 @@ class FloatService(Service):
         return number
 
 
-class FloatController(Controller):
+class FloatController(HTTPController):
     ROUTE = "/"
     ENDPOINTS = [Endpoint(method="get")]
 

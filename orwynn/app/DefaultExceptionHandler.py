@@ -1,5 +1,5 @@
 from orwynn.app.ErrorHandler import ErrorHandler
-from orwynn.base.error.get_non_framework_exceptions import \
+from orwynn.error.get_non_framework_exceptions import \
     get_non_framework_exceptions
 from orwynn.log.Log import Log
 from orwynn.proxy.BootProxy import BootProxy

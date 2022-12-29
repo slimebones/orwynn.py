@@ -15,32 +15,27 @@ from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.app_rc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from orwynn.app_rc.AppRC import AppRC
 from orwynn.app_rc.AppRCSearchError import AppRCSearchError
-from orwynn.base.controller.Controller import Controller
-from orwynn.base.controller.http_controller.HTTPController import \
-    HTTPController
-from orwynn.base.controller.websocket.WebsocketController import \
-    WebsocketController
-from orwynn.base.database.DatabaseKind import DatabaseKind
-from orwynn.base.database.UnknownDatabaseKindError import \
-    UnknownDatabaseKindError
-from orwynn.base.error.Error import Error
-from orwynn.base.error.get_non_framework_exceptions import \
-    get_non_framework_exceptions
-from orwynn.base.error.MalfunctionError import MalfunctionError
-from orwynn.base.indication.default_api_indication import \
-    default_api_indication
-from orwynn.base.indication.Indication import Indication
-from orwynn.base.middleware.Middleware import Middleware
-from orwynn.base.module.Module import Module
-from orwynn.base.worker._Worker import Worker
 from orwynn.boot.BootMode import BootMode
 from orwynn.boot.UnknownBootModeError import UnknownBootModeError
 from orwynn.boot.UnknownSourceError import UnknownSourceError
+from orwynn.controller.Controller import Controller
+from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.controller.websocket.WebsocketController import WebsocketController
+from orwynn.database.DatabaseKind import DatabaseKind
+from orwynn.database.UnknownDatabaseKindError import UnknownDatabaseKindError
 from orwynn.di.DI import DI
 from orwynn.di.missing_di_object_error import MissingDIObjectError
+from orwynn.error.Error import Error
+from orwynn.error.get_non_framework_exceptions import \
+    get_non_framework_exceptions
+from orwynn.error.MalfunctionError import MalfunctionError
+from orwynn.indication.default_api_indication import default_api_indication
+from orwynn.indication.Indication import Indication
 from orwynn.log.configure_log import configure_log
 from orwynn.log.Log import Log
 from orwynn.log.LogConfig import LogConfig
+from orwynn.middleware.Middleware import Middleware
+from orwynn.module.Module import Module
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
@@ -53,6 +48,7 @@ from orwynn.util.file.yml import load_yml
 from orwynn.util.validation import (RequestValidationException, validate,
                                     validate_each)
 from orwynn.util.web import CORS, HTTPException, HTTPMethod
+from orwynn.worker.Worker import Worker
 
 
 class Boot(Worker):
@@ -322,7 +318,7 @@ class Boot(Worker):
                 is_controller_found = True
 
                 if isinstance(c, HTTPController):
-                    self.__register_http_controller_for_module(c, m)
+                    self.__register_http_for_module(c, m)
                 elif isinstance(c, WebsocketController):
                     self.__register_websocket_controller_for_module(c, m)
                 else:
@@ -336,7 +332,7 @@ class Boot(Worker):
                 " so DI should have been initialized it"
             )
 
-    def __register_http_controller_for_module(
+    def __register_http_for_module(
         self,
         c: HTTPController,
         m: Module

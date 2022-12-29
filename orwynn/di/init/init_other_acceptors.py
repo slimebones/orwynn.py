@@ -1,13 +1,12 @@
 import inspect
 
-from orwynn.base.controller.Controller import Controller
-from orwynn.base.controller.http_controller.HTTPController import \
-    HTTPController
-from orwynn.base.middleware.Middleware import Middleware
-from orwynn.base.module.Module import Module
+from orwynn.controller.Controller import Controller
+from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.DIContainer import DIContainer
 from orwynn.di.provider import Provider
+from orwynn.middleware.Middleware import Middleware
+from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.util import web
 from orwynn.util.validation import validate
@@ -39,7 +38,7 @@ def init_other_acceptors(
             )
 
             # Middleware should accept modules only from HTTPControllers
-            if isinstance(C, HTTPController):
+            if issubclass(C, HTTPController):
                 module_covered_routes_for_middleware.append(web.join_routes(
                     module.route, controller.route
                 ))

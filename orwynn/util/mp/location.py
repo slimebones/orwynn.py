@@ -1,6 +1,6 @@
 from typing import Any
 
-from orwynn.base.error.Error import Error
+from orwynn.error.Error import Error
 
 # Location is several nested dicrionary keys joined with ".", e.g. if you have
 # dictionary:

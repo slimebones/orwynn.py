@@ -1,9 +1,9 @@
-from orwynn.base.mapping.CustomUseOfMappingReservedFieldError import \
+from orwynn.mapping.CustomUseOfMappingReservedFieldError import \
     CustomUseOfMappingReservedFieldError
-from orwynn.base.test.HttpClient import HttpClient
 from orwynn.mongo.Document import Document
 from orwynn.mongo.DuplicateKeyError import DuplicateKeyError
 from orwynn.proxy.BootProxy import BootProxy
+from orwynn.test.HttpClient import HttpClient
 from orwynn.util import validation
 from orwynn.util.web import TestResponse
 from tests.std.user import User

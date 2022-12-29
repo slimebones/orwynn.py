@@ -7,12 +7,11 @@ import pydantic
 from orwynn.app.AlreadyRegisteredMethodError import \
     AlreadyRegisteredMethodError
 from orwynn.app.App import App
-from orwynn.base.controller.http_controller.endpoint.Endpoint import Endpoint
-from orwynn.base.controller.http_controller.endpoint.EndpointNotFoundError import \
+from orwynn.controller.endpoint.Endpoint import Endpoint
+from orwynn.controller.endpoint.EndpointNotFoundError import \
     EndpointNotFoundError
-from orwynn.base.indication.Indication import Indication
-from orwynn.base.model.Model import Model
-from orwynn.base.worker._Worker import Worker
+from orwynn.indication.Indication import Indication
+from orwynn.model.Model import Model
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn.router.UnmatchedEndpointEntityError import \
@@ -23,6 +22,7 @@ from orwynn.util import validation
 from orwynn.util.web import HTTPMethod
 from orwynn.util.web.UnsupportedHTTPMethodError import \
     UnsupportedHTTPMethodError
+from orwynn.worker.Worker import Worker
 
 
 class Router(Worker):

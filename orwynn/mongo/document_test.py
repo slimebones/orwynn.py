@@ -1,9 +1,9 @@
 from pytest import fixture
 
-from orwynn.base.database.DatabaseKind import DatabaseKind
-from orwynn.base.module import Module
 from orwynn.boot.Boot import Boot
-from orwynn.mongo import Document
+from orwynn.database.DatabaseKind import DatabaseKind
+from orwynn.module.Module import Module
+from orwynn.mongo.Document import Document
 from orwynn.mongo.DocumentUpdateError import DocumentUpdateError
 from orwynn.util import validation
 

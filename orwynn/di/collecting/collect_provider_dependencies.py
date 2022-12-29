@@ -1,6 +1,4 @@
-from orwynn.base.config.Config import Config
-from orwynn.base.module.Module import Module
-from orwynn.base.service.framework_service import FrameworkService
+from orwynn.config.Config import Config
 from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.di.collecting.get_parameters_for_provider import \
     get_parameters_for_provider
@@ -13,6 +11,8 @@ from orwynn.di.collecting.provider_dependencies_map import \
 from orwynn.di.is_provider import is_provider
 from orwynn.di.NotProviderError import NotProviderError
 from orwynn.di.provider import Provider
+from orwynn.module.Module import Module
+from orwynn.service.framework_service import FrameworkService
 from orwynn.util.fmt import format_chain
 
 

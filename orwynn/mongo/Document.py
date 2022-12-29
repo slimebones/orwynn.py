@@ -6,9 +6,9 @@ from pydantic.fields import ModelField
 from pymongo.cursor import Cursor
 from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
 
-from orwynn.base.mapping.CustomUseOfMappingReservedFieldError import \
+from orwynn.mapping.CustomUseOfMappingReservedFieldError import \
     CustomUseOfMappingReservedFieldError
-from orwynn.base.mapping.Mapping import Mapping, if_linked
+from orwynn.mapping.Mapping import Mapping, if_linked
 from orwynn.mongo.ClientSession import ClientSession
 from orwynn.mongo.DocumentUpdateError import DocumentUpdateError
 from orwynn.mongo.DuplicateKeyError import DuplicateKeyError
