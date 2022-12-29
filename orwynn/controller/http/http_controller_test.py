@@ -10,7 +10,7 @@ from orwynn.controller.MissingControllerClassAttributeError import \
 from orwynn.model.Model import Model
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.test.HttpClient import HttpClient
+from orwynn.test.Client import Client
 from orwynn.util import validation
 from orwynn.util.validation import (RequestValidationException, expect,
                                     validate_re)
@@ -104,7 +104,7 @@ def test_already_registered():
     expect(Boot, AlreadyRegisteredMethodError, m1)
 
 
-def test_std_routes(std_boot: Boot, std_http: HttpClient):
+def test_std_routes(std_boot: Boot, std_http: Client):
     json: dict = std_http.get_jsonify("/text")
     text: Text = Text.recover(json)
     validate_re(text.text, DEFAULT_ID + r"\: .+")
@@ -117,7 +117,7 @@ def test_default_404():
 
     data: dict = Boot(
         Module(route="/", Controllers=[C1])
-    ).app.http_client.get_jsonify(
+    ).app.client.get_jsonify(
         "/pizza",
         404
     )
@@ -147,7 +147,7 @@ def test_default_request_validation_error():
 
     data: dict = Boot(
         Module(route="/", Controllers=[C1])
-    ).app.http_client.post_jsonify(
+    ).app.client.post_jsonify(
         "/",
         422,
         json={
@@ -180,7 +180,7 @@ def test_default_method_not_allowed():
 
     data: dict = Boot(
         Module(route="/", Controllers=[C1])
-    ).app.http_client.post_jsonify(
+    ).app.client.post_jsonify(
         "/",
         405
     )

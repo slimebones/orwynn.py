@@ -5,7 +5,7 @@ from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
-from orwynn.test.HttpClient import HttpClient
+from orwynn.test.Client import Client
 from orwynn.util.web import Request, Response, TestResponse
 
 
@@ -30,7 +30,7 @@ def test_basic():
         Controllers=[C1],
         Middleware=[Mw1]
     ))
-    http: HttpClient = boot.app.http_client
+    http: Client = boot.app.client
     response: TestResponse = http.get("/hello/world")
 
     assert response.headers["x-test"] == "hello"

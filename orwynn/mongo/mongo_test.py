@@ -3,13 +3,13 @@ from orwynn.mapping.CustomUseOfMappingReservedFieldError import \
 from orwynn.mongo.Document import Document
 from orwynn.mongo.DuplicateKeyError import DuplicateKeyError
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.test.HttpClient import HttpClient
+from orwynn.test.Client import Client
 from orwynn.util import validation
 from orwynn.util.web import TestResponse
 from tests.std.user import User
 
 
-def test_user_create(std_mongo_boot, std_http: HttpClient):
+def test_user_create(std_mongo_boot, std_http: Client):
     r: TestResponse = std_http.post(
         "/users",
         200,
@@ -21,14 +21,14 @@ def test_user_create(std_mongo_boot, std_http: HttpClient):
     User.find_one({"id": created_user.id})
 
 
-def test_reserved_mapping_field(std_mongo_boot, std_http: HttpClient):
+def test_reserved_mapping_field(std_mongo_boot, std_http: Client):
     class M(Document):
         mongo_filter: int
 
     validation.expect(M, CustomUseOfMappingReservedFieldError, mongo_filter=1)
 
 
-def test_same_id_creation(std_mongo_boot, std_http: HttpClient):
+def test_same_id_creation(std_mongo_boot, std_http: Client):
     r: TestResponse = std_http.post(
         "/users",
         200,

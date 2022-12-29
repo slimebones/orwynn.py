@@ -5,7 +5,7 @@ from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.error.Error import Error
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.test.HttpClient import HttpClient
+from orwynn.test.Client import Client
 from orwynn.util import validation
 from orwynn.util.web import JSONResponse, Request, TestResponse
 
@@ -28,7 +28,7 @@ def test_basic():
         Module(route="/", Controllers=[C1]),
         ErrorHandlers=[EH1]
     )
-    http: HttpClient = boot.app.http_client
+    http: Client = boot.app.client
 
     r: TestResponse = http.get("/", 400)
 
@@ -51,7 +51,7 @@ def test_default_exception():
     boot: Boot = Boot(
         Module(route="/", Controllers=[C1])
     )
-    http: HttpClient = boot.app.http_client
+    http: Client = boot.app.client
 
     r: TestResponse = http.get("/", 400)
 
@@ -88,7 +88,7 @@ def test_identical_error_handlers():
         # Order matters
         ErrorHandlers=[EH1, EH2]
     )
-    http: HttpClient = boot.app.http_client
+    http: Client = boot.app.client
 
     r: TestResponse = http.get("/", 401)
 

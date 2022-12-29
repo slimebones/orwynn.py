@@ -8,8 +8,8 @@ from starlette.types import Receive, Scope, Send
 
 from orwynn.middleware.Middleware import Middleware
 from orwynn.service.framework_service import FrameworkService
-from orwynn.test.HttpClient import HttpClient
-from orwynn.test.TestClient import TestClient
+from orwynn.test.Client import Client
+from orwynn.test.EmbeddedTestClient import EmbeddedTestClient
 from orwynn.util import validation
 from orwynn.util.web import CORS, HTTPMethod
 
@@ -32,6 +32,7 @@ class App(FrameworkService):
             }
 
         self.__is_cors_configured: bool = False
+        self.__client: Client = Client(EmbeddedTestClient(self.__app))
 
     async def __call__(
         self, scope: Scope, receive: Receive, send: Send
@@ -43,12 +44,8 @@ class App(FrameworkService):
         return self.__app.websocket
 
     @property
-    def test_client(self) -> TestClient:
-        return TestClient(self.__app)
-
-    @property
-    def http_client(self) -> HttpClient:
-        return HttpClient(self.test_client)
+    def client(self) -> Client:
+        return self.__client
 
     def add_middleware(self, middleware: Middleware) -> None:
         validation.validate(middleware, Middleware)

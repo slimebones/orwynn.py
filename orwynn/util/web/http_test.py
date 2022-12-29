@@ -1,8 +1,8 @@
 from pytest import fixture
 
-from orwynn.test.HttpClient import HttpClient
+from orwynn.test.Client import Client
 
 
 @fixture
-def std_http(std_app) -> HttpClient:
-    return HttpClient(std_app.test_client)
+def std_http(std_app) -> Client:
+    return std_app.client

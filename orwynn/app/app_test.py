@@ -10,7 +10,7 @@ def std_app(std_boot: Boot) -> App:
 
 
 def test_openapi(run_endpoint):
-    data: dict = Boot.ie().app.http_client.get_jsonify("/openapi.json", 200)
+    data: dict = Boot.ie().app.client.get_jsonify("/openapi.json", 200)
 
     path: dict = data["paths"]["/"]["get"]
     assert path["deprecated"] is True

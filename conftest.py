@@ -17,8 +17,8 @@ from orwynn.di.di_test import std_di_container
 from orwynn.module.Module import Module
 from orwynn.mongo.Mongo import Mongo
 from orwynn.proxy.boot_data_proxy_test import std_boot_data_proxy
-from orwynn.test.HttpClient import HttpClient
-from orwynn.test.TestClient import TestClient
+from orwynn.test.Client import Client
+from orwynn.test.EmbeddedTestClient import EmbeddedTestClient
 from orwynn.util.web.http_test import std_http
 from orwynn.worker.Worker import Worker
 from tests.structs import (circular_module_struct, long_circular_module_struct,

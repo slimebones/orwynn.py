@@ -2,7 +2,8 @@ import inspect
 from types import NoneType
 from typing import Any, Callable, TypeVar
 
-from orwynn.test.TestClient import TestClient
+from orwynn.test.EmbeddedTestClient import EmbeddedTestClient
+from orwynn.util import validation
 from orwynn.util.validation import validate
 from orwynn.util.web import TestResponse
 
@@ -12,10 +13,12 @@ from orwynn.util.web import TestResponse
 _JsonifyExpectedType = TypeVar("_JsonifyExpectedType")
 
 
-class HttpClient:
+class Client:
     """Operates with HTTP client requests for test purposes."""
-    def __init__(self, client: TestClient) -> None:
-        self._client: TestClient = client
+    def __init__(self, client: EmbeddedTestClient) -> None:
+        validation.validate(client, EmbeddedTestClient)
+        self._client: EmbeddedTestClient = client
+        self.ws = self._client.websocket_connect
 
     def get_jsonify(
         self,

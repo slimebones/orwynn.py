@@ -9,4 +9,4 @@ class WebsocketController(Controller):
     ROUTE: ClassVar[str | None] = None
 
     async def process(self, ws: Websocket) -> None:
-        pass
+        raise NotImplementedError()

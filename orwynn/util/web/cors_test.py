@@ -2,7 +2,7 @@ from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.module.Module import Module
-from orwynn.test.HttpClient import HttpClient
+from orwynn.test.Client import Client
 from orwynn.util.web.CORS import CORS
 
 
@@ -20,7 +20,7 @@ def test_basic():
             allow_origins=["*"]
         )
     )
-    http: HttpClient = boot.app.http_client
+    http: Client = boot.app.client
 
     r = http.options("/", headers={"origin": "hello"})
 
@@ -41,7 +41,7 @@ def test_correct_origin():
             allow_origins=["hello"]
         )
     )
-    http: HttpClient = boot.app.http_client
+    http: Client = boot.app.client
 
     r = http.options("/", headers={"origin": "hello"})
 
@@ -59,7 +59,7 @@ def test_wrong_origin():
             allow_origins=["nothello"]
         )
     )
-    http: HttpClient = boot.app.http_client
+    http: Client = boot.app.client
 
     r = http.options("/", headers={"origin": "hello"})
 
