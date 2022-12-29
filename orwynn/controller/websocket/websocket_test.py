@@ -1,7 +1,6 @@
 from orwynn.boot.Boot import Boot
 from orwynn.controller.websocket.Websocket import Websocket
 from orwynn.controller.websocket.WebsocketController import WebsocketController
-from orwynn.model.Model import Model
 from orwynn.module.Module import Module
 
 

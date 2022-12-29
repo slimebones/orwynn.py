@@ -25,7 +25,7 @@ from orwynn.mongo.Document import Document
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.service.Service import Service
 from orwynn.test.Client import Client
-from orwynn.test.Test import Test
 from orwynn.test.EmbeddedTestClient import EmbeddedTestClient
+from orwynn.test.Test import Test
 # Utils #
 from orwynn.util import crypto, rnd, validation, web
