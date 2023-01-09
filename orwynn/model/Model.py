@@ -1,4 +1,4 @@
-from typing import Any, Self, TypeVar
+from typing import Any, ClassVar, Self, TypeVar
 
 import pydantic
 
@@ -8,7 +8,15 @@ RecoverType = TypeVar("RecoverType", bound="Model")
 
 
 class Model(pydantic.BaseModel):
-    """Basic way to represent a data in the app."""
+    """Basic way to represent a data in the app.
+
+    Attributes:
+        API_TYPE:
+            Text type to be added to API json type field. Defaults to digested
+            class name.
+    """
+    API_TYPE: ClassVar[str | None] = None
+
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
 

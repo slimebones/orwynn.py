@@ -137,7 +137,10 @@ class Indication:
             final_field: str | dict
             match v:
                 case Indicator.TYPE:
-                    final_field = obj.__class__.__name__
+                    if isinstance(obj, Model) and obj.API_TYPE is not None:
+                        final_field = validation.apply(obj.API_TYPE, str)
+                    else:
+                        final_field = obj.__class__.__name__
                     is_type_indicator_found = True
                 case Indicator.VALUE:
                     if isinstance(obj, HTTPException):

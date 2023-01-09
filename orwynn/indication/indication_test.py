@@ -54,3 +54,17 @@ def test_multiple_schemas():
     })
 
     assert i.gen_schema(Item) == i.gen_schema(Item)
+
+
+def test_custom_model_api_type():
+    class Item(Model):
+        API_TYPE = "BestItem"
+        name: str
+        price: float
+
+    i: Indication = Indication({
+        "type": Indicator.TYPE,
+        "value": Indicator.VALUE
+    })
+
+    assert i.digest(Item(name="pizza", price=2.3))["type"] == "BestItem"

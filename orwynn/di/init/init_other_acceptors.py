@@ -65,7 +65,9 @@ def __collect_dependencies_for_acceptor(
     result: dict[str, Provider] = {}
 
     for param in inspect.signature(A).parameters.values():
-        if param.name == "covered_routes":
+        if (
+            param.name == "covered_routes"
+        ):
             continue
 
         # See collect_provider_dependencies.py::_get_parameters_for_provider
