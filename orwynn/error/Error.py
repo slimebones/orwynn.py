@@ -7,10 +7,13 @@ class Error(Exception):
     Attributes:
         message (optional):
             Message to be attached to the error.
+        status_code (optional):
+            Status code to be retrieved by error handlers.
     """
-    def __init__(self, message: str = "") -> None:
+    def __init__(self, message: str = "", status_code: int = 400) -> None:
         super().__init__(message)
         self.message = message
+        self.status_code = status_code
 
     @property
     def api(self) -> dict:

@@ -9,4 +9,4 @@ class DefaultErrorHandler(ErrorHandler):
 
     def handle(self, request: Request, error: Error) -> Response:
         Log.error(error)
-        return JSONResponse(error.api, 400)
+        return JSONResponse(error.api, error.status_code)
