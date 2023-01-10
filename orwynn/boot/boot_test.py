@@ -6,7 +6,6 @@ from orwynn import validation
 from orwynn.app_rc.AppRC import AppRC
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
-from orwynn.boot.UnknownBootModeError import UnknownBootModeError
 from orwynn.database.DatabaseKind import DatabaseKind
 from orwynn.di.DI import DI
 from orwynn.module.Module import Module
@@ -52,8 +51,11 @@ def set_test_mode():
 
 
 @fixture
-def set_std_app_rc_dir():
-    os.environ["Orwynn_AppRCDir"] = os.path.join(os.getcwd(), "tests/std")
+def set_std_app_rc_path():
+    os.environ["Orwynn_AppRCPath"] = os.path.join(
+        os.getcwd(),
+        "tests/std/apprc.yml"
+    )
 
 
 def test_init_mode_default(std_struct: Module):
@@ -90,10 +92,10 @@ def test_init_mode_prod(std_struct: Module):
 
 def test_init_incorrect_mode(std_struct: Module):
     os.environ["Orwynn_Mode"] = "helloworld"
-    validation.expect(Boot, UnknownBootModeError, root_module=std_struct)
+    validation.expect(Boot, ValueError, root_module=std_struct)
 
 
-def test_init_enable_mongo(std_struct: Module, set_std_app_rc_dir):
+def test_init_enable_mongo(std_struct: Module, set_std_app_rc_path):
     Boot(
         root_module=std_struct,
         databases=[DatabaseKind.MONGO]
@@ -104,7 +106,7 @@ def test_init_enable_mongo(std_struct: Module, set_std_app_rc_dir):
 
 def test_nested_configs_prod(
     std_struct: Module,
-    set_std_app_rc_dir,
+    set_std_app_rc_path,
     set_prod_mode
 ):
     Boot(
@@ -118,7 +120,7 @@ def test_nested_configs_prod(
 
 def test_nested_configs_dev(
     std_struct: Module,
-    set_std_app_rc_dir,
+    set_std_app_rc_path,
     set_dev_mode
 ):
     Boot(
@@ -132,7 +134,7 @@ def test_nested_configs_dev(
 
 def test_nested_configs_test(
     std_struct: Module,
-    set_std_app_rc_dir,
+    set_std_app_rc_path,
     set_test_mode
 ):
     Boot(

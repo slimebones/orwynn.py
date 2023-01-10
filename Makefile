@@ -1,5 +1,8 @@
 test:
-	poetry run coverage run -m pytest -x -v --ignore=tests/app -p no:warnings orwynn tests
+	poetry run coverage run -m pytest -x -v --ignore=tests/app -p no:warnings orwynn tests --show-capture=stdout
+
+test-show-all:
+	poetry run coverage run -m pytest -x -v --ignore=tests/app -p no:warnings orwynn tests --show-capture=all
 
 lint:
 # Ignore:

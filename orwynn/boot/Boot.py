@@ -1,3 +1,4 @@
+import contextlib
 import os
 import re
 from pathlib import Path
@@ -29,6 +30,7 @@ from orwynn.error.Error import Error
 from orwynn.error.get_non_framework_exceptions import \
     get_non_framework_exceptions
 from orwynn.error.MalfunctionError import MalfunctionError
+from orwynn.file.NotDirError import NotDirError
 from orwynn.indication.default_api_indication import default_api_indication
 from orwynn.indication.Indication import Indication
 from orwynn.log.configure_log import configure_log
@@ -43,7 +45,6 @@ from orwynn.proxy.BootProxy import BootProxy
 from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn.router.Router import Router
 from orwynn import validation, web
-from orwynn.file.NotDirError import NotDirError
 from orwynn.file.yml import load_yml
 from orwynn.validation import (RequestValidationException, validate,
                                     validate_each)
@@ -80,9 +81,9 @@ class Boot(Worker):
             Boot mode for application. Defaults to DEV.
         Orwynn_RootDir:
             Root directory for application. Defaults to os.getcwd()
-        Orwynn_AppRCDir:
-            Directory where application configs is located. Defaults to root
-            directory.
+        Orwynn_AppRCPath:
+            Path where app configuration file located. Defaults to
+            "./apprc.yml".
 
     Usage:
     ```py
@@ -94,7 +95,7 @@ class Boot(Worker):
 
     app: App = Boot(
         root_module=root_module
-    )app
+    ).app
     ```
     """
     @Log.catch(reraise=True)
@@ -375,7 +376,7 @@ class Boot(Worker):
         if not mode_env:
             return BootMode.DEV
         else:
-            return self._parse_mode_from_str(mode_env)
+            return BootMode(mode_env)
 
     def __parse_root_dir(self) -> Path:
         root_dir: Path
@@ -394,86 +395,61 @@ class Boot(Worker):
         return root_dir
 
     def __parse_app_rc(self, root_dir: Path, mode: BootMode) -> AppRC:
-        rc_env: str = os.getenv(
-            "Orwynn_AppRCDir",
+
+        # All required for this enabled mode data goes here
+        final_app_rc: dict = {}
+
+        rc_path_env: str = os.getenv(
+            "Orwynn_AppRCPath",
             ""
         )
         should_raise_search_error: bool
 
-        rc_dir: Path
-        if not rc_env:
-            rc_dir = root_dir
+        rc_path: Path
+        if not rc_path_env:
+            rc_path = Path(root_dir, "apprc.yml")
             # On default assignment no errors raised if files not found / empty
             should_raise_search_error = False
         else:
-            rc_dir = Path(rc_env)
+            # Env path started from "./" is supported in this case of
+            # concatenation since pathlib.Path does smart path joining
+            rc_path = Path(root_dir, rc_path_env)
             should_raise_search_error = True
 
-        if Path(rc_env).exists():
-            if not rc_dir.is_dir():
-                raise NotDirError(
-                    f"{rc_dir} is not a directory"
-                )
-            app_rc: AppRC = {}
-            mode_nesting_index: int = APP_RC_MODE_NESTING.index(mode)
-            # Load from bottom to top updating previous one with newest one
-            for nesting_mode in APP_RC_MODE_NESTING[:mode_nesting_index + 1]:
-                try:
-                    app_rc.update(
-                        self.__load_appropriate_app_rc(
-                            rc_dir,
-                            nesting_mode
-                        )
-                    )
-                except AppRCSearchError:
-                    continue
+        if Path(rc_path).exists():
+            # Here goes all data contained in yaml config
+            app_rc: AppRC = load_yml(rc_path)
+
             if app_rc == {} and should_raise_search_error:
-                raise AppRCSearchError(
-                    f"loading rc files from dir {rc_dir} hasn't had any effect"
-                    " - no files present (at least prod config) or they are"
-                    " empty"
-                )
-            return app_rc
+                raise ValueError(f"apprc on path {rc_path} is empty")
+
+            # Check if apprc contains any unsupported top-level keys
+            for k in app_rc.keys():
+                supported_top_level_keys: list[str] = [
+                    x.value for x in BootMode
+                ]
+                if k not in supported_top_level_keys:
+                    raise ValueError(
+                        f"unsupported top-level key \"{k}\" of apprc config"
+                    )
+
+            # Load from bottom to top updating previous one with newest one
+            mode_nesting_index: int = APP_RC_MODE_NESTING.index(mode)
+            for nesting_mode in APP_RC_MODE_NESTING[:mode_nesting_index + 1]:
+                # Supress: We don't mind if any top-level key is missing here
+                with contextlib.suppress(KeyError):
+                    final_app_rc.update(app_rc[nesting_mode.value])
         elif (
-            rc_env.startswith("http://")
-            or rc_env.startswith("https://")
+            rc_path_env.startswith("http://")
+            or rc_path_env.startswith("https://")
         ):
             raise NotImplementedError("URL sources are not yet implemented")
-        else:
-            raise UnknownSourceError(
-                f"unknown source {rc_env}"
+        elif should_raise_search_error:
+            raise AppRCSearchError(
+                f"unsupported apprc path {rc_path}"
             )
 
-    def __load_appropriate_app_rc(self, rc_dir: Path, mode: BootMode) -> AppRC:
-        for f in rc_dir.iterdir():
-            try:
-                prelast_suffix, last_suffix = f.suffixes[len(f.suffixes) - 2:]
-            except ValueError:
-                # Not enough values to unpack
-                continue
-
-            if (
-                re.match(r"^apprc\..+\..+$", f.name.lower())
-                and prelast_suffix.lower() == "." + mode.value.lower()
-                and last_suffix.lower() in [".yml", ".yaml"]
-            ):
-                return load_yml(f)
-
-        raise AppRCSearchError(
-            f"cannot find apprc for mode {mode} in directory {rc_dir}"
-        )
-
-    @staticmethod
-    def _parse_mode_from_str(mode: str) -> BootMode:
-        match mode:
-            case "test":
-                return BootMode.TEST
-            case  "dev":
-                return BootMode.DEV
-            case  "prod":
-                return BootMode.PROD
-            case _:
-                raise UnknownBootModeError(f"unknown mode {mode}")
+        return final_app_rc
 
     def __enable_databases(self, database_kinds: list[DatabaseKind]) -> None:
         for kind in database_kinds:

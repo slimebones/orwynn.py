@@ -1,0 +1,13 @@
+prod:
+  Mongo:
+    database_name: orwynntest
+  Text:
+    words_amount: 1
+
+dev:
+  Text:
+    words_amount: 2
+
+test:
+  Text:
+    words_amount: 3
