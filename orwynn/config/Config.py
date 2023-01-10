@@ -4,7 +4,7 @@ from typing import Any, Self
 from orwynn.app_rc.AppRC import AppRC
 from orwynn.model.Model import Model
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.util import validation
+from orwynn import validation
 
 
 class Config(Model):

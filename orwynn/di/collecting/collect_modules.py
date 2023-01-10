@@ -1,6 +1,6 @@
 from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.module.Module import Module
-from orwynn.util.fmt import format_chain
+from orwynn.fmt import format_chain
 
 
 def collect_modules(

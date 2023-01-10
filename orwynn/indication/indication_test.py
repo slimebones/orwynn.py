@@ -5,7 +5,7 @@ from pytest import fixture
 from orwynn.indication.Indication import Indication
 from orwynn.indication.Indicator import Indicator
 from orwynn.model.Model import Model
-from orwynn.util.parsing.parsing import parse_key
+from orwynn.parsing.parsing import parse_key
 from tests.std.text import Text
 
 

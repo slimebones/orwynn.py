@@ -13,7 +13,7 @@ from orwynn.di.NotProviderError import NotProviderError
 from orwynn.di.provider import Provider
 from orwynn.module.Module import Module
 from orwynn.service.framework_service import FrameworkService
-from orwynn.util.fmt import format_chain
+from orwynn.fmt import format_chain
 
 
 def collect_provider_dependencies(

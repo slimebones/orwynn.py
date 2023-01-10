@@ -13,14 +13,14 @@ from orwynn.indication.unsupported_indicator_error import \
     UnsupportedIndicatorError
 from orwynn.model.Model import Model
 from orwynn.SUBCLASSABLES import SUBCLASSABLES
-from orwynn.util import validation
-from orwynn.util.cls import ClassNotFoundError, find_subclass_by_name
-from orwynn.util.mp.location import (FieldLocation, find_field_by_location,
+from orwynn import validation
+from orwynn.cls import ClassNotFoundError, find_subclass_by_name
+from orwynn.mp.location import (FieldLocation, find_field_by_location,
                                      find_location_by_field)
-from orwynn.util.validation import (RequestValidationException, validate,
+from orwynn.validation import (RequestValidationException, validate,
                                     validate_dict)
-from orwynn.util.validation.validator import Validator
-from orwynn.util.web import HTTPException
+from orwynn.validation.validator import Validator
+from orwynn.web import HTTPException
 
 _Locations = dict[Indicator, FieldLocation]
 

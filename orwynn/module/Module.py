@@ -10,7 +10,7 @@ from orwynn.middleware.Middleware import Middleware as MiddlewareClass
 from orwynn.module.framework_service_module_reference_error import \
     FrameworkServiceModuleReferenceError
 from orwynn.service.framework_service import FrameworkService
-from orwynn.util.validation import validate, validate_route
+from orwynn.validation import validate, validate_route
 
 
 class Module:

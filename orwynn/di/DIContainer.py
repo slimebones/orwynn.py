@@ -14,7 +14,7 @@ from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.middleware.Middleware import Middleware
 from orwynn.model.Model import Model
 from orwynn.SUBCLASSABLES import SUBCLASSABLES
-from orwynn.util.validation import validate
+from orwynn.validation import validate
 
 _InnerObj = TypeVar("_InnerObj")
 

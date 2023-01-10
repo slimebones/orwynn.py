@@ -28,4 +28,4 @@ from orwynn.test.Client import Client
 from orwynn.test.EmbeddedTestClient import EmbeddedTestClient
 from orwynn.test.Test import Test
 # Utils #
-from orwynn.util import crypto, rnd, validation, web
+from orwynn import crypto, rnd, validation, web

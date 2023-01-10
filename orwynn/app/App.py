@@ -5,13 +5,14 @@ from fastapi.middleware.cors import CORSMiddleware as FastAPI_CORSMiddleware
 from starlette.middleware.base import \
     BaseHTTPMiddleware as StarletteBaseHTTPMiddleware
 from starlette.types import Receive, Scope, Send
+from orwynn.log.handler_catch import handler_catch
 
 from orwynn.middleware.Middleware import Middleware
 from orwynn.service.framework_service import FrameworkService
 from orwynn.test.Client import Client
 from orwynn.test.EmbeddedTestClient import EmbeddedTestClient
-from orwynn.util import validation
-from orwynn.util.web import CORS, HTTPMethod
+from orwynn import validation
+from orwynn.web import CORS, HTTPMethod
 
 if TYPE_CHECKING:
     from orwynn.app.ErrorHandler import ErrorHandler
@@ -88,5 +89,5 @@ class App(FrameworkService):
         else:
             self.__app.add_exception_handler(
                 error_handler.E,
-                error_handler.handle
+                handler_catch(error_handler.handle)
             )

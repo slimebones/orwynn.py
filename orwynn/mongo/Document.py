@@ -14,7 +14,7 @@ from orwynn.mongo.DocumentUpdateError import DocumentUpdateError
 from orwynn.mongo.DuplicateKeyError import DuplicateKeyError
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoEntity import MongoEntity
-from orwynn.util import fmt, validation
+from orwynn import fmt, validation
 
 
 class Document(Mapping):

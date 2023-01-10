@@ -8,7 +8,7 @@ from orwynn.model.Model import Model
 from orwynn.module.Module import Module
 from orwynn.router.UnmatchedEndpointEntityError import \
     UnmatchedEndpointEntityError
-from orwynn.util import validation
+from orwynn import validation
 
 
 @fixture

@@ -3,7 +3,7 @@ from typing import Any
 
 from orwynn.mapping.MappingNotLinkedError import MappingNotLinkedError
 from orwynn.model.Model import Model
-from orwynn.util.types import DecoratedCallable
+from orwynn.types import DecoratedCallable
 
 
 def if_linked(

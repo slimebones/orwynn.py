@@ -42,12 +42,12 @@ from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn.router.Router import Router
-from orwynn.util import validation, web
-from orwynn.util.file.NotDirError import NotDirError
-from orwynn.util.file.yml import load_yml
-from orwynn.util.validation import (RequestValidationException, validate,
+from orwynn import validation, web
+from orwynn.file.NotDirError import NotDirError
+from orwynn.file.yml import load_yml
+from orwynn.validation import (RequestValidationException, validate,
                                     validate_each)
-from orwynn.util.web import CORS, HTTPException, HTTPMethod
+from orwynn.web import CORS, HTTPException, HTTPMethod
 from orwynn.worker.Worker import Worker
 
 

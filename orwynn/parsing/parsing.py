@@ -1,8 +1,8 @@
 from typing import Any, TypeVar
 
-from orwynn.util.parsing.parsing_error import (KeyParsingError, ParsingError,
+from orwynn.parsing.parsing_error import (KeyParsingError, ParsingError,
                                                StrIntParsingError)
-from orwynn.util.validation import ValidationExpectedType, validate
+from orwynn.validation import ValidationExpectedType, validate
 
 ParsedEntity = TypeVar('ParsedEntity', bound=Any)
 

@@ -4,8 +4,8 @@ from orwynn.mongo.Document import Document
 from orwynn.mongo.DuplicateKeyError import DuplicateKeyError
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.test.Client import Client
-from orwynn.util import validation
-from orwynn.util.web import TestResponse
+from orwynn import validation
+from orwynn.web import TestResponse
 from tests.std.user import User
 
 

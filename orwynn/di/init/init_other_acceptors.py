@@ -8,8 +8,8 @@ from orwynn.di.provider import Provider
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.util import web
-from orwynn.util.validation import validate
+from orwynn import web
+from orwynn.validation import validate
 
 
 def init_other_acceptors(

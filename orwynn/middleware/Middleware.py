@@ -1,7 +1,7 @@
 from typing import Callable
 
-from orwynn.util import validation
-from orwynn.util.web import Request, Response
+from orwynn import validation
+from orwynn.web import Request, Response
 
 
 class Middleware:

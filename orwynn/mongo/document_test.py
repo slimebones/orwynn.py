@@ -5,7 +5,7 @@ from orwynn.database.DatabaseKind import DatabaseKind
 from orwynn.module.Module import Module
 from orwynn.mongo.Document import Document
 from orwynn.mongo.DocumentUpdateError import DocumentUpdateError
-from orwynn.util import validation
+from orwynn import validation
 
 
 class Item(Document):

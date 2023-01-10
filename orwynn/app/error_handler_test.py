@@ -6,8 +6,8 @@ from orwynn.error.Error import Error
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.test.Client import Client
-from orwynn.util import validation
-from orwynn.util.web import JSONResponse, Request, TestResponse
+from orwynn import validation
+from orwynn.web import JSONResponse, Request, TestResponse
 
 
 def test_basic():

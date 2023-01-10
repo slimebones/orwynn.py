@@ -3,9 +3,9 @@ from types import NoneType
 from typing import Any, Callable, TypeVar
 
 from orwynn.test.EmbeddedTestClient import EmbeddedTestClient
-from orwynn.util import validation
-from orwynn.util.validation import validate
-from orwynn.util.web import TestResponse
+from orwynn import validation
+from orwynn.validation import validate
+from orwynn.web import TestResponse
 
 # If ever you get to Python3.12, see if PEP 696 introduced, then apply
 # ... = TypeVar("...", default=dict)

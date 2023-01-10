@@ -18,9 +18,9 @@ from orwynn.router.UnmatchedEndpointEntityError import \
     UnmatchedEndpointEntityError
 from orwynn.router.WrongHandlerReturnTypeError import \
     WrongHandlerReturnTypeError
-from orwynn.util import validation
-from orwynn.util.web import HTTPMethod
-from orwynn.util.web.UnsupportedHTTPMethodError import \
+from orwynn import validation
+from orwynn.web import HTTPMethod
+from orwynn.web.UnsupportedHTTPMethodError import \
     UnsupportedHTTPMethodError
 from orwynn.worker.Worker import Worker
 

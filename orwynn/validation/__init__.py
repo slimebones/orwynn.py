@@ -12,14 +12,14 @@ from typing import Any, Callable, Sized, TypeVar
 from pydantic import ValidationError as __PydanticValidationError
 from pydantic import validator as __pydantic_validator
 
-from orwynn.util.validation.ExpectationError import ExpectationError
-from orwynn.util.validation.re_validation_error import ReValidationError
-from orwynn.util.validation.RequestValidationException import \
+from orwynn.validation.ExpectationError import ExpectationError
+from orwynn.validation.re_validation_error import ReValidationError
+from orwynn.validation.RequestValidationException import \
     RequestValidationException
-from orwynn.util.validation.unknown_validator_error import \
+from orwynn.validation.unknown_validator_error import \
     UnknownValidatorError
-from orwynn.util.validation.validation_error import ValidationError
-from orwynn.util.validation.validator import Validator
+from orwynn.validation.validation_error import ValidationError
+from orwynn.validation.validator import Validator
 
 ValidationExpectedType = type | list[type] | Validator | Path
 ApplyExpectedType = TypeVar("ApplyExpectedType")

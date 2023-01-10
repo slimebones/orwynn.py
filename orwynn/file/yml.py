@@ -6,7 +6,7 @@ from typing import Any
 
 import yaml
 
-from orwynn.util.validation import validate
+from orwynn.validation import validate
 
 
 class YmlLoader(Enum):

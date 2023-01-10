@@ -10,7 +10,7 @@ from orwynn.di.DIContainer import DIContainer
 from orwynn.di.is_provider import is_provider
 from orwynn.di.missing_di_object_error import MissingDIObjectError
 from orwynn.di.provider import Provider
-from orwynn.util.fmt import format_chain
+from orwynn.fmt import format_chain
 
 
 def init_providers(

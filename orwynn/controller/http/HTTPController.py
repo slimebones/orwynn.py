@@ -7,8 +7,8 @@ from orwynn.controller.http.DefinedTwiceControllerMethodError import \
 from orwynn.controller.MissingControllerClassAttributeError import \
     MissingControllerClassAttributeError
 from orwynn.proxy.EndpointProxy import EndpointProxy
-from orwynn.util import validation
-from orwynn.util.web import HTTPMethod, UnsupportedHTTPMethodError
+from orwynn import validation
+from orwynn.web import HTTPMethod, UnsupportedHTTPMethodError
 
 
 class HTTPController(Controller):

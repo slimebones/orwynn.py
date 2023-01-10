@@ -11,7 +11,7 @@ from orwynn.di.DI import DI
 from orwynn.module.Module import Module
 from orwynn.mongo.Mongo import Mongo
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.util import validation
+from orwynn import validation
 from tests.std.text import TextConfig
 
 

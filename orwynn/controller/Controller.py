@@ -2,7 +2,7 @@ from typing import ClassVar
 
 from orwynn.controller.MissingControllerClassAttributeError import \
     MissingControllerClassAttributeError
-from orwynn.util.validation import validate, validate_route
+from orwynn.validation import validate, validate_route
 
 
 class Controller:

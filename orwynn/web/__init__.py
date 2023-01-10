@@ -7,8 +7,8 @@ from fastapi.responses import HTMLResponse as FastAPI_HTMLResponse
 from fastapi.responses import JSONResponse as FastAPI_JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from orwynn.util import validation
-from orwynn.util.web.CORS import CORS
+from orwynn import validation
+from orwynn.web.CORS import CORS
 
 from .UnsupportedHTTPMethodError import UnsupportedHTTPMethodError
 

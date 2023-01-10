@@ -1,8 +1,8 @@
 from typing import Any, ClassVar
 
 from orwynn.model.Model import Model
-from orwynn.util import validation
-from orwynn.util.web import Request, Response
+from orwynn import validation
+from orwynn.web import Request, Response
 
 
 class ErrorHandler(Model):

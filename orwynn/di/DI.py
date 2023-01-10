@@ -10,7 +10,7 @@ from orwynn.di.init.init_other_acceptors import init_other_acceptors
 from orwynn.di.init.init_providers import init_providers
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
-from orwynn.util.validation import validate
+from orwynn.validation import validate
 from orwynn.worker.Worker import Worker
 
 

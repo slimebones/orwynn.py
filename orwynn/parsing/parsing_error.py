@@ -1,7 +1,7 @@
 from types import NoneType
 
 from orwynn.error.Error import Error
-from orwynn.util.validation import validate
+from orwynn.validation import validate
 
 
 class ParsingError(Error):

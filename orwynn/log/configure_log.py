@@ -3,7 +3,7 @@ from orwynn.log.Log import Log
 from orwynn.log.LogConfig import LogConfig
 from orwynn.log.LogHandler import LogHandler
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.util import validation
+from orwynn import validation
 
 
 def configure_log(config: LogConfig) -> None:

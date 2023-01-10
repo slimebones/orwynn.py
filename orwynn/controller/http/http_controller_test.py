@@ -11,13 +11,13 @@ from orwynn.model.Model import Model
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.test.Client import Client
-from orwynn.util import validation
-from orwynn.util.validation import (RequestValidationException, expect,
+from orwynn import validation
+from orwynn.validation import (RequestValidationException, expect,
                                     validate_re)
-from orwynn.util.validation.re_validation_error import ReValidationError
-from orwynn.util.validation.validation_error import ValidationError
-from orwynn.util.web import HTTPException, HTTPMethod
-from orwynn.util.web.UnsupportedHTTPMethodError import \
+from orwynn.validation.re_validation_error import ReValidationError
+from orwynn.validation.validation_error import ValidationError
+from orwynn.web import HTTPException, HTTPMethod
+from orwynn.web.UnsupportedHTTPMethodError import \
     UnsupportedHTTPMethodError
 from tests.std.text import DEFAULT_ID, Text
 

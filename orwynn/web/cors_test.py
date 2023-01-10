@@ -3,7 +3,7 @@ from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.module.Module import Module
 from orwynn.test.Client import Client
-from orwynn.util.web.CORS import CORS
+from orwynn.web.CORS import CORS
 
 
 def test_basic():

@@ -1,4 +1,4 @@
-from orwynn.util.fmt import pascalify, snakefy
+from orwynn.fmt import pascalify, snakefy
 
 
 def test_snakefy():

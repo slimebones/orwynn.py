@@ -10,7 +10,7 @@ from orwynn.database.DatabaseEntityNotFoundError import \
     DatabaseEntityNotFoundError
 from orwynn.mongo.MongoConfig import MongoConfig
 from orwynn.mongo.MongoEntity import MongoEntity
-from orwynn.util import validation
+from orwynn import validation
 
 
 class Mongo(Database):
