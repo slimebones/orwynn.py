@@ -11,5 +11,4 @@ def reraise_catch(error: Exception):
     # try-except block for correct linting even if error isn't actually passed
     # up the stack
     with contextlib.suppress(Exception), Log.catch(reraise=False):
-        print("Hello!")
         raise error
