@@ -5,13 +5,6 @@ from orwynn.error.Error import Error
 # Location is several nested dicrionary keys joined with ".", e.g. if you have
 # dictionary:
 # ```python
-# {
-#     "a1": {
-#         "a2": {
-#             "a3": 10
-#         }
-#     }
-# }
 # ```
 # location of field with value 10 will be "a1.a2.a3"
 FieldLocation = str
@@ -73,10 +66,10 @@ def find_field_by_location(location: FieldLocation, mp: dict) -> Any:
     while keys:
         try:
             result = result[keys.pop()]
-        except KeyError:
+        except KeyError as err:
             raise FieldNotFoundError(
                 f"no field for location \"{location}\" in map {mp}"
-            )
+            ) from err
 
     return result
 

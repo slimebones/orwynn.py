@@ -1,7 +1,8 @@
 from typing import ClassVar
 
-from orwynn.controller.MissingControllerClassAttributeError import \
-    MissingControllerClassAttributeError
+from orwynn.controller.MissingControllerClassAttributeError import (
+    MissingControllerClassAttributeError,
+)
 from orwynn.validation import validate, validate_route
 
 

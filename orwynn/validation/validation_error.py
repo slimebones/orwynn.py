@@ -18,14 +18,14 @@ class ValidationError(Error):
         ):
             if isinstance(expected_type, type):
                 message = \
-                    f'{repr(failed_obj)} should have type:' \
-                    f' {expected_type.__name__}'
+                    f"{repr(failed_obj)} should have type:" \
+                    f" {expected_type.__name__}"
             elif type(expected_type) is list:
                 message = \
-                    f'{repr(failed_obj)}' \
-                    ' should have one type of the following' \
-                    f' list: {[type_.__name__ for type_ in expected_type]}'
+                    f"{repr(failed_obj)}" \
+                    " should have one type of the following" \
+                    + f" list: {[type_.__name__ for type_ in expected_type]}"
             else:
-                raise TypeError('Unrecognized type of `expected_type`')
+                raise TypeError("Unrecognized type of `expected_type`")
 
         super().__init__(message)

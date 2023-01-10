@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 from typing import TypeVar
 
 SingletonInstance = TypeVar("SingletonInstance")
@@ -27,10 +28,8 @@ class SingletonMeta(type):
     def discard(cls, should_validate: bool = True) -> None:
         if should_validate:
             cls.__validate_in_instances("cannot discard")
-        try:
+        with contextlib.suppress(KeyError):
             del cls.__instances[cls]
-        except KeyError:
-            pass
 
 
 class Singleton(metaclass=SingletonMeta):

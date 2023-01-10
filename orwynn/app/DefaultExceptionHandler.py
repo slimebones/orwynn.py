@@ -1,8 +1,9 @@
-from orwynn.app.ErrorHandler import ErrorHandler
-from orwynn.error.get_non_framework_exceptions import \
-    get_non_framework_exceptions
-from orwynn.proxy.BootProxy import BootProxy
 from orwynn import validation
+from orwynn.app.ErrorHandler import ErrorHandler
+from orwynn.error.get_non_framework_exceptions import (
+    get_non_framework_exceptions,
+)
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.web import JSONResponse, Request, Response
 
 

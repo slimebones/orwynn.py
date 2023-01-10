@@ -4,8 +4,9 @@ from typing import TypeVar
 from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.config.Config import Config
 from orwynn.controller.Controller import Controller
-from orwynn.di.di_object_already_initialized_in_container_error import \
-    DIObjectAlreadyInitializedInContainerError
+from orwynn.di.di_object_already_initialized_in_container_error import (
+    DIObjectAlreadyInitializedInContainerError,
+)
 from orwynn.di.DIObject import DIObject
 from orwynn.di.finalized_di_container_error import FinalizedDIContainerError
 from orwynn.di.is_provider import is_provider
@@ -84,7 +85,7 @@ class DIContainer:
 
         obj_class_name: str = obj.__class__.__name__
 
-        if obj_class_name in self._data.keys():
+        if obj_class_name in self._data:
             raise DIObjectAlreadyInitializedInContainerError(
                 f"DI object {obj} already initialized"
             )
@@ -114,10 +115,10 @@ class DIContainer:
 
         try:
             return self._data[key]
-        except KeyError:
+        except KeyError as error:
             raise MissingDIObjectError(
                 f"di object for key \"{key}\" is not found"
-            )
+            ) from error
 
     def find_re(self, pattern: str) -> list[DIObject]:
         """Searches di objects by pattern.

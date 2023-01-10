@@ -6,15 +6,16 @@ from pydantic.fields import ModelField
 from pymongo.cursor import Cursor
 from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
 
-from orwynn.mapping.CustomUseOfMappingReservedFieldError import \
-    CustomUseOfMappingReservedFieldError
+from orwynn import fmt, validation
+from orwynn.mapping.CustomUseOfMappingReservedFieldError import (
+    CustomUseOfMappingReservedFieldError,
+)
 from orwynn.mapping.Mapping import Mapping, if_linked
 from orwynn.mongo.ClientSession import ClientSession
 from orwynn.mongo.DocumentUpdateError import DocumentUpdateError
 from orwynn.mongo.DuplicateKeyError import DuplicateKeyError
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoEntity import MongoEntity
-from orwynn import fmt, validation
 
 
 class Document(Mapping):
@@ -25,7 +26,7 @@ class Document(Mapping):
     mapping.
     """
     def __init__(self, **data: Any) -> None:
-        for k in data.keys():
+        for k in data:
             if k.startswith("mongo_"):
                 raise CustomUseOfMappingReservedFieldError(
                     f"field {k} for mapping {self.__class__} is reserved,"
@@ -97,7 +98,7 @@ class Document(Mapping):
                 )
             )
         except PymongoDuplicateKeyError as error:
-            raise DuplicateKeyError(original_error=error)
+            raise DuplicateKeyError(original_error=error) from error
 
     @if_linked
     def remove(
@@ -158,7 +159,7 @@ class Document(Mapping):
         fields: dict[str, ModelField] = self.__fields__
 
         for k, v in dct.items():
-            if k in fields.keys():
+            if k in fields:
                 # Only strict checking should be performed
                 if type(v) != fields[k].type_:
                     raise DocumentUpdateError(

@@ -19,7 +19,7 @@ class StrIntParsingError(ParsingError):
         validate(failed_str, str)
 
         if not message and failed_str:
-            message = f'{failed_str} is not parseable to int'
+            message = f"{failed_str} is not parseable to int"
 
         super().__init__(message)
 
@@ -36,6 +36,6 @@ class KeyParsingError(ParsingError):
         validate(failed_key, str)
 
         if not message and parsed_map and failed_key:
-            message = f'{parsed_map} has no key: \'{failed_key}\''
+            message = f"{parsed_map} has no key: \"{failed_key}\""
 
         super().__init__(message)

@@ -1,3 +1,4 @@
+from orwynn import validation
 from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
@@ -6,7 +7,6 @@ from orwynn.error.Error import Error
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.test.Client import Client
-from orwynn import validation
 from orwynn.web import JSONResponse, Request, TestResponse
 
 

@@ -1,11 +1,11 @@
 from pytest import fixture
 
+from orwynn import validation
 from orwynn.boot.Boot import Boot
 from orwynn.database.DatabaseKind import DatabaseKind
 from orwynn.module.Module import Module
 from orwynn.mongo.Document import Document
 from orwynn.mongo.DocumentUpdateError import DocumentUpdateError
-from orwynn import validation
 
 
 class Item(Document):
@@ -108,24 +108,17 @@ def test_find_all_limited(create_two_items):
 #   see https://www.mongodb.com/community/forums/t/why-replica-set-is-mandatory-for-transactions-in-mongodb/9533  # noqa: E501
 # def test_success_transaction(create_item: Item):
 #     def __create_item(s):
-#         create_item.update(set={"name": "hello"})
 
 #     with Item.start_session() as session:
-#         session.with_transaction(__create_item)
 
 
 # def test_failed_transaction(create_item: Item):
 #     def __create_item(s: ClientSession):
-#         Item(name="kebab", price=2.1).create(session=s)
-#         create_item.update(set={"name": 50})
 
 #     with Item.start_session() as session:
 #         validation.expect(
 #             session.with_transaction,
 #             DocumentUpdateError,
 #             __create_item
-#         )
 
 #     # Original name should be unchanged, new item not created
-#     assert Item.find_one().name == "pizza"
-#     assert len(list(Item.find_all())) == 1

@@ -31,7 +31,6 @@ ModelValidationError = __PydanticValidationError
 # def optimize(...) -> Any:
 #   def inner(...) -> Any:
 #       ...
-#   return inner
 
 
 def validate(

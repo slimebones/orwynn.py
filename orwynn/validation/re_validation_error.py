@@ -12,6 +12,6 @@ class ReValidationError(Error):
     ) -> None:
         if not message and failed_obj is not None and pattern is not None:
             message = \
-                f'{repr(failed_obj)} should implement pattern {pattern}'
+                f"{repr(failed_obj)} should implement pattern {pattern}"
 
         super().__init__(message)

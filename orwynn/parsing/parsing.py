@@ -4,7 +4,7 @@ from orwynn.parsing.parsing_error import (KeyParsingError, ParsingError,
                                                StrIntParsingError)
 from orwynn.validation import ValidationExpectedType, validate
 
-ParsedEntity = TypeVar('ParsedEntity', bound=Any)
+ParsedEntity = TypeVar("ParsedEntity", bound=Any)
 
 
 def parse_bool(entity: str | bool) -> bool:
@@ -29,14 +29,14 @@ def parse_bool(entity: str | bool) -> bool:
 
     if type(entity) is str:
         match entity:
-            case 'true':
+            case "true":
                 res = True
-            case 'false':
+            case "false":
                 res = False
             case _:
                 raise ParsingError(
-                    'Str entity to transform to bool should have value'
-                    ' `true` or `false`')
+                    "Str entity to transform to bool should have value"
+                    " `true` or `false`")
     elif type(entity) is bool:
         res = entity
     else:

@@ -21,7 +21,6 @@ class YmlLoader(Enum):
 
 class NotValidYmlError(Exception):
     """If loaded yml is not valid."""
-    pass
 
 
 class NotValidFileSuffixError(Exception):
@@ -55,8 +54,8 @@ def load_yml(
     if p.suffix.lower() not in [".yaml", ".yml"]:
         raise NotValidFileSuffixError(f"suffix {p.suffix} is not valid suffix")
 
-    with open(p, "r") as file:
-        data = yaml.load(file, Loader=loader.value)
+    with open(p) as file:
+        data = yaml.load(file, Loader=loader.value)  # noqa: S506
         if data is None:
             # Empty files should return empty dicts
             data = {}

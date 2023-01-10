@@ -6,4 +6,3 @@ class MalfunctionError(Error):
 
     Rare error signifies problems with framework's source code.
     """
-    pass

@@ -26,7 +26,7 @@ class TextConfig(Config):
     @model_validator("words_amount")
     def validate_words_in_range(cls, v):
         if not 1 <= v <= 20:
-            raise ValueError("{} must be in range 1-20".format(v))
+            raise ValueError(f"{v} must be in range 1-20")
         return v
 
 

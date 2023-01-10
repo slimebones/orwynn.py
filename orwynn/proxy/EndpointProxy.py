@@ -1,9 +1,10 @@
 from typing import Callable, ItemsView
 
-from orwynn.controller.endpoint.Endpoint import Endpoint
-from orwynn.controller.endpoint.EndpointNotFoundError import \
-    EndpointNotFoundError
 from orwynn import validation
+from orwynn.controller.endpoint.Endpoint import Endpoint
+from orwynn.controller.endpoint.EndpointNotFoundError import (
+    EndpointNotFoundError,
+)
 from orwynn.worker.Worker import Worker
 
 
@@ -33,7 +34,7 @@ class EndpointProxy(Worker):
 
         try:
             return self.__spec_by_fn[fn]
-        except KeyError:
+        except KeyError as err:
             raise EndpointNotFoundError(
                 f"{fn} not found in proxy"
-            )
+            ) from err

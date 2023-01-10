@@ -35,12 +35,10 @@ def circular_module_struct() -> Module:
 
     m1._imports.append(m2)
 
-    rm = Module(
+    return Module(
         route="/",
         imports=[m1]
     )
-
-    return rm
 
 
 @fixture
@@ -52,9 +50,7 @@ def long_circular_module_struct() -> Module:
 
     m1._imports.append(m4)
 
-    rm = Module(
+    return Module(
         route="/",
         imports=[m1]
     )
-
-    return rm

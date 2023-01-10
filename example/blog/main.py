@@ -1,7 +1,16 @@
 from typing import Iterable
 
-from orwynn import (Boot, Document, Endpoint, HTTPController, Model, Module,
-                    Service, crypto, validation)
+from orwynn import (
+    Boot,
+    Document,
+    Endpoint,
+    HTTPController,
+    Model,
+    Module,
+    Service,
+    crypto,
+    validation,
+)
 
 
 class UserIn(Model):

@@ -5,4 +5,3 @@ class Service:
     Controllers, since Service never ever need to call a controller, so it
     doesn't have to know about them.
     """
-    pass

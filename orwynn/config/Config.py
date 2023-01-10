@@ -1,10 +1,10 @@
 import re
 from typing import Any, Self
 
+from orwynn import validation
 from orwynn.app_rc.AppRC import AppRC
 from orwynn.model.Model import Model
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn import validation
 
 
 class Config(Model):

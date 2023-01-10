@@ -2,16 +2,17 @@ from typing import TYPE_CHECKING, Any, Callable
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware as FastAPI_CORSMiddleware
-from starlette.middleware.base import \
-    BaseHTTPMiddleware as StarletteBaseHTTPMiddleware
+from starlette.middleware.base import (
+    BaseHTTPMiddleware as StarletteBaseHTTPMiddleware,
+)
 from starlette.types import Receive, Scope, Send
-from orwynn.log.handler_catch import handler_catch
 
+from orwynn import validation
+from orwynn.log.handler_catch import handler_catch
 from orwynn.middleware.Middleware import Middleware
 from orwynn.service.framework_service import FrameworkService
 from orwynn.test.Client import Client
 from orwynn.test.EmbeddedTestClient import EmbeddedTestClient
-from orwynn import validation
 from orwynn.web import CORS, HTTPMethod
 
 if TYPE_CHECKING:

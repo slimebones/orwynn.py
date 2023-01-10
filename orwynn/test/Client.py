@@ -8,7 +8,6 @@ from orwynn.validation import validate
 from orwynn.web import TestResponse
 
 # If ever you get to Python3.12, see if PEP 696 introduced, then apply
-# ... = TypeVar("...", default=dict)
 # but for now it is in the next form
 _JsonifyExpectedType = TypeVar("_JsonifyExpectedType")
 
@@ -162,7 +161,7 @@ class Client:
         asserted_status_code: int | None,
         **kwargs
     ) -> TestResponse:
-        request: str = ' '.join([stack[0][3], url])
+        request: str = " ".join([stack[0][3], url])
         return self._resolve_request(request, asserted_status_code, **kwargs)
 
     def _resolve_request(
@@ -179,10 +178,10 @@ class Client:
         validate(request, str)
         validate(asserted_status_code, [int, NoneType])
 
-        # Request example: 'get /users/1'
-        method, url = request.split(' ')
+        # Request example: "get /users/1"
+        method, url = request.split(" ")
 
-        # Also can accept uppercase 'GET ...'
+        # Also can accept uppercase "GET ..."
         method = method.lower()
 
         match method:
@@ -199,7 +198,7 @@ class Client:
             case "options":
                 test_client_method = self._client.options
             case _:
-                raise ValueError(f'Method {method} is not supported')
+                raise ValueError(f"Method {method} is not supported")
 
         response: TestResponse = test_client_method(url, **request_kwargs)
 

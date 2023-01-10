@@ -1,7 +1,7 @@
 from typing import Any, ClassVar
 
-from orwynn.model.Model import Model
 from orwynn import validation
+from orwynn.model.Model import Model
 from orwynn.web import Request, Response
 
 

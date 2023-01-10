@@ -4,24 +4,27 @@ from typing import Any, Callable
 
 import pydantic
 
-from orwynn.app.AlreadyRegisteredMethodError import \
-    AlreadyRegisteredMethodError
+from orwynn import validation
+from orwynn.app.AlreadyRegisteredMethodError import (
+    AlreadyRegisteredMethodError,
+)
 from orwynn.app.App import App
 from orwynn.controller.endpoint.Endpoint import Endpoint
-from orwynn.controller.endpoint.EndpointNotFoundError import \
-    EndpointNotFoundError
+from orwynn.controller.endpoint.EndpointNotFoundError import (
+    EndpointNotFoundError,
+)
 from orwynn.indication.Indication import Indication
 from orwynn.model.Model import Model
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.proxy.EndpointProxy import EndpointProxy
-from orwynn.router.UnmatchedEndpointEntityError import \
-    UnmatchedEndpointEntityError
-from orwynn.router.WrongHandlerReturnTypeError import \
-    WrongHandlerReturnTypeError
-from orwynn import validation
+from orwynn.router.UnmatchedEndpointEntityError import (
+    UnmatchedEndpointEntityError,
+)
+from orwynn.router.WrongHandlerReturnTypeError import (
+    WrongHandlerReturnTypeError,
+)
 from orwynn.web import HTTPMethod
-from orwynn.web.UnsupportedHTTPMethodError import \
-    UnsupportedHTTPMethodError
+from orwynn.web.UnsupportedHTTPMethodError import UnsupportedHTTPMethodError
 from orwynn.worker.Worker import Worker
 
 
@@ -79,7 +82,7 @@ class Router(Worker):
             )
 
         if (
-            route in self.__methods_by_route.keys()
+            route in self.__methods_by_route
             and method in self.__methods_by_route[route]
         ):
             raise AlreadyRegisteredMethodError(
@@ -124,13 +127,15 @@ class Router(Worker):
             final_responses: dict[int, dict[str, Any]] = {}
             if spec.responses:
                 for response in spec.responses:
-                    if response.status_code == spec.default_status_code:
-                        if response.Entity is not fn_return_typehint:
-                            raise UnmatchedEndpointEntityError(
-                                f"route handler {fn} response endpoint entity"
-                                f" {response.Entity} is not match returned"
-                                f" typehint {fn_return_typehint}"
-                            )
+                    if (
+                        response.status_code == spec.default_status_code
+                        and response.Entity is not fn_return_typehint
+                    ):
+                        raise UnmatchedEndpointEntityError(
+                            f"route handler {fn} response endpoint entity"
+                            f" {response.Entity} is not match returned"
+                            f" typehint {fn_return_typehint}"
+                        )
 
                     final_responses[response.status_code] = {
                         "model": api_indication.gen_schema(response.Entity),
@@ -177,9 +182,7 @@ class Router(Worker):
         self,
         fn: Callable
     ) -> bool:
-        for typehint in typing.get_type_hints(fn).values():
-            # Check pydantic base models in case user used them instead of
-            # orwynn.Model
-            if issubclass(typehint, pydantic.BaseModel):
-                return True
-        return False
+        return any(
+            issubclass(typehint, pydantic.BaseModel)
+            for typehint in typing.get_type_hints(fn).values()
+        )

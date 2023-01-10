@@ -1,3 +1,5 @@
+import contextlib
+
 from orwynn.log.Log import Log
 
 
@@ -8,8 +10,6 @@ def reraise_catch(error: Exception):
 
     # try-except block for correct linting even if error isn't actually passed
     # up the stack
-    try:
-        with Log.catch(reraise=False):
-            raise error
-    except:
-        pass
+    with contextlib.suppress(Exception), Log.catch(reraise=False):
+        print("Hello!")
+        raise error

@@ -1,5 +1,6 @@
 import inspect
 
+from orwynn import web
 from orwynn.controller.Controller import Controller
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.di.acceptor import Acceptor
@@ -8,7 +9,6 @@ from orwynn.di.provider import Provider
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn import web
 from orwynn.validation import validate
 
 

@@ -2,6 +2,7 @@ import os
 
 from pytest import fixture
 
+from orwynn import validation
 from orwynn.app_rc.AppRC import AppRC
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
@@ -11,7 +12,6 @@ from orwynn.di.DI import DI
 from orwynn.module.Module import Module
 from orwynn.mongo.Mongo import Mongo
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn import validation
 from tests.std.text import TextConfig
 
 

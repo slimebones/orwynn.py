@@ -1,9 +1,12 @@
-from orwynn.di.collecting.no_dependencies_for_given_provider_error import \
-    NoDependenciesForGivenProviderError
-from orwynn.di.collecting.provider_already_initialized_for_map_error import \
-    ProviderAlreadyInitializedForMapError
-from orwynn.di.collecting.provider_not_found_in_map_error import \
-    ProviderNotFoundInMapError
+from orwynn.di.collecting.no_dependencies_for_given_provider_error import (
+    NoDependenciesForGivenProviderError,
+)
+from orwynn.di.collecting.provider_already_initialized_for_map_error import (
+    ProviderAlreadyInitializedForMapError,
+)
+from orwynn.di.collecting.provider_not_found_in_map_error import (
+    ProviderNotFoundInMapError,
+)
 from orwynn.di.provider import Provider
 
 
@@ -20,7 +23,7 @@ class ProviderDependenciesMap:
 
     @property
     def Providers(self) -> list[type[Provider]]:
-        return [P for P in self._map.keys()]
+        return list(self._map.keys())
 
     @property
     def mapped_items(self):

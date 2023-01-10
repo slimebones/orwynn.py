@@ -1,4 +1,5 @@
-from fastapi.exceptions import \
-    RequestValidationError as FastAPIRequestValidationError
+from fastapi.exceptions import (
+    RequestValidationError as FastAPIRequestValidationError,
+)
 
 RequestValidationException = FastAPIRequestValidationError

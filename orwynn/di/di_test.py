@@ -1,7 +1,8 @@
 from pytest import fixture
 
-from orwynn.di.collecting.provider_dependencies_map import \
-    ProviderDependenciesMap
+from orwynn.di.collecting.provider_dependencies_map import (
+    ProviderDependenciesMap,
+)
 from orwynn.di.DIContainer import DIContainer
 from orwynn.di.init.init_providers import init_providers
 from orwynn.proxy.BootProxy import BootProxy

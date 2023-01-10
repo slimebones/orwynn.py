@@ -1,19 +1,23 @@
 from orwynn.config.Config import Config
 from orwynn.di.circular_dependency_error import CircularDependencyError
-from orwynn.di.collecting.get_parameters_for_provider import \
-    get_parameters_for_provider
-from orwynn.di.collecting.provider_already_initialized_for_map_error import \
-    ProviderAlreadyInitializedForMapError
-from orwynn.di.collecting.provider_availability_error import \
-    ProviderAvailabilityError
-from orwynn.di.collecting.provider_dependencies_map import \
-    ProviderDependenciesMap
+from orwynn.di.collecting.get_parameters_for_provider import (
+    get_parameters_for_provider,
+)
+from orwynn.di.collecting.provider_already_initialized_for_map_error import (
+    ProviderAlreadyInitializedForMapError,
+)
+from orwynn.di.collecting.provider_availability_error import (
+    ProviderAvailabilityError,
+)
+from orwynn.di.collecting.provider_dependencies_map import (
+    ProviderDependenciesMap,
+)
 from orwynn.di.is_provider import is_provider
 from orwynn.di.NotProviderError import NotProviderError
 from orwynn.di.provider import Provider
+from orwynn.fmt import format_chain
 from orwynn.module.Module import Module
 from orwynn.service.framework_service import FrameworkService
-from orwynn.fmt import format_chain
 
 
 def collect_provider_dependencies(
@@ -52,13 +56,10 @@ def _traverse(
 
     if P in chain:
         raise CircularDependencyError(
-            "provider {} occured twice in dependency chain {}"
-            .format(
-                P,
-                # Failed provider is added second time to the chain for
-                # error descriptiveness
-                format_chain(chain + [P])
-            )
+            # Failed provider is added second time to the chain for
+            # error descriptiveness
+            f"provider {P} occured twice in dependency chain"
+            f" {format_chain(chain + [P])}"
         )
     chain.append(P)
 

@@ -10,4 +10,3 @@ class FrameworkService(Service):
     This service shouldn't be added in module.Providers in order to be
     injected - it is always accessible for any Acceptor in the app.
     """
-    pass

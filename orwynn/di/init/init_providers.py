@@ -2,10 +2,12 @@ import inspect
 
 from orwynn.config.Config import Config
 from orwynn.di.circular_dependency_error import CircularDependencyError
-from orwynn.di.collecting.no_dependencies_for_given_provider_error import \
-    NoDependenciesForGivenProviderError
-from orwynn.di.collecting.provider_dependencies_map import \
-    ProviderDependenciesMap
+from orwynn.di.collecting.no_dependencies_for_given_provider_error import (
+    NoDependenciesForGivenProviderError,
+)
+from orwynn.di.collecting.provider_dependencies_map import (
+    ProviderDependenciesMap,
+)
 from orwynn.di.DIContainer import DIContainer
 from orwynn.di.is_provider import is_provider
 from orwynn.di.missing_di_object_error import MissingDIObjectError
@@ -58,13 +60,10 @@ def _traverse(
 
     if StarterProvider in chain:
         raise CircularDependencyError(
-            "provider {} occured twice in dependency chain {}"
-            .format(
-                StarterProvider,
-                # Failed provider is added second time to the chain for
-                # error descriptiveness
-                format_chain(chain + [StarterProvider])
-            )
+            # Failed provider is added second time to the chain for
+            # error descriptiveness
+            f"provider {StarterProvider} occured twice in dependency chain"
+            f" {format_chain(chain + [StarterProvider])}"
         )
 
     try:
@@ -120,7 +119,7 @@ def _traverse(
     else:
         result_provider = StarterProvider(
             *already_initialized_dependencies
-        )  # type: ignore
+        )
 
     container.add(result_provider)
     return result_provider
