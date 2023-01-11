@@ -2,6 +2,7 @@ import contextlib
 import os
 from pathlib import Path
 from types import NoneType
+
 from orwynn import mp, validation
 from orwynn.apprc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from orwynn.apprc.AppRC import AppRC
@@ -83,10 +84,10 @@ def __parse_into(
     mode: BootMode
 ) -> None:
     if source == {} and should_check_if_source_empty:
-        raise ValueError(f"parsed apprc source is empty")
+        raise ValueError("parsed apprc source is empty")
 
     # Check if apprc contains any unsupported top-level keys
-    for k in receiver.keys():
+    for k in receiver:
         supported_top_level_keys: list[str] = [
             x.value for x in BootMode
         ]

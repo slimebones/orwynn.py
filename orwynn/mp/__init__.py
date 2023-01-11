@@ -1,5 +1,6 @@
-from typing import Any
 from copy import deepcopy
+from typing import Any
+
 import dictdiffer
 
 from orwynn import validation
@@ -32,10 +33,7 @@ def patch(
 
     patched: dictpp
 
-    if should_deepcopy:
-        patched = deepcopy(to_be_patched)
-    else:
-        patched = to_be_patched
+    patched = deepcopy(to_be_patched) if should_deepcopy else to_be_patched
 
     diff = dictdiffer.diff(to_be_patched, source)
 
@@ -56,10 +54,9 @@ def patch(
             final_location: str
             for addition in change:
                 # Calculate final location in patched dict
-                if location:
-                    final_location = ".".join([location, addition[0]])
-                else:
-                    final_location = addition[0]
+                final_location = ".".join(
+                    [location, addition[0]]
+                ) if location else addition[0]
                 patched[final_location] = addition[1]
 
         elif event_name == "change":
