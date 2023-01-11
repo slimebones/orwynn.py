@@ -13,9 +13,9 @@ from orwynn.app.DefaultHTTPExceptionHandler import DefaultHTTPExceptionHandler
 from orwynn.app.DefaultRequestValidationExceptionHandler import \
     DefaultRequestValidationExceptionHandler
 from orwynn.app.ErrorHandler import ErrorHandler
-from orwynn.app_rc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
-from orwynn.app_rc.AppRC import AppRC
-from orwynn.app_rc.AppRCSearchError import AppRCSearchError
+from orwynn.apprc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
+from orwynn.apprc.AppRC import AppRC
+from orwynn.apprc.AppRCSearchError import AppRCSearchError
 from orwynn.boot.BootMode import BootMode
 from orwynn.boot.UnknownBootModeError import UnknownBootModeError
 from orwynn.boot.UnknownSourceError import UnknownSourceError
@@ -40,11 +40,12 @@ from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
+from orwynn.mp import dictpp
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn.router.Router import Router
-from orwynn import validation, web
+from orwynn import mp, validation, web
 from orwynn.file.yml import load_yml
 from orwynn.validation import (RequestValidationException, validate,
                                     validate_each)
@@ -129,7 +130,7 @@ class Boot(Worker):
         self.__mode: BootMode = self.__parse_mode()
         self.__root_dir: Path = self.__parse_root_dir()
         self.__api_indication: Indication = api_indication
-        self.__app_rc: AppRC = self.__parse_app_rc(
+        self.__app_rc: AppRC = self.__parse_apprc(
             self.__root_dir,
             self.__mode
         )
@@ -394,10 +395,10 @@ class Boot(Worker):
 
         return root_dir
 
-    def __parse_app_rc(self, root_dir: Path, mode: BootMode) -> AppRC:
+    def __parse_apprc(self, root_dir: Path, mode: BootMode) -> AppRC:
 
         # All required for this enabled mode data goes here
-        final_app_rc: dict = {}
+        final_apprc: AppRC = dictpp()
 
         rc_path_env: str = os.getenv(
             "Orwynn_AppRCPath",
@@ -418,13 +419,13 @@ class Boot(Worker):
 
         if Path(rc_path).exists():
             # Here goes all data contained in yaml config
-            app_rc: AppRC = load_yml(rc_path)
+            apprc: AppRC = dictpp(load_yml(rc_path))
 
-            if app_rc == {} and should_raise_search_error:
+            if apprc == {} and should_raise_search_error:
                 raise ValueError(f"apprc on path {rc_path} is empty")
 
             # Check if apprc contains any unsupported top-level keys
-            for k in app_rc.keys():
+            for k in apprc.keys():
                 supported_top_level_keys: list[str] = [
                     x.value for x in BootMode
                 ]
@@ -438,7 +439,11 @@ class Boot(Worker):
             for nesting_mode in APP_RC_MODE_NESTING[:mode_nesting_index + 1]:
                 # Supress: We don't mind if any top-level key is missing here
                 with contextlib.suppress(KeyError):
-                    final_app_rc.update(app_rc[nesting_mode.value])
+                    mp.patch(
+                        mp.dictpp(final_apprc),
+                        mp.dictpp(apprc[nesting_mode.value]),
+                        should_deepcopy=False
+                    )
         elif (
             rc_path_env.startswith("http://")
             or rc_path_env.startswith("https://")
@@ -449,7 +454,7 @@ class Boot(Worker):
                 f"unsupported apprc path {rc_path}"
             )
 
-        return final_app_rc
+        return final_apprc
 
     def __enable_databases(self, database_kinds: list[DatabaseKind]) -> None:
         for kind in database_kinds:

@@ -3,7 +3,7 @@ import os
 from pytest import fixture
 
 from orwynn import validation
-from orwynn.app_rc.AppRC import AppRC
+from orwynn.apprc.AppRC import AppRC
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
 from orwynn.database.DatabaseKind import DatabaseKind
@@ -28,7 +28,8 @@ def run_std(std_struct: Module):
 
 @fixture
 def std_mongo_boot(std_struct: Module) -> Boot:
-    os.environ["Orwynn_AppRCDir"] = os.path.join(os.getcwd(), "tests/std")
+    os.environ["Orwynn_AppRCPath"] = \
+        os.path.join(os.getcwd(), "tests/std/apprc.yml")
     return Boot(
         root_module=std_struct,
         databases=[DatabaseKind.MONGO]

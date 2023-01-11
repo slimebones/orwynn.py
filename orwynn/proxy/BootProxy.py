@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from orwynn.app_rc.AppRC import AppRC
+from orwynn.apprc.AppRC import AppRC
 from orwynn.boot.BootMode import BootMode
 from orwynn.worker.Worker import Worker
 
