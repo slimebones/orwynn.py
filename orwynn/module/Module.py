@@ -52,8 +52,8 @@ class Module:
     """
     def __init__(
         self,
-        *,
         route: str,
+        *,
         Providers: list[type[Provider]] | None = None,
         Controllers: list[type[Controller]] | None = None,
         Middleware: list[type[MiddlewareClass]] | None = None,

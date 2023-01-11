@@ -1,8 +1,7 @@
-import contextlib
 import os
-import re
 from pathlib import Path
 from types import NoneType
+from copy import deepcopy
 
 import dotenv
 
@@ -16,6 +15,7 @@ from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.apprc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from orwynn.apprc.AppRC import AppRC
 from orwynn.apprc.AppRCSearchError import AppRCSearchError
+from orwynn.apprc.parse_apprc import parse_apprc
 from orwynn.boot.BootMode import BootMode
 from orwynn.boot.UnknownBootModeError import UnknownBootModeError
 from orwynn.boot.UnknownSourceError import UnknownSourceError
@@ -73,18 +73,26 @@ class Boot(Worker):
         cors (optional):
             CORS policy applied to the whole application. No CORS applied by
             default.
-        ErrorHandlers (optional)
+        ErrorHandlers (optional):
             List of error handlers to add. By default framework adds builtin
             Exception and orwynn.Error handlers.
+        apprc (optional):
+            Application configuration. By default environ Orwynn_AppRCPath is
+            checked if this arg is not given.
+        mode (optional):
+            Application mode. By default environ Orwynn_Mode is
+            checked if this arg is not given.
 
     Environs:
         Orwynn_Mode:
-            Boot mode for application. Defaults to DEV.
+            Boot mode for application. Defaults to DEV. Alternatively you can
+            pass arg "mode".
         Orwynn_RootDir:
             Root directory for application. Defaults to os.getcwd()
         Orwynn_AppRCPath:
             Path where app configuration file located. Defaults to
-            "./apprc.yml".
+            "./apprc.yml". Alternatively you can pass dictionary directly in
+            "apprc" attribute.
 
     Usage:
     ```py
@@ -108,7 +116,9 @@ class Boot(Worker):
         api_indication: Indication | None = None,
         databases: list[DatabaseKind] | None = None,
         cors: CORS | None = None,
-        ErrorHandlers: list[type[ErrorHandler]] | None = None
+        ErrorHandlers: list[type[ErrorHandler]] | None = None,
+        apprc: AppRC | None = None,
+        mode: BootMode | None = None
     ) -> None:
         super().__init__()
         if dotenv_path is None:
@@ -124,15 +134,22 @@ class Boot(Worker):
         validate_each(
             ErrorHandlers, ErrorHandler, expected_sequence_type=list
         )
+        validate(apprc, [AppRC, NoneType])
+        validate(mode, [BootMode, NoneType])
 
         dotenv.load_dotenv(dotenv_path, override=True)
 
-        self.__mode: BootMode = self.__parse_mode()
+        self.__mode: BootMode
+        if mode:
+            self.__mode = mode
+        else:
+            self.__mode = self.__parse_mode()
         self.__root_dir: Path = self.__parse_root_dir()
         self.__api_indication: Indication = api_indication
-        self.__app_rc: AppRC = self.__parse_apprc(
+        self.__app_rc: AppRC = parse_apprc(
             self.__root_dir,
-            self.__mode
+            self.__mode,
+            deepcopy(apprc)
         )
 
         # Init proxies
@@ -394,67 +411,6 @@ class Boot(Worker):
             )
 
         return root_dir
-
-    def __parse_apprc(self, root_dir: Path, mode: BootMode) -> AppRC:
-
-        # All required for this enabled mode data goes here
-        final_apprc: AppRC = dictpp()
-
-        rc_path_env: str = os.getenv(
-            "Orwynn_AppRCPath",
-            ""
-        )
-        should_raise_search_error: bool
-
-        rc_path: Path
-        if not rc_path_env:
-            rc_path = Path(root_dir, "apprc.yml")
-            # On default assignment no errors raised if files not found / empty
-            should_raise_search_error = False
-        else:
-            # Env path started from "./" is supported in this case of
-            # concatenation since pathlib.Path does smart path joining
-            rc_path = Path(root_dir, rc_path_env)
-            should_raise_search_error = True
-
-        if Path(rc_path).exists():
-            # Here goes all data contained in yaml config
-            apprc: AppRC = dictpp(load_yml(rc_path))
-
-            if apprc == {} and should_raise_search_error:
-                raise ValueError(f"apprc on path {rc_path} is empty")
-
-            # Check if apprc contains any unsupported top-level keys
-            for k in apprc.keys():
-                supported_top_level_keys: list[str] = [
-                    x.value for x in BootMode
-                ]
-                if k not in supported_top_level_keys:
-                    raise ValueError(
-                        f"unsupported top-level key \"{k}\" of apprc config"
-                    )
-
-            # Load from bottom to top updating previous one with newest one
-            mode_nesting_index: int = APP_RC_MODE_NESTING.index(mode)
-            for nesting_mode in APP_RC_MODE_NESTING[:mode_nesting_index + 1]:
-                # Supress: We don't mind if any top-level key is missing here
-                with contextlib.suppress(KeyError):
-                    mp.patch(
-                        mp.dictpp(final_apprc),
-                        mp.dictpp(apprc[nesting_mode.value]),
-                        should_deepcopy=False
-                    )
-        elif (
-            rc_path_env.startswith("http://")
-            or rc_path_env.startswith("https://")
-        ):
-            raise NotImplementedError("URL sources are not yet implemented")
-        elif should_raise_search_error:
-            raise AppRCSearchError(
-                f"unsupported apprc path {rc_path}"
-            )
-
-        return final_apprc
 
     def __enable_databases(self, database_kinds: list[DatabaseKind]) -> None:
         for kind in database_kinds:

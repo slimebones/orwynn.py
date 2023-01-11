@@ -3,7 +3,7 @@ from orwynn.mp import patch, dictpp
 
 def test_patch():
     a = dictpp({
-        "BurgetShot": {
+        "BurgerShot": {
             "location": "Vinewood",
             "employees": 15,
             "menu": {
@@ -14,7 +14,7 @@ def test_patch():
         }
     })
     b = dictpp({
-        "BurgetShot": {
+        "BurgerShot": {
             "menu": {
                 "cola": 1.8,
                 "pizza": 4.1,
@@ -26,7 +26,7 @@ def test_patch():
     result = patch(a, b)
 
     assert result == {
-        "BurgetShot": {
+        "BurgerShot": {
             "location": "Vinewood",
             "employees": 15,
             "menu": {
@@ -42,7 +42,7 @@ def test_patch():
 
 def test_patch_no_deepcopy():
     a = dictpp({
-        "BurgetShot": {
+        "BurgerShot": {
             "location": "Vinewood",
             "employees": 15,
             "menu": {
@@ -53,7 +53,7 @@ def test_patch_no_deepcopy():
         }
     })
     b = dictpp({
-        "BurgetShot": {
+        "BurgerShot": {
             "menu": {
                 "cola": 1.8,
                 "pizza": 4.1,
@@ -65,7 +65,7 @@ def test_patch_no_deepcopy():
     patch(a, b, should_deepcopy=False)
 
     assert a == {
-        "BurgetShot": {
+        "BurgerShot": {
             "location": "Vinewood",
             "employees": 15,
             "menu": {

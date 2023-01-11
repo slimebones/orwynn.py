@@ -48,8 +48,8 @@ def patch(
         event_name, location, change = event
         # How dictdiffer event_name, location and change would like for a
         # reference:
-        #   change BurgetShot.menu.cola (1.5, 1.8)
-        #   add BurgetShot.menu [('pizza', 4.1), ('fried_chicken', 3.5)]
+        #   change BurgerShot.menu.cola (1.5, 1.8)
+        #   add BurgerShot.menu [('pizza', 4.1), ('fried_chicken', 3.5)]
 
         # Consider only adding and changing events
         if event_name == "add":
