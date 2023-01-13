@@ -1,4 +1,5 @@
 import pytest
+
 from orwynn.cls import bind_first_arg, bind_first_arg_async
 
 

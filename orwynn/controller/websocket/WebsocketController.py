@@ -1,8 +1,10 @@
-from typing import Any, Callable, ClassVar
-from orwynn import validation
+from typing import Callable, ClassVar
 
+from orwynn import validation
 from orwynn.controller.Controller import Controller
-from orwynn.controller.websocket.WebsocketEventHandler import WebsocketEventHandler
+from orwynn.controller.websocket.WebsocketEventHandler import (
+    WebsocketEventHandler,
+)
 
 
 class WebsocketController(Controller):
@@ -55,10 +57,7 @@ class WebsocketController(Controller):
                     ) from err
 
                 event_name: str
-                if k == "main":
-                    event_name = "main"
-                else:
-                    event_name = k[3:]
+                event_name = "main" if k == "main" else k[3:]
 
                 if event_name == "":
                     raise ValueError(
@@ -68,6 +67,9 @@ class WebsocketController(Controller):
 
                 events.append(WebsocketEventHandler(
                     name=event_name,
+                    # It's important to use "getattr()" here instead of
+                    # "v" since last is obtained from class and is not bound to
+                    # an instance.
                     fn=getattr(self, k)
                 ))
 

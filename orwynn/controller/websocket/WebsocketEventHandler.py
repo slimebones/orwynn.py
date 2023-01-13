@@ -1,4 +1,5 @@
 from typing import Callable
+
 from orwynn.model.Model import Model
 
 

@@ -1,7 +1,8 @@
 import functools
 import inspect
-from typing import Any, Callable
 import typing
+from typing import Any, Callable
+
 from orwynn.error.Error import Error
 from orwynn.types import Class
 
@@ -60,7 +61,6 @@ def bind_first_arg_async(arg: Any):
     """Same as bind_first_arg(), but for async functions.
     """
     def wrapper(fn: Callable):
-        print(fn)
         @functools.wraps(fn)
         async def inner(*args, **kwargs):
             return await fn(arg, *args, **kwargs)
