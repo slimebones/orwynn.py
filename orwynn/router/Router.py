@@ -52,6 +52,7 @@ class Router(Worker):
         validation.validate(route, str)
         validation.validate(fn, Callable)
 
+        print(f"register ws {fn} for route {route}")
         self.__app.websocket_handler(route)(fn)
 
     def register_route(

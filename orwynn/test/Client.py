@@ -17,7 +17,7 @@ class Client:
     def __init__(self, client: EmbeddedTestClient) -> None:
         validation.validate(client, EmbeddedTestClient)
         self._client: EmbeddedTestClient = client
-        self.ws = self._client.websocket_connect
+        self.websocket = self._client.websocket_connect
 
     def get_jsonify(
         self,

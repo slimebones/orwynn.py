@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from types import NoneType
 from copy import deepcopy
+from typing import Callable
 
 import dotenv
 
@@ -19,6 +20,7 @@ from orwynn.apprc.parse_apprc import parse_apprc
 from orwynn.boot.BootMode import BootMode
 from orwynn.boot.UnknownBootModeError import UnknownBootModeError
 from orwynn.boot.UnknownSourceError import UnknownSourceError
+from orwynn.cls import bind_first_arg, bind_first_arg_async
 from orwynn.controller.Controller import Controller
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.controller.websocket.WebsocketController import WebsocketController
@@ -383,10 +385,23 @@ class Boot(Worker):
         c: WebsocketController,
         m: Module
     ) -> None:
-        self.__router.register_websocket(
-            route=web.join_routes(m.route, c.route),
-            fn=c.process
-        )
+        # Methods started from "on_" or equal to "main" should be registered.
+        # "main" is assigned to MODULE_ROUTE + CONTROLLER_ROUTE directly.
+        for event_handler in c.event_handlers:
+            method_route: str
+            if event_handler.name == "main":
+                method_route = "/"
+            else:
+                method_route = event_handler.name
+
+
+            # Final route = MODULE_ROUTE + CONTROLLER_ROUTE + METHOD_ROUTE
+            self.__router.register_websocket(
+                route=web.join_routes(m.route, c.route, method_route),
+                # Bind actual controller instance "c" for a dynamically
+                # obtained method "v"
+                fn=event_handler.fn
+            )
 
     def __parse_mode(self) -> BootMode:
         mode_env: str | None = os.getenv("Orwynn_Mode")

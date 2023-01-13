@@ -10,10 +10,24 @@ def format_chain(lst: list[Any]) -> str:
     return " -> ".join([str(x) for x in lst])
 
 
+def kebabify(name: str) -> str:
+    """Converts name to kebab-case.
+
+    Args:
+        name:
+            Name to convert.
+
+    Returns:
+        Name converted.
+    """
+    # All underscores are simply replaced
+    return name.lower().replace("_", "-")
+
+
 def snakefy(name: str) -> str:
     """Converts name to snake_case.
 
-    Note that this is not reversible using camelfy()
+    Note that this is not reversible using camelfy().
 
     Args:
         name:

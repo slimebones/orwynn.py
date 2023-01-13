@@ -1,3 +1,7 @@
+import functools
+import inspect
+from typing import Any, Callable
+import typing
 from orwynn.error.Error import Error
 from orwynn.types import Class
 
@@ -30,6 +34,38 @@ def find_subclass_by_name(name: str, BaseClass: Class) -> Class:
         )
     else:
         return out
+
+def bind_first_arg(arg: Any):
+    """Adds first argument to wrapped function call.
+
+    Useful when you want to add e.g. "self" with some instance to dynamically
+    obtained class's method.
+
+    Args:
+        arg:
+            First arg to be added to wrapped function call.
+
+    Returns:
+        Wrapper accepting function.
+    """
+    def wrapper(fn: Callable):
+        @functools.wraps(fn)
+        def inner(*args, **kwargs):
+            return fn(arg, *args, **kwargs)
+        return inner
+    return wrapper
+
+
+def bind_first_arg_async(arg: Any):
+    """Same as bind_first_arg(), but for async functions.
+    """
+    def wrapper(fn: Callable):
+        print(fn)
+        @functools.wraps(fn)
+        async def inner(*args, **kwargs):
+            return await fn(arg, *args, **kwargs)
+        return inner
+    return wrapper
 
 
 def __traverse_subclasses_checking_name(name: str, C: Class) -> Class | None:

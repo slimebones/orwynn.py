@@ -1,4 +1,8 @@
-from orwynn.fmt import pascalify, snakefy
+from orwynn.fmt import kebabify, pascalify, snakefy
+
+
+def test_kebabify():
+    assert kebabify("wow_hello") == "wow-hello"
 
 
 def test_snakefy():
