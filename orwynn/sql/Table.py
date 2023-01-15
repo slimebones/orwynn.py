@@ -1,13 +1,13 @@
 from typing import Any
-import uuid
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from orwynn.fmt import snakefy
+from ..rnd import makeid
 
 
 class Table(DeclarativeBase):
-    """Base orm model responsible of holding database model's data and at least
+    """Base orm model responsible of holding database model's data and
     it's basic CRUD operations.
 
     Update representatives are defined individually at each subclass
@@ -17,10 +17,13 @@ class Table(DeclarativeBase):
     _id: Mapped[int] = mapped_column(primary_key=True)
     _type: Mapped[str]
 
+    # Do not map Table to actual database table
+    __abstract__ = True
+
     # For each table special string uuid is generated, but it is not a primary
     # key for the performance sake, for details see:
     #   https://stackoverflow.com/a/517591/14748231
-    _uuid: Mapped[str] = mapped_column(default=uuid.uuid4, unique=True)
+    _uuid: Mapped[str] = mapped_column(default=makeid, unique=True)
 
     @hybrid_property
     def id(self) -> int:

@@ -7,7 +7,7 @@ import re
 import typing
 from inspect import isclass
 from pathlib import Path
-from typing import Any, Callable, Sized, TypeVar
+from typing import Any, Callable, Optional, Sized, TypeVar
 
 from pydantic import ValidationError as __PydanticValidationError
 from pydantic import validator as __pydantic_validator
@@ -275,6 +275,19 @@ def expect(
         raise ExpectationError(
             f"error {ErrorToExpect} expected on call of function {fn}"
         )
+
+
+CheckedObj = TypeVar("CheckedObj")
+def check(obj: Optional[CheckedObj]) -> CheckedObj:
+    """Checks if given object is not None.
+
+    Raises:
+        ValidationError:
+            If given object is None.
+    """
+    if obj is None:
+        raise ValidationError(f"shouldn't be None")
+    return obj
 
 
 def __check_validator(obj: Any, validator: Validator) -> None:
