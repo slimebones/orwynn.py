@@ -1,9 +1,11 @@
 from typing import Any
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
 from orwynn.fmt import snakefy
-from ..rnd import makeid
+from orwynn.rnd import makeid
 
 
 class Table(DeclarativeBase):

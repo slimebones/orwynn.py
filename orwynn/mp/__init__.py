@@ -8,11 +8,30 @@ from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.mp.dictpp import dictpp
 
 
+def find(location: str, mp: dict) -> Any:
+    """Finds field by location.
+
+    Args:
+        location:
+            String representing location to search from in format
+            "key1.key2.key3".
+        mp:
+            Dict to search in.
+
+    Returns:
+        Field found.
+    """
+    validation.validate(location, str)
+    validation.validate(mp, dict)
+
+    return dictpp(mp)[location]
+
+
 def patch(
-    to_be_patched: dictpp,
-    source: dictpp,
+    to_be_patched: dict,
+    source: dict,
     should_deepcopy: bool = True
-) -> dictpp:
+) -> dict:
     """Patch one dictionary by another.
 
     Args:
@@ -28,12 +47,16 @@ def patch(
     Returns:
         Patched dictionary.
     """
-    validation.validate(to_be_patched, dictpp)
-    validation.validate(source, dictpp)
+    validation.validate(to_be_patched, dict)
+    validation.validate(source, dict)
 
     patched: dictpp
 
-    patched = deepcopy(to_be_patched) if should_deepcopy else to_be_patched
+    # Cast to dictpp to operation with locations. At return it's important
+    # to cast it back to normal dict.
+    patched = dictpp(
+        deepcopy(to_be_patched) if should_deepcopy else to_be_patched
+    )
 
     diff = dictdiffer.diff(to_be_patched, source)
 
@@ -66,4 +89,5 @@ def patch(
                 )
             patched[location] = change[1]
 
-    return patched
+    # Cast back to normal dictionary
+    return dict(patched)

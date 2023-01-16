@@ -1,4 +1,3 @@
 
-from orwynn.mp import dictpp
 
-AppRC = dictpp
+AppRC = dict

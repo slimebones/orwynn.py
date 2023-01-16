@@ -21,6 +21,9 @@ from orwynn.validation.unknown_validator_error import \
 from orwynn.validation.validation_error import ValidationError
 from orwynn.validation.validator import Validator
 
+# WARNING: typing aliases are not currently supported so passing types like
+#   "dict[str, Any]" to check will produce ValidationError in any case since
+#   direct runtime comparison is made.
 ValidationExpectedType = type | list[type] | Validator | Path
 ApplyExpectedType = TypeVar("ApplyExpectedType")
 model_validator = __pydantic_validator

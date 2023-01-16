@@ -9,7 +9,6 @@ from orwynn.apprc.AppRC import AppRC
 from orwynn.apprc.AppRCSearchError import AppRCSearchError
 from orwynn.boot.BootMode import BootMode
 from orwynn.file.yml import load_yml
-from orwynn.mp import dictpp
 
 
 def parse_apprc(
@@ -34,7 +33,7 @@ def parse_apprc(
     validation.validate(direct_apprc, [AppRC, NoneType])
 
     # All required for this enabled mode data goes here
-    final_apprc: AppRC = dictpp()
+    final_apprc: AppRC = {}
 
     if not direct_apprc:
         rc_path_env: str = os.getenv(
@@ -56,9 +55,8 @@ def parse_apprc(
 
         if Path(rc_path).exists():
             # Here goes all data contained in yaml config
-            apprc: AppRC = dictpp(load_yml(rc_path))
+            apprc: AppRC = load_yml(rc_path)
             __parse_into(final_apprc, apprc, should_raise_search_error, mode)
-
         elif (
             rc_path_env.startswith("http://")
             or rc_path_env.startswith("https://")
@@ -70,16 +68,16 @@ def parse_apprc(
                 f"unsupported apprc path {rc_path}"
             )
     else:
-        # For direct app rc empty check should be always performed, so we pass
-        # True
+        # For direct app rc emptiness check should be always performed, so we
+        # pass True
         __parse_into(final_apprc, direct_apprc, True, mode)
 
     return final_apprc
 
 
 def __parse_into(
-    receiver: dictpp,
-    source: dictpp,
+    receiver: dict,
+    source: dict,
     should_check_if_source_empty: bool,
     mode: BootMode
 ) -> None:

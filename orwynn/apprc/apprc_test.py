@@ -1,6 +1,6 @@
 import pytest
 
-from orwynn import validation
+from orwynn import mp, validation
 from orwynn.apprc.AppRC import AppRC
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
@@ -8,7 +8,6 @@ from orwynn.config.Config import Config
 from orwynn.di.DI import DI
 from orwynn.model.Model import Model
 from orwynn.module.Module import Module
-from orwynn.mp import dictpp
 
 
 class Menu(Model):
@@ -23,7 +22,7 @@ class BurgerShotConfig(Config):
 
 @pytest.fixture
 def raw_apprc() -> AppRC:
-    return dictpp({
+    return {
         "prod": {
             "BurgerShot": {
                 "location": "Vinewood",
@@ -53,7 +52,7 @@ def raw_apprc() -> AppRC:
                 }
             }
         }
-    })
+    }
 
 
 def test_prod(raw_apprc: AppRC):
@@ -66,7 +65,7 @@ def test_prod(raw_apprc: AppRC):
     assert validation.apply(
         DI.ie().find("BurgerShotConfig"),
         BurgerShotConfig
-    ).dict() == raw_apprc["prod.BurgerShot"]
+    ).dict() == mp.find("prod.BurgerShot", raw_apprc)
 
 
 def test_dev(raw_apprc: AppRC):

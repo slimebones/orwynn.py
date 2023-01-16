@@ -1,16 +1,17 @@
 from enum import Enum
 from typing import Generator
 
-from sqlalchemy import ForeignKey, select
-from orwynn import Boot, Module, validation
 import pytest
-from sqlalchemy.orm import Mapped, relationship, mapped_column
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .Table import Table
+from orwynn import validation
+from orwynn.crypto import hash_password
 
-from .SQLDatabase import SQLDatabase
 from .SQLConfig import SQLConfig
+from .SQLDatabase import SQLDatabase
 from .SQLService import SQLService
+from .Table import Table
 
 
 class User(Table):
@@ -56,7 +57,7 @@ def _sqlite() -> Generator:
 def _user1() -> User:
     return User(
         name="Tommy",
-        hpassword="vicecity",
+        hpassword=hash_password("vicecity"),
     )
 
 
@@ -64,7 +65,7 @@ def _user1() -> User:
 def _user2() -> User:
     return User(
         name="Lance",
-        hpassword="vancenotdance"
+        hpassword=hash_password("vancenotdance")
     )
 
 
@@ -139,7 +140,7 @@ def test_postgresql_init():
         database_type=SQLDatabase.POSTGRESQL,
         database_name="orwynn-test",
         database_user="postgres",
-        database_password="postgres",
+        database_password="postgres",  # noqa: S106
         database_host="localhost",
         database_port=5432
     ))

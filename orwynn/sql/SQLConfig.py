@@ -1,5 +1,6 @@
 
 from typing import Any
+
 from orwynn import Config
 
 from .SQLDatabase import SQLDatabase

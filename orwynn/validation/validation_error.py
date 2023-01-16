@@ -23,7 +23,7 @@ class ValidationError(Error):
             elif type(expected_type) is list:
                 message = \
                     f"{repr(failed_obj)}" \
-                    " should have one type of the following" \
+                    " should be any type of" \
                     + f" list: {[type_.__name__ for type_ in expected_type]}"
             else:
                 raise TypeError("Unrecognized type of `expected_type`")
