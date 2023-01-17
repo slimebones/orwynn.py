@@ -20,7 +20,8 @@ from orwynn.module.Module import Module
 from orwynn.mongo.Document import Document
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.service.Service import Service
-from orwynn.sql import SQLService, Table
+from orwynn.sql.SQLService import SQLService
+from orwynn.sql.Table import Table
 from orwynn.test.Client import Client
 from orwynn.test.EmbeddedTestClient import EmbeddedTestClient
 from orwynn.test.Test import Test
