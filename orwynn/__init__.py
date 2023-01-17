@@ -24,6 +24,7 @@ from orwynn.middleware.Middleware import Middleware
 from orwynn.model.Model import Model
 from orwynn.module.Module import Module
 from orwynn.mongo.Document import Document
+from orwynn.sql import Table, SQLService
 
 # Proxies #
 from orwynn.proxy.BootProxy import BootProxy
