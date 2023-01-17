@@ -1,5 +1,6 @@
 from typing import Optional, Sequence
-from orwynn import Service, validation
+from orwynn import validation
+from orwynn.service.Service import Service
 
 from .Table import Table
 

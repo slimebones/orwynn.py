@@ -1,15 +1,9 @@
 """Scalable web-framework with out-of-the-box architecture."""
-# Bases are imported directly
-
-# Crucial workers and services #
-# Utils #
 from orwynn import crypto, dt, mp, rnd, uio, validation, web
 from orwynn.app.App import App
 from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
-
-# Base classes #
 from orwynn.config.Config import Config
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HTTPController import HTTPController
@@ -24,11 +18,9 @@ from orwynn.middleware.Middleware import Middleware
 from orwynn.model.Model import Model
 from orwynn.module.Module import Module
 from orwynn.mongo.Document import Document
-from orwynn.sql import Table, SQLService
-
-# Proxies #
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.service.Service import Service
+from orwynn.sql import SQLService, Table
 from orwynn.test.Client import Client
 from orwynn.test.EmbeddedTestClient import EmbeddedTestClient
 from orwynn.test.Test import Test
