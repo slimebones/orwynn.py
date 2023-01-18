@@ -40,6 +40,9 @@ class Table(DeclarativeBase):
                 primary_key=True
             )
 
+    # Declaring _type as class atrribute might be a reason for sqlalchemy to
+    # raise a warning, maybe because this field is being redefined by
+    # subclasses.
     @declared_attr
     def _type(self) -> Mapped[str]:
         return mapped_column()
