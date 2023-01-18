@@ -1,5 +1,6 @@
-from typing import Any
+from typing import Any, Self
 
+from sqlalchemy import ForeignKey
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -16,9 +17,6 @@ class Table(DeclarativeBase):
     (e.g. `set_something()`), and by default accessed via basic model
     alteration, e.g. `MyModel.name = 'Another name'`.
     """
-    _id: Mapped[int] = mapped_column(primary_key=True)
-    _type: Mapped[str]
-
     # Do not map Table to actual database table
     __abstract__ = True
 
@@ -30,6 +28,34 @@ class Table(DeclarativeBase):
     @hybrid_property
     def id(self) -> int:
         return self._id
+
+    @declared_attr.cascading  # type: ignore
+    def _id(cls) -> Mapped[int]:
+        parent: type[Self] = cls._get_parent_class()
+        if parent is Table:
+            return mapped_column(primary_key=True)
+        else:
+            return mapped_column(
+                ForeignKey(snakefy(parent.__name__) + "._id"),
+                primary_key=True
+            )
+
+    @declared_attr
+    def _type(self) -> Mapped[str]:
+        return mapped_column()
+
+    @classmethod
+    def _get_parent_class(cls) -> type[Self]:
+        bases: tuple[type] = cls.__bases__
+
+        if len(bases) == 1:
+            return bases[0]
+        elif len(bases) > 1:
+            raise ValueError(
+                "multiple inheritance for Tables is not supported"
+            )
+        else:
+            raise
 
     @hybrid_property
     def type(self) -> str:
