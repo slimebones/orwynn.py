@@ -1,18 +1,18 @@
 from typing import Optional, Sequence
 from orwynn import validation
-from orwynn.service.Service import Service
+from orwynn.database.Database import Database
 
 from .Table import Table
 
-from .SQLDatabase import SQLDatabase
+from .SQLDatabaseKind import SQLDatabaseKind
 
-from .SQLConfig import SQLConfig
+from orwynn.sql.SQLConfig import SQLConfig
 from sqlalchemy import create_engine, Engine
 from sqlalchemy import Table as SQLAlchemyTable
 from sqlalchemy.orm import Session
 
 
-class SQLService(Service):
+class SQL(Database):
     def __init__(
         self,
         config: SQLConfig
@@ -66,15 +66,15 @@ class SQLService(Service):
     def __create_engine(self) -> Engine:
         url: str
         connect_args: dict = {}
-        match self.__config.database_type:
-            case SQLDatabase.POSTGRESQL:
+        match self.__config.database_kind:
+            case SQLDatabaseKind.POSTGRESQL:
                 url = \
                     f"postgresql://{self.__config.database_user}" \
                     + f"{self.__config.database_password}" \
                     + f"@{self.__config.database_host}" \
                     + f":{self.__config.database_port}" \
                     + f"/{self.__config.database_name}"
-            case SQLDatabase.SQLITE:
+            case SQLDatabaseKind.SQLITE:
                 database_path: str = validation.apply(
                     self.__config.database_path,
                     str
@@ -91,7 +91,7 @@ class SQLService(Service):
                 connect_args.update({"check_same_thread": False})
             case _:
                 raise TypeError(
-                    f"unknown database {self.__config.database_type}"
+                    f"unknown database {self.__config.database_kind}"
                 )
         return create_engine(
             url, connect_args=connect_args

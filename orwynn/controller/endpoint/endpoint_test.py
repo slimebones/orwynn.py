@@ -48,10 +48,19 @@ def run_endpoint():
         def get(self) -> Item:
             return Item(name="hello", price=1)
 
-    Boot(Module(
-        route="/",
-        Controllers=[C1]
-    ))
+    Boot(
+        Module(
+            route="/",
+            Controllers=[C1]
+        ),
+        apprc={
+            "test": {
+                "Mongo": {
+                    "database_name": "orwynn-test"
+                }
+            }
+        }
+    )
 
 
 def test_not_matched_spec_to_return_type():

@@ -1,11 +1,13 @@
 from orwynn.config.Config import Config
-from orwynn.di.provider import Provider
-from orwynn.service.framework_service import FrameworkService
+from orwynn.di.Provider import Provider
+from orwynn.service.FrameworkService import FrameworkService
 from orwynn.service.Service import Service
 
 """List of builtin classes in Provider category.
 
-Providers with lower priority cannot inject ones with higher priority.
+Providers with higher priority cannot inject ones with lower priority.
+
+This list: Lower index => higher priority.
 """
 BUILTIN_PROVIDERS: list[type[Provider]] = [
     Config,

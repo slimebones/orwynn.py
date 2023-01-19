@@ -2,7 +2,6 @@ from pytest import fixture
 
 from orwynn import validation
 from orwynn.boot.Boot import Boot
-from orwynn.database.DatabaseKind import DatabaseKind
 from orwynn.module.Module import Module
 from orwynn.mongo.Document import Document
 from orwynn.mongo.DocumentUpdateError import DocumentUpdateError
@@ -16,7 +15,7 @@ class Item(Document):
 
 @fixture
 def run_mongo_boot():
-    Boot(Module(route="/"), databases=[DatabaseKind.MONGO])
+    Boot(Module(route="/"))
 
 
 @fixture

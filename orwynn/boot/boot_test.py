@@ -6,7 +6,6 @@ from orwynn import validation
 from orwynn.apprc.AppRC import AppRC
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
-from orwynn.database.DatabaseKind import DatabaseKind
 from orwynn.di.DI import DI
 from orwynn.module.Module import Module
 from orwynn.mongo.Mongo import Mongo
@@ -28,11 +27,8 @@ def run_std(std_struct: Module):
 
 @fixture
 def std_mongo_boot(std_struct: Module) -> Boot:
-    os.environ["Orwynn_AppRCPath"] = \
-        os.path.join(os.getcwd(), "tests/std/apprc.yml")
     return Boot(
-        root_module=std_struct,
-        databases=[DatabaseKind.MONGO]
+        root_module=std_struct
     )
 
 
@@ -52,7 +48,7 @@ def set_test_mode():
 
 
 @fixture
-def set_std_app_rc_path():
+def set_std_apprc_path_env() -> None:
     os.environ["Orwynn_AppRCPath"] = os.path.join(
         os.getcwd(),
         "tests/std/apprc.yml"
@@ -96,24 +92,23 @@ def test_init_incorrect_mode(std_struct: Module):
     validation.expect(Boot, ValueError, root_module=std_struct)
 
 
-def test_init_enable_mongo(std_struct: Module, set_std_app_rc_path):
+def test_init_enable_mongo(std_struct: Module, set_std_apprc_path_env):
     Boot(
-        root_module=std_struct,
-        databases=[DatabaseKind.MONGO]
+        root_module=std_struct
     )
 
-    assert Mongo.ie()
+    validation.validate(DI.ie().find("Mongo"), Mongo)
 
 
 def test_nested_configs_prod(
     std_struct: Module,
-    set_std_app_rc_path,
+    set_std_apprc_path_env,
     set_prod_mode
 ):
     Boot(
         root_module=std_struct
     )
-    app_rc: AppRC = BootProxy.ie().app_rc
+    app_rc: AppRC = BootProxy.ie().apprc
     text_config: TextConfig = DI.ie().find("TextConfig")
 
     assert app_rc["Text"]["words_amount"] == text_config.words_amount == 1
@@ -121,13 +116,13 @@ def test_nested_configs_prod(
 
 def test_nested_configs_dev(
     std_struct: Module,
-    set_std_app_rc_path,
+    set_std_apprc_path_env,
     set_dev_mode
 ):
     Boot(
         root_module=std_struct
     )
-    app_rc: AppRC = BootProxy.ie().app_rc
+    app_rc: AppRC = BootProxy.ie().apprc
     text_config: TextConfig = DI.ie().find("TextConfig")
 
     assert app_rc["Text"]["words_amount"] == text_config.words_amount == 2
@@ -135,13 +130,13 @@ def test_nested_configs_dev(
 
 def test_nested_configs_test(
     std_struct: Module,
-    set_std_app_rc_path,
+    set_std_apprc_path_env,
     set_test_mode
 ):
     Boot(
         root_module=std_struct
     )
-    app_rc: AppRC = BootProxy.ie().app_rc
+    app_rc: AppRC = BootProxy.ie().apprc
     text_config: TextConfig = DI.ie().find("TextConfig")
 
     assert app_rc["Text"]["words_amount"] == text_config.words_amount == 3

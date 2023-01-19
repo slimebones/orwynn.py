@@ -2,6 +2,7 @@ from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.module.Module import Module
 from orwynn.mongo.Document import Document
+from orwynn.mongo.Mongo import Mongo
 from orwynn.service.Service import Service
 
 
@@ -11,7 +12,7 @@ class User(Document):
 
 
 class UserService(Service):
-    def __init__(self) -> None:
+    def __init__(self, mongo: Mongo) -> None:
         super().__init__()
 
     def find(self, id: str) -> User:

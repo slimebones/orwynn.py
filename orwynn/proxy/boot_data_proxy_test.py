@@ -13,6 +13,6 @@ def std_boot_data_proxy() -> BootProxy:
         root_dir=Path.cwd(),
         mode=BootMode.TEST,
         api_indication=default_api_indication,
-        app_rc={},
+        apprc={},
         ErrorHandlers=[]
     )

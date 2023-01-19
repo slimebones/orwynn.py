@@ -5,7 +5,7 @@ from orwynn.controller.Controller import Controller
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.DIContainer import DIContainer
-from orwynn.di.provider import Provider
+from orwynn.di.Provider import Provider
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy

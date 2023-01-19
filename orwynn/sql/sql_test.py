@@ -9,8 +9,8 @@ from orwynn import validation
 from orwynn.crypto import hash_password
 
 from .SQLConfig import SQLConfig
-from .SQLDatabase import SQLDatabase
-from .SQLService import SQLService
+from .SQLDatabaseKind import SQLDatabaseKind
+from .SQL import SQL
 from .Table import Table
 
 
@@ -41,8 +41,8 @@ class Like(Table):
 
 @pytest.fixture
 def _sqlite() -> Generator:
-    service = SQLService(SQLConfig(
-        database_type=SQLDatabase.SQLITE,
+    service = SQL(SQLConfig(
+        database_kind=SQLDatabaseKind.SQLITE,
         database_path=":memory:"
     ))
 
@@ -83,28 +83,28 @@ def _like1() -> Like:
 
 
 @pytest.fixture
-def _add_user1(_sqlite: SQLService, _user1: User) -> None:
+def _add_user1(_sqlite: SQL, _user1: User) -> None:
     with _sqlite.session as session:
         session.add(_user1)
         session.commit()
 
 
 @pytest.fixture
-def _add_user2(_sqlite: SQLService, _user2: User) -> None:
+def _add_user2(_sqlite: SQL, _user2: User) -> None:
     with _sqlite.session as session:
         session.add(_user2)
         session.commit()
 
 
 @pytest.fixture
-def _add_tweet1(_sqlite: SQLService, _tweet1: Tweet) -> None:
+def _add_tweet1(_sqlite: SQL, _tweet1: Tweet) -> None:
     with _sqlite.session as session:
         session.add(_tweet1)
         session.commit()
 
 
 @pytest.fixture
-def _add_like1(_sqlite: SQLService, _like1: Like) -> None:
+def _add_like1(_sqlite: SQL, _like1: Like) -> None:
     with _sqlite.session as session:
         session.add(_like1)
         session.commit()
@@ -112,7 +112,7 @@ def _add_like1(_sqlite: SQLService, _like1: Like) -> None:
 
 @pytest.fixture
 def _connect_user1a2_tweet1_like1(
-    _sqlite: SQLService,
+    _sqlite: SQL,
     _add_user1,
     _add_user2,
     _add_tweet1,
@@ -130,14 +130,14 @@ def _connect_user1a2_tweet1_like1(
 
 
 def test_sqlite_init():
-    SQLService(SQLConfig(
-        database_type=SQLDatabase.SQLITE,
+    SQL(SQLConfig(
+        database_kind=SQLDatabaseKind.SQLITE,
         database_path=":memory:"
     ))
 
 def test_postgresql_init():
-    SQLService(SQLConfig(
-        database_type=SQLDatabase.POSTGRESQL,
+    SQL(SQLConfig(
+        database_kind=SQLDatabaseKind.POSTGRESQL,
         database_name="orwynn-test",
         database_user="postgres",
         database_password="postgres",  # noqa: S106
@@ -147,7 +147,7 @@ def test_postgresql_init():
 
 
 def test_create(
-    _sqlite: SQLService,
+    _sqlite: SQL,
     _connect_user1a2_tweet1_like1
 ):
     with _sqlite.session as s:
@@ -160,7 +160,7 @@ def test_create(
         assert user2.likes == [like1]
 
 
-def test_enum_field(_sqlite: SQLService):
+def test_enum_field(_sqlite: SQL):
     class Color(Enum):
         RED = 1
         BLUE = 2

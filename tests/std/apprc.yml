@@ -1,6 +1,6 @@
 prod:
   Mongo:
-    database_name: orwynntest
+    database_name: orwynn-test
   Text:
     words_amount: 1
 

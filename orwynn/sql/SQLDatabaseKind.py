@@ -1,6 +1,6 @@
 from enum import Enum
 
 
-class SQLDatabase(Enum):
+class SQLDatabaseKind(Enum):
     POSTGRESQL = "postgresql"
     SQLITE = "sqlite"

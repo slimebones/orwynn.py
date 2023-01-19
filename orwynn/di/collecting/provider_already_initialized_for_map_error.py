@@ -1,4 +1,4 @@
-from orwynn.di.provider import Provider
+from orwynn.di.Provider import Provider
 from orwynn.error.Error import Error
 
 

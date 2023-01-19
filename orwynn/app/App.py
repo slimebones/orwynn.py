@@ -10,7 +10,7 @@ from starlette.types import Receive, Scope, Send
 from orwynn import validation
 from orwynn.log.handler_catch import handler_catch
 from orwynn.middleware.Middleware import Middleware
-from orwynn.service.framework_service import FrameworkService
+from orwynn.service.FrameworkService import FrameworkService
 from orwynn.test.Client import Client
 from orwynn.test.EmbeddedTestClient import EmbeddedTestClient
 from orwynn.web import CORS, HTTPMethod

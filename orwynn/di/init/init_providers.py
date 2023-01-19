@@ -11,7 +11,7 @@ from orwynn.di.collecting.provider_dependencies_map import (
 from orwynn.di.DIContainer import DIContainer
 from orwynn.di.is_provider import is_provider
 from orwynn.di.missing_di_object_error import MissingDIObjectError
-from orwynn.di.provider import Provider
+from orwynn.di.Provider import Provider
 from orwynn.fmt import format_chain
 
 
@@ -27,7 +27,6 @@ def init_providers(
     Returns:
         DI container populated with initialized providers by their names.
     """
-
     # Note for this module that most validation logic has been already
     # performed at previous stages, so no need to do checks here.
 

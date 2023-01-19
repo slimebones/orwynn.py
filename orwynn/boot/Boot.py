@@ -24,7 +24,6 @@ from orwynn.cls import bind_first_arg, bind_first_arg_async
 from orwynn.controller.Controller import Controller
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.controller.websocket.WebsocketController import WebsocketController
-from orwynn.database.DatabaseKind import DatabaseKind
 from orwynn.database.UnknownDatabaseKindError import UnknownDatabaseKindError
 from orwynn.di.DI import DI
 from orwynn.di.missing_di_object_error import MissingDIObjectError
@@ -49,6 +48,7 @@ from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn.router.Router import Router
 from orwynn import mp, validation, web
 from orwynn.file.yml import load_yml
+from orwynn.sql.SQL import SQL
 from orwynn.validation import (RequestValidationException, validate,
                                     validate_each)
 from orwynn.web import CORS, HTTPException, HTTPMethod
@@ -64,14 +64,12 @@ class Boot(Worker):
     Attributes:
         root_module:
             Root module of the app.
-        dotenv_path (optional):
+        dotenv_path (optional)Dir:
             Path to .env file. Defaults to ".env".
         api_indication (optional):
             Indication object used as a convention for outcoming API
             structures. Defaults to predefined by framework's indication
             convention.
-        databases (optional):
-            List of database kinds enabled. No databases enabled by default.
         cors (optional):
             CORS policy applied to the whole application. No CORS applied by
             default.
@@ -93,7 +91,7 @@ class Boot(Worker):
             Root directory for application. Defaults to os.getcwd()
         Orwynn_AppRCPath:
             Path where app configuration file located. Defaults to
-            "./apprc.yml". Alternatively you can pass dictionary directly in
+            "./apprc.yml". Alternatively you can pass a dictionary directly in
             "apprc" attribute.
 
     Usage:
@@ -116,7 +114,6 @@ class Boot(Worker):
         *,
         dotenv_path: Path | None = None,
         api_indication: Indication | None = None,
-        databases: list[DatabaseKind] | None = None,
         cors: CORS | None = None,
         ErrorHandlers: list[type[ErrorHandler]] | None = None,
         apprc: AppRC | None = None,
@@ -148,33 +145,32 @@ class Boot(Worker):
             self.__mode = self.__parse_mode()
         self.__root_dir: Path = self.__parse_root_dir()
         self.__api_indication: Indication = api_indication
-        self.__app_rc: AppRC = parse_apprc(
+        self.__apprc: AppRC = parse_apprc(
             self.__root_dir,
             self.__mode,
             deepcopy(apprc)
         )
+        print(self.__apprc)
 
         # Init proxies
         BootProxy(
             root_dir=self.__root_dir,
             mode=self.__mode,
             api_indication=self.__api_indication,
-            app_rc=self.__app_rc,
+            apprc=self.__apprc,
             ErrorHandlers=ErrorHandlers
         )
         EndpointProxy()
         APIIndicationOnlyProxy(api_indication)
 
-        if databases is None:
-            databases = []
-        else:
-            validate_each(databases, DatabaseKind, expected_sequence_type=list)
-
-        # Add crucial builtin objects
+        # Add framework services
         root_module.add_provider_or_skip(App)
         root_module.add_provider_or_skip(LogConfig)
+        # FIXME: It is better to add non-crucial framework services (such as
+        #   Mongo or SQL) only on need.
+        root_module.add_provider_or_skip(Mongo)
+        root_module.add_provider_or_skip(SQL)
 
-        self.__enable_databases(databases)
         self.__di: DI = DI(root_module)
 
         self.__router: Router = Router(
@@ -426,19 +422,3 @@ class Boot(Worker):
             )
 
         return root_dir
-
-    def __enable_databases(self, database_kinds: list[DatabaseKind]) -> None:
-        for kind in database_kinds:
-            match kind:
-                case DatabaseKind.MONGO:
-                    Mongo(
-                        config=MongoConfig.load()
-                    )
-                case DatabaseKind.POSTRGRESQL:
-                    raise NotImplementedError(
-                        "postgresql database currently not supported"
-                    )
-                case _:
-                    raise UnknownDatabaseKindError(
-                        f"unknown database kind {kind}"
-                    )

@@ -7,7 +7,7 @@ from orwynn.di.collecting.provider_already_initialized_for_map_error import (
 from orwynn.di.collecting.provider_not_found_in_map_error import (
     ProviderNotFoundInMapError,
 )
-from orwynn.di.provider import Provider
+from orwynn.di.Provider import Provider
 
 
 class ProviderDependenciesMap:

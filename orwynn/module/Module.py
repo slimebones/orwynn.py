@@ -5,12 +5,12 @@ from orwynn.app.EmptyRouteError import EmptyRouteError
 from orwynn.controller.Controller import Controller
 from orwynn.di.is_provider import is_provider
 from orwynn.di.NotProviderError import NotProviderError
-from orwynn.di.provider import Provider
+from orwynn.di.Provider import Provider
 from orwynn.middleware.Middleware import Middleware as MiddlewareClass
 from orwynn.module.framework_service_module_reference_error import (
     FrameworkServiceModuleReferenceError,
 )
-from orwynn.service.framework_service import FrameworkService
+from orwynn.service.FrameworkService import FrameworkService
 from orwynn.validation import validate, validate_route
 
 

@@ -14,10 +14,10 @@ from orwynn.di.collecting.provider_dependencies_map import (
 )
 from orwynn.di.is_provider import is_provider
 from orwynn.di.NotProviderError import NotProviderError
-from orwynn.di.provider import Provider
+from orwynn.di.Provider import Provider
 from orwynn.fmt import format_chain
 from orwynn.module.Module import Module
-from orwynn.service.framework_service import FrameworkService
+from orwynn.service.FrameworkService import FrameworkService
 
 
 def collect_provider_dependencies(
@@ -96,7 +96,7 @@ def _traverse(
                 nested_module
             )
 
-    # Pop blocking element.  For this concept see collect_modules._traverse
+    # Pop blocking element. For this concept see collect_modules._traverse
     # function
     chain.pop()
 
@@ -108,10 +108,11 @@ def _check_availability(
 ) -> Module | None:
     # Check if P2 is available to P1, module is required to start searching
     # from. Returns the module where P2 is located or None if P2 is a
-    # FrameworkService.
+    # FrameworkService. Also returns None if P1 is FrameworkService and P2 is
+    # any Config because we 100% sure that Config will be available.
 
     # If P1_module is None, this means that we entered a Framework scope and
-    # will be serarching there.
+    # will search there.
 
     # Note, that this function is not checking provider priorities. So it's
     # possible to see positive output here for lower-priority provider
@@ -121,11 +122,15 @@ def _check_availability(
     # Resolve cases with frameworks services right away:
     #   - If P2 is a FrameworkService, we can be assured that it is available
     #       for any other requested Provider, except for cases, if requested
-    #       Provider is a Config. -> Why?
+    #       Provider is a Config, because Config is the only class that has
+    #       higher priority than FrameworkService.
     is_error: bool
     res: Module | None = None
 
-    if issubclass(P2, FrameworkService) and not issubclass(P1, Config):
+    if (
+        issubclass(P1, FrameworkService) and issubclass(P2, Config)
+        or issubclass(P2, FrameworkService) and not issubclass(P1, Config)
+    ):
         is_error = False
     elif P1_module is not None:
         found_module = _search_matching_provider(

@@ -20,14 +20,14 @@ class BootProxy(Worker):
         root_dir: Path,
         mode: BootMode,
         api_indication: "Indication",
-        app_rc: AppRC,
+        apprc: AppRC,
         ErrorHandlers: list[type["ErrorHandler"]]
     ) -> None:
         super().__init__()
         self.__root_dir: Path = root_dir
         self.__mode: BootMode = mode
         self.__api_indication: Indication = api_indication
-        self.__app_rc: AppRC = app_rc
+        self.__apprc: AppRC = apprc
         self.__ErrorHandlers: list[type["ErrorHandler"]] = ErrorHandlers
 
     @property
@@ -39,8 +39,8 @@ class BootProxy(Worker):
         return self.__api_indication
 
     @property
-    def app_rc(self) -> AppRC:
-        return self.__app_rc
+    def apprc(self) -> AppRC:
+        return self.__apprc
 
     @property
     def ErrorHandlers(self) -> list[type["ErrorHandler"]]:
@@ -52,7 +52,7 @@ class BootProxy(Worker):
             "root_dir": self.__root_dir,
             "mode": self.__mode,
             "api_indication": self.__api_indication,
-            "app_rc": self.__app_rc,
+            "app_rc": self.__apprc,
             "ErrorHandlers": self.__ErrorHandlers
         }
 

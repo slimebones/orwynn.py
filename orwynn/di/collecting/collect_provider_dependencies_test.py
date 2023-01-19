@@ -9,7 +9,7 @@ from orwynn.di.collecting.collect_provider_dependencies import (
     collect_provider_dependencies,
 )
 from orwynn.di.is_provider import is_provider
-from orwynn.di.provider import Provider
+from orwynn.di.Provider import Provider
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
 from tests.std.Assertion import Assertion
@@ -17,7 +17,6 @@ from tests.std.Assertion import Assertion
 
 @fixture
 def std_provider_dependencies_map(
-    std_boot_data_proxy: BootProxy,
     std_modules: list[Module]
 ) -> ProviderDependenciesMap:
     return collect_provider_dependencies(std_modules)

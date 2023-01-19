@@ -7,6 +7,7 @@ from pymongo.cursor import Cursor
 from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
 
 from orwynn import fmt, validation
+from orwynn.di.DI import DI
 from orwynn.mapping.CustomUseOfMappingReservedFieldError import (
     CustomUseOfMappingReservedFieldError,
 )
@@ -40,7 +41,7 @@ class Document(Mapping):
 
     @classmethod
     def _get_mongo(cls) -> Mongo:
-        return Mongo.ie()
+        return validation.apply(DI.ie().find("Mongo"), Mongo)
 
     @classmethod
     def start_session(cls, **kwargs) -> ClientSession:

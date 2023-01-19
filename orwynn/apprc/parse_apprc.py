@@ -96,6 +96,7 @@ def __parse_into(
 
     # Load from bottom to top updating previous one with newest one
     mode_nesting_index: int = APP_RC_MODE_NESTING.index(mode)
+    print(mode_nesting_index)
     for nesting_mode in APP_RC_MODE_NESTING[:mode_nesting_index + 1]:
         # Supress: We don't mind if any top-level key is missing here
         with contextlib.suppress(KeyError):

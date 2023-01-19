@@ -18,8 +18,8 @@ class Config(Model):
 
         validation.validate_dict(extra, (str, validation.Validator.SKIP))
 
-        app_rc: AppRC = BootProxy.ie().app_rc
-        config_kwargs: dict[str, Any] = app_rc.get(
+        apprc: AppRC = BootProxy.ie().apprc
+        config_kwargs: dict[str, Any] = apprc.get(
             cls._convert_name_to_rc_format(),
             {}
         )
