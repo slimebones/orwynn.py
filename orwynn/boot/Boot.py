@@ -1,35 +1,32 @@
+import contextlib
 import os
+from copy import deepcopy
 from pathlib import Path
 from types import NoneType
-from copy import deepcopy
-from typing import Callable
 
 import dotenv
 
+from orwynn import validation, web
 from orwynn.app.App import App
 from orwynn.app.DefaultErrorHandler import DefaultErrorHandler
 from orwynn.app.DefaultExceptionHandler import DefaultExceptionHandler
 from orwynn.app.DefaultHTTPExceptionHandler import DefaultHTTPExceptionHandler
-from orwynn.app.DefaultRequestValidationExceptionHandler import \
-    DefaultRequestValidationExceptionHandler
+from orwynn.app.DefaultRequestValidationExceptionHandler import (
+    DefaultRequestValidationExceptionHandler,
+)
 from orwynn.app.ErrorHandler import ErrorHandler
-from orwynn.apprc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from orwynn.apprc.AppRC import AppRC
-from orwynn.apprc.AppRCSearchError import AppRCSearchError
 from orwynn.apprc.parse_apprc import parse_apprc
 from orwynn.boot.BootMode import BootMode
-from orwynn.boot.UnknownBootModeError import UnknownBootModeError
-from orwynn.boot.UnknownSourceError import UnknownSourceError
-from orwynn.cls import bind_first_arg, bind_first_arg_async
 from orwynn.controller.Controller import Controller
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.controller.websocket.WebsocketController import WebsocketController
-from orwynn.database.UnknownDatabaseKindError import UnknownDatabaseKindError
 from orwynn.di.DI import DI
 from orwynn.di.missing_di_object_error import MissingDIObjectError
 from orwynn.error.Error import Error
-from orwynn.error.get_non_framework_exceptions import \
-    get_non_framework_exceptions
+from orwynn.error.get_non_framework_exceptions import (
+    get_non_framework_exceptions,
+)
 from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.file.NotDirError import NotDirError
 from orwynn.indication.default_api_indication import default_api_indication
@@ -39,19 +36,15 @@ from orwynn.log.Log import Log
 from orwynn.log.LogConfig import LogConfig
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
-from orwynn.mongo.Mongo import Mongo
-from orwynn.mongo.MongoConfig import MongoConfig
-from orwynn.mp import dictpp
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn.router.Router import Router
-from orwynn import mp, validation, web
-from orwynn.file.yml import load_yml
-from orwynn.service.FrameworkService import FrameworkService
-from orwynn.sql.SQL import SQL
-from orwynn.validation import (RequestValidationException, validate,
-                                    validate_each)
+from orwynn.validation import (
+    RequestValidationException,
+    validate,
+    validate_each,
+)
 from orwynn.web import CORS, HTTPException, HTTPMethod
 from orwynn.worker.Worker import Worker
 
@@ -175,18 +168,14 @@ class Boot(Worker):
 
         self.__configure_log()
 
-        try:
+        # Supress: Don't raise error to ease test writings
+        with contextlib.suppress(MissingDIObjectError):
             self.__register_routes(self.__di.modules, self.__di.controllers)
-        except MissingDIObjectError:
-            # Don't raise error to ease test writings
-            pass
-        try:
+        # Supress: No middleware defined, it's ok
+        with contextlib.suppress(MissingDIObjectError):
             self.__register_middleware(
                 self.__di.all_middleware
             )
-        except MissingDIObjectError:
-            # No middleware defined, it's ok
-            pass
 
         if cors is not None:
             self.app.configure_cors(cors)
@@ -281,8 +270,8 @@ class Boot(Worker):
         for HandledException in HandledBuiltinExceptions:
             try:
                 RemainingExceptionSubclasses.remove(HandledException)
-            except ValueError:
-                raise MalfunctionError()
+            except ValueError as err:
+                raise MalfunctionError() from err
 
         # Handle special exceptions
         if HTTPException in RemainingExceptionSubclasses:
@@ -381,10 +370,8 @@ class Boot(Worker):
         # "main" is assigned to MODULE_ROUTE + CONTROLLER_ROUTE directly.
         for event_handler in c.event_handlers:
             method_route: str
-            if event_handler.name == "main":
-                method_route = "/"
-            else:
-                method_route = event_handler.name
+            method_route = \
+                "/" if event_handler.name == "main" else event_handler.name
 
 
             # Final route = MODULE_ROUTE + CONTROLLER_ROUTE + METHOD_ROUTE
@@ -407,10 +394,8 @@ class Boot(Worker):
         root_dir: Path
         root_dir_env: str = os.getenv("Orwynn_RootDir", "")
 
-        if not root_dir_env:
-            root_dir = Path(os.getcwd())
-        else:
-            root_dir = Path(root_dir_env)
+        root_dir = \
+            Path(os.getcwd()) if not root_dir_env else Path(root_dir_env)
 
         if not root_dir.is_dir():
             raise NotDirError(

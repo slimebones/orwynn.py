@@ -11,7 +11,6 @@ from orwynn.di.collecting.collect_provider_dependencies import (
 from orwynn.di.is_provider import is_provider
 from orwynn.di.Provider import Provider
 from orwynn.module.Module import Module
-from orwynn.proxy.BootProxy import BootProxy
 from tests.std.Assertion import Assertion
 
 

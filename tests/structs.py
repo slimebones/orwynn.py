@@ -6,6 +6,7 @@ annotate that this root module has been built with some modules using self
 importing.
 """
 import pytest
+
 from orwynn.module.Module import Module
 from tests.std.root_module import root_module as std_root_module
 

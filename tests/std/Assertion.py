@@ -5,14 +5,13 @@ from orwynn.di.acceptor import Acceptor
 from orwynn.di.Provider import Provider
 from orwynn.log.LogConfig import LogConfig
 from orwynn.module.Module import Module
+from orwynn.mongo.Mongo import Mongo
+from orwynn.mongo.MongoConfig import MongoConfig
 from tests.std.float import FloatController, FloatService, float_module
 from tests.std.number import NumberController, NumberService, number_module
 from tests.std.root_module import root_module
 from tests.std.text import TextConfig, TextController, TextService, text_module
 from tests.std.user import UserService, UsersIdController, user_module
-
-from orwynn.mongo.Mongo import Mongo
-from orwynn.mongo.MongoConfig import MongoConfig
 
 
 class Assertion:

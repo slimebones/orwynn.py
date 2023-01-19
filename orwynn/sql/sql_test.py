@@ -8,9 +8,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from orwynn import validation
 from orwynn.crypto import hash_password
 
+from .SQL import SQL
 from .SQLConfig import SQLConfig
 from .SQLDatabaseKind import SQLDatabaseKind
-from .SQL import SQL
 from .Table import Table
 
 

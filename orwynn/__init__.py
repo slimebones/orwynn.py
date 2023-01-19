@@ -15,13 +15,13 @@ from orwynn.log.Log import Log
 from orwynn.middleware.Middleware import Middleware
 from orwynn.model.Model import Model
 from orwynn.module.Module import Module
+from orwynn.mongo import module as mongo_module
 from orwynn.mongo.Document import Document
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.service.Service import Service
+from orwynn.sql import module as sql_module
 from orwynn.sql.SQL import SQL
 from orwynn.sql.Table import Table
 from orwynn.test.Client import Client
 from orwynn.test.EmbeddedTestClient import EmbeddedTestClient
 from orwynn.test.Test import Test
-from orwynn.mongo import module as mongo_module
-from orwynn.sql import module as sql_module

@@ -4,9 +4,8 @@ from orwynn.di.collecting.provider_dependencies_map import (
 )
 from orwynn.di.DIContainer import DIContainer
 from orwynn.di.init.init_providers import init_providers
-from tests.std.Assertion import Assertion
-
 from orwynn.module.Module import Module
+from tests.std.Assertion import Assertion
 
 
 def test_std(

@@ -1,14 +1,12 @@
-import os
 from pytest import fixture
-from orwynn.boot.Boot import Boot
 
+from orwynn.boot.Boot import Boot
 from orwynn.di.collecting.provider_dependencies_map import (
     ProviderDependenciesMap,
 )
 from orwynn.di.DIContainer import DIContainer
 from orwynn.di.init.init_providers import init_providers
 from orwynn.module.Module import Module
-from orwynn.proxy.BootProxy import BootProxy
 
 
 @fixture

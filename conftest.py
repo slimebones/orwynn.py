@@ -4,19 +4,24 @@ import contextlib
 import os
 
 from pytest import fixture
-from orwynn import validation
 
+from orwynn import validation
 from orwynn.app.App import App
 from orwynn.app.app_test import std_app
 from orwynn.boot.Boot import Boot
-from orwynn.boot.boot_test import run_std, set_std_apprc_path_env, std_boot, std_mongo_boot
+from orwynn.boot.boot_test import (
+    run_std,
+    set_std_apprc_path_env,
+    std_boot,
+    std_mongo_boot,
+)
 from orwynn.boot.BootMode import BootMode
 from orwynn.controller.endpoint.endpoint_test import run_endpoint
-from orwynn.di.DI import DI
 from orwynn.di.collecting.collect_modules_test import std_modules
 from orwynn.di.collecting.collect_provider_dependencies_test import (
     std_provider_dependencies_map,
 )
+from orwynn.di.DI import DI
 from orwynn.di.di_test import std_di_container
 from orwynn.di.missing_di_object_error import MissingDIObjectError
 from orwynn.module.Module import Module

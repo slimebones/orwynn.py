@@ -20,7 +20,7 @@ class SQLConfig(Config):
             db_kind: SQLDatabaseKind = data["database_kind"]
         except KeyError as err:
             raise KeyError(
-                f"define key \"database_kind\" in your apprc config"
+                "define key \"database_kind\" in your apprc config"
             ) from err
 
         # Check right associations
