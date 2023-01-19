@@ -1,3 +1,4 @@
+from orwynn import mongo
 from orwynn.app.App import App
 from orwynn.boot.BootConfig import BootConfig
 from orwynn.di.acceptor import Acceptor
@@ -20,7 +21,8 @@ class Assertion:
         text_module,
         number_module,
         float_module,
-        user_module
+        user_module,
+        mongo.module
     ]
     # Order of these providers doesn't matter here since set() should be
     # performed on comparison tests

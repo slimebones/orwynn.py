@@ -48,6 +48,7 @@ from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn.router.Router import Router
 from orwynn import mp, validation, web
 from orwynn.file.yml import load_yml
+from orwynn.service.FrameworkService import FrameworkService
 from orwynn.sql.SQL import SQL
 from orwynn.validation import (RequestValidationException, validate,
                                     validate_each)
@@ -150,7 +151,6 @@ class Boot(Worker):
             self.__mode,
             deepcopy(apprc)
         )
-        print(self.__apprc)
 
         # Init proxies
         BootProxy(
@@ -166,10 +166,6 @@ class Boot(Worker):
         # Add framework services
         root_module.add_provider_or_skip(App)
         root_module.add_provider_or_skip(LogConfig)
-        # FIXME: It is better to add non-crucial framework services (such as
-        #   Mongo or SQL) only on need.
-        root_module.add_provider_or_skip(Mongo)
-        root_module.add_provider_or_skip(SQL)
 
         self.__di: DI = DI(root_module)
 

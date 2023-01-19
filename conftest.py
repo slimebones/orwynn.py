@@ -36,6 +36,8 @@ from tests.structs import (
 
 @fixture(autouse=True)
 def run_around_tests():
+    os.environ["Orwynn_Mode"] = "test"
+
     yield
 
     # Suppress:

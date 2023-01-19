@@ -1,3 +1,4 @@
+from orwynn import mongo
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.module.Module import Module
@@ -49,5 +50,6 @@ class UsersIdController(HTTPController):
 user_module = Module(
     route="/users",
     Providers=[UserService],
-    Controllers=[UsersController, UsersIdController]
+    Controllers=[UsersController, UsersIdController],
+    imports=[mongo.module]
 )

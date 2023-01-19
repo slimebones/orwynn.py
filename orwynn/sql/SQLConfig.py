@@ -16,10 +16,15 @@ class SQLConfig(Config):
     database_port: int | None = None
 
     def __init__(self, **data: Any) -> None:
-        db_type: SQLDatabaseKind = data["database_type"]
+        try:
+            db_kind: SQLDatabaseKind = data["database_kind"]
+        except KeyError as err:
+            raise KeyError(
+                f"define key \"database_kind\" in your apprc config"
+            ) from err
 
         # Check right associations
-        if db_type is SQLDatabaseKind.POSTGRESQL:
+        if db_kind is SQLDatabaseKind.POSTGRESQL:
             for key in [
                 "database_name",
                 "database_user",
@@ -31,7 +36,7 @@ class SQLConfig(Config):
                     raise ValueError(
                         f"for PostgreSQL you should define {key} in SQL config"
                     )
-        elif db_type is SQLDatabaseKind.SQLITE:
+        elif db_kind is SQLDatabaseKind.SQLITE:
             if not data.get("database_path", None):
                 raise ValueError(
                     "for SQLite you should define database_path in SQL config"

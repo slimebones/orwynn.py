@@ -1,9 +1,10 @@
 from typing import Any
 
-from orwynn.service.FrameworkService import FrameworkService
+from orwynn.service.Service import Service
 
 
-class Database(FrameworkService):
+
+class Database(Service):
     """Represents a connection to database as well as set of actions with this
     database.
 

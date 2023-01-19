@@ -23,3 +23,5 @@ from orwynn.sql.Table import Table
 from orwynn.test.Client import Client
 from orwynn.test.EmbeddedTestClient import EmbeddedTestClient
 from orwynn.test.Test import Test
+from orwynn.mongo import module as mongo_module
+from orwynn.sql import module as sql_module

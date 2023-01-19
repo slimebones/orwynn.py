@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from orwynn import validation
+from orwynn import mongo, validation
 from orwynn.boot.Boot import Boot
 from orwynn.module.Module import Module
 from orwynn.mongo.Document import Document
@@ -15,7 +15,7 @@ class Item(Document):
 
 @fixture
 def run_mongo_boot():
-    Boot(Module(route="/"))
+    Boot(Module(route="/", imports=[mongo.module]))
 
 
 @fixture
