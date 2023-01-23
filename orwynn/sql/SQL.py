@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Optional, Sequence
 from orwynn import validation
 from orwynn.database.Database import Database
@@ -70,20 +71,26 @@ class SQL(Database):
             case SQLDatabaseKind.POSTGRESQL:
                 url = \
                     f"postgresql://{self.__config.database_user}" \
-                    + f"{self.__config.database_password}" \
+                    + f":{self.__config.database_password}" \
                     + f"@{self.__config.database_host}" \
                     + f":{self.__config.database_port}" \
                     + f"/{self.__config.database_name}"
+                print(url)
             case SQLDatabaseKind.SQLITE:
                 database_path: str = validation.apply(
                     self.__config.database_path,
                     str
                 )
-                # Correct in-memory url to avoid url building problems
-                if database_path == ":memory:":
-                    database_path = "/:memory:"
 
-                url = f"sqlite://{database_path}"
+                # Create directories for the path if they are not exist.
+                # https://stackoverflow.com/a/273227/14748231
+                Path(database_path).parent.mkdir(parents=True, exist_ok=True)
+
+                # Note that here we add additional slash since in either
+                # memory ":memory:", relative "var/app.db" or absolute
+                # "/tmp/app.db" cases we have to prepend slash to comply with
+                # SQLite standard.
+                url = f"sqlite:///{database_path}"
 
                 # Make SQLite know that more than one thread could interact
                 # with the database for the same request.

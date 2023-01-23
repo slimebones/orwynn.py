@@ -1,4 +1,6 @@
+import contextlib
 from enum import Enum
+import os
 from typing import Generator
 
 import pytest
@@ -129,14 +131,49 @@ def _connect_user1a2_tweet1_like1(
         s.commit()
 
 
-def test_sqlite_init():
-    SQL(SQLConfig(
+def test_sqlite_init_memory():
+    sql = SQL(SQLConfig(
         database_kind=SQLDatabaseKind.SQLITE,
         database_path=":memory:"
     ))
+    sql.create_tables()
+    sql.drop_tables()
+
+
+def test_sqlite_init_relative_path():
+    # Delete old data to ensure auto directory creating is working.
+    with contextlib.suppress(FileNotFoundError):
+        try:
+            os.removedirs(os.path.join(os.getcwd(), "var/tmp"))
+        except OSError: # Directory not empty
+            os.remove(os.path.join(os.getcwd(), "var/tmp/test.db"))
+
+    sql = SQL(SQLConfig(
+        database_kind=SQLDatabaseKind.SQLITE,
+        database_path="var/tmp/test.db"
+    ))
+    sql.create_tables()
+    sql.drop_tables()
+
+
+def test_sqlite_init_absolute_path():
+    # Delete old data to ensure auto directory creating is working.
+    with contextlib.suppress(FileNotFoundError):
+        try:
+            os.removedirs("/tmp/orwynn")
+        except OSError: # Directory not empty
+            os.remove("/tmp/orwynn/test.db")
+
+    sql = SQL(SQLConfig(
+        database_kind=SQLDatabaseKind.SQLITE,
+        database_path="/tmp/orwynn/test.db"
+    ))
+    sql.create_tables()
+    sql.drop_tables()
+
 
 def test_postgresql_init():
-    SQL(SQLConfig(
+    sql = SQL(SQLConfig(
         database_kind=SQLDatabaseKind.POSTGRESQL,
         database_name="orwynn-test",
         database_user="postgres",
@@ -144,6 +181,8 @@ def test_postgresql_init():
         database_host="localhost",
         database_port=5432
     ))
+    sql.create_tables()
+    sql.drop_tables()
 
 
 def test_create(
