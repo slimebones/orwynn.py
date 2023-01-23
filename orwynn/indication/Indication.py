@@ -1,3 +1,5 @@
+from enum import Enum
+import json
 from typing import Any, ItemsView
 
 from orwynn.BaseSubclassable import BaseSubclassable
@@ -182,8 +184,15 @@ class Indication:
                         final_field = {
                             "message": "; ".join([str(x) for x in obj.args])
                         }
-                    elif isinstance(obj, Error) or isinstance(obj, Model):
+                    elif isinstance(obj, Error):
                         final_field = obj.dict()
+                    elif isinstance(obj, Model):
+                        # Since pydantic seems to not having a way to deal
+                        # with Enums through dict() call (only via Config),
+                        # here we do not performance good operation of
+                        # converting to json and back to ensure that no Python
+                        # objects is remained in digested model.
+                        final_field = json.loads(obj.json())
                     else:
                         raise TypeError(
                             f"unsupported obj type {type(obj)}"

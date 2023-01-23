@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Any
 
 from pytest import fixture
@@ -68,3 +69,35 @@ def test_custom_model_api_type():
     })
 
     assert i.digest(Item(name="pizza", price=2.3))["type"] == "BestItem"
+
+
+def test_digest_enum(default_indication: Indication):
+    class Color(Enum):
+        RED = "red"
+        GREEN = "green"
+
+    class Priority(Enum):
+        HIGH = 1
+        LOW = 2
+
+    class Item(Model):
+        color: Color
+        priority: Priority
+
+        def __init__(self, **data: Any) -> None:
+            super().__init__(**data)
+
+    digested_mp: dict[str, Any] = default_indication.digest(
+        Item(
+            color="red",
+            priority=1
+        )
+    )
+
+    mp_value: dict = parse_key("value", digested_mp, dict)
+
+    # Enum fields should be converted to values
+    assert mp_value["color"] == "red"
+    assert mp_value["priority"] == 1
+
+    Item.parse_obj(mp_value)

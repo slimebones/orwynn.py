@@ -1,3 +1,4 @@
+from typing import Any
 from orwynn.config.Config import Config
 from orwynn.error.MalfunctionError import MalfunctionError
 
@@ -13,7 +14,7 @@ class SQLConfig(Config):
     database_host: str | None = None
     database_port: int | None = None
 
-    def __init__(self, **data) -> None:
+    def __init__(self, **data: Any) -> None:
         try:
             db_kind: SQLDatabaseKind = SQLDatabaseKind(data["database_kind"])
         except KeyError as err:
