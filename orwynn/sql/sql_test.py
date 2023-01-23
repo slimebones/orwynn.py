@@ -133,7 +133,7 @@ def _connect_user1a2_tweet1_like1(
 
 def test_sqlite_init_memory():
     sql = SQL(SQLConfig(
-        database_kind=SQLDatabaseKind.SQLITE,
+        database_kind="sqlite",
         database_path=":memory:"
     ))
     sql.create_tables()
@@ -149,7 +149,7 @@ def test_sqlite_init_relative_path():
             os.remove(os.path.join(os.getcwd(), "var/tmp/test.db"))
 
     sql = SQL(SQLConfig(
-        database_kind=SQLDatabaseKind.SQLITE,
+        database_kind="sqlite",
         database_path="var/tmp/test.db"
     ))
     sql.create_tables()
@@ -165,7 +165,7 @@ def test_sqlite_init_absolute_path():
             os.remove("/tmp/orwynn/test.db")
 
     sql = SQL(SQLConfig(
-        database_kind=SQLDatabaseKind.SQLITE,
+        database_kind="sqlite",
         database_path="/tmp/orwynn/test.db"
     ))
     sql.create_tables()
@@ -174,7 +174,7 @@ def test_sqlite_init_absolute_path():
 
 def test_postgresql_init():
     sql = SQL(SQLConfig(
-        database_kind=SQLDatabaseKind.POSTGRESQL,
+        database_kind="postgresql",
         database_name="orwynn-test",
         database_user="postgres",
         database_password="postgres",  # noqa: S106

@@ -1,7 +1,5 @@
-
-from typing import Any
-
 from orwynn.config.Config import Config
+from orwynn.error.MalfunctionError import MalfunctionError
 
 from .SQLDatabaseKind import SQLDatabaseKind
 
@@ -15,9 +13,9 @@ class SQLConfig(Config):
     database_host: str | None = None
     database_port: int | None = None
 
-    def __init__(self, **data: Any) -> None:
+    def __init__(self, **data) -> None:
         try:
-            db_kind: SQLDatabaseKind = data["database_kind"]
+            db_kind: SQLDatabaseKind = SQLDatabaseKind(data["database_kind"])
         except KeyError as err:
             raise KeyError(
                 "define key \"database_kind\" in your apprc config"
@@ -42,6 +40,6 @@ class SQLConfig(Config):
                     "for SQLite you should define database_path in SQL config"
                 )
         else:
-            raise
+            raise MalfunctionError()
 
         super().__init__(**data)
