@@ -1,6 +1,6 @@
 import contextlib
-from enum import Enum
 import os
+from enum import Enum
 from typing import Generator
 
 import pytest
@@ -144,9 +144,13 @@ def test_sqlite_init_relative_path():
     # Delete old data to ensure auto directory creating is working.
     with contextlib.suppress(FileNotFoundError):
         try:
-            os.removedirs(os.path.join(os.getcwd(), "var/tmp"))
+            os.removedirs(os.path.join(
+                os.getcwd(), "var/tmp"
+            ))
         except OSError: # Directory not empty
-            os.remove(os.path.join(os.getcwd(), "var/tmp/test.db"))
+            os.remove(os.path.join(
+                os.getcwd(), "var/tmp/test.db"
+            ))
 
     sql = SQL(SQLConfig(
         database_kind="sqlite",
@@ -160,13 +164,13 @@ def test_sqlite_init_absolute_path():
     # Delete old data to ensure auto directory creating is working.
     with contextlib.suppress(FileNotFoundError):
         try:
-            os.removedirs("/tmp/orwynn")
+            os.removedirs("/tmp/orwynn")  # noqa: S108
         except OSError: # Directory not empty
-            os.remove("/tmp/orwynn/test.db")
+            os.remove("/tmp/orwynn/test.db")  # noqa: S108
 
     sql = SQL(SQLConfig(
         database_kind="sqlite",
-        database_path="/tmp/orwynn/test.db"
+        database_path="/tmp/orwynn/test.db"  # noqa: S108
     ))
     sql.create_tables()
     sql.drop_tables()

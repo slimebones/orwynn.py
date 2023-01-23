@@ -1,4 +1,5 @@
 from typing import Any
+
 from orwynn.config.Config import Config
 from orwynn.error.MalfunctionError import MalfunctionError
 
