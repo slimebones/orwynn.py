@@ -5,4 +5,5 @@ from orwynn.mongo.MongoConfig import MongoConfig
 module = Module(
     "/mongo",
     Providers=[Mongo, MongoConfig],
+    exports=[Mongo, MongoConfig]
 )

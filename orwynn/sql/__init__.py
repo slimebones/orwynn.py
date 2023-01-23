@@ -6,4 +6,5 @@ from .SQLConfig import SQLConfig
 module = Module(
     "/mongo",
     Providers=[SQL, SQLConfig],
+    exports=[SQL, SQLConfig]
 )
