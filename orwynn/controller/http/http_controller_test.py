@@ -168,10 +168,6 @@ def test_default_request_validation_error():
 
 
 def test_default_method_not_allowed():
-    class Item(Model):
-        name: str
-        price: float
-
     class C1(HTTPController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
