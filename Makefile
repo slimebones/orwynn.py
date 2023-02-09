@@ -1,7 +1,4 @@
 test:
-	poetry run coverage run -m pytest -x -v --ignore=tests/app -p no:warnings orwynn tests --show-capture=stdout
-
-test-show-all:
 	poetry run coverage run -m pytest -x -v --ignore=tests/app -p no:warnings orwynn tests --show-capture=all
 
 lint:
@@ -33,13 +30,15 @@ lint:
 #				No strict rules for string concatenation.
 #		- PGH003:
 #				To not search for specific error code on type ignoring.
+#		- RUF001:
+#				Do not replace symbols in false-positive scenario.
 #
 # Main package __init__.py shouldn't be lintered since it may contain unused
 # imports.
 	poetry run ruff \
 		--select=ALL \
 		--fix \
-		--ignore=E999,D,ANN,PT,ARG,B008,EM101,EM102,FBT,N,RET504,RET505,RET506,RET507,Q003,ISC002,ISC003,A,PGH003 \
+		--ignore=E999,D,ANN,PT,ARG,B008,EM101,EM102,FBT,N,RET504,RET505,RET506,RET507,Q003,ISC002,ISC003,A,PGH003,RUF001 \
 		--line-length=79 \
 		--isolated \
 		--max-complexity 10 \
