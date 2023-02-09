@@ -10,7 +10,7 @@
 						"splitTerminals": [
 								{
 										"name": "base",
-										"commands": ["source .venv/bin/activate.fish"]
+										"commands": ["poetry shell"]
 								}
 						]
 				},
