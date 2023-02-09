@@ -27,11 +27,16 @@ def __add_handler(handler: LogHandler) -> None:
             handler.serialize = False
 
     handler_kwargs: dict = handler.kwargs or {}
-    Log.add(
-        handler.sink,
+    kwargs: dict = dict(
         level=handler.level,
         format=handler.format,
-        rotation=handler.rotation,
         serialize=handler.serialize,
         **handler_kwargs
+    )
+    if isinstance(handler.sink, str):
+        kwargs["rotation"] = handler.rotation  # type: ignore
+
+    Log.add(
+        handler.sink,
+        **kwargs
     )

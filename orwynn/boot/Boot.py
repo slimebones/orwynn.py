@@ -31,6 +31,7 @@ from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.file.NotDirError import NotDirError
 from orwynn.indication.default_api_indication import default_api_indication
 from orwynn.indication.Indication import Indication
+from orwynn.log.LogMiddleware import LogMiddleware
 from orwynn.log.configure_log import configure_log
 from orwynn.log.Log import Log
 from orwynn.log.LogConfig import LogConfig
@@ -159,6 +160,7 @@ class Boot(Worker):
         # Add framework services
         root_module.add_provider_or_skip(App)
         root_module.add_provider_or_skip(LogConfig)
+        root_module.add_middleware_or_skip(LogMiddleware)
 
         self.__di: DI = DI(root_module)
 
@@ -167,6 +169,9 @@ class Boot(Worker):
         )
 
         self.__configure_log()
+
+        # Add builtin middlewares
+        self.__add_builtin_middlewares()
 
         # Supress: Don't raise error to ease test writings
         with contextlib.suppress(MissingDIObjectError):
@@ -403,3 +408,15 @@ class Boot(Worker):
             )
 
         return root_dir
+
+    def __add_builtin_middlewares(
+        self
+    ) -> None:
+        # LogMiddleware is recommended to be outermost (at custom level)
+        # Middleware
+        self.app.add_middleware(
+            validation.apply(
+                self.__di.find("LogMiddleware"),
+                LogMiddleware
+            )
+        )
