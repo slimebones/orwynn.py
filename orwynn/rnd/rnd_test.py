@@ -1,5 +1,5 @@
-from orwynn.rnd import makeid
+from orwynn.rnd import gen_uuid
 
 
 def test_makeid():
-    assert type(makeid()) is str
+    assert type(gen_uuid()) is str
