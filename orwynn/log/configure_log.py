@@ -26,11 +26,12 @@ def __add_handler(handler: LogHandler) -> None:
         if handler.serialize is None:
             handler.serialize = False
 
+    handler_kwargs: dict = handler.kwargs or {}
     Log.add(
         handler.sink,
         level=handler.level,
         format=handler.format,
         rotation=handler.rotation,
         serialize=handler.serialize,
-        **handler.kwargs
+        **handler_kwargs
     )
