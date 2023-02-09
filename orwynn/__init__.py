@@ -25,4 +25,3 @@ from orwynn.sql.SQL import SQL
 from orwynn.sql.Table import Table
 from orwynn.test.Client import Client
 from orwynn.test.EmbeddedTestClient import EmbeddedTestClient
-from orwynn.test.Test import Test
