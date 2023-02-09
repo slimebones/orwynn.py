@@ -13,6 +13,7 @@ from orwynn.indication.Indication import Indication
 from orwynn.indication.Indicator import Indicator
 from orwynn.log.Log import Log
 from orwynn.middleware.Middleware import Middleware
+from orwynn.middleware.NextCallFn import NextCallFn
 from orwynn.model.Model import Model
 from orwynn.module.Module import Module
 from orwynn.mongo import module as mongo_module
