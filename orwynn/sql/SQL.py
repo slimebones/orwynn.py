@@ -75,7 +75,6 @@ class SQL(Database):
                     + f"@{self.__config.database_host}" \
                     + f":{self.__config.database_port}" \
                     + f"/{self.__config.database_name}"
-                print(url)
             case SQLDatabaseKind.SQLITE:
                 database_path: str = validation.apply(
                     self.__config.database_path,
