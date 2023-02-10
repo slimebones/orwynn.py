@@ -6,6 +6,8 @@ from orwynn import validation
 from orwynn.apprc.AppRC import AppRC
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
+from orwynn.controller.Controller import Controller
+from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.di.DI import DI
 from orwynn.module.Module import Module
 from orwynn.mongo.Mongo import Mongo
@@ -140,3 +142,19 @@ def test_nested_configs_test(
     text_config: TextConfig = DI.ie().find("TextConfig")
 
     assert app_rc["Text"]["words_amount"] == text_config.words_amount == 3
+
+
+def test_global_route():
+    class C(Controller):
+        ROUTE = "/message"
+        ENDPOINTS = [Endpoint(method="get")]
+
+        def get(self) -> dict:
+            return {"message": "hello"}
+
+    boot: Boot = Boot(
+        root_module=Module("/user", Controllers=[C]),
+        global_route="/donuts"
+    )
+
+    boot.app.client.get_jsonify("/donuts/user/message", 200)
