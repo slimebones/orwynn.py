@@ -3,6 +3,7 @@ import os
 from copy import deepcopy
 from pathlib import Path
 from types import NoneType
+from typing import Literal
 
 import dotenv
 
@@ -17,6 +18,7 @@ from orwynn.app.DefaultRequestValidationExceptionHandler import (
 from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.apprc.AppRC import AppRC
 from orwynn.apprc.parse_apprc import parse_apprc
+from orwynn.boot.api_version.ApiVersion import ApiVersion
 from orwynn.boot.BootMode import BootMode
 from orwynn.controller.Controller import Controller
 from orwynn.controller.http.HTTPController import HTTPController
@@ -77,6 +79,13 @@ class Boot(Worker):
         mode (optional):
             Application mode. By default environ Orwynn_Mode is
             checked if this arg is not given.
+        global_route (optional):
+            Global route to be prepended to every controller's route. Defaults
+            to no route. Can accept formatting "{version}" for an API version
+            to be injected into route.
+        api_version (optional):
+            Object describes API versioning rules for the project. By default
+            only v1 is supported.
 
     Environs:
         Orwynn_Mode:
@@ -112,7 +121,9 @@ class Boot(Worker):
         cors: CORS | None = None,
         ErrorHandlers: list[type[ErrorHandler]] | None = None,
         apprc: AppRC | None = None,
-        mode: BootMode | None = None
+        mode: BootMode | None = None,
+        global_route: str | None = None,
+        api_version: ApiVersion | None = None
     ) -> None:
         super().__init__()
         if dotenv_path is None:
@@ -131,6 +142,14 @@ class Boot(Worker):
         validate(apprc, [AppRC, NoneType])
         validate(mode, [BootMode, NoneType])
 
+        if global_route is None:
+            global_route = ""
+        validate(global_route, str)
+
+        if api_version is None:
+            api_version = ApiVersion()
+        validate(api_version, ApiVersion)
+
         dotenv.load_dotenv(dotenv_path, override=True)
 
         self.__mode: BootMode
@@ -145,6 +164,8 @@ class Boot(Worker):
             self.__mode,
             deepcopy(apprc)
         )
+        self.__global_route: str = global_route
+        self.__api_version: ApiVersion = api_version
 
         # Init proxies
         BootProxy(
@@ -152,7 +173,9 @@ class Boot(Worker):
             mode=self.__mode,
             api_indication=self.__api_indication,
             apprc=self.__apprc,
-            ErrorHandlers=ErrorHandlers
+            ErrorHandlers=ErrorHandlers,
+            global_route=self.__global_route,
+            api_version=self.__api_version
         )
         EndpointProxy()
         APIIndicationOnlyProxy(api_indication)
@@ -342,30 +365,83 @@ class Boot(Worker):
 
     def __register_http_for_module(
         self,
-        c: HTTPController,
-        m: Module
+        controller: HTTPController,
+        module: Module
     ) -> None:
         # At least one method found
         is_method_found: bool = False
         for http_method in HTTPMethod:
             # Don't register unused methods
-            if http_method in c.methods:
+            if http_method in controller.methods:
                 is_method_found = True
 
-                self.__router.register_route(
-                    # We can concatenate routes such way since routes
-                    # are validated to not contain following slash
-                    # -> But join_routes() handles this situation, doesn't it?
-                    route=web.join_routes(m.route, c.route),
-                    fn=c.get_fn_by_http_method(http_method),
-                    method=http_method
+                routes: set[str] = self.__get_routes_for_http_controller(
+                    controller,
+                    module
                 )
+
+                for route in routes:
+                    self.__router.register_route(
+                        route=route,
+                        fn=controller.get_fn_by_http_method(http_method),
+                        method=http_method
+                    )
 
         if not is_method_found:
             raise MalfunctionError(
-                f"no http methods found for controller {c.__class__},"
+                f"no http methods found for controller {controller.__class__},"
                 " this shouldn't have passed validation at Controller.__init__"
             )
+
+    def __get_routes_for_http_controller(
+        self,
+        controller: HTTPController,
+        module: Module
+    ) -> set[str]:
+        """Returns all http routes which given controller accessible from.
+        """
+        routes: set[str] = set()
+        final_versions: set[int] = set()
+        version: int | set[int] | None | Literal["*"] = controller.VERSION
+
+        # Get the latest version if none is specified for controller
+        if version is None:
+            final_versions.add(self.__api_version.latest)
+        elif isinstance(version, int):
+            final_versions.add(version)
+        elif isinstance(version, set):
+            final_versions.update(version)
+        elif isinstance(version, str):
+            if version != "*":
+                raise MalfunctionError(
+                    f"version cannot be {version}, a validatation check should"
+                    " have been performed at HTTPController"
+                )
+            # Add all supported versions
+            final_versions.update(self.__api_version.supported)
+        else:
+            raise MalfunctionError(
+                f"unrecognized version {version}, a validation check should"
+                " have been performed at HTTPController"
+            )
+
+        for v in final_versions:
+            self.__api_version.check_if_supported(v)
+
+            # We can concatenate routes such way since routes
+            # are validated to not contain following slash
+            # -> But join_routes() handles this situation, doesn't it?
+            concatenated_route: str = web.join_routes(
+                self.__global_route.replace(
+                    "{version}",
+                    str(v)
+                ),
+                module.route,
+                controller.route
+            )
+            routes.add(concatenated_route)
+
+        return routes
 
     def __register_websocket_controller_for_module(
         self,

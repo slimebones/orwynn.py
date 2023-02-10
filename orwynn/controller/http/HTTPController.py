@@ -1,4 +1,5 @@
-from typing import Callable, ClassVar
+from types import NoneType
+from typing import Callable, ClassVar, Literal, Optional
 
 from orwynn.controller.Controller import Controller
 from orwynn.controller.endpoint.Endpoint import Endpoint
@@ -22,7 +23,7 @@ class HTTPController(Controller):
     Controller should be assigned at according Module.controllers field to be
     initialized and registered.
 
-    Class-attributes:
+    Class-Attributes:
         ROUTE:
             A subroute of Module's route (where controller attached) which
             controller will answer to. This attribute is required to be
@@ -30,9 +31,12 @@ class HTTPController(Controller):
             It is allowed to be "/" to handle Module's root route requests.
         ENDPOINTS:
             List of endpoints enabled in this controller.
+        VERSION (optional):
+            An API version the controller supports. Defaults to the latest one.
     """
     ROUTE: ClassVar[str | None] = None
     ENDPOINTS: ClassVar[list[Endpoint] | None] = None
+    VERSION: ClassVar[Optional[int | set[int] | Literal["*"]]] = None
 
     def __init__(self) -> None:
         self._methods: list[HTTPMethod] = []
@@ -81,6 +85,12 @@ class HTTPController(Controller):
                     self.get_fn_by_http_method(http_method),
                     endpoint
                 )
+
+        validation.validate(self.VERSION, [int, set, NoneType, str])
+        if isinstance(self.VERSION, str) and self.VERSION != "*":
+            raise TypeError(
+                f"unrecognized VERSION {self.VERSION}"
+            )
 
     @property
     def route(self) -> str:

@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from orwynn.apprc.AppRC import AppRC
+from orwynn.boot.api_version.ApiVersion import ApiVersion
 from orwynn.boot.BootMode import BootMode
 from orwynn.worker.Worker import Worker
 
@@ -21,7 +22,9 @@ class BootProxy(Worker):
         mode: BootMode,
         api_indication: "Indication",
         apprc: AppRC,
-        ErrorHandlers: list[type["ErrorHandler"]]
+        ErrorHandlers: list[type["ErrorHandler"]],
+        global_route: str,
+        api_version: ApiVersion
     ) -> None:
         super().__init__()
         self.__root_dir: Path = root_dir
@@ -29,6 +32,8 @@ class BootProxy(Worker):
         self.__api_indication: Indication = api_indication
         self.__apprc: AppRC = apprc
         self.__ErrorHandlers: list[type["ErrorHandler"]] = ErrorHandlers
+        self.__global_route: str = global_route
+        self.__api_version: ApiVersion = api_version
 
     @property
     def mode(self) -> BootMode:
@@ -45,6 +50,14 @@ class BootProxy(Worker):
     @property
     def ErrorHandlers(self) -> list[type["ErrorHandler"]]:
         return self.__ErrorHandlers
+
+    @property
+    def global_route(self) -> str:
+        return self.__global_route
+
+    @property
+    def api_version(self) -> ApiVersion:
+        return self.__api_version
 
     @property
     def boot_config_data(self) -> dict:
