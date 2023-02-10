@@ -183,7 +183,6 @@ class Boot(Worker):
         # Add framework services
         root_module.add_provider_or_skip(App)
         root_module.add_provider_or_skip(LogConfig)
-        root_module.add_middleware_or_skip(LogMiddleware)
 
         self.__di: DI = DI(root_module)
 
@@ -193,7 +192,7 @@ class Boot(Worker):
 
         self.__configure_log()
 
-        # Add builtin middlewares
+        # TMP: Add builtin middlewares
         self.__add_builtin_middlewares()
 
         # Supress: Don't raise error to ease test writings
@@ -489,11 +488,5 @@ class Boot(Worker):
     def __add_builtin_middlewares(
         self
     ) -> None:
-        # LogMiddleware is recommended to be outermost (at custom level)
-        # Middleware
-        self.app.add_middleware(
-            validation.apply(
-                self.__di.find("LogMiddleware"),
-                LogMiddleware
-            )
-        )
+        # Add non-framework Middleware: starlette-context
+        self.app.add_context_middleware()

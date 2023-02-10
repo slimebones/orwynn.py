@@ -6,6 +6,7 @@ from fastapi import Response as FastAPIResponse
 from fastapi.responses import HTMLResponse as FastAPI_HTMLResponse
 from fastapi.responses import JSONResponse as FastAPI_JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from orwynn.web.context import context as context
 
 from orwynn import validation
 from orwynn.web.CORS import CORS

@@ -9,6 +9,7 @@ from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.error.Error import Error
 from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.log.Log import Log
+from orwynn.log.LogMiddleware import LogMiddleware
 from orwynn.module.Module import Module
 from orwynn.test.Client import Client
 
@@ -73,7 +74,7 @@ def test_get():
             assert json == RETURNED_DATA
 
     client: Client = Boot(
-        Module(route="/", Controllers=[C1]),
+        Module(route="/", Controllers=[C1], Middleware=[LogMiddleware]),
         apprc=__get_log_apprc(__check)
     ).app.client
 
@@ -103,7 +104,7 @@ def test_get__error():
             assert json == Error("hello").api
 
     client: Client = Boot(
-        Module(route="/", Controllers=[C1]),
+        Module(route="/", Controllers=[C1], Middleware=[LogMiddleware]),
         apprc=__get_log_apprc(__check)
     ).app.client
 

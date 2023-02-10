@@ -636,6 +636,17 @@ anyio = ">=3.4.0,<5"
 full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart", "pyyaml"]
 
 [[package]]
+name = "starlette-context"
+version = "0.3.5"
+description = "Access context in Starlette"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+starlette = "*"
+
+[[package]]
 name = "text-unidecode"
 version = "1.3"
 description = "The most basic Text::Unidecode port"
@@ -769,7 +780,7 @@ python-versions = ">=3.4"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.11"
-content-hash = "4ba27df8867c841729ea84cd93b243a4cf74cb6a2c6a7eb4d46c10c46ddf5ee9"
+content-hash = "e1ec15585ea73bc89d0c9724276af7b6fdc42dc76c76542a69df663f4ecc6bcb"
 
 [metadata.files]
 anyio = [
@@ -1342,6 +1353,10 @@ sqlalchemy = [
 starlette = [
     {file = "starlette-0.22.0-py3-none-any.whl", hash = "sha256:b5eda991ad5f0ee5d8ce4c4540202a573bb6691ecd0c712262d0bc85cf8f2c50"},
     {file = "starlette-0.22.0.tar.gz", hash = "sha256:b092cbc365bea34dd6840b42861bdabb2f507f8671e642e8272d2442e08ea4ff"},
+]
+starlette-context = [
+    {file = "starlette_context-0.3.5-py37-none-any.whl", hash = "sha256:d9eeccaafd4fad13abe662295b802c8a58a7e11a0d33f933f001212472619086"},
+    {file = "starlette_context-0.3.5.tar.gz", hash = "sha256:e6b9f905823860e9e36c013dbfcf770562f3b88bec21cb861fef2e0bd0615697"},
 ]
 text-unidecode = [
     {file = "text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93"},
