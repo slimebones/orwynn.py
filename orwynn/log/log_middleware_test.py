@@ -8,6 +8,7 @@ from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.error.Error import Error
 from orwynn.error.MalfunctionError import MalfunctionError
+from orwynn.log.Log import Log
 from orwynn.module.Module import Module
 from orwynn.test.Client import Client
 
@@ -81,6 +82,8 @@ def test_get():
         200
     )
 
+    Log.remove()
+
 
 def test_get__error():
     class C1(HTTPController):
@@ -108,3 +111,5 @@ def test_get__error():
         "/",
         400
     )
+
+    Log.remove()
