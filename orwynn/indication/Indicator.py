@@ -11,5 +11,5 @@ class Indicator(Enum):
         VALUE:
             Indicates that field should contain a value of an object.
     """
-    TYPE = 0
-    VALUE = 1
+    TYPE = "type"
+    VALUE = "value"
