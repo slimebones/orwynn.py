@@ -5,7 +5,7 @@ from orwynn.model.Model import Model
 from orwynn.web import Request, Response
 
 
-class ErrorHandler(Model):
+class ErrorHandler:
     """Handles outcoming errors from the application.
 
     Method handle(...) should be redefined in subclass in order to work.
@@ -16,7 +16,7 @@ class ErrorHandler(Model):
     """
     E: ClassVar[type[Exception] | list[type[Exception]] | None] = None
 
-    def __init__(self, **data: Any) -> None:
+    def __init__(self) -> None:
         if self.E is None:
             raise TypeError(
                 f"{self.__class__} error class is not set"
@@ -35,10 +35,6 @@ class ErrorHandler(Model):
                 )
             else:
                 validation.validate(self.E, Exception)
-        super().__init__(**data)
 
     def handle(self, request: Request, error: Exception) -> Response:
         raise NotImplementedError()
-
-    class Config:
-        arbitrary_types_allowed = True

@@ -165,8 +165,6 @@ class DIContainer:
                 # Choose more specific base classes for subclasses of Model
                 if C is Model and issubclass(ObjCls, Config):
                     BaseCls = Config
-                elif C is Model and issubclass(ObjCls, ErrorHandler):
-                    BaseCls = ErrorHandler
                 else:
                     BaseCls = C
 

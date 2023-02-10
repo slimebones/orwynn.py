@@ -299,6 +299,7 @@ class Boot(Worker):
         if not is_default_error_handled:
             self.app.add_error_handler(DefaultErrorHandler())
 
+        # Add other handlers
         for error_handler in error_handlers:
             self.app.add_error_handler(error_handler)
 
