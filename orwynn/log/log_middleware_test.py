@@ -1,7 +1,7 @@
 import json
 from typing import Any, Optional
 
-from loguru import Message
+from loguru._handler import Message
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HTTPController import HTTPController

@@ -31,9 +31,13 @@ class HTTPLogger:
 
         json_: Optional[dict] = None
         with contextlib.suppress(json.JSONDecodeError):
-            # FIXME: hangs here, see:
+            # FIXME: hangs here, using request.body hangs too, see:
             #   https://github.com/encode/starlette/issues/847
-            json_ = validation.apply(await request.json(), dict)
+            # json_ = validation.apply(await request.json(), dict)
+            #
+            # Seems like for now no request json will be collected until
+            # mentioned issue is resolved.
+            json_ = None
         if not json_:
             json_ = None
 
