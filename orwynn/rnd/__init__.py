@@ -1,7 +1,7 @@
 import uuid
 
 
-def gen_uuid() -> str:
+def gen_id() -> str:
     """Creates unique id.
 
     Returns:

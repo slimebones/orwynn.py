@@ -40,10 +40,10 @@ def __check_log_message(message: Message) -> dict:
     )
 
     if extra["type"] == "request":
-        assert type(extra["uuid"]) is str
+        assert type(extra["id"]) is str
         assert type(extra["url"]) is str
     elif extra["type"] == "response":
-        assert type(extra["request_uuid"]) is str
+        assert type(extra["request_id"]) is str
         assert type(extra["status_code"]) is int
         assert type(extra["media_type"]) is str
     else:

@@ -20,7 +20,7 @@ class LogMiddleware(Middleware):
     ) -> web.Response:
         # Log the request
         try:
-            request_uuid: str = await self.__http_logger.log_request(request)
+            request_id: str = await self.__http_logger.log_request(request)
         except Error as err:
             return web.JSONResponse(err.api, err.status_code)
         except Exception as err:  # noqa: BLE001
@@ -33,7 +33,7 @@ class LogMiddleware(Middleware):
             await self.__http_logger.log_response(
                 response,
                 request=request,
-                request_uuid=request_uuid
+                request_id=request_id
             )
         except Error as err:
             return web.JSONResponse(err.api, err.status_code)

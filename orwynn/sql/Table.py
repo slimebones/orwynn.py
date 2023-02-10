@@ -6,7 +6,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from orwynn.fmt import snakefy
-from orwynn.rnd import gen_uuid
+from orwynn.rnd import gen_id
 
 
 class Table(DeclarativeBase):
@@ -20,23 +20,23 @@ class Table(DeclarativeBase):
     # Do not map Table to actual database table
     __abstract__ = True
 
-    # For each table special string uuid is generated, but it is not a primary
+    # For each table special string id is generated, but it is not a primary
     # key for the performance sake, for details see:
     #   https://stackoverflow.com/a/517591/14748231
-    _uuid: Mapped[str] = mapped_column(default=gen_uuid, unique=True)
+    _id: Mapped[str] = mapped_column(default=gen_id, unique=True)
 
     @hybrid_property
-    def id(self) -> int:
-        return self._id
+    def sql_id(self) -> int:
+        return self._sql_id
 
     @declared_attr.cascading  # type: ignore
-    def _id(cls) -> Mapped[int]:
+    def _sql_id(cls) -> Mapped[int]:
         parent: type[Self] = cls._get_parent_class()
         if parent is Table:
             return mapped_column(primary_key=True)
         else:
             return mapped_column(
-                ForeignKey(snakefy(parent.__name__) + "._id"),
+                ForeignKey(snakefy(parent.__name__) + "._sql_id"),
                 primary_key=True
             )
 
@@ -65,8 +65,8 @@ class Table(DeclarativeBase):
         return self._type
 
     @hybrid_property
-    def uuid(self) -> str:
-        return self._uuid
+    def id(self) -> str:
+        return self._id
 
     @declared_attr.directive
     def __tablename__(cls) -> str:

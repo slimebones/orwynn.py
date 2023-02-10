@@ -15,20 +15,20 @@ class HTTPLogger:
         self,
         request: web.Request
     ) -> str:
-        """Assigns special uuid to request and logs it.
+        """Assigns special id to request and logs it.
 
         Args:
             request:
                 Request to be logged.
 
         Returns:
-            Request assigned UUID.
+            Request assigned ID.
         """
         plain_message: str = \
             f"request {request.method.upper()} {request.url.path}" \
             f"{request.url.query}"
 
-        request_uuid: str = rnd.gen_uuid()
+        request_id: str = rnd.gen_id()
 
         json_: dict | None = None
         with contextlib.suppress(json.JSONDecodeError):
@@ -43,7 +43,7 @@ class HTTPLogger:
 
         extra: dict = {
             "type": "request",
-            "uuid": request_uuid,
+            "id": request_id,
             # Get full URL
             "url": request.url._url,
             "headers": dict(request.headers),
@@ -52,14 +52,14 @@ class HTTPLogger:
 
         Log.bind(**extra).info(plain_message)
 
-        return request_uuid
+        return request_id
 
     async def log_response(
         self,
         response: web.Response,
         *,
         request: web.Request,
-        request_uuid: str
+        request_id: str
     ) -> None:
         """Logs a response linking it to the according request.
         """
@@ -95,7 +95,7 @@ class HTTPLogger:
         extra: dict = {
             "type": "response",
             "status_code": response.status_code,
-            "request_uuid": request_uuid,
+            "request_id": request_id,
             "media_type": response.media_type,
             "headers": dict(response.headers),
             "json": json_
