@@ -166,8 +166,7 @@ class DIContainer:
                 if C is Model and issubclass(ObjCls, Config):
                     BaseCls = Config
                 else:
-                    BaseCls = C
-
+                    BaseCls =  C
         if not BaseCls:
             raise MalfunctionError(
                 f"cannot found base class for obj {obj}, this object"

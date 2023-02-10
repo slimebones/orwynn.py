@@ -1,14 +1,12 @@
 import json
-from typing import Any, Optional
 
 from loguru._handler import Message
+
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.error.MalfunctionError import MalfunctionError
-from orwynn.log.LogMiddleware import LogMiddleware
 from orwynn.module.Module import Module
-from orwynn import web
 from orwynn.test.Client import Client
 
 
@@ -49,7 +47,7 @@ def test_get():
 
     def __check(message: Message) -> None:
         data: dict = __check_log_message(message)
-        json: Optional[dict] = data["extra"]["json"]
+        json: dict | None = data["extra"]["json"]
 
         if data["extra"]["type"] == "request":
             assert json is None

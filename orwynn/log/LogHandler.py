@@ -1,5 +1,5 @@
 from datetime import time, timedelta
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 from orwynn.model.Model import Model
 
@@ -17,4 +17,4 @@ class LogHandler(Model):
     # problems with importing
     rotation: str | int | time | timedelta | Callable = "10 MB"
     serialize: bool | None = None
-    kwargs: Optional[dict] = None
+    kwargs: dict | None = None

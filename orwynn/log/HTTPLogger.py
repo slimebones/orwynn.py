@@ -1,9 +1,10 @@
 import contextlib
 import json
-from typing import Optional
-from orwynn import rnd, web, validation
+
 from starlette.concurrency import iterate_in_threadpool
 from starlette.responses import StreamingResponse
+
+from orwynn import rnd, validation, web
 from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.log.Log import Log
 
@@ -29,11 +30,10 @@ class HTTPLogger:
 
         request_uuid: str = rnd.gen_uuid()
 
-        json_: Optional[dict] = None
+        json_: dict | None = None
         with contextlib.suppress(json.JSONDecodeError):
             # FIXME: hangs here, using request.body hangs too, see:
             #   https://github.com/encode/starlette/issues/847
-            # json_ = validation.apply(await request.json(), dict)
             #
             # Seems like for now no request json will be collected until
             # mentioned issue is resolved.
@@ -41,14 +41,14 @@ class HTTPLogger:
         if not json_:
             json_ = None
 
-        extra: dict = dict(
-            type="request",
-            uuid=request_uuid,
+        extra: dict = {
+            "type": "request",
+            "uuid": request_uuid,
             # Get full URL
-            url=request.url._url,
-            headers=dict(request.headers),
-            json=json_
-        )
+            "url": request.url._url,
+            "headers": dict(request.headers),
+            "json": json_
+        }
 
         Log.bind(**extra).info(plain_message)
 
@@ -77,13 +77,12 @@ class HTTPLogger:
             )
             # And this is an alternative handling, consider enabling it if you
             # get the MalfunctionError:
-            # response_body = response.body.decode()
 
         plain_message: str = \
             f"response {response.status_code}" \
             f" {request.url.path}{request.url.query}:" \
             f" {response_body}"
-        json_: Optional[dict]
+        json_: dict | None
         json_ = validation.apply(
             json.loads(
                 response_body
@@ -93,14 +92,14 @@ class HTTPLogger:
         if not json_:
             json_ = None
 
-        extra: dict = dict(
-            type="response",
-            status_code=response.status_code,
-            request_uuid=request_uuid,
-            media_type=response.media_type,
-            headers=dict(response.headers),
-            json=json_
-        )
+        extra: dict = {
+            "type": "response",
+            "status_code": response.status_code,
+            "request_uuid": request_uuid,
+            "media_type": response.media_type,
+            "headers": dict(response.headers),
+            "json": json_
+        }
 
         Log.bind(**extra).info(plain_message)
 

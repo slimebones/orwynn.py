@@ -1,6 +1,4 @@
-from typing import Any
-from orwynn import validation
-from orwynn import web
+from orwynn import validation, web
 from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
