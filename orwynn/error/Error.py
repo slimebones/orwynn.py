@@ -1,8 +1,15 @@
+from typing import ClassVar
+
+from orwynn.indication.IndicationType import IndicationType
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
 
 
 class Error(Exception):
     """Base error class of the app.
+
+    Class-Attributes:
+        INDICATION_TYPE (optional):
+            Type to be displayed in final response body. Defaults to ERROR.
 
     Attributes:
         message (optional):
@@ -10,6 +17,8 @@ class Error(Exception):
         status_code (optional):
             Status code to be retrieved by error handlers.
     """
+    INDICATION_TYPE: ClassVar[IndicationType | None] = None
+
     def __init__(self, message: str = "", status_code: int = 400) -> None:
         super().__init__(message)
         self.message = message
@@ -23,4 +32,6 @@ class Error(Exception):
         return APIIndicationOnlyProxy.ie().api_indication.digest(self)
 
     def dict(self, *args, **kwargs) -> dict:
-        return {"message": self.message}
+        return {
+            "message": self.message
+        }

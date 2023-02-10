@@ -27,19 +27,19 @@ def test_digest_default(default_indication: Indication):
     mp_type: str = parse_key("type", digested_mp, str)
     mp_value: dict = parse_key("value", digested_mp, dict)
 
-    assert mp_type == "Text"
+    assert mp_type == "ok"
     Text.parse_obj(mp_value)
 
 
 def test_recover_default(default_indication: Indication):
-    recovering_mp: dict[str, Any] = {
-        "type": "Text",
+    recovering_mp: dict = {
+        "type": "ok",
         "value": {
             "text": "hello"
         }
     }
 
-    recovered_model = default_indication.recover(recovering_mp)
+    recovered_model: Text = default_indication.recover(Text, recovering_mp)
     assert type(recovered_model) is Text
     assert recovered_model.text == "hello"
 
@@ -55,20 +55,6 @@ def test_multiple_schemas():
     })
 
     assert i.gen_schema(Item) == i.gen_schema(Item)
-
-
-def test_custom_model_api_type():
-    class Item(Model):
-        API_TYPE = "BestItem"
-        name: str
-        price: float
-
-    i: Indication = Indication({
-        "type": Indicator.TYPE,
-        "value": Indicator.VALUE
-    })
-
-    assert i.digest(Item(name="pizza", price=2.3))["type"] == "BestItem"
 
 
 def test_digest_enum(default_indication: Indication):

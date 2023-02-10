@@ -8,8 +8,9 @@ from orwynn.error.ErrorValueSchema import ErrorValueSchema
 from orwynn.error.HTTPExceptionValueSchema import HTTPExceptionValueSchema
 from orwynn.error.RequestValidationExceptionValueSchema import \
     RequestValidationExceptionValueSchema
+from orwynn.indication.IndicationType import IndicationType
 from orwynn.indication.digesting_error import DigestingError
-from orwynn.indication.Indicatable import Indicatable, IndicatableClass
+from orwynn.indication.Indicatable import IndicatableTypeVar, Indicatable
 from orwynn.indication.Indicator import Indicator
 from orwynn.indication.unsupported_indicator_error import \
     UnsupportedIndicatorError
@@ -59,7 +60,7 @@ class Indication:
 
     def gen_schema(
         self,
-        Entity: IndicatableClass
+        Entity: type[IndicatableTypeVar]
     ) -> type[Model]:
         schema_name: str = Entity.__name__ + "IndicationSchema"
         schema_kwargs: dict[str, Any] = {}
@@ -132,18 +133,11 @@ class Indication:
         """
         result: dict = {}
 
-        is_type_indicator_found: bool = False
-        is_value_indicator_found: bool = False
-
         for k, v in self.items:
             final_field: str | dict
             match v:
                 case Indicator.TYPE:
-                    if isinstance(obj, Model) and obj.API_TYPE is not None:
-                        final_field = validation.apply(obj.API_TYPE, str)
-                    else:
-                        final_field = obj.__class__.__name__
-                    is_type_indicator_found = True
+                    final_field = self.__get_type_for_object(obj).value
                 case Indicator.VALUE:
                     if isinstance(obj, HTTPException):
                         final_field = {
@@ -177,6 +171,8 @@ class Indication:
                             "message": message,
                             "locations": locations
                         }
+                    elif isinstance(obj, Error):
+                        final_field = obj.dict()
                     elif (
                         isinstance(obj, Exception)
                         and not isinstance(obj, Error)
@@ -184,8 +180,6 @@ class Indication:
                         final_field = {
                             "message": "; ".join([str(x) for x in obj.args])
                         }
-                    elif isinstance(obj, Error):
-                        final_field = obj.dict()
                     elif isinstance(obj, Model):
                         # Since pydantic seems to not having a way to deal
                         # with Enums through dict() call (only via Config),
@@ -197,28 +191,19 @@ class Indication:
                         raise TypeError(
                             f"unsupported obj type {type(obj)}"
                         )
-                    is_value_indicator_found = True
                 case _:
                     raise UnsupportedIndicatorError(
                         f"indicator {v} is not supported"
                     )
             result[k] = final_field
 
-        if not is_type_indicator_found:
-            raise DigestingError(
-                f"indication {self} should contain indicator {Indicator.TYPE}"
-                f" and {Indicator.VALUE} in any fields to be able to digest"
-                " models"
-            )
-
-        if not is_value_indicator_found:
-            raise DigestingError(
-                "wasn't able to find Indicator.VALUE related field"
-            )
-
         return result
 
-    def recover(self, mp: dict) -> BaseSubclassable | Exception:
+    def recover(
+        self,
+        Object: type[IndicatableTypeVar],
+        mp: dict
+    ) -> IndicatableTypeVar:
         """Creates object from given map according to indication rules.
 
         Note that your project's indication instance should match an indication
@@ -230,6 +215,8 @@ class Indication:
         Recovering of Python's Exception are also supported.
 
         Args:
+            Object:
+                Object type to recover.
             mp:
                 Dictionary from which object will be recovered.
 
@@ -241,72 +228,39 @@ class Indication:
                 TYPE or VALUE locations of given dictionary are not matched
                 with according indication data.
         """
-        validate_dict(mp, (str, Validator.SKIP))
-
-        TargetClass: type = self.__find_type_in_mp(mp)
-        value: dict = self.__find_value_in_mp(mp)
-
-        if (
-            issubclass(TargetClass, HTTPException)
-        ):
-            return TargetClass(
-                status_code=value["status_code"],
-                detail=value["message"]
-            )
-        elif (
-            issubclass(TargetClass, RequestValidationException)
-        ):
-            # Temporarily RequestValidationException data is not recovered
-            return TargetClass(
-                errors=[]
-            )
-        elif (
-            issubclass(TargetClass, Exception)
-            and not issubclass(TargetClass, Error)
-        ):
-            return TargetClass(*value["message"].split("; "))
-        else:
-            return TargetClass(**value)
-
-    def recover_model_with_type(
-        self, ModelType: type[Model], mp: dict
-    ) -> Model:
-        """Creates model object of given type using given map according to
-        indication rules.
-
-        Works the same as recover_model(...), but is faster since knows which
-        model type to initialize.
-
-        Args:
-            ModelType:
-                Type to initialize.
-            mp:
-                Dictionary from which model will be recovered.
-
-        Returns:
-            Recovered model.
-
-        Raises:
-            RecoveringError:
-                TYPE or VALUE locations of given dictionary are not matched
-                with according indication data.
-        """
-        validate(ModelType, Model)
+        validate(Object, type)
         validate_dict(mp, (str, Validator.SKIP))
 
         # Note that in this case availability of Indicator.TYPE field in given
         # map is not checked since only Indicator.VALUE is needed.
-        model_value: dict = self.__find_value_in_mp(mp)
+        value: dict = self.__find_value_in_mp(mp)
 
-        return ModelType.parse_obj(model_value)
-
-    def __find_type_in_mp(self, mp: dict) -> type:
-        indication_type_field_location: FieldLocation = \
-            self.__locations[Indicator.TYPE]
-        mp_type_field: str = find_field_by_location(
-            indication_type_field_location, mp
-        )
-        return self.__find_subclass_by_name_out_of_subclassables(mp_type_field)
+        if (
+            issubclass(Object, HTTPException)
+        ):
+            return Object(
+                status_code=value["status_code"],
+                detail=value["message"]
+            )
+        elif (
+            issubclass(Object, RequestValidationException)
+        ):
+            # Temporarily RequestValidationException data is not recovered
+            return Object(
+                errors=[]
+            )
+        elif issubclass(Object, Error):
+            return Object(message=value["message"])
+        elif (
+            issubclass(Object, Exception)
+        ):
+            return Object(*value["message"].split("; "))
+        elif issubclass(Object, Model):
+            return Object.parse_obj(value)
+        else:
+            raise TypeError(
+                f"unrecognized Object {Object}"
+            )
 
     def __find_value_in_mp(self, mp: dict) -> dict:
         indication_value_field_location: FieldLocation = \
@@ -318,16 +272,28 @@ class Indication:
         validate(mp_value, dict)
         return mp_value
 
-    def __find_subclass_by_name_out_of_subclassables(self, name: str) -> type:
-        subclass: type | None = None
+    def __get_type_for_object(
+        self,
+        obj: Indicatable
+    ) -> IndicationType:
+        indication_type: IndicationType = IndicationType.OK
 
-        # Including Exception in searched classes may take much longer
-        for Subclassable in SUBCLASSABLES + [Exception]:
-            try:
-                subclass = find_subclass_by_name(name, Subclassable)
-            except ClassNotFoundError:
-                continue
-            else:
-                return subclass
+        # For models default type is OK, unless is defined
+        # otherwise in INDICATION_TYPE
+        if isinstance(obj, Model) and obj.INDICATION_TYPE is not None:
+            indication_type = validation.apply(
+                obj.INDICATION_TYPE,
+                IndicationType
+            )
+        # For Exception indication type is always ERROR, for
+        # orwynn.Error it's ERROR by default, unless is
+        # defined otherwise in Error.INDICATION_TYPE
+        elif isinstance(obj, Exception):
+            indication_type = IndicationType.ERROR
+            if isinstance(obj, Error) and obj.INDICATION_TYPE is not None:
+                indication_type = validation.apply(
+                    obj.INDICATION_TYPE,
+                    IndicationType
+                )
 
-        raise ValueError(f"subclassable with name {name} not found")
+        return indication_type

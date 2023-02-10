@@ -34,7 +34,7 @@ def test_basic():
     r: TestResponse = http.get("/", 400)
 
     recovered_error: Error = validation.apply(
-        BootProxy.ie().api_indication.recover(r.json()),
+        BootProxy.ie().api_indication.recover(Error, r.json()),
         Error
     )
 
@@ -57,7 +57,7 @@ def test_default_exception():
     r: TestResponse = http.get("/", 400)
 
     recovered_exception: Exception = validation.apply(
-        BootProxy.ie().api_indication.recover(r.json()),
+        BootProxy.ie().api_indication.recover(Exception, r.json()),
         Exception
     )
 
@@ -96,7 +96,7 @@ def test_identical_error_handlers():
     r: TestResponse = http.get("/", 401)
 
     recovered_error: Error = validation.apply(
-        BootProxy.ie().api_indication.recover(r.json()),
+        BootProxy.ie().api_indication.recover(Error, r.json()),
         Error
     )
 

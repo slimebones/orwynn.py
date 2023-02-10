@@ -47,6 +47,6 @@ def test_same_id_creation(std_mongo_boot, std_http: Client):
     )
 
     validation.validate(
-        BootProxy.ie().api_indication.recover(r2.json()),
+        BootProxy.ie().api_indication.recover(DuplicateKeyError, r2.json()),
         DuplicateKeyError
     )

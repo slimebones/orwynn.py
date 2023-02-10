@@ -2,6 +2,8 @@ from typing import Any, ClassVar, Self, TypeVar
 
 import pydantic
 
+from orwynn import validation
+from orwynn.indication.IndicationType import IndicationType
 from orwynn.proxy.BootProxy import BootProxy
 
 RecoverType = TypeVar("RecoverType", bound="Model")
@@ -10,12 +12,11 @@ RecoverType = TypeVar("RecoverType", bound="Model")
 class Model(pydantic.BaseModel):
     """Basic way to represent a data in the app.
 
-    Attributes:
-        API_TYPE:
-            Text type to be added to API json type field. Defaults to digested
-            class name.
+    Class-Attributes:
+        INDICATION_TYPE (optional):
+            Type to be displayed in final response body. Defaults to OK.
     """
-    API_TYPE: ClassVar[str | None] = None
+    INDICATION_TYPE: ClassVar[IndicationType | None] = None
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
@@ -33,8 +34,11 @@ class Model(pydantic.BaseModel):
     @classmethod
     def recover(cls, mp: dict) -> Self:
         """Recovers model of this class using dictionary."""
-        return BootProxy.ie().api_indication.recover_model_with_type(
-            cls, mp
+        return validation.apply(
+                BootProxy.ie().api_indication.recover(
+                cls, mp
+            ),
+            Model
         )
 
     @classmethod

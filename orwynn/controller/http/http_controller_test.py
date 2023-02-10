@@ -125,6 +125,7 @@ def test_default_404():
 
     recovered_exception: HTTPException = validation.apply(
         BootProxy.ie().api_indication.recover(
+            HTTPException,
             data
         ),
         HTTPException
@@ -161,6 +162,7 @@ def test_default_request_validation_error():
     # back in indication
     validation.apply(
         BootProxy.ie().api_indication.recover(
+            RequestValidationException,
             data
         ),
         RequestValidationException
@@ -184,6 +186,7 @@ def test_default_method_not_allowed():
 
     recovered_exception: HTTPException = validation.apply(
         BootProxy.ie().api_indication.recover(
+            HTTPException,
             data
         ),
         HTTPException

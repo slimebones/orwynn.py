@@ -1,8 +1,9 @@
-from orwynn.indication.Indicatable import IndicatableClass
+
+from orwynn.indication.Indicatable import Indicatable
 from orwynn.model.Model import Model
 
 
 class EndpointResponse(Model):
     status_code: int
-    Entity: IndicatableClass
+    Entity: type[Indicatable]
     description: str | None = None

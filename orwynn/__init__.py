@@ -10,6 +10,7 @@ from orwynn.controller.websocket.Websocket import Websocket
 from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.error.Error import Error
 from orwynn.indication.Indication import Indication
+from orwynn.indication.IndicationType import IndicationType
 from orwynn.indication.Indicator import Indicator
 from orwynn.log.Log import Log
 from orwynn.middleware.Middleware import Middleware
