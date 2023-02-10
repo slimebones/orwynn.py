@@ -1,4 +1,6 @@
 """Scalable web-framework with out-of-the-box architecture."""
+# Only base most required imports should be here to not overflow shortcut
+# imports, others can be imported from modules directly.
 from orwynn.app.App import App
 from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.boot.Boot import Boot
