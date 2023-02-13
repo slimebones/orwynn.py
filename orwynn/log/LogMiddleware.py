@@ -1,5 +1,5 @@
-
 from orwynn import web
+from orwynn.web.context.RequestContextId import RequestContextId
 from orwynn.error.Error import Error
 from orwynn.log.HTTPLogger import HTTPLogger
 from orwynn.middleware.Middleware import Middleware, NextCallFn
@@ -18,26 +18,18 @@ class LogMiddleware(Middleware):
     async def process(
         self, request: web.Request, call_next: NextCallFn
     ) -> web.Response:
-        # Log the request
-        try:
-            request_id: str = await self.__http_logger.log_request(request)
-        except Error as err:
-            return web.JSONResponse(err.api, err.status_code)
-        except Exception as err:  # noqa: BLE001
-            return web.JSONResponse(" ; ".join(err.args), 400)
+        request_id: str = RequestContextId().get()
+        await self.__http_logger.log_request(
+            request,
+            request_id
+        )
 
         response: web.Response = await call_next(request)
 
-        # Log the response
-        try:
-            await self.__http_logger.log_response(
-                response,
-                request=request,
-                request_id=request_id
-            )
-        except Error as err:
-            return web.JSONResponse(err.api, err.status_code)
-        except Exception as err:  # noqa: BLE001
-            return web.JSONResponse(" ; ".join(err.args), 400)
+        await self.__http_logger.log_response(
+            response,
+            request=request,
+            request_id=request_id
+        )
 
         return response

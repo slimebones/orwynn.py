@@ -8,6 +8,7 @@ from typing import Literal
 import dotenv
 
 from orwynn import validation, web
+from orwynn.BUILTIN_MIDDLEWARE import BUILTIN_MIDDLEWARE
 from orwynn.app.App import App
 from orwynn.app.DefaultErrorHandler import DefaultErrorHandler
 from orwynn.app.DefaultExceptionHandler import DefaultExceptionHandler
@@ -37,6 +38,7 @@ from orwynn.log.configure_log import configure_log
 from orwynn.log.Log import Log
 from orwynn.log.LogConfig import LogConfig
 from orwynn.log.LogMiddleware import LogMiddleware
+from orwynn.middleware.BuiltinMiddleware import BuiltinMiddleware
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
@@ -192,16 +194,14 @@ class Boot(Worker):
 
         self.__configure_log()
 
-        # TMP: Add builtin middlewares
-        self.__add_builtin_middlewares()
-
         # Supress: Don't raise error to ease test writings
         with contextlib.suppress(MissingDIObjectError):
             self.__register_routes(self.__di.modules, self.__di.controllers)
         # Supress: No middleware defined, it's ok
         with contextlib.suppress(MissingDIObjectError):
             self.__register_middleware(
-                self.__di.all_middleware
+                # Add builtin middlewares first, and others second
+                [m() for m in BUILTIN_MIDDLEWARE] + self.__di.all_middleware
             )
 
         if cors is not None:
@@ -333,7 +333,10 @@ class Boot(Worker):
                 self.__register_controller_class_for_module(m, C, controllers)
 
     def __register_middleware(self, middleware: list[Middleware]) -> None:
-        for m in middleware:
+        # Note that middleware here is reversed since Starlette.add_middleware
+        # inserts new functions at the top of the middleware list which makes
+        # older added middlewares executable last, which is not logical.
+        for m in reversed(middleware):
             self.app.add_middleware(m)
 
     def __register_controller_class_for_module(
@@ -484,9 +487,3 @@ class Boot(Worker):
             )
 
         return root_dir
-
-    def __add_builtin_middlewares(
-        self
-    ) -> None:
-        # Add non-framework Middleware: starlette-context
-        self.app.add_context_middleware()

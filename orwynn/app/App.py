@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING, Any, Callable
 
-from starlette_context.middleware import RawContextMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware as FastAPI_CORSMiddleware
 from starlette.middleware.base import (
@@ -9,7 +8,6 @@ from starlette.middleware.base import (
 from starlette.types import Receive, Scope, Send
 
 from orwynn import validation
-from orwynn.log.handler_catch import handler_catch
 from orwynn.middleware.Middleware import Middleware
 from orwynn.service.FrameworkService import FrameworkService
 from orwynn.test.Client import Client
@@ -91,16 +89,5 @@ class App(FrameworkService):
         else:
             self.__app.add_exception_handler(
                 error_handler.E,
-                # FIXME: Not the best way to log all errors.
-                # handler_catch(error_handler.handle)
                 error_handler.handle
             )
-
-    def add_context_middleware(
-        self
-    ) -> None:
-        # FIXME: In future consider creating native orwynn.Middleware serving
-        #   the functions of context manager.
-        self.__app.add_middleware(
-            RawContextMiddleware
-        )

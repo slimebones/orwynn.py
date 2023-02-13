@@ -13,22 +13,26 @@ class HTTPLogger:
     """Logs HTTP requests and responses."""
     async def log_request(
         self,
-        request: web.Request
+        request: web.Request,
+        request_id: str
     ) -> str:
         """Assigns special id to request and logs it.
 
         Args:
             request:
                 Request to be logged.
+            request_id:
+                ID of the request.
 
         Returns:
             Request assigned ID.
         """
+        validation.validate(request, web.Request)
+        validation.validate(request_id, str)
+
         plain_message: str = \
             f"request {request.method.upper()} {request.url.path}" \
             f"{request.url.query}"
-
-        request_id: str = rnd.gen_id()
 
         json_: dict | None = None
         with contextlib.suppress(json.JSONDecodeError):
