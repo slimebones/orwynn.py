@@ -3,7 +3,7 @@ import os
 from copy import deepcopy
 from pathlib import Path
 from types import NoneType
-from typing import Literal
+from typing import Literal, Sequence
 
 import dotenv
 
@@ -38,6 +38,7 @@ from orwynn.indication.Indication import Indication
 from orwynn.log.Log import Log
 from orwynn.log.LogConfig import LogConfig
 from orwynn.log.configure_log import configure_log
+from orwynn.middleware.BuiltinMiddleware import BuiltinMiddleware
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
@@ -198,11 +199,19 @@ class Boot(Worker):
         # Supress: Don't raise error to ease test writings
         with contextlib.suppress(MissingDIObjectError):
             self.__register_routes(self.__di.modules, self.__di.controllers)
-        # Supress: No middleware defined, it's ok
-        with contextlib.suppress(MissingDIObjectError):
+
+        # Register middleware
+        builtin_middleware: list[BuiltinMiddleware] = [
+            m() for m in BUILTIN_MIDDLEWARE
+        ]
+        try:
             self.__register_middleware(
                 # Add builtin middlewares first, and others second
-                [m() for m in BUILTIN_MIDDLEWARE] + self.__di.all_middleware
+                builtin_middleware + self.__di.all_middleware
+            )
+        except MissingDIObjectError:
+            self.__register_middleware(
+                builtin_middleware
             )
 
         if cors is not None:
@@ -326,7 +335,7 @@ class Boot(Worker):
             for C in m.Controllers:
                 self.__register_controller_class_for_module(m, C, controllers)
 
-    def __register_middleware(self, middleware: list[Middleware]) -> None:
+    def __register_middleware(self, middleware: Sequence[Middleware]) -> None:
         # Note that middleware here is reversed since Starlette.add_middleware
         # inserts new functions at the top of the middleware list which makes
         # older added middlewares executable last, which is not logical.

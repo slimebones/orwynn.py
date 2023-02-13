@@ -11,9 +11,6 @@ from orwynn.log.Log import Log
 
 class HTTPLogger:
     """Logs HTTP requests and responses."""
-    def __init__(self, log: Log) -> None:
-        self.__log = log
-
     async def log_request(
         self,
         request: web.Request,
@@ -61,8 +58,8 @@ class HTTPLogger:
         # Note that here and on response field "request_id" also duplicated
         # at extra.request_id by logger itself. It's ok and shouldn't be
         # removed for all logs compliance.
-        self.__log.info(
-            plain_message, extra=extra
+        Log.bind(**extra).info(
+            plain_message
         )
 
         return request_id
@@ -115,8 +112,8 @@ class HTTPLogger:
             }
         }
 
-        self.__log.info(
-            plain_message, extra=extra
+        Log.bind(**extra).info(
+            plain_message
         )
 
     async def __get_response_body(

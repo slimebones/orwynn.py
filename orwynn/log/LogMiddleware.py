@@ -10,10 +10,10 @@ class LogMiddleware(Middleware):
 
     It's recommended to be outermost (at custom level) middleware.
     """
-    def __init__(self, covered_routes: list[str], log: Log) -> None:
+    def __init__(self, covered_routes: list[str]) -> None:
         super().__init__(covered_routes)
 
-        self.__http_logger: HTTPLogger = HTTPLogger(log)
+        self.__http_logger: HTTPLogger = HTTPLogger()
 
     async def process(
         self, request: web.Request, call_next: NextCallFn
