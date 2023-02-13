@@ -3,6 +3,7 @@ from orwynn.app.App import App
 from orwynn.boot.BootConfig import BootConfig
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.Provider import Provider
+from orwynn.log.LogConfig import LogConfig
 from orwynn.module.Module import Module
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
@@ -26,6 +27,7 @@ class Assertion:
     # performed on comparison tests
     COLLECTED_PROVIDERS: list[type[Provider]] = [
         App,
+        LogConfig,
         Mongo,
         MongoConfig,
         TextService,

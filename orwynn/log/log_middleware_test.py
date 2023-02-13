@@ -7,7 +7,7 @@ from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.error.Error import Error
 from orwynn.error.MalfunctionError import MalfunctionError
-from orwynn.log import module as log_module
+from orwynn.log.Log import Log
 from orwynn.log.LogMiddleware import LogMiddleware
 from orwynn.module.Module import Module
 from orwynn.testing import get_log_apprc
@@ -60,8 +60,7 @@ def test_get():
 
     boot: Boot = Boot(
         Module(
-            route="/", Controllers=[C1], Middleware=[LogMiddleware],
-            imports=[log_module]
+            route="/", Controllers=[C1], Middleware=[LogMiddleware]
         ),
         apprc=get_log_apprc(__check)
     )
@@ -71,7 +70,7 @@ def test_get():
         200
     )
 
-    boot.log.remove_handler()
+    Log.remove()
 
 
 def test_get__error():
@@ -93,8 +92,7 @@ def test_get__error():
 
     boot: Boot = Boot(
         Module(
-            route="/", Controllers=[C1], Middleware=[LogMiddleware],
-            imports=[log_module]
+            route="/", Controllers=[C1], Middleware=[LogMiddleware]
         ),
         apprc=get_log_apprc(__check)
     )
@@ -104,4 +102,4 @@ def test_get__error():
         400
     )
 
-    boot.log.remove_handler()
+    Log.remove()

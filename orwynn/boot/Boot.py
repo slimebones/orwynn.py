@@ -8,6 +8,7 @@ from typing import Literal
 import dotenv
 
 from orwynn import web
+from orwynn import validation
 from orwynn.app.App import App
 from orwynn.app.DefaultErrorHandler import DefaultErrorHandler
 from orwynn.app.DefaultExceptionHandler import DefaultExceptionHandler
@@ -35,6 +36,8 @@ from orwynn.file.NotDirError import NotDirError
 from orwynn.indication.default_api_indication import default_api_indication
 from orwynn.indication.Indication import Indication
 from orwynn.log.Log import Log
+from orwynn.log.LogConfig import LogConfig
+from orwynn.log.configure_log import configure_log
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
@@ -179,8 +182,14 @@ class Boot(Worker):
 
         # Add framework services
         root_module.add_provider_or_skip(App)
+        # Log config is always added to configure logging, it can be built from
+        # an empty apprc too.
+        root_module.add_provider_or_skip(LogConfig)
 
         self.__di: DI = DI(root_module)
+
+        # Configure logging
+        configure_log(validation.apply(self.__di.find("LogConfig"), LogConfig))
 
         self.__router: Router = Router(
             self.app
@@ -204,11 +213,6 @@ class Boot(Worker):
     @property
     def app(self) -> App:
         return self.__di.app_service
-
-    @property
-    def log(self) -> Log:
-        """Convenience method to get log service on tests, etc."""
-        return self.__di.log
 
     @property
     def mode(self) -> BootMode:

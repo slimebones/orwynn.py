@@ -2,7 +2,6 @@ from orwynn import validation
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HTTPController import HTTPController
-from orwynn.log import module as log_module
 from orwynn.log.LogMiddleware import LogMiddleware
 from orwynn.module.Module import Module
 from orwynn.web.context.RequestContextId import RequestContextId
@@ -24,8 +23,7 @@ def test_basic():
         Module(
             "/",
             Controllers=[C1],
-            Middleware=[LogMiddleware],
-            imports=[log_module]
+            Middleware=[LogMiddleware]
         )
     )
 

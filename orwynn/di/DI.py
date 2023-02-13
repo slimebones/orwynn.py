@@ -64,10 +64,6 @@ class DI(Worker):
         return validation.apply(self.find("App"), App)
 
     @property
-    def log(self) -> Log:
-        return validation.apply(self.find("Log"), Log)
-
-    @property
     def controllers(self) -> list[Controller]:
         """Fetches all controllers from container.
 
