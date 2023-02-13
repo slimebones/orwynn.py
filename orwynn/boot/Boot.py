@@ -34,7 +34,6 @@ from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.file.NotDirError import NotDirError
 from orwynn.indication.default_api_indication import default_api_indication
 from orwynn.indication.Indication import Indication
-from orwynn.log.configure_log import configure_log
 from orwynn.log.Log import Log
 from orwynn.log.LogConfig import LogConfig
 from orwynn.log.LogMiddleware import LogMiddleware
@@ -113,7 +112,6 @@ class Boot(Worker):
     ).app
     ```
     """
-    @Log.catch(reraise=True)
     def __init__(
         self,
         root_module: Module,
@@ -184,15 +182,12 @@ class Boot(Worker):
 
         # Add framework services
         root_module.add_provider_or_skip(App)
-        root_module.add_provider_or_skip(LogConfig)
 
         self.__di: DI = DI(root_module)
 
         self.__router: Router = Router(
             self.app
         )
-
-        self.__configure_log()
 
         # Supress: Don't raise error to ease test writings
         with contextlib.suppress(MissingDIObjectError):
@@ -214,19 +209,17 @@ class Boot(Worker):
         return self.__di.app_service
 
     @property
+    def log(self) -> Log:
+        """Convenience method to get log service on tests, etc."""
+        return self.__di.log
+
+    @property
     def mode(self) -> BootMode:
         return self.__mode
 
     @property
     def api_indication(self) -> Indication:
         return self.__api_indication
-
-    def __configure_log(self) -> None:
-        log_config: LogConfig = validation.apply(
-            self.__di.find("LogConfig"),
-            LogConfig
-        )
-        configure_log(log_config)
 
     def __register_error_handlers(
         self

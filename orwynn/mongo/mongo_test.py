@@ -5,7 +5,7 @@ from orwynn.mapping.CustomUseOfMappingReservedFieldError import (
 from orwynn.mongo.Document import Document
 from orwynn.mongo.DuplicateKeyError import DuplicateKeyError
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.test.Client import Client
+from orwynn.testing.Client import Client
 from orwynn.web import TestResponse
 from tests.std.user import User
 

@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from orwynn.test.Client import Client
+from orwynn.testing.Client import Client
 
 
 @fixture

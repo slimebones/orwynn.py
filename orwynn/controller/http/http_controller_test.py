@@ -14,7 +14,7 @@ from orwynn.controller.MissingControllerClassAttributeError import (
 from orwynn.model.Model import Model
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.test.Client import Client
+from orwynn.testing.Client import Client
 from orwynn.validation import RequestValidationException, expect, validate_re
 from orwynn.validation.re_validation_error import ReValidationError
 from orwynn.validation.validation_error import ValidationError

@@ -10,8 +10,8 @@ from starlette.types import Receive, Scope, Send
 from orwynn import validation
 from orwynn.middleware.Middleware import Middleware
 from orwynn.service.FrameworkService import FrameworkService
-from orwynn.test.Client import Client
-from orwynn.test.EmbeddedTestClient import EmbeddedTestClient
+from orwynn.testing.Client import Client
+from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
 from orwynn.web import CORS, HTTPMethod
 
 if TYPE_CHECKING:

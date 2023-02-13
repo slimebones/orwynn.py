@@ -4,29 +4,15 @@ from typing import Callable
 from loguru._handler import Message
 
 from orwynn.boot.Boot import Boot
+from orwynn.log import module as log_module
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.error.Error import Error
 from orwynn.error.MalfunctionError import MalfunctionError
-from orwynn.log.Log import Log
 from orwynn.log.LogMiddleware import LogMiddleware
 from orwynn.module.Module import Module
-from orwynn.test.Client import Client
-
-
-def __get_log_apprc(check_fn: Callable) -> dict:
-    return {
-        "prod": {
-            "Log": {
-                "handlers": [
-                    {
-                        "sink": check_fn,
-                        "serialize": True
-                    }
-                ]
-            }
-        }
-    }
+from orwynn.testing import get_log_apprc
+from orwynn.testing.Client import Client
 
 
 def __check_log_message(message: Message) -> dict:
@@ -73,17 +59,20 @@ def test_get():
         elif data["record"]["extra"]["type"] == "response":
             assert json == RETURNED_DATA
 
-    client: Client = Boot(
-        Module(route="/", Controllers=[C1], Middleware=[LogMiddleware]),
-        apprc=__get_log_apprc(__check)
-    ).app.client
-
+    boot: Boot = Boot(
+        Module(
+            route="/", Controllers=[C1], Middleware=[LogMiddleware],
+            imports=[log_module]
+        ),
+        apprc=get_log_apprc(__check)
+    )
+    client: Client = boot.app.client
     client.get(
         "/",
         200
     )
 
-    Log.remove()
+    boot.log.remove_handler()
 
 
 def test_get__error():
@@ -103,14 +92,17 @@ def test_get__error():
         elif data["extra"]["type"] == "response":
             assert json == Error("hello").api
 
-    client: Client = Boot(
-        Module(route="/", Controllers=[C1], Middleware=[LogMiddleware]),
-        apprc=__get_log_apprc(__check)
-    ).app.client
-
+    boot: Boot = Boot(
+        Module(
+            route="/", Controllers=[C1], Middleware=[LogMiddleware],
+            imports=[log_module]
+        ),
+        apprc=get_log_apprc(__check)
+    )
+    client: Client = boot.app.client
     client.get(
         "/",
         400
     )
 
-    Log.remove()
+    boot.log.remove_handler()

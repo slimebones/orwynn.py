@@ -1,4 +1,5 @@
 from orwynn import validation
+from orwynn.log import module as log_module
 from orwynn.log.LogMiddleware import LogMiddleware
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
@@ -22,7 +23,9 @@ def test_basic():
     boot: Boot = Boot(
         Module(
             "/",
-            Controllers=[C1]
+            Controllers=[C1],
+            Middleware=[LogMiddleware],
+            imports=[log_module]
         )
     )
 

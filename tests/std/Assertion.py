@@ -27,7 +27,6 @@ class Assertion:
     # performed on comparison tests
     COLLECTED_PROVIDERS: list[type[Provider]] = [
         App,
-        LogConfig,
         Mongo,
         MongoConfig,
         TextService,

@@ -5,7 +5,7 @@ from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
-from orwynn.test.Client import Client
+from orwynn.testing.Client import Client
 from orwynn.web import Request, Response, TestResponse
 
 

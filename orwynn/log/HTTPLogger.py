@@ -11,6 +11,9 @@ from orwynn.log.Log import Log
 
 class HTTPLogger:
     """Logs HTTP requests and responses."""
+    def __init__(self, log: Log) -> None:
+        self.__log = log
+
     async def log_request(
         self,
         request: web.Request,
@@ -46,15 +49,21 @@ class HTTPLogger:
             json_ = None
 
         extra: dict = {
-            "type": "request",
-            "id": request_id,
-            # Get full URL
-            "url": request.url._url,
-            "headers": dict(request.headers),
-            "json": json_
+            "request": {
+                "id": request_id,
+                # Get full URL
+                "url": request.url._url,
+                "headers": dict(request.headers),
+                "json": json_
+            }
         }
 
-        Log.bind(**extra).info(plain_message)
+        # Note that here and on response field "request_id" also duplicated
+        # at extra.request_id by logger itself. It's ok and shouldn't be
+        # removed for all logs compliance.
+        self.__log.info(
+            plain_message, extra=extra
+        )
 
         return request_id
 
@@ -97,15 +106,18 @@ class HTTPLogger:
             json_ = None
 
         extra: dict = {
-            "type": "response",
-            "status_code": response.status_code,
-            "request_id": request_id,
-            "media_type": response.media_type,
-            "headers": dict(response.headers),
-            "json": json_
+            "response": {
+                "status_code": response.status_code,
+                "request_id": request_id,
+                "media_type": response.media_type,
+                "headers": dict(response.headers),
+                "json": json_
+            }
         }
 
-        Log.bind(**extra).info(plain_message)
+        self.__log.info(
+            plain_message, extra=extra
+        )
 
     async def __get_response_body(
         self,

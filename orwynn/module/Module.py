@@ -149,7 +149,7 @@ class Module:
                     raise NotProviderError(FailedClass=P)
                 if issubclass(P, FrameworkService):
                     raise FrameworkServiceModuleReferenceError(
-                        f"framework service {P} is referenced in"
+                        f"a framework service {P} cannot be referenced in"
                         f" the module {self}"
                     )
             res = Providers

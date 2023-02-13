@@ -2,7 +2,7 @@ from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.module.Module import Module
-from orwynn.test.Client import Client
+from orwynn.testing.Client import Client
 from orwynn.web.CORS import CORS
 
 
@@ -32,8 +32,8 @@ def test_correct_origin():
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 
-    def get(self):
-        return {}
+        def get(self) -> dict:
+            return {}
 
     boot: Boot = Boot(
         Module(route="/", Controllers=[C1]),

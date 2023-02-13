@@ -7,7 +7,7 @@ from orwynn.error.Error import Error
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.service.Service import Service
-from orwynn.test.Client import Client
+from orwynn.testing.Client import Client
 from orwynn.web import JSONResponse, Request, TestResponse
 
 

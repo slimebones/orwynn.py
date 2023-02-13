@@ -27,8 +27,8 @@ from orwynn.di.missing_di_object_error import MissingDIObjectError
 from orwynn.module.Module import Module
 from orwynn.mongo.Mongo import Mongo
 from orwynn.proxy.boot_data_proxy_test import std_boot_data_proxy
-from orwynn.test.Client import Client
-from orwynn.test.EmbeddedTestClient import EmbeddedTestClient
+from orwynn.testing.Client import Client
+from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
 from orwynn.web.http_test import std_http
 from orwynn.worker.Worker import Worker
 from tests.structs import (
@@ -51,6 +51,7 @@ def run_around_tests():
     with contextlib.suppress(MissingDIObjectError, TypeError):
         validation.apply(DI.ie().find("Mongo"), Mongo).drop_database()
     __discardWorkers()
+
 
 def __discardWorkers(W: type[Worker] = Worker):
     for NestedW in W.__subclasses__():
