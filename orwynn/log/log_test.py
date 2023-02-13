@@ -1,15 +1,15 @@
 import json
+
 import pytest
+
 from orwynn import validation
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.di.DI import DI
-from orwynn.log.Log import Log
-from orwynn.log.LogConfig import LogConfig
-from orwynn.log.LogHandler import LogHandler
-from orwynn.module.Module import Module
 from orwynn.log import module as log_module
+from orwynn.log.Log import Log
+from orwynn.module.Module import Module
 from orwynn.testing import get_log_apprc
 
 
@@ -37,8 +37,6 @@ def test_logged_request_id():
         data: dict = json.loads(str(message))
         extra: dict = data["record"]["extra"]
 
-        from pprint import pprint
-        pprint(data)
         assert 0
 
         assert isinstance(extra["request_id"], str)

@@ -1,6 +1,5 @@
-from orwynn import validation
+from orwynn import validation, web
 from orwynn.middleware.NextCallFn import NextCallFn
-from orwynn import web
 
 
 class Middleware:

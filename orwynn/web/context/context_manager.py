@@ -1,13 +1,13 @@
 from contextlib import contextmanager
 from contextvars import Token
-from typing import Optional
+
 from orwynn import validation
 from orwynn.web.context.ContextStorage import ContextStorage
 
 
 @contextmanager
 def context_manager(
-    data: Optional[dict] = None
+    data: dict | None = None
 ):
     """Populates the context storage with the given data.
 

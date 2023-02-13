@@ -1,14 +1,13 @@
 import json
-from typing import Callable
 
 from loguru._handler import Message
 
 from orwynn.boot.Boot import Boot
-from orwynn.log import module as log_module
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HTTPController import HTTPController
 from orwynn.error.Error import Error
 from orwynn.error.MalfunctionError import MalfunctionError
+from orwynn.log import module as log_module
 from orwynn.log.LogMiddleware import LogMiddleware
 from orwynn.module.Module import Module
 from orwynn.testing import get_log_apprc

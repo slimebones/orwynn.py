@@ -4,7 +4,7 @@ import json
 from starlette.concurrency import iterate_in_threadpool
 from starlette.responses import StreamingResponse
 
-from orwynn import rnd, validation, web
+from orwynn import validation, web
 from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.log.Log import Log
 

@@ -8,8 +8,7 @@ from fastapi.responses import JSONResponse as FastAPI_JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from orwynn import validation
-from orwynn.web.context.ContextStorage import \
-    ContextStorage
+from orwynn.web.context.ContextStorage import ContextStorage
 from orwynn.web.CORS import CORS
 
 from .UnsupportedHTTPMethodError import UnsupportedHTTPMethodError

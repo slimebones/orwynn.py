@@ -17,6 +17,7 @@ from orwynn.error.Error import Error
 from orwynn.indication.Indication import Indication
 from orwynn.indication.IndicationType import IndicationType
 from orwynn.indication.Indicator import Indicator
+from orwynn.log import module as log_module
 from orwynn.log.Log import Log
 from orwynn.middleware.Middleware import Middleware
 from orwynn.middleware.NextCallFn import NextCallFn
@@ -27,7 +28,6 @@ from orwynn.mongo.Document import Document
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.service.Service import Service
 from orwynn.sql import module as sql_module
-from orwynn.log import module as log_module
 from orwynn.sql.SQL import SQL
 from orwynn.sql.Table import Table
 from orwynn.testing.Client import Client

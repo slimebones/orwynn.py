@@ -1,21 +1,23 @@
 from contextvars import ContextVar, Token
-from typing import Any, Optional
-from orwynn import validation
-from orwynn.web.context.AlreadyInitializedStorageError import AlreadyInitializedStorageError
+from typing import Any
 
+from orwynn import validation
+from orwynn.web.context.AlreadyInitializedStorageError import (
+    AlreadyInitializedStorageError,
+)
 from orwynn.web.context.UndefinedStorageError import UndefinedStorageError
 from orwynn.worker.Worker import Worker
 
 
 class ContextStorage(Worker):
     def __init__(self) -> None:
-        self.__storage: ContextVar[Optional[dict]] = ContextVar(
+        self.__storage: ContextVar[dict | None] = ContextVar(
             "context_storage",
             default=None
         )
 
     def __get_storage_data_or_error(self) -> dict:
-        storage_data: Optional[dict] = self.__storage.get()
+        storage_data: dict | None = self.__storage.get()
 
         if storage_data is None:
             raise UndefinedStorageError()
