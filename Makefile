@@ -56,8 +56,8 @@ check: lint test
 coverage:
 	poetry run coverage report -m
 
-coverage-html:
+coverage.html:
 	poetry run coverage html --show-contexts && python -m http.server -d htmlcov 8000
 
-changelog.gen:
+changelog:
 	git-changelog -c angular -o CHANGELOG.md .
