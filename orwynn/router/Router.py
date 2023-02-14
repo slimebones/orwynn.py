@@ -182,7 +182,15 @@ class Router(Worker):
         self,
         fn: Callable
     ) -> bool:
-        return any(
-            issubclass(typehint, pydantic.BaseModel)
-            for typehint in typing.get_type_hints(fn).values()
-        )
+        # Wrap return statement in try...except to prevent error from
+        # issubclass() about wrong typehint (typehint is not a class)
+        for typehint in typing.get_type_hints(fn).values():
+            try:
+                flag: bool = issubclass(typehint, pydantic.BaseModel)
+            except TypeError:
+                continue
+            else:
+                if flag:
+                    return True
+        return False
+
