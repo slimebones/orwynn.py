@@ -21,7 +21,7 @@ from orwynn.di.collecting.collect_modules_test import std_modules
 from orwynn.di.collecting.collect_provider_dependencies_test import (
     std_provider_dependencies_map,
 )
-from orwynn.di.DI import DI
+from orwynn.di.Di import Di
 from orwynn.di.di_test import std_di_container
 from orwynn.di.missing_di_object_error import MissingDIObjectError
 from orwynn.log.log_test import log_apprc_sink_to_writer, writer
@@ -50,7 +50,7 @@ def run_around_tests():
     #   MissingDIObjectError: Mongo is not initialized, skip
     #   TypeError: DI wasn't initialized, skip
     with contextlib.suppress(MissingDIObjectError, TypeError):
-        validation.apply(DI.ie().find("Mongo"), Mongo).drop_database()
+        validation.apply(Di.ie().find("Mongo"), Mongo).drop_database()
     __discardWorkers()
 
 

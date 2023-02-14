@@ -96,8 +96,8 @@ def _traverse(
         chain.pop()
 
     # All dependencies for this provider have been initialized - now initialize
-    # this provider. Checks on previous phases should have validated, that
-    # every provider waits only positional arguments.
+    # this provider. Checks on previous phases should have been validated, that
+    # is every provider waits only positional arguments.
     result_provider: Provider
     if issubclass(StarterProvider, Config):
         # For configs we need to prepare names kwargs, so we perform

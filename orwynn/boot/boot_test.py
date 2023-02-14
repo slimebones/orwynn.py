@@ -1,18 +1,27 @@
 import os
 
 from pytest import fixture
+import pytest
 
 from orwynn import validation
 from orwynn.apprc.AppRC import AppRC
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
+from orwynn.config.Config import Config
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HttpController import HttpController
-from orwynn.di.DI import DI
+from orwynn.di.Di import Di
 from orwynn.module.Module import Module
 from orwynn.mongo.Mongo import Mongo
 from orwynn.proxy.BootProxy import BootProxy
 from tests.std.text import TextConfig
+
+from orwynn.service.Service import Service
+
+
+class _GService(Service):
+    def calculate(self, *args: int) -> int:
+        return sum(args)
 
 
 @fixture
@@ -99,7 +108,7 @@ def test_init_enable_mongo(std_struct: Module, set_std_apprc_path_env):
         root_module=std_struct
     )
 
-    validation.validate(DI.ie().find("Mongo"), Mongo)
+    validation.validate(Di.ie().find("Mongo"), Mongo)
 
 
 def test_nested_configs_prod(
@@ -111,7 +120,7 @@ def test_nested_configs_prod(
         root_module=std_struct
     )
     app_rc: AppRC = BootProxy.ie().apprc
-    text_config: TextConfig = DI.ie().find("TextConfig")
+    text_config: TextConfig = Di.ie().find("TextConfig")
 
     assert app_rc["Text"]["words_amount"] == text_config.words_amount == 1
 
@@ -125,7 +134,7 @@ def test_nested_configs_dev(
         root_module=std_struct
     )
     app_rc: AppRC = BootProxy.ie().apprc
-    text_config: TextConfig = DI.ie().find("TextConfig")
+    text_config: TextConfig = Di.ie().find("TextConfig")
 
     assert app_rc["Text"]["words_amount"] == text_config.words_amount == 2
 
@@ -139,7 +148,7 @@ def test_nested_configs_test(
         root_module=std_struct
     )
     app_rc: AppRC = BootProxy.ie().apprc
-    text_config: TextConfig = DI.ie().find("TextConfig")
+    text_config: TextConfig = Di.ie().find("TextConfig")
 
     assert app_rc["Text"]["words_amount"] == text_config.words_amount == 3
 
@@ -158,3 +167,35 @@ def test_global_route():
     )
 
     boot.app.client.get_jsonify("/donuts/user/message", 200)
+
+
+@pytest.fixture
+def __gmodule() -> Module:
+    return Module(
+        "/gmodule",
+        Providers=[_GService],
+        exports=[_GService]
+    )
+
+def test_global_modules(
+    __gmodule: Module
+):
+    class C1(HttpController):
+        ROUTE = "/"
+        ENDPOINTS = [Endpoint(method="get")]
+
+        def __init__(self, gservice: _GService) -> None:
+            super().__init__()
+            self.__gservice: _GService = gservice
+
+        def get(self) -> dict:
+            return {"value": self.__gservice.calculate(1, 2, 3)}
+
+    boot: Boot = Boot(
+        root_module=Module("/", Controllers=[C1]),
+        global_modules=[__gmodule]
+    )
+
+    data: dict = boot.app.client.get_jsonify("/", 200)
+
+    assert data["value"] == 6

@@ -5,7 +5,7 @@ from orwynn.apprc.AppRC import AppRC
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
 from orwynn.config.Config import Config
-from orwynn.di.DI import DI
+from orwynn.di.Di import Di
 from orwynn.model.Model import Model
 from orwynn.module.Module import Module
 
@@ -63,7 +63,7 @@ def test_prod(raw_apprc: AppRC):
     )
 
     assert validation.apply(
-        DI.ie().find("BurgerShotConfig"),
+        Di.ie().find("BurgerShotConfig"),
         BurgerShotConfig
     ).dict() == mp.find("prod.BurgerShot", raw_apprc)
 
@@ -76,7 +76,7 @@ def test_dev(raw_apprc: AppRC):
     )
 
     assert validation.apply(
-        DI.ie().find("BurgerShotConfig"),
+        Di.ie().find("BurgerShotConfig"),
         BurgerShotConfig
     ).dict() == {
         "location": "Vinewood",
@@ -98,7 +98,7 @@ def test_test(raw_apprc: AppRC):
     )
 
     assert validation.apply(
-        DI.ie().find("BurgerShotConfig"),
+        Di.ie().find("BurgerShotConfig"),
         BurgerShotConfig
     ).dict() == {
         "location": "Jefferson",

@@ -3,7 +3,7 @@ import inspect
 from pytest import fixture
 
 from orwynn.config.Config import Config
-from orwynn.di.collecting.collect_modules import collect_modules
+from orwynn.di.collecting.ModuleCollector import ModuleCollector
 from orwynn.di.collecting.collect_provider_dependencies import (
     ProviderDependenciesMap,
     collect_provider_dependencies,
@@ -23,7 +23,7 @@ def std_provider_dependencies_map(
 
 def test_std(std_struct: Module):
     metamap: ProviderDependenciesMap = collect_provider_dependencies(
-        collect_modules(std_struct)
+        ModuleCollector(std_struct).collected_modules
     )
 
     # Order doesn't matter

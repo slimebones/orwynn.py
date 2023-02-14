@@ -1,8 +1,9 @@
+from typing import Optional
 from orwynn import validation
 from orwynn.app.App import App
 from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.controller.Controller import Controller
-from orwynn.di.collecting.collect_modules import collect_modules
+from orwynn.di.collecting.ModuleCollector import ModuleCollector
 from orwynn.di.collecting.collect_provider_dependencies import (
     collect_provider_dependencies,
 )
@@ -16,7 +17,7 @@ from orwynn.validation import validate
 from orwynn.worker.Worker import Worker
 
 
-class DI(Worker):
+class Di(Worker):
     """Resolves Dependency-injection related tasks for an application.
 
     Only objects in categories Providers and Acceptors take part in DI. For now
@@ -44,15 +45,30 @@ class DI(Worker):
         root_module:
             Root module of the app.
     """
-    def __init__(self, root_module: Module) -> None:
+    def __init__(
+        self,
+        root_module: Module,
+        *,
+        global_modules: Optional[list[Module]] = None,
+    ) -> None:
         super().__init__()
-        validate(root_module, Module)
+        validation.validate(root_module, Module)
 
-        # So here we have generally two stages of DI:
-        #   1. Collecting (module "di/collecting")
-        #   2. Initializing (module "di/init")
+        if global_modules is None:
+            global_modules = []
+        validation.validate_each(
+            global_modules, Module, expected_sequence_type=list
+        )
 
-        self.modules: list[Module] = collect_modules(root_module)
+        # So here we have generally a two stages of DI:
+        #   1. Collecting (component "di/collecting")
+        #   2. Initializing (component "di/init")
+
+        self.modules: list[Module] = ModuleCollector(
+            root_module,
+            global_modules=global_modules
+        ).collected_modules
+
         self.__container: DIContainer = init_providers(
             collect_provider_dependencies(self.modules)
         )

@@ -1,5 +1,7 @@
 import copy
 from types import NoneType
+from typing import Self
+from orwynn import validation
 
 from orwynn.app.EmptyRouteError import EmptyRouteError
 from orwynn.controller.Controller import Controller
@@ -121,21 +123,35 @@ class Module:
 
         return route
 
-    def add_provider_or_skip(self, P: type[Provider]) -> None:
+    def _fw_add_provider_or_skip(self, P: type[Provider]) -> None:
         if not is_provider(P):
             raise TypeError("should receive provider")
         if P not in self._Providers:
             self._Providers.append(P)
 
-    def add_controller_or_skip(self, C: type[Controller]) -> None:
+    def _fw_add_controller_or_skip(self, C: type[Controller]) -> None:
         validate(C, Controller)
         if C not in self._Controllers:
             self._Controllers.append(C)
 
-    def add_middleware_or_skip(self, Mw: type[MiddlewareClass]) -> None:
+    def _fw_add_middleware_or_skip(self, Mw: type[MiddlewareClass]) -> None:
         validate(Mw, MiddlewareClass)
         if Mw not in self._Middleware:
             self._Middleware.append(Mw)
+
+    def _fw_add_imports(self, *modules: Self) -> None:
+        """Adds imported modules.
+
+        Generally used to add global imports.
+        """
+        for module in modules:
+            validation.validate(module, Module)
+            if module in self._imports:
+                raise ValueError(
+                    f"module {module} has been already added to containing"
+                    f" module {self}"
+                )
+            self._imports.append(module)
 
     def _parse_providers(
         self,

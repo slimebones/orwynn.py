@@ -3,7 +3,7 @@ import os
 from copy import deepcopy
 from pathlib import Path
 from types import NoneType
-from typing import Literal, Sequence
+from typing import Literal, Optional, Sequence
 
 import dotenv
 
@@ -24,7 +24,7 @@ from orwynn.BUILTIN_MIDDLEWARE import BUILTIN_MIDDLEWARE
 from orwynn.controller.Controller import Controller
 from orwynn.controller.http.HttpController import HttpController
 from orwynn.controller.websocket.WebsocketController import WebsocketController
-from orwynn.di.DI import DI
+from orwynn.di.Di import Di
 from orwynn.di.missing_di_object_error import MissingDIObjectError
 from orwynn.error.Error import Error
 from orwynn.error.get_non_framework_exceptions import (
@@ -83,6 +83,10 @@ class Boot(Worker):
             Global route to be prepended to every controller's route. Defaults
             to no route. Can accept formatting "{version}" for an API version
             to be injected into route.
+        global_imports (optional):
+            Modules available across all other modules imported into the
+            application. Note that no other instance can import a globally
+            available module.
         api_version (optional):
             Object describes API versioning rules for the project. By default
             only v1 is supported.
@@ -122,6 +126,7 @@ class Boot(Worker):
         apprc: AppRC | None = None,
         mode: BootMode | None = None,
         global_route: str | None = None,
+        global_modules: Optional[list[Module]] = None,
         api_version: ApiVersion | None = None
     ) -> None:
         super().__init__()
@@ -144,6 +149,10 @@ class Boot(Worker):
         if global_route is None:
             global_route = ""
         validate(global_route, str)
+
+        if global_modules is None:
+            global_modules = []
+        validate_each(global_modules, Module, expected_sequence_type=list)
 
         if api_version is None:
             api_version = ApiVersion()
@@ -180,12 +189,12 @@ class Boot(Worker):
         APIIndicationOnlyProxy(api_indication)
 
         # Add framework services
-        root_module.add_provider_or_skip(App)
+        root_module._fw_add_provider_or_skip(App)
         # Log config is always added to configure logging, it can be built from
         # an empty apprc too.
-        root_module.add_provider_or_skip(LogConfig)
+        root_module._fw_add_provider_or_skip(LogConfig)
 
-        self.__di: DI = DI(root_module)
+        self.__di: Di = Di(root_module, global_modules=global_modules)
 
         # Configure logging
         configure_log(validation.apply(self.__di.find("LogConfig"), LogConfig))
