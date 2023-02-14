@@ -11,6 +11,7 @@ from orwynn.config.Config import Config
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HttpController import HttpController
 from orwynn.di.Di import Di
+from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.module.Module import Module
 from orwynn.mongo.Mongo import Mongo
 from orwynn.proxy.BootProxy import BootProxy
@@ -199,3 +200,27 @@ def test_global_modules(
     data: dict = boot.app.client.get_jsonify("/", 200)
 
     assert data["value"] == 6
+
+
+def test_global_modules_reimported(
+    __gmodule: Module
+):
+    """No module can import globally-defined modules."""
+    class C1(HttpController):
+        ROUTE = "/"
+        ENDPOINTS = [Endpoint(method="get")]
+
+        def __init__(self, gservice: _GService) -> None:
+            super().__init__()
+            self.__gservice: _GService = gservice
+
+        def get(self) -> dict:
+            return {"value": self.__gservice.calculate(1, 2, 3)}
+
+    validation.expect(
+        Boot,
+        CircularDependencyError,
+        # Root module reimports globally defined module
+        root_module=Module("/", Controllers=[C1], imports=[__gmodule]),
+        global_modules=[__gmodule]
+    )

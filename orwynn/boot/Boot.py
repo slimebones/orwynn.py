@@ -61,7 +61,7 @@ class Boot(Worker):
     Attributes:
         root_module:
             Root module of the app.
-        dotenv_path (optional)Dir:
+        dotenv_path (optional):
             Path to .env file. Defaults to ".env".
         api_indication (optional):
             Indication object used as a convention for outcoming API

@@ -5,6 +5,7 @@ from orwynn import validation
 
 from orwynn.app.EmptyRouteError import EmptyRouteError
 from orwynn.controller.Controller import Controller
+from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.di.is_provider import is_provider
 from orwynn.di.NotProviderError import NotProviderError
 from orwynn.di.Provider import Provider
@@ -147,7 +148,7 @@ class Module:
         for module in modules:
             validation.validate(module, Module)
             if module in self._imports:
-                raise ValueError(
+                raise CircularDependencyError(
                     f"module {module} has been already added to containing"
                     f" module {self}"
                 )
