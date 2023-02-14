@@ -1,6 +1,5 @@
 from orwynn import web
 from orwynn.log.HTTPLogger import HTTPLogger
-from orwynn.log.Log import Log
 from orwynn.middleware.Middleware import Middleware, NextCallFn
 from orwynn.web.context.RequestContextId import RequestContextId
 

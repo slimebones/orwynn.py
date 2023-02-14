@@ -7,8 +7,7 @@ from typing import Literal, Sequence
 
 import dotenv
 
-from orwynn import web
-from orwynn import validation
+from orwynn import validation, web
 from orwynn.app.App import App
 from orwynn.app.DefaultErrorHandler import DefaultErrorHandler
 from orwynn.app.DefaultExceptionHandler import DefaultExceptionHandler
@@ -35,9 +34,8 @@ from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.file.NotDirError import NotDirError
 from orwynn.indication.default_api_indication import default_api_indication
 from orwynn.indication.Indication import Indication
-from orwynn.log.Log import Log
-from orwynn.log.LogConfig import LogConfig
 from orwynn.log.configure_log import configure_log
+from orwynn.log.LogConfig import LogConfig
 from orwynn.middleware.BuiltinMiddleware import BuiltinMiddleware
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module

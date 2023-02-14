@@ -10,7 +10,6 @@ from orwynn.di.DIContainer import DIContainer
 from orwynn.di.DIObject import DIObject
 from orwynn.di.init.init_other_acceptors import init_other_acceptors
 from orwynn.di.init.init_providers import init_providers
-from orwynn.log.Log import Log
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
 from orwynn.validation import validate

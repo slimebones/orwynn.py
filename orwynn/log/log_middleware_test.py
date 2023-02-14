@@ -24,12 +24,12 @@ def __check_log_message(message: str) -> list[dict]:
         extra: dict = data["record"]["extra"]
 
         request_or_response: Literal["request", "response"]
-        if "request" in extra and not "response" in extra:
+        if "request" in extra and "response" not in extra:
             request_or_response = "request"
             request_data: dict = extra["request"]
             assert type(request_data["id"]) is str
             assert type(request_data["url"]) is str
-        elif "response" in extra and not "request" in extra:
+        elif "response" in extra and "request" not in extra:
             request_or_response = "response"
             response_data: dict = extra["response"]
             assert type(response_data["request_id"]) is str
