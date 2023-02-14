@@ -7,7 +7,7 @@ from .Table import Table
 
 from .SQLDatabaseKind import SQLDatabaseKind
 
-from orwynn.sql.SQLConfig import SQLConfig
+from orwynn.sql.SqlConfig import SqlConfig
 from sqlalchemy import create_engine, Engine
 from sqlalchemy import Table as SQLAlchemyTable
 from sqlalchemy.orm import Session
@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session
 class Sql(Database):
     def __init__(
         self,
-        config: SQLConfig
+        config: SqlConfig
     ) -> None:
         super().__init__()
         self.__config = config

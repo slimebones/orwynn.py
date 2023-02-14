@@ -1,10 +1,10 @@
 from orwynn.module.Module import Module
 
 from .Sql import Sql
-from .SQLConfig import SQLConfig
+from .SqlConfig import SqlConfig
 
 module = Module(
     "/mongo",
-    Providers=[Sql, SQLConfig],
-    exports=[Sql, SQLConfig]
+    Providers=[Sql, SqlConfig],
+    exports=[Sql, SqlConfig]
 )

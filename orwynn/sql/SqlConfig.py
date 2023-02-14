@@ -6,7 +6,7 @@ from orwynn.error.MalfunctionError import MalfunctionError
 from .SQLDatabaseKind import SQLDatabaseKind
 
 
-class SQLConfig(Config):
+class SqlConfig(Config):
     database_kind: SQLDatabaseKind
     database_name: str | None = None
     database_user: str | None = None

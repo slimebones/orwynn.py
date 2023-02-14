@@ -11,7 +11,7 @@ from orwynn import validation
 from orwynn.crypto import hash_password
 
 from .Sql import Sql
-from .SQLConfig import SQLConfig
+from .SqlConfig import SqlConfig
 from .SQLDatabaseKind import SQLDatabaseKind
 from .Table import Table
 
@@ -43,7 +43,7 @@ class Like(Table):
 
 @pytest.fixture
 def _sqlite() -> Generator:
-    service = Sql(SQLConfig(
+    service = Sql(SqlConfig(
         database_kind=SQLDatabaseKind.SQLITE,
         database_path=":memory:"
     ))
@@ -132,7 +132,7 @@ def _connect_user1a2_tweet1_like1(
 
 
 def test_sqlite_init_memory():
-    sql = Sql(SQLConfig(
+    sql = Sql(SqlConfig(
         database_kind="sqlite",
         database_path=":memory:"
     ))
@@ -152,7 +152,7 @@ def test_sqlite_init_relative_path():
                 os.getcwd(), "var/tmp/test.db"
             ))
 
-    sql = Sql(SQLConfig(
+    sql = Sql(SqlConfig(
         database_kind="sqlite",
         database_path="var/tmp/test.db"
     ))
@@ -168,7 +168,7 @@ def test_sqlite_init_absolute_path():
         except OSError: # Directory not empty
             os.remove("/tmp/orwynn/test.db")  # noqa: S108
 
-    sql = Sql(SQLConfig(
+    sql = Sql(SqlConfig(
         database_kind="sqlite",
         database_path="/tmp/orwynn/test.db"  # noqa: S108
     ))
@@ -177,7 +177,7 @@ def test_sqlite_init_absolute_path():
 
 
 def test_postgresql_init():
-    sql = Sql(SQLConfig(
+    sql = Sql(SqlConfig(
         database_kind="postgresql",
         database_name="orwynn-test",
         database_user="postgres",
