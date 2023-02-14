@@ -5,13 +5,13 @@ from orwynn.boot.api_version.UnsupportedVersionError import (
 )
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
-from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.controller.http.HttpController import HttpController
 from orwynn.module.Module import Module
 
 # NOTE: By default there is no global route for backwards compatiblity.
 
 def test_versioned_global_route():
-    class C(HTTPController):
+    class C(HttpController):
         ROUTE = "/message"
         ENDPOINTS = [Endpoint(method="get")]
 
@@ -29,7 +29,7 @@ def test_versioned_global_route():
 def test_controller_version():
     # HTTPController can define older version of API than available.
     #
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/message"
         VERSION = 1
         ENDPOINTS = [Endpoint(method="get")]
@@ -37,7 +37,7 @@ def test_controller_version():
         def get(self) -> dict:
             return {"message": "hello v1"}
 
-    class C2(HTTPController):
+    class C2(HttpController):
         # Here we don't need to define a VERSION, since the v2 should be
         # latest.
         ROUTE = "/message"
@@ -66,7 +66,7 @@ def test_controller_version():
 
 
 def test_controller_all_versions():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/message"
         VERSION = "*"
         ENDPOINTS = [Endpoint(method="get")]
@@ -95,7 +95,7 @@ def test_controller_all_versions():
 
 
 def test_controller_several_versions():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/message"
         VERSION = {2, 3}
         ENDPOINTS = [Endpoint(method="get")]
@@ -123,7 +123,7 @@ def test_controller_several_versions():
 
 
 def test_controller_unsupported_version():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/message"
         VERSION = 3
         ENDPOINTS = [Endpoint(method="get")]
@@ -143,7 +143,7 @@ def test_controller_unsupported_version():
 
 
 def test_controller_unsupported_version_of_many():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/message"
         # Some are supported, some are not
         VERSION = {2, 3}

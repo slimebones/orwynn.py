@@ -1,7 +1,7 @@
 from orwynn import validation
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
-from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.controller.http.HttpController import HttpController
 from orwynn.log.LogMiddleware import LogMiddleware
 from orwynn.module.Module import Module
 from orwynn.web.context.RequestContextId import RequestContextId
@@ -12,7 +12,7 @@ def test_basic():
     """Request id should be fetchable from context within request-response
     cycle and unfetchable outside this cycle.
     """
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 

@@ -1,6 +1,6 @@
 from orwynn import mongo
 from orwynn.controller.endpoint.Endpoint import Endpoint
-from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.controller.http.HttpController import HttpController
 from orwynn.module.Module import Module
 from orwynn.mongo.Document import Document
 from orwynn.mongo.Mongo import Mongo
@@ -23,7 +23,7 @@ class UserService(Service):
         return user.create()
 
 
-class UsersController(HTTPController):
+class UsersController(HttpController):
     ROUTE = "/"
     ENDPOINTS = [Endpoint(method="post")]
 
@@ -35,7 +35,7 @@ class UsersController(HTTPController):
         return self.sv.create(user).api
 
 
-class UsersIdController(HTTPController):
+class UsersIdController(HttpController):
     ROUTE = "/{id}"
     ENDPOINTS = [Endpoint(method="get")]
 

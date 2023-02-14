@@ -1,13 +1,13 @@
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
-from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.controller.http.HttpController import HttpController
 from orwynn.module.Module import Module
 from orwynn.testing.Client import Client
 from orwynn.web.CORS import CORS
 
 
 def test_basic():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 
@@ -28,7 +28,7 @@ def test_basic():
 
 
 def test_correct_origin():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 
@@ -49,7 +49,7 @@ def test_correct_origin():
 
 
 def test_wrong_origin():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 

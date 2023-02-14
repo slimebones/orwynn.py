@@ -13,7 +13,7 @@ from sqlalchemy import Table as SQLAlchemyTable
 from sqlalchemy.orm import Session
 
 
-class SQL(Database):
+class Sql(Database):
     def __init__(
         self,
         config: SQLConfig

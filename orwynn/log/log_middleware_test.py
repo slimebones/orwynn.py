@@ -4,7 +4,7 @@ from typing import Literal
 
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
-from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.controller.http.HttpController import HttpController
 from orwynn.error.Error import Error
 from orwynn.log.Log import Log
 from orwynn.log.LogMiddleware import LogMiddleware
@@ -57,7 +57,7 @@ def test_get(
 ):
     RETURNED_DATA: dict = {"hello": 1}
 
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 
@@ -91,7 +91,7 @@ def test_get__error(
     writer: Writer,
     log_apprc_sink_to_writer: dict
 ):
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 

@@ -22,7 +22,7 @@ from orwynn.boot.api_version.ApiVersion import ApiVersion
 from orwynn.boot.BootMode import BootMode
 from orwynn.BUILTIN_MIDDLEWARE import BUILTIN_MIDDLEWARE
 from orwynn.controller.Controller import Controller
-from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.controller.http.HttpController import HttpController
 from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.di.DI import DI
 from orwynn.di.missing_di_object_error import MissingDIObjectError
@@ -351,7 +351,7 @@ class Boot(Worker):
             if type(c) is C:
                 is_controller_found = True
 
-                if isinstance(c, HTTPController):
+                if isinstance(c, HttpController):
                     self.__register_http_for_module(c, m)
                 elif isinstance(c, WebsocketController):
                     self.__register_websocket_controller_for_module(c, m)
@@ -368,7 +368,7 @@ class Boot(Worker):
 
     def __register_http_for_module(
         self,
-        controller: HTTPController,
+        controller: HttpController,
         module: Module
     ) -> None:
         # At least one method found
@@ -398,7 +398,7 @@ class Boot(Worker):
 
     def __get_routes_for_http_controller(
         self,
-        controller: HTTPController,
+        controller: HttpController,
         module: Module
     ) -> set[str]:
         """Returns all http routes which given controller accessible from.

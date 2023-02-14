@@ -7,7 +7,7 @@ from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.DefinedTwiceControllerMethodError import (
     DefinedTwiceControllerMethodError,
 )
-from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.controller.http.HttpController import HttpController
 from orwynn.controller.MissingControllerClassAttributeError import (
     MissingControllerClassAttributeError,
 )
@@ -25,11 +25,11 @@ from tests.std.text import DEFAULT_ID, Text
 
 def test_http_methods():
     for method in HTTPMethod:
-        assert hasattr(HTTPController, method.value)
+        assert hasattr(HttpController, method.value)
 
 
 def test_undefined_route():
-    class C1(HTTPController):
+    class C1(HttpController):
         ENDPOINTS = [Endpoint(method="get")]
 
     m1 = Module(route="/", Controllers=[C1])
@@ -37,7 +37,7 @@ def test_undefined_route():
 
 
 def test_invalid_route():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "i don't like rules"
         ENDPOINTS = [Endpoint(method="get")]
 
@@ -46,7 +46,7 @@ def test_invalid_route():
 
 
 def test_undefined_endpoints():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/c1"
 
     m1 = Module(route="/", Controllers=[C1])
@@ -54,7 +54,7 @@ def test_undefined_endpoints():
 
 
 def test_empty_endpoints():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/c1"
         ENDPOINTS = []
 
@@ -63,7 +63,7 @@ def test_empty_endpoints():
 
 
 def test_unsupported_method():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/c1"
         ENDPOINTS = [Endpoint(method="donuts")]
 
@@ -72,7 +72,7 @@ def test_unsupported_method():
 
 
 def test_defined_twice_method():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/c1"
         ENDPOINTS = [Endpoint(method="get"), Endpoint(method="get")]
 
@@ -81,7 +81,7 @@ def test_defined_twice_method():
 
 
 def test_uppercase_methods():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/c1"
         ENDPOINTS = [
             Endpoint(method="GET"),
@@ -93,11 +93,11 @@ def test_uppercase_methods():
 
 
 def test_already_registered():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/hello"
         ENDPOINTS = [Endpoint(method="get")]
 
-    class C2(HTTPController):
+    class C2(HttpController):
         ROUTE = "/hello"
         ENDPOINTS = [Endpoint(method="get")]
 
@@ -112,7 +112,7 @@ def test_std_routes(std_boot: Boot, std_http: Client):
 
 
 def test_default_404():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 
@@ -140,7 +140,7 @@ def test_default_request_validation_error():
         name: str
         price: float
 
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="post")]
 
@@ -170,7 +170,7 @@ def test_default_request_validation_error():
 
 
 def test_default_method_not_allowed():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 

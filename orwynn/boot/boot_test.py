@@ -7,7 +7,7 @@ from orwynn.apprc.AppRC import AppRC
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
 from orwynn.controller.endpoint.Endpoint import Endpoint
-from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.controller.http.HttpController import HttpController
 from orwynn.di.DI import DI
 from orwynn.module.Module import Module
 from orwynn.mongo.Mongo import Mongo
@@ -145,7 +145,7 @@ def test_nested_configs_test(
 
 
 def test_global_route():
-    class C(HTTPController):
+    class C(HttpController):
         ROUTE = "/message"
         ENDPOINTS = [Endpoint(method="get")]
 

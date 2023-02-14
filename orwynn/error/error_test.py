@@ -1,6 +1,6 @@
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
-from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.controller.http.HttpController import HttpController
 from orwynn.error.Error import Error
 from orwynn.indication.Indication import Indication
 from orwynn.indication.IndicationType import IndicationType
@@ -9,7 +9,7 @@ from orwynn.module.Module import Module
 
 
 def test_custom_status_code():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 

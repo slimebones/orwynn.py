@@ -10,7 +10,7 @@ from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
 from orwynn.config.Config import Config
 from orwynn.controller.endpoint.Endpoint import Endpoint
-from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.controller.http.HttpController import HttpController
 from orwynn.controller.websocket.Websocket import Websocket
 from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.error.Error import Error
@@ -27,7 +27,7 @@ from orwynn.mongo.Document import Document
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.service.Service import Service
 from orwynn.sql import module as sql_module
-from orwynn.sql.SQL import SQL
+from orwynn.sql.Sql import Sql
 from orwynn.sql.Table import Table
 from orwynn.testing.Client import Client
 from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient

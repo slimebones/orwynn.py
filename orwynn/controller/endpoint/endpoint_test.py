@@ -4,7 +4,7 @@ from orwynn import mongo, validation
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.endpoint.EndpointResponse import EndpointResponse
-from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.controller.http.HttpController import HttpController
 from orwynn.model.Model import Model
 from orwynn.module.Module import Module
 from orwynn.router.UnmatchedEndpointEntityError import (
@@ -22,7 +22,7 @@ def run_endpoint():
         message: str
         power: float
 
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [
             Endpoint(
@@ -73,7 +73,7 @@ def test_not_matched_spec_to_return_type():
         name: str
         price: float
 
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [
             Endpoint(

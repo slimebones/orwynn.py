@@ -12,7 +12,7 @@ from orwynn import validation
 from orwynn.web import HTTPMethod, UnsupportedHTTPMethodError
 
 
-class HTTPController(Controller):
+class HttpController(Controller):
     """Handles incoming requests and returns responses to the client.
 
     Calls service or different services under the hood to prepare a response.

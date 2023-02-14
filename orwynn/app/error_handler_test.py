@@ -2,7 +2,7 @@ from orwynn import validation, web
 from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
-from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.controller.http.HttpController import HttpController
 from orwynn.error.Error import Error
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
@@ -12,7 +12,7 @@ from orwynn.web import JSONResponse, Request, TestResponse
 
 
 def test_basic():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 
@@ -42,7 +42,7 @@ def test_basic():
 
 
 def test_default_exception():
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 
@@ -67,7 +67,7 @@ def test_default_exception():
 def test_identical_error_handlers():
     # Last added error handler should only be executed for the error
     #
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 
@@ -114,7 +114,7 @@ def test_as_acceptor():
         ) -> str:
             return ASSERTED_TEXT
 
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 

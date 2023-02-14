@@ -5,7 +5,7 @@ from loguru._handler import Message
 
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
-from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.controller.http.HttpController import HttpController
 from orwynn.log.Log import Log
 from orwynn.module.Module import Module
 from orwynn.testing import Writer, get_log_apprc
@@ -24,7 +24,7 @@ def log_apprc_sink_to_writer(writer: Writer) -> dict:
 
 
 def test_logged_request_id(writer: Writer, log_apprc_sink_to_writer: dict):
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [
             Endpoint(method="get")

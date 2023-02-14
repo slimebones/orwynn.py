@@ -2,7 +2,7 @@ from typing import Callable
 
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
-from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.controller.http.HttpController import HttpController
 from orwynn.middleware.HttpMiddleware import HttpMiddleware
 from orwynn.module.Module import Module
 from orwynn.testing.Client import Client
@@ -18,7 +18,7 @@ def test_basic():
             response.headers["x-test"] = "hello"
             return response
 
-    class C1(HTTPController):
+    class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 

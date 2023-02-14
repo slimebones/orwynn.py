@@ -4,7 +4,7 @@ from orwynn.app.App import App
 from orwynn.boot.BootConfig import BootConfig
 from orwynn.config.Config import Config
 from orwynn.controller.endpoint.Endpoint import Endpoint
-from orwynn.controller.http.HTTPController import HTTPController
+from orwynn.controller.http.HttpController import HttpController
 from orwynn.model.Model import Model
 from orwynn.module.Module import Module
 from orwynn.service.Service import Service
@@ -54,7 +54,7 @@ class TextService(Service):
         )
 
 
-class TextController(HTTPController):
+class TextController(HttpController):
     ROUTE = "/"
     ENDPOINTS = [Endpoint(method="get")]
 

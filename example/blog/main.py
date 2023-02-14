@@ -4,7 +4,7 @@ from orwynn import (
     Boot,
     Document,
     Endpoint,
-    HTTPController,
+    HttpController,
     Model,
     Module,
     Service,
@@ -45,7 +45,7 @@ class UserService(Service):
         return User.find_all()
 
 
-class UsersIdController(HTTPController):
+class UsersIdController(HttpController):
     ROUTE = "/users/{id}"
     ENDPOINTS = [Endpoint(method="get")]
 
@@ -57,7 +57,7 @@ class UsersIdController(HTTPController):
         return self.sv.find(id)
 
 
-class UsersController(HTTPController):
+class UsersController(HttpController):
     ROUTE = "/users"
     ENDPOINTS = [Endpoint(method="get"), Endpoint(method="post")]
 
