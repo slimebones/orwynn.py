@@ -1,10 +1,11 @@
 from orwynn import web
 from orwynn.log.HTTPLogger import HTTPLogger
-from orwynn.middleware.Middleware import Middleware, NextCallFn
+from orwynn.middleware.HttpMiddleware import HttpMiddleware
+from orwynn.middleware.HttpNextCallFn import HttpNextCallFn
 from orwynn.web.context.RequestContextId import RequestContextId
 
 
-class LogMiddleware(Middleware):
+class LogMiddleware(HttpMiddleware):
     """Logs information about request and response lihking them together.
 
     It's recommended to be outermost (at custom level) middleware.
@@ -15,7 +16,7 @@ class LogMiddleware(Middleware):
         self.__http_logger: HTTPLogger = HTTPLogger()
 
     async def process(
-        self, request: web.Request, call_next: NextCallFn
+        self, request: web.Request, call_next: HttpNextCallFn
     ) -> web.Response:
         request_id: str = RequestContextId().get()
         await self.__http_logger.log_request(

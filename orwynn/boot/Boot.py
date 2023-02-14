@@ -36,7 +36,7 @@ from orwynn.indication.default_api_indication import default_api_indication
 from orwynn.indication.Indication import Indication
 from orwynn.log.configure_log import configure_log
 from orwynn.log.LogConfig import LogConfig
-from orwynn.middleware.BuiltinMiddleware import BuiltinMiddleware
+from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
@@ -199,7 +199,7 @@ class Boot(Worker):
             self.__register_routes(self.__di.modules, self.__di.controllers)
 
         # Register middleware
-        builtin_middleware: list[BuiltinMiddleware] = [
+        builtin_middleware: list[BuiltinHttpMiddleware] = [
             m() for m in BUILTIN_MIDDLEWARE
         ]
         try:

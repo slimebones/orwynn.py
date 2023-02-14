@@ -176,14 +176,14 @@ class Module:
 
     @staticmethod
     def _parse_middleware(
-        Middleware: list[type[MiddlewareClass]] | None
+        Middleware_: list[type[MiddlewareClass]] | None
     ) -> list[type[MiddlewareClass]]:
         res: list[type[MiddlewareClass]]
 
-        if Middleware:
-            for Middleware_ in Middleware:
-                validate(Middleware_, MiddlewareClass)
-            res = Middleware
+        if Middleware_:
+            for M in Middleware_:
+                validate(M, MiddlewareClass)
+            res = Middleware_
         else:
             res = []
 

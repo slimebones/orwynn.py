@@ -3,14 +3,14 @@ from typing import Callable
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HTTPController import HTTPController
-from orwynn.middleware.Middleware import Middleware
+from orwynn.middleware.HttpMiddleware import HttpMiddleware
 from orwynn.module.Module import Module
 from orwynn.testing.Client import Client
 from orwynn.web import Request, Response, TestResponse
 
 
 def test_basic():
-    class Mw1(Middleware):
+    class Mw1(HttpMiddleware):
         async def process(
             self, request: Request, call_next: Callable
         ) -> Response:

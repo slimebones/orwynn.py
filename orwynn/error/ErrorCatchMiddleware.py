@@ -1,10 +1,10 @@
 from orwynn import web
 from orwynn.error.Error import Error
-from orwynn.middleware.BuiltinMiddleware import BuiltinMiddleware
-from orwynn.middleware.NextCallFn import NextCallFn
+from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
+from orwynn.middleware.HttpNextCallFn import HttpNextCallFn
 
 
-class ErrorCatchBuiltinMiddleware(BuiltinMiddleware):
+class ErrorCatchBuiltinMiddleware(BuiltinHttpMiddleware):
     """Catches all errors happened at middleware level.
 
     Should be outermost defined middleware, even among builtin ones.
@@ -18,7 +18,7 @@ class ErrorCatchBuiltinMiddleware(BuiltinMiddleware):
     async def process(
         self,
         request: web.Request,
-        call_next: NextCallFn
+        call_next: HttpNextCallFn
     ) -> web.Response:
         # TODO: Move error handling logic from here and error handlers to
         #   the unified method to not repeat things.

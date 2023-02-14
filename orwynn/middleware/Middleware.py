@@ -1,5 +1,6 @@
-from orwynn import validation, web
-from orwynn.middleware.NextCallFn import NextCallFn
+from typing import Any, Callable
+
+from orwynn import validation
 
 
 class Middleware:
@@ -36,9 +37,9 @@ class Middleware:
 
     async def dispatch(
         self,
-        request: web.Request,
-        call_next: NextCallFn
-    ) -> web.Response:
+        request: Any,
+        call_next: Callable
+    ) -> Any:
         if self.__should_process(request.url.path):
             return await self.process(request, call_next)
         else:
@@ -46,7 +47,7 @@ class Middleware:
 
     async def process(
         self,
-        request: web.Request,
-        call_next: NextCallFn
-    ) -> web.Response:
-        raise NotImplementedError()
+        request: Any,
+        call_next: Any
+    ) -> Any:
+        return await call_next(request)

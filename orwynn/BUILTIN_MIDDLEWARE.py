@@ -1,5 +1,5 @@
 from orwynn.error.ErrorCatchMiddleware import ErrorCatchBuiltinMiddleware
-from orwynn.middleware.BuiltinMiddleware import BuiltinMiddleware
+from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
 from orwynn.web.context.ContextBuiltinMiddleware import (
     ContextBuiltinMiddleware,
 )
@@ -8,7 +8,7 @@ from orwynn.web.context.RequestContextBuiltinMiddleware import (
 )
 
 # Order matters, the lowest index is initialized first
-BUILTIN_MIDDLEWARE: list[type[BuiltinMiddleware]] = [
+BUILTIN_MIDDLEWARE: list[type[BuiltinHttpMiddleware]] = [
     ErrorCatchBuiltinMiddleware,
     ContextBuiltinMiddleware,
     RequestContextBuiltinMiddleware
