@@ -24,6 +24,7 @@ from orwynn.di.collecting.collect_provider_dependencies_test import (
 from orwynn.di.DI import DI
 from orwynn.di.di_test import std_di_container
 from orwynn.di.missing_di_object_error import MissingDIObjectError
+from orwynn.log.log_test import log_apprc_sink_to_writer, writer
 from orwynn.module.Module import Module
 from orwynn.mongo.Mongo import Mongo
 from orwynn.proxy.boot_data_proxy_test import std_boot_data_proxy
