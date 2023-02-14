@@ -3,7 +3,7 @@ import os
 from copy import deepcopy
 from pathlib import Path
 from types import NoneType
-from typing import Literal, Optional, Sequence
+from typing import Literal, Sequence
 
 import dotenv
 
@@ -126,7 +126,7 @@ class Boot(Worker):
         apprc: AppRC | None = None,
         mode: BootMode | None = None,
         global_route: str | None = None,
-        global_modules: Optional[list[Module]] = None,
+        global_modules: list[Module] | None = None,
         api_version: ApiVersion | None = None
     ) -> None:
         super().__init__()
@@ -208,18 +208,7 @@ class Boot(Worker):
             self.__register_routes(self.__di.modules, self.__di.controllers)
 
         # Register middleware
-        builtin_middleware: list[BuiltinHttpMiddleware] = [
-            m() for m in BUILTIN_MIDDLEWARE
-        ]
-        try:
-            self.__register_middleware(
-                # Add builtin middlewares first, and others second
-                builtin_middleware + self.__di.all_middleware
-            )
-        except MissingDIObjectError:
-            self.__register_middleware(
-                builtin_middleware
-            )
+        self.__run_register_middleware()
 
         if cors is not None:
             self.app.configure_cors(cors)
@@ -412,6 +401,12 @@ class Boot(Worker):
     ) -> set[str]:
         """Returns all http routes which given controller accessible from.
         """
+        if module.route is None:
+            raise MalfunctionError(
+                f"module {module} has not route and shouldn't have added any"
+                " controllers"
+            )
+
         routes: set[str] = set()
         final_versions: set[int] = set()
         version: int | set[int] | None | Literal["*"] = controller.VERSION
@@ -460,13 +455,18 @@ class Boot(Worker):
         c: WebsocketController,
         m: Module
     ) -> None:
+        if m.route is None:
+            raise MalfunctionError(
+                f"module {m} has not route and shouldn't have added any"
+                " controllers"
+            )
+
         # Methods started from "on_" or equal to "main" should be registered.
         # "main" is assigned to MODULE_ROUTE + CONTROLLER_ROUTE directly.
         for event_handler in c.event_handlers:
             method_route: str
             method_route = \
                 "/" if event_handler.name == "main" else event_handler.name
-
 
             # Final route = MODULE_ROUTE + CONTROLLER_ROUTE + METHOD_ROUTE
             self.__router.register_websocket(
@@ -497,3 +497,17 @@ class Boot(Worker):
             )
 
         return root_dir
+
+    def __run_register_middleware(self) -> None:
+        builtin_middleware: list[BuiltinHttpMiddleware] = [
+            m() for m in BUILTIN_MIDDLEWARE
+        ]
+        try:
+            self.__register_middleware(
+                # Add builtin middlewares first, and others second
+                builtin_middleware + self.__di.all_middleware
+            )
+        except MissingDIObjectError:
+            self.__register_middleware(
+                builtin_middleware
+            )

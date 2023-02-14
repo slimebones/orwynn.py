@@ -1,8 +1,8 @@
 import copy
 from types import NoneType
 from typing import Self
-from orwynn import validation
 
+from orwynn import validation
 from orwynn.app.EmptyRouteError import EmptyRouteError
 from orwynn.controller.Controller import Controller
 from orwynn.di.circular_dependency_error import CircularDependencyError
@@ -21,10 +21,10 @@ class Module:
     """Provides metadata to organize the application structure.
 
     Attributes:
-        route:
+        route (optional):
             All controllers defined under this module will
-            operate under this route. Route cannot be "/" to be distinguishable
-            from other modules.
+            operate under this route. By default the module has no route and
+            hence cannot accept any controllers and middlewares.
         Providers (optional):
             List of Providers to be initialized and shared at least across this
             module.
@@ -55,7 +55,7 @@ class Module:
     """
     def __init__(
         self,
-        route: str,
+        route: str | None = None,
         *,
         Providers: list[type[Provider]] | None = None,
         Controllers: list[type[Controller]] | None = None,
@@ -64,14 +64,31 @@ class Module:
         exports: list[type[Provider]] | None = None
     ) -> None:
         super().__init__()
-        validate(route, str)
+        validate(route, [str, NoneType])
         validate(Providers, [list, NoneType])
         validate(Controllers, [list, NoneType])
         validate(Middleware, [list, NoneType])
         validate(imports, [list, NoneType])
         validate(exports, [list, NoneType])
 
-        self._route: str = self._parse_route(route)
+        self.__route: str | None
+        if route is None:
+            self.__route = route
+
+            # Module without route cannot accept Controller and Middleware
+            if Controllers is not None:
+                raise ValueError(
+                    f"module {self} has not route and cannot accept"
+                    " controllers"
+                )
+            elif Middleware is not None:
+                raise ValueError(
+                    f"module {self} has not route and cannot accept"
+                    " middleware"
+                )
+        else:
+            self.__route = self.__parse_route(route)
+
         self._Providers: list[type[Provider]] = self._parse_providers(
             Providers
         )
@@ -87,13 +104,13 @@ class Module:
     def __repr__(self) -> str:
         return "<{} \"{}\" at {}>".format(
             self.__class__.__name__,
-            self.route,
+            self.route or "no-route",
             hex(id(self))
         )
 
     @property
-    def route(self) -> str:
-        return self._route
+    def route(self) -> str | None:
+        return self.__route
 
     @property
     def Providers(self) -> list[type[Provider]]:
@@ -116,7 +133,7 @@ class Module:
         return copy.copy(self._exports)
 
     @staticmethod
-    def _parse_route(route: str) -> str:
+    def __parse_route(route: str) -> str:
         if route:
             validate_route(route)
         else:

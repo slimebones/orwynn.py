@@ -3,11 +3,11 @@ import inspect
 from pytest import fixture
 
 from orwynn.config.Config import Config
-from orwynn.di.collecting.ModuleCollector import ModuleCollector
 from orwynn.di.collecting.collect_provider_dependencies import (
     ProviderDependenciesMap,
     collect_provider_dependencies,
 )
+from orwynn.di.collecting.ModuleCollector import ModuleCollector
 from orwynn.di.is_provider import is_provider
 from orwynn.di.Provider import Provider
 from orwynn.module.Module import Module

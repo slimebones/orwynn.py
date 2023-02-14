@@ -1,4 +1,4 @@
-from typing import Optional
+
 from orwynn import validation
 from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.fmt import format_chain
@@ -24,7 +24,7 @@ class ModuleCollector:
         self,
         root_module: Module,
         *,
-        global_modules: Optional[list[Module]] = None
+        global_modules: list[Module] | None = None
     ) -> None:
         validation.validate(root_module, Module)
         if not global_modules:
@@ -66,12 +66,12 @@ class ModuleCollector:
         if init_module not in self.__collected_modules:
             self.__collected_modules.append(init_module)
 
-            # Add all globally available modules to the current's module imports,
-            # and only then continue to inspect the imports.
+            # Add all globally available modules to the current's module
+            # imports, and only then continue to inspect the imports.
             #
             # But don't add global modules as imports to another global
             # modules :-)
-            if not init_module in self.__global_modules:
+            if init_module not in self.__global_modules:
                 init_module._fw_add_imports(*self.__global_modules)
 
             if init_module._imports:
@@ -84,8 +84,8 @@ class ModuleCollector:
                     # recursively
                     self.__traverse(m)
 
-        # On blocking case remove recently added module since we don't want this
-        # module to appear in other branch, e.g.:
+        # On blocking case remove recently added module since we don't want
+        # this module to appear in other branch, e.g.:
         #   A -> B (blocking: call chain.pop())-> C; A -> B -> D -> C;
         # If C hadn't been removed at the first iteration, we would have got a
         # circular error.

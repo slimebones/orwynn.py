@@ -6,6 +6,7 @@ from orwynn.controller.http.HttpController import HttpController
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.DIContainer import DIContainer
 from orwynn.di.Provider import Provider
+from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
@@ -28,6 +29,12 @@ def init_other_acceptors(
         module_covered_routes_for_middleware: list[str] = []
 
         for C in module.Controllers:
+            if module.route is None:
+                raise MalfunctionError(
+                    f"module {module} has not route and shouldn't have added"
+                    " any controllers or middleware"
+                )
+
             validate(C, Controller)
 
             controller: Controller = C(
@@ -44,6 +51,12 @@ def init_other_acceptors(
                 ))
 
         for Mw in module.Middleware:
+            if module.route is None:
+                raise MalfunctionError(
+                    f"module {module} has not route and shouldn't have added"
+                    " any controllers or middleware"
+                )
+
             validate(Mw, Middleware)
             container.add(
                 Mw(

@@ -1,23 +1,21 @@
 import os
 
-from pytest import fixture
 import pytest
+from pytest import fixture
 
 from orwynn import validation
 from orwynn.apprc.AppRC import AppRC
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
-from orwynn.config.Config import Config
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HttpController import HttpController
-from orwynn.di.Di import Di
 from orwynn.di.circular_dependency_error import CircularDependencyError
+from orwynn.di.Di import Di
 from orwynn.module.Module import Module
 from orwynn.mongo.Mongo import Mongo
 from orwynn.proxy.BootProxy import BootProxy
-from tests.std.text import TextConfig
-
 from orwynn.service.Service import Service
+from tests.std.text import TextConfig
 
 
 class _GService(Service):
