@@ -58,3 +58,6 @@ coverage:
 
 coverage-html:
 	poetry run coverage html --show-contexts && python -m http.server -d htmlcov 8000
+
+changelog.gen:
+	git-changelog -c angular -o CHANGELOG.md .
