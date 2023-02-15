@@ -1,5 +1,5 @@
 from orwynn import web
-from orwynn.log.HTTPLogger import HTTPLogger
+from orwynn.log.HttpLogger import HttpLogger
 from orwynn.middleware.HttpMiddleware import HttpMiddleware
 from orwynn.middleware.HttpNextCallFn import HttpNextCallFn
 from orwynn.web.context.RequestContextId import RequestContextId
@@ -13,7 +13,7 @@ class LogMiddleware(HttpMiddleware):
     def __init__(self, covered_routes: list[str]) -> None:
         super().__init__(covered_routes)
 
-        self.__http_logger: HTTPLogger = HTTPLogger()
+        self.__http_logger: HttpLogger = HttpLogger()
 
     async def process(
         self, request: web.Request, call_next: HttpNextCallFn

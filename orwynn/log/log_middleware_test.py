@@ -14,6 +14,7 @@ from orwynn.testing.Client import Client
 
 
 def __check_log_message(message: str) -> list[dict]:
+    assert message != ""
     items: list[str] = message.split("\n")
     parsed_items: list[dict] = []
 

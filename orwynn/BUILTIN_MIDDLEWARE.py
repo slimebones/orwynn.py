@@ -11,8 +11,14 @@ from orwynn.middleware.BuiltinWebsocketMiddleware import (
 from orwynn.web.context.ContextBuiltinMiddleware import (
     ContextBuiltinMiddleware,
 )
+from orwynn.web.context.ContextBuiltinWebsocketMiddleware import (
+    ContextBuiltinWebsocketMiddleware,
+)
 from orwynn.web.context.RequestContextBuiltinMiddleware import (
     RequestContextBuiltinMiddleware,
+)
+from orwynn.web.context.RequestContextBuiltinWebsocketMiddleware import (
+    RequestContextBuiltinWebsocketMiddleware,
 )
 from orwynn.web.websocket.ConnectionBuiltinWebsocketMiddleware import (
     ConnectionBuiltinWebsocketMiddleware,
@@ -27,5 +33,7 @@ BUILTIN_HTTP_MIDDLEWARE: list[type[BuiltinHttpMiddleware]] = [
 
 BUILTIN_WEBSOCKET_MIDDLEWARE: list[type[BuiltinWebsocketMiddleware]] = [
     ConnectionBuiltinWebsocketMiddleware,
-    ErrorCatchBuiltinWebsocketMiddleware
+    ErrorCatchBuiltinWebsocketMiddleware,
+    ContextBuiltinWebsocketMiddleware,
+    RequestContextBuiltinWebsocketMiddleware
 ]

@@ -9,7 +9,7 @@ from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.log.Log import Log
 
 
-class HTTPLogger:
+class HttpLogger:
     """Logs HTTP requests and responses."""
     async def log_request(
         self,
