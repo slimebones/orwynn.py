@@ -1,5 +1,5 @@
 from orwynn import validation
-from orwynn.app.ErrorHandler import ErrorHandler
+from orwynn.error.ErrorHandler import ErrorHandler
 from orwynn.error.get_non_framework_exceptions import (
     get_non_framework_exceptions,
 )

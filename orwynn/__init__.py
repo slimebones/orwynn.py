@@ -5,7 +5,6 @@
 # Also it's OK to include framework modules here to import, such as sql_module
 # or log_module.
 from orwynn.app.App import App
-from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
 from orwynn.config.Config import Config
@@ -15,6 +14,7 @@ from orwynn.controller.http.HttpController import HttpController
 from orwynn.controller.websocket.Websocket import Websocket
 from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.error.Error import Error
+from orwynn.error.ErrorHandler import ErrorHandler
 from orwynn.indication.Indication import Indication
 from orwynn.indication.IndicationType import IndicationType
 from orwynn.indication.Indicator import Indicator

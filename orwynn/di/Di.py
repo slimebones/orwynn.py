@@ -1,7 +1,6 @@
 
 from orwynn import validation
 from orwynn.app.App import App
-from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.controller.Controller import Controller
 from orwynn.di.collecting.collect_provider_dependencies import (
     collect_provider_dependencies,
@@ -11,6 +10,7 @@ from orwynn.di.DIContainer import DIContainer
 from orwynn.di.DIObject import DIObject
 from orwynn.di.init.init_other_acceptors import init_other_acceptors
 from orwynn.di.init.init_providers import init_providers
+from orwynn.error.ErrorHandler import ErrorHandler
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
 from orwynn.worker.Worker import Worker

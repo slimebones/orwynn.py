@@ -1,9 +1,9 @@
 from orwynn import validation, web
-from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HttpController import HttpController
 from orwynn.error.Error import Error
+from orwynn.error.ErrorHandler import ErrorHandler
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.service.Service import Service

@@ -7,7 +7,7 @@ from orwynn.boot.BootMode import BootMode
 from orwynn.worker.Worker import Worker
 
 if TYPE_CHECKING:
-    from orwynn.app.ErrorHandler import ErrorHandler
+    from orwynn.error.ErrorHandler import ErrorHandler
     from orwynn.indication.Indication import Indication
 
 

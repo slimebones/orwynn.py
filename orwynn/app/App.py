@@ -15,7 +15,7 @@ from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
 from orwynn.web import CORS, HTTPMethod
 
 if TYPE_CHECKING:
-    from orwynn.app.ErrorHandler import ErrorHandler
+    from orwynn.error.ErrorHandler import ErrorHandler
 
 
 class App(FrameworkService):

@@ -9,13 +9,9 @@ import dotenv
 
 from orwynn import validation, web
 from orwynn.app.App import App
-from orwynn.app.DefaultErrorHandler import DefaultErrorHandler
-from orwynn.app.DefaultExceptionHandler import DefaultExceptionHandler
-from orwynn.app.DefaultHTTPExceptionHandler import DefaultHTTPExceptionHandler
 from orwynn.app.DefaultRequestValidationExceptionHandler import (
     DefaultRequestValidationExceptionHandler,
 )
-from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.apprc.AppRC import AppRC
 from orwynn.apprc.parse_apprc import parse_apprc
 from orwynn.boot.api_version.ApiVersion import ApiVersion
@@ -26,7 +22,13 @@ from orwynn.controller.http.HttpController import HttpController
 from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.di.Di import Di
 from orwynn.di.missing_di_object_error import MissingDIObjectError
+from orwynn.error.DefaultErrorHandler import DefaultErrorHandler
+from orwynn.error.DefaultExceptionHandler import DefaultExceptionHandler
+from orwynn.error.DefaultHTTPExceptionHandler import (
+    DefaultHTTPExceptionHandler,
+)
 from orwynn.error.Error import Error
+from orwynn.error.ErrorHandler import ErrorHandler
 from orwynn.error.get_non_framework_exceptions import (
     get_non_framework_exceptions,
 )

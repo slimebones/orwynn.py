@@ -1,7 +1,6 @@
 import re
 from typing import TypeVar
 
-from orwynn.app.ErrorHandler import ErrorHandler
 from orwynn.config.Config import Config
 from orwynn.controller.Controller import Controller
 from orwynn.di.di_object_already_initialized_in_container_error import (
@@ -11,6 +10,7 @@ from orwynn.di.DIObject import DIObject
 from orwynn.di.finalized_di_container_error import FinalizedDIContainerError
 from orwynn.di.is_provider import is_provider
 from orwynn.di.missing_di_object_error import MissingDIObjectError
+from orwynn.error.ErrorHandler import ErrorHandler
 from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.middleware.Middleware import Middleware
 from orwynn.model.Model import Model
