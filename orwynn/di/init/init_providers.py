@@ -8,7 +8,7 @@ from orwynn.di.collecting.no_dependencies_for_given_provider_error import (
 from orwynn.di.collecting.provider_dependencies_map import (
     ProviderDependenciesMap,
 )
-from orwynn.di.DIContainer import DIContainer
+from orwynn.di.DiContainer import DiContainer
 from orwynn.di.is_provider import is_provider
 from orwynn.di.missing_di_object_error import MissingDIObjectError
 from orwynn.di.Provider import Provider
@@ -17,7 +17,7 @@ from orwynn.fmt import format_chain
 
 def init_providers(
     provider_dependencies_map: ProviderDependenciesMap
-) -> DIContainer:
+) -> DiContainer:
     """Traverses through given providers and dependencies initializing them.
 
     Args:
@@ -30,7 +30,7 @@ def init_providers(
     # Note for this module that most validation logic has been already
     # performed at previous stages, so no need to do checks here.
 
-    container: DIContainer = DIContainer()
+    container: DiContainer = DiContainer()
 
     for P in provider_dependencies_map.Providers:
         try:
@@ -52,7 +52,7 @@ def _traverse(
     *,
     StarterProvider: type[Provider],
     mp: ProviderDependenciesMap,
-    container: DIContainer,
+    container: DiContainer,
     chain: list[type[Provider]]
 ) -> Provider:
     already_initialized_dependencies: list[Provider] = []

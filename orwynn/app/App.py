@@ -8,7 +8,6 @@ from starlette.middleware.base import (
 from starlette.types import Receive, Scope, Send
 
 from orwynn import validation
-from orwynn.middleware.Middleware import Middleware
 from orwynn.service.FrameworkService import FrameworkService
 from orwynn.testing.Client import Client
 from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
@@ -48,16 +47,6 @@ class App(FrameworkService):
     def client(self) -> Client:
         return self.__client
 
-    def add_middleware(self, middleware: Middleware) -> None:
-        validation.validate(middleware, Middleware)
-        # Note that dispatch(...) method is linked to be as entrypoint to
-        # middleware. This will be a place where a middleware takes decision
-        # to not process request to certain endpoint or not.
-        self.__app.add_middleware(
-            StarletteBaseHTTPMiddleware,
-            dispatch=middleware.dispatch
-        )
-
     def configure_cors(self, cors: CORS) -> None:
         """Configures CORS policy used for the whole app."""
         if self.__is_cors_configured:
@@ -75,6 +64,15 @@ class App(FrameworkService):
             **kwargs
         )
         self.__is_cors_configured = True
+
+    def add_http_middleware_fn(
+        self,
+        fn: Callable
+    ) -> None:
+        self.__app.add_middleware(
+            StarletteBaseHTTPMiddleware,
+            dispatch=fn
+        )
 
     def add_error_handler(self, error_handler: "ErrorHandler") -> None:
         if error_handler.E is None:

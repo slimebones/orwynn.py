@@ -10,6 +10,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from orwynn import validation
 from orwynn.web.context.ContextStorage import ContextStorage
 from orwynn.web.CORS import CORS
+from orwynn.web.websocket.Websocket import Websocket
 
 from .UnsupportedHTTPMethodError import UnsupportedHTTPMethodError
 

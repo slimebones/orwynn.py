@@ -16,7 +16,10 @@ from orwynn.apprc.AppRC import AppRC
 from orwynn.apprc.parse_apprc import parse_apprc
 from orwynn.boot.api_version.ApiVersion import ApiVersion
 from orwynn.boot.BootMode import BootMode
-from orwynn.BUILTIN_MIDDLEWARE import BUILTIN_MIDDLEWARE
+from orwynn.BUILTIN_MIDDLEWARE import (
+    BUILTIN_HTTP_MIDDLEWARE,
+    BUILTIN_WEBSOCKET_MIDDLEWARE,
+)
 from orwynn.controller.Controller import Controller
 from orwynn.controller.http.HttpController import HttpController
 from orwynn.controller.websocket.WebsocketController import WebsocketController
@@ -39,7 +42,9 @@ from orwynn.indication.Indication import Indication
 from orwynn.log.configure_log import configure_log
 from orwynn.log.LogConfig import LogConfig
 from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
-from orwynn.middleware.Middleware import Middleware
+from orwynn.middleware.BuiltinWebsocketMiddleware import (
+    BuiltinWebsocketMiddleware,
+)
 from orwynn.module.Module import Module
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
 from orwynn.proxy.BootProxy import BootProxy
@@ -189,12 +194,14 @@ class Boot(Worker):
         )
         EndpointProxy()
         APIIndicationOnlyProxy(api_indication)
+        ##
 
         # Add framework services
         root_module._fw_add_provider_or_skip(App)
         # Log config is always added to configure logging, it can be built from
         # an empty apprc too.
         root_module._fw_add_provider_or_skip(LogConfig)
+        ##
 
         self.__di: Di = Di(root_module, global_modules=global_modules)
 
@@ -205,12 +212,16 @@ class Boot(Worker):
             self.app
         )
 
+        # Add middleware, it should be done before the controller's
+        # adding
+        self.__add_middleware()
+
         # Supress: Don't raise error to ease test writings
         with contextlib.suppress(MissingDIObjectError):
             self.__register_routes(self.__di.modules, self.__di.controllers)
 
-        # Register middleware
-        self.__run_register_middleware()
+        # Register websockets after adding middleware and controllers
+        self.__router.register_websocket_layers()
 
         if cors is not None:
             self.app.configure_cors(cors)
@@ -333,19 +344,18 @@ class Boot(Worker):
             for C in m.Controllers:
                 self.__register_controller_class_for_module(m, C, controllers)
 
-    def __register_middleware(self, middleware: Sequence[Middleware]) -> None:
-        # Note that middleware here is reversed since Starlette.add_middleware
-        # inserts new functions at the top of the middleware list which makes
-        # older added middlewares executable last, which is not logical.
-        for m in reversed(middleware):
-            self.app.add_middleware(m)
-
     def __register_controller_class_for_module(
         self,
         m: Module,
         C: type[Controller],
         controllers: list[Controller]
     ) -> None:
+        if m.route is None:
+            raise MalfunctionError(
+                f"module {m} has not route and shouldn't have added any"
+                " controllers"
+            )
+
         is_controller_found: bool = False
         for c in controllers:
             if type(c) is C:
@@ -354,7 +364,10 @@ class Boot(Worker):
                 if isinstance(c, HttpController):
                     self.__register_http_for_module(c, m)
                 elif isinstance(c, WebsocketController):
-                    self.__register_websocket_controller_for_module(c, m)
+                    self.__router.add_websocket_controller(
+                        c,
+                        module_route=m.route
+                    )
                 else:
                     raise TypeError(
                         f"controller unsupported type {type(c)}"
@@ -452,32 +465,6 @@ class Boot(Worker):
 
         return routes
 
-    def __register_websocket_controller_for_module(
-        self,
-        c: WebsocketController,
-        m: Module
-    ) -> None:
-        if m.route is None:
-            raise MalfunctionError(
-                f"module {m} has not route and shouldn't have added any"
-                " controllers"
-            )
-
-        # Methods started from "on_" or equal to "main" should be registered.
-        # "main" is assigned to MODULE_ROUTE + CONTROLLER_ROUTE directly.
-        for event_handler in c.event_handlers:
-            method_route: str
-            method_route = \
-                "/" if event_handler.name == "main" else event_handler.name
-
-            # Final route = MODULE_ROUTE + CONTROLLER_ROUTE + METHOD_ROUTE
-            self.__router.register_websocket(
-                route=web.join_routes(m.route, c.route, method_route),
-                # Bind actual controller instance "c" for a dynamically
-                # obtained method "v"
-                fn=event_handler.fn
-            )
-
     def __parse_mode(self) -> BootMode:
         mode_env: str | None = os.getenv("Orwynn_Mode")
 
@@ -500,16 +487,25 @@ class Boot(Worker):
 
         return root_dir
 
-    def __run_register_middleware(self) -> None:
-        builtin_middleware: list[BuiltinHttpMiddleware] = [
-            m() for m in BUILTIN_MIDDLEWARE
+    def __add_middleware(self) -> None:
+        http_builtin_middleware: Sequence[BuiltinHttpMiddleware] = [
+            m() for m in BUILTIN_HTTP_MIDDLEWARE
         ]
+        websocket_builtin_middleware: Sequence[
+            BuiltinWebsocketMiddleware
+        ] = [
+            m() for m in BUILTIN_WEBSOCKET_MIDDLEWARE
+        ]
+
         try:
-            self.__register_middleware(
+            self.__router.add_middleware(
                 # Add builtin middlewares first, and others second
-                builtin_middleware + self.__di.all_middleware
+                http_builtin_middleware
+                + websocket_builtin_middleware
+                + self.__di.all_middleware
             )
         except MissingDIObjectError:
-            self.__register_middleware(
-                builtin_middleware
+            self.__router.add_middleware(
+                http_builtin_middleware
+                + websocket_builtin_middleware  # type: ignore
             )

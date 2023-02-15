@@ -2,8 +2,8 @@ from typing import Callable, ClassVar
 
 from orwynn import validation
 from orwynn.controller.Controller import Controller
-from orwynn.controller.websocket.WebsocketEventHandler import (
-    WebsocketEventHandler,
+from orwynn.web.websocket.WebsocketEventHandlerMethod import (
+    WebsocketEventHandlerMethod,
 )
 
 
@@ -39,11 +39,22 @@ class WebsocketController(Controller):
     """
     ROUTE: ClassVar[str | None] = None
 
+    @classmethod
+    def get_handler_subroutes(cls) -> list[str]:
+        """Returns subroutes for each defined handler method."""
+        subroutes: list[str] = []
+        for k in cls.__dict__:
+            if k[:3] == "on_" or k == "main":
+                subroutes.append(
+                    "/" if k == "main" else k.replace("on_", "/")
+                )
+        return subroutes
+
     @property
-    def event_handlers(self) -> list[WebsocketEventHandler]:
+    def event_handlers(self) -> list[WebsocketEventHandlerMethod]:
         """Returns all self bound event handlers started with "on_".
         """
-        events: list[WebsocketEventHandler] = []
+        events: list[WebsocketEventHandlerMethod] = []
 
         for k, v in self.__class__.__dict__.items():
             if k[:3] == "on_" or k == "main":
@@ -65,7 +76,7 @@ class WebsocketController(Controller):
                         f" {event_name}"
                     )
 
-                events.append(WebsocketEventHandler(
+                events.append(WebsocketEventHandlerMethod(
                     name=event_name,
                     # It's important to use "getattr()" here instead of
                     # "v" since last is obtained from class and is not bound to

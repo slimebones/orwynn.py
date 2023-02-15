@@ -1,7 +1,7 @@
 from orwynn.boot.Boot import Boot
-from orwynn.controller.websocket.Websocket import Websocket
 from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.module.Module import Module
+from orwynn.web.websocket.Websocket import Websocket
 
 
 def test_main_route():
@@ -9,7 +9,6 @@ def test_main_route():
         ROUTE = "/hello"
 
         async def main(self, ws: Websocket) -> None:
-            await ws.accept()
             await ws.send_json({"message": "Hello!"})
             await ws.close()
 
@@ -29,7 +28,6 @@ def test_custom_route():
         ROUTE = "/hello"
 
         async def on_message(self, ws: Websocket) -> None:
-            await ws.accept()
             await ws.send_json({"message": "Hello!"})
             await ws.close()
 
@@ -49,17 +47,14 @@ def test_several_routes():
         ROUTE = "/hello"
 
         async def main(self, ws: Websocket) -> None:
-            await ws.accept()
             await ws.send_json({"message": "main"})
             await ws.close()
 
         async def on_message(self, ws: Websocket) -> None:
-            await ws.accept()
             await ws.send_json({"message": "message"})
             await ws.close()
 
         async def on_hello(self, ws: Websocket) -> None:
-            await ws.accept()
             await ws.send_json({"message": "hello"})
             await ws.close()
 

@@ -27,4 +27,12 @@ class ErrorCatchBuiltinMiddleware(BuiltinHttpMiddleware):
         except Error as err:
             return web.JSONResponse(err.api, err.status_code)
         except Exception as err:  # noqa: BLE001
-            return web.JSONResponse(" ; ".join(err.args), 400)
+            return web.JSONResponse(
+                {
+                    "type": "error",
+                    "value": {
+                        "message": " ; ".join(err.args)
+                    }
+                },
+                400
+            )

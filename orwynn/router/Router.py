@@ -1,10 +1,10 @@
 import typing
 from inspect import isclass
-from typing import Any, Callable
+from typing import Any, Callable, Sequence
 
 import pydantic
 
-from orwynn import validation
+from orwynn import validation, web
 from orwynn.app.AlreadyRegisteredMethodError import (
     AlreadyRegisteredMethodError,
 )
@@ -13,13 +13,22 @@ from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.endpoint.EndpointNotFoundError import (
     EndpointNotFoundError,
 )
+from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.indication.Indication import Indication
+from orwynn.middleware.HttpMiddleware import HttpMiddleware
+from orwynn.middleware.Middleware import Middleware
+from orwynn.middleware.WebsocketMiddleware import WebsocketMiddleware
 from orwynn.model.Model import Model
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn.router.UnmatchedEndpointEntityError import (
     UnmatchedEndpointEntityError,
 )
+from orwynn.router.WebsocketHandler import (
+    DispatchWebsocketHandler,
+    WebsocketHandler,
+)
+from orwynn.router.WebsocketStack import WebsocketStack
 from orwynn.router.WrongHandlerReturnTypeError import (
     WrongHandlerReturnTypeError,
 )
@@ -37,27 +46,57 @@ class Router(Worker):
         super().__init__()
         self.__app: App = app
         self.__methods_by_route: dict[str, set[HTTPMethod]] = {}
+        self.__websocket_stack: WebsocketStack = WebsocketStack(
+            self.__app.websocket_handler
+        )
+        self.__is_websocket_middleware_added: bool = False
 
-    def register_websocket(
-        self, *, route: str, fn: Callable
+    def register_websocket_layers(
+        self
     ) -> None:
-        """Registers websocket for route.
+        """Registers all added websocket instances to the system."""
+        self.__websocket_stack.register()
+
+    def add_websocket_controller(
+        self, controller: WebsocketController, module_route: str
+    ) -> None:
+        """Add websocket controller for a route.
 
         Attributes:
-            route:
-                Route to register to.
-            fn:
-                Function to register.
+            controller:
+                Websocket controller to add.
+            module_route:
+                Module route to be added to controller's route. It will then be
+                joined with method path for each controller's method.
         """
-        validation.validate(route, str)
-        validation.validate(fn, Callable)
+        validation.validate(controller, WebsocketController)
+        validation.validate(module_route, str)
 
-        self.__app.websocket_handler(route)(fn)
+        if not self.__is_websocket_middleware_added:
+            raise ValueError(
+                "add websocket middleware first"
+            )
+
+        # Methods started from "on_" or equal to "main" should be registered.
+        # "main" is assigned to MODULE_ROUTE + CONTROLLER_ROUTE directly.
+        for event_handler in controller.event_handlers:
+            method_route: str = \
+                "/" if event_handler.name == "main" else event_handler.name
+            final_route: str = web.join_routes(
+                controller.route, module_route, method_route
+            )
+            self.__websocket_stack.add_call(
+                WebsocketHandler(
+                    fn=event_handler.fn,
+                    route=final_route
+                )
+            )
+
 
     def register_route(
         self, *, route: str, fn: Callable, method: HTTPMethod
     ) -> None:
-        """Registers fn for route.
+        """Registers a fn for a route.
 
         Attributes:
             route:
@@ -108,6 +147,77 @@ class Router(Worker):
                 fn
             )
         )(fn)
+
+    def add_middleware(self, middleware: Sequence[Middleware]) -> None:
+        """
+        Adds middleware to the system.
+        """
+        # Note that middleware here is reversed since Starlette.add_middleware
+        # inserts new functions at the top of the middleware list which makes
+        # older added middlewares executable last, which is not logical.
+        #
+        # But this reversion should be executed only for HtppMiddleware since
+        # for Websockets we have own logic.
+        #
+        # So, first task is to separate middleware
+        http_middleware: list[HttpMiddleware] = []
+        websocket_middleware: list[WebsocketMiddleware] = []
+
+        for middleware_ in middleware:
+            if isinstance(middleware_, HttpMiddleware):
+                http_middleware.append(middleware_)
+            elif isinstance(middleware_, WebsocketMiddleware):
+                websocket_middleware.append(middleware_)
+            elif type(middleware_) is Middleware:
+                raise TypeError(
+                    f"cannot register an instance {middleware_} of an abstact"
+                    " class Middleware"
+                )
+            else:
+                raise TypeError(
+                    f"unrecognized middleware {middleware_}"
+                )
+
+        # Add HTTP from reversed list to comply Starlette
+        for http_middleware_ in reversed(http_middleware):
+            self.__add_middleware(http_middleware_)
+
+        # Add Websocket normally
+        if websocket_middleware != []:
+            if self.__is_websocket_middleware_added:
+                raise ValueError(
+                    "websocket middleware have been already added"
+                )
+
+            for websocket_middleware_ in websocket_middleware:
+                self.__add_middleware(websocket_middleware_)
+
+            self.__is_websocket_middleware_added = True
+
+    def __add_middleware(self, middleware: Middleware) -> None:
+        validation.validate(middleware, Middleware)
+
+        # Note that dispatch(...) method is linked to be as entrypoint to a
+        # middleware. This will be a place where a middleware takes decision
+        # to not process request to certain endpoint or not.
+        if type(middleware) is Middleware:
+            raise TypeError(
+                f"cannot accept abstract class implementation {middleware}"
+            )
+        elif isinstance(middleware, HttpMiddleware):
+            self.__app.add_http_middleware_fn(
+                middleware.dispatch
+            )
+        elif isinstance(middleware, WebsocketMiddleware):
+            self.__websocket_stack.add_call(
+                DispatchWebsocketHandler(
+                    fn=middleware.dispatch
+                )
+            )
+        else:
+            raise TypeError(
+                f"unrecognized middleware {middleware}"
+            )
 
     def __parse_endpoint_spec_kwargs(
         self, spec: Endpoint | None, fn: Callable

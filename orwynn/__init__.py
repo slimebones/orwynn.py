@@ -11,7 +11,6 @@ from orwynn.config.Config import Config
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.endpoint.EndpointResponse import EndpointResponse
 from orwynn.controller.http.HttpController import HttpController
-from orwynn.controller.websocket.Websocket import Websocket
 from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.error.Error import Error
 from orwynn.error.ErrorHandler import ErrorHandler
@@ -21,6 +20,8 @@ from orwynn.indication.Indicator import Indicator
 from orwynn.log.Log import Log
 from orwynn.middleware.HttpMiddleware import HttpMiddleware
 from orwynn.middleware.HttpNextCallFn import HttpNextCallFn
+from orwynn.middleware.WebsocketMiddleware import WebsocketMiddleware
+from orwynn.middleware.WebsocketNextCallFn import WebsocketNextCallFn
 from orwynn.model.Model import Model
 from orwynn.module.Module import Module
 from orwynn.mongo import module as mongo_module
@@ -32,3 +33,4 @@ from orwynn.sql.Sql import Sql
 from orwynn.sql.Table import Table
 from orwynn.testing.Client import Client
 from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
+from orwynn.web.websocket.Websocket import Websocket

@@ -6,7 +6,7 @@ from orwynn.controller.Controller import Controller
 from orwynn.di.di_object_already_initialized_in_container_error import (
     DIObjectAlreadyInitializedInContainerError,
 )
-from orwynn.di.DIObject import DIObject
+from orwynn.di.DiObject import DiObject
 from orwynn.di.finalized_di_container_error import FinalizedDIContainerError
 from orwynn.di.is_provider import is_provider
 from orwynn.di.missing_di_object_error import MissingDIObjectError
@@ -20,20 +20,20 @@ from orwynn.validation import validate
 _InnerObj = TypeVar("_InnerObj")
 
 
-class DIContainer:
+class DiContainer:
     """Holds data about initialized di objects."""
     def __init__(self) -> None:
-        self._data: dict[str, DIObject] = {}
+        self._data: dict[str, DiObject] = {}
 
         # Struct running in parallel to main data one to hold references by
         # class for self properties like getting all controllers
-        self._objects_by_base_class: dict[type[DIObject], list[DIObject]] = {}
+        self._objects_by_base_class: dict[type[DiObject], list[DiObject]] = {}
 
         self._is_provider_populating_finalized: bool = False
 
     @property
-    def items(self) -> list[tuple[str, DIObject]]:
-        result: list[tuple[str, DIObject]] = []
+    def items(self) -> list[tuple[str, DiObject]]:
+        result: list[tuple[str, DiObject]] = []
 
         for name, obj in self._data.items():
             result.append((name, obj))
@@ -67,7 +67,7 @@ class DIContainer:
         )
         return result
 
-    def add(self, obj: DIObject) -> None:
+    def add(self, obj: DiObject) -> None:
         """Adds DI object to the container.
 
         Args:
@@ -94,7 +94,7 @@ class DIContainer:
 
         self._assign_obj_to_base_class(obj)
 
-    def find(self, key: str) -> DIObject:
+    def find(self, key: str) -> DiObject:
         """Returns DI object by its key.
 
         Note that searching is made using PascalCased keys, but actual object
@@ -120,7 +120,7 @@ class DIContainer:
                 f"di object for key \"{key}\" is not found"
             ) from error
 
-    def find_re(self, pattern: str) -> list[DIObject]:
+    def find_re(self, pattern: str) -> list[DiObject]:
         """Searches di objects by pattern.
 
         Args:
@@ -132,7 +132,7 @@ class DIContainer:
         """
         validate(pattern, str)
 
-        result: list[DIObject] = []
+        result: list[DiObject] = []
 
         for k, v in self._data.items():
             if re.match(pattern, k):
@@ -155,9 +155,9 @@ class DIContainer:
 
         self._is_provider_populating_finalized = True
 
-    def _assign_obj_to_base_class(self, obj: DIObject) -> None:
-        ObjCls: type[DIObject] = type(obj)
-        BaseCls: type[DIObject] | None = None
+    def _assign_obj_to_base_class(self, obj: DiObject) -> None:
+        ObjCls: type[DiObject] = type(obj)
+        BaseCls: type[DiObject] | None = None
 
         # Find out object's base class
         for C in SUBCLASSABLES:

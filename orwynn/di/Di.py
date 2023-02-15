@@ -6,8 +6,8 @@ from orwynn.di.collecting.collect_provider_dependencies import (
     collect_provider_dependencies,
 )
 from orwynn.di.collecting.ModuleCollector import ModuleCollector
-from orwynn.di.DIContainer import DIContainer
-from orwynn.di.DIObject import DIObject
+from orwynn.di.DiContainer import DiContainer
+from orwynn.di.DiObject import DiObject
 from orwynn.di.init.init_other_acceptors import init_other_acceptors
 from orwynn.di.init.init_providers import init_providers
 from orwynn.error.ErrorHandler import ErrorHandler
@@ -68,7 +68,7 @@ class Di(Worker):
             global_modules=global_modules
         ).collected_modules
 
-        self.__container: DIContainer = init_providers(
+        self.__container: DiContainer = init_providers(
             collect_provider_dependencies(self.modules)
         )
         init_other_acceptors(self.__container, self.modules)
@@ -99,7 +99,7 @@ class Di(Worker):
     def error_handlers(self) -> list[ErrorHandler]:
         return self.__container.error_handlers
 
-    def find(self, key: str) -> DIObject:
+    def find(self, key: str) -> DiObject:
         """Returns DI object by its key.
 
         Note that searching is made using PascalCased keys, but actual object
