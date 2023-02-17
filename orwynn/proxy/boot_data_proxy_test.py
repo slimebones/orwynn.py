@@ -14,5 +14,5 @@ def std_boot_data_proxy() -> BootProxy:
         mode=BootMode.TEST,
         api_indication=default_api_indication,
         apprc={},
-        ErrorHandlers=[]
+        ExceptionHandlers=[]
     )

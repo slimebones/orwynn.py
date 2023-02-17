@@ -27,8 +27,9 @@ def test_versioned_global_route():
 
 
 def test_controller_version():
-    # HTTPController can define older version of API than available.
-    #
+    """
+    HttpController can define older version of API than available.
+    """
     class C1(HttpController):
         ROUTE = "/message"
         VERSION = 1

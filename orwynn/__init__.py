@@ -12,16 +12,16 @@ from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.endpoint.EndpointResponse import EndpointResponse
 from orwynn.controller.http.HttpController import HttpController
 from orwynn.controller.websocket.WebsocketController import WebsocketController
-from orwynn.error.catching.ErrorHandler import ErrorHandler
+from orwynn.error.catching.ExceptionHandler import ExceptionHandler
 from orwynn.error.Error import Error
 from orwynn.indication.Indication import Indication
 from orwynn.indication.IndicationType import IndicationType
 from orwynn.indication.Indicator import Indicator
 from orwynn.log.Log import Log
 from orwynn.middleware.HttpMiddleware import HttpMiddleware
-from orwynn.middleware.HttpNextCallFn import HttpNextCallFn
+from orwynn.middleware.HttpNextCall import HttpNextCall
 from orwynn.middleware.WebsocketMiddleware import WebsocketMiddleware
-from orwynn.middleware.WebsocketNextCallFn import WebsocketNextCallFn
+from orwynn.middleware.WebsocketNextCall import WebsocketNextCall
 from orwynn.model.Model import Model
 from orwynn.module.Module import Module
 from orwynn.mongo import module as mongo_module

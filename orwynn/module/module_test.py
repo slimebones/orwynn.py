@@ -2,7 +2,7 @@ from orwynn import validation, web
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HttpController import HttpController
 from orwynn.middleware.HttpMiddleware import HttpMiddleware
-from orwynn.middleware.HttpNextCallFn import HttpNextCallFn
+from orwynn.middleware.HttpNextCall import HttpNextCall
 from orwynn.module.Module import Module
 
 
@@ -29,7 +29,7 @@ def test_controller_added_to_no_route():
 def test_middleware_added_to_no_route():
     class M1(HttpMiddleware):
         async def process(
-            self, request: web.Request, call_next: HttpNextCallFn
+            self, request: web.Request, call_next: HttpNextCall
         ) -> web.Response:
             return await super().process(request, call_next)
 

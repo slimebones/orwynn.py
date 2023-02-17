@@ -1,8 +1,10 @@
 import functools
+from pprint import pprint
 from typing import Callable
 
 from orwynn import web
 from orwynn.error.MalfunctionError import MalfunctionError
+from orwynn.error.catching.ExceptionHandler import ExceptionHandler
 from orwynn.router.NextCallHandler import NextCallHandler
 from orwynn.router.WebsocketHandler import (
     DispatchWebsocketHandler,

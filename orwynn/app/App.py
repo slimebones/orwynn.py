@@ -2,53 +2,51 @@ from typing import TYPE_CHECKING, Any, Awaitable, Callable, Union
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware as FastAPI_CORSMiddleware
-from orwynn import web
-from orwynn.error.catching.ErrorHandlerBuiltinHttpMiddleware import ErrorHandlerBuiltinHttpMiddleware
-from starlette.middleware.base import (
-    BaseHTTPMiddleware as StarletteBaseHTTPMiddleware,
-)
-from starlette.middleware.exceptions import (
-    ExceptionMiddleware as StarletteExceptionMiddleware
-)
 from starlette.types import Receive, Scope, Send
 
-from orwynn import validation
-from orwynn.error.catching.DefaultExceptionHandler import DefaultExceptionHandler
+from orwynn import validation, web
+from orwynn.app.CoreApp import CoreApp
+from orwynn.error.catching.DefaultHttpExceptionHandler import DefaultHttpExceptionHandler
 from orwynn.service.FrameworkService import FrameworkService
 from orwynn.testing.Client import Client
 from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
-from orwynn.validation.RequestValidationException import RequestValidationException
-from orwynn.web import CORS, HTTPMethod, Response
-
-if TYPE_CHECKING:
-    pass
+from orwynn.validation.RequestValidationException import \
+    RequestValidationException
+from orwynn.web import CORS, HttpException, HTTPMethod
 
 
 class App(FrameworkService):
     def __init__(self) -> None:
-        self.__app: FastAPI = FastAPI(docs_url="/doc")
+        self.__core_app: CoreApp = CoreApp(docs_url="/doc")
+
+        self._fw_add_middleware = self.__core_app.add_middleware
 
         self.HTTP_METHODS_TO_REGISTERING_FUNCTIONS: \
             dict[HTTPMethod, Callable] = {
-                HTTPMethod.GET: self.__app.get,
-                HTTPMethod.POST: self.__app.post,
-                HTTPMethod.PUT: self.__app.put,
-                HTTPMethod.DELETE: self.__app.delete,
-                HTTPMethod.PATCH: self.__app.patch,
-                HTTPMethod.OPTIONS: self.__app.options
+                HTTPMethod.GET: self.__core_app.get,
+                HTTPMethod.POST: self.__core_app.post,
+                HTTPMethod.PUT: self.__core_app.put,
+                HTTPMethod.DELETE: self.__core_app.delete,
+                HTTPMethod.PATCH: self.__core_app.patch,
+                HTTPMethod.OPTIONS: self.__core_app.options
             }
 
         self.__is_cors_configured: bool = False
-        self.__client: Client = Client(EmbeddedTestClient(self.__app))
+        self.__client: Client = Client(EmbeddedTestClient(self.__core_app))
+
+        # Remove FastAPI default exception handlers to not cross with ours -
+        # since we write handlers directly via middleware
+        del self.__core_app.exception_handlers[HttpException]
+        del self.__core_app.exception_handlers[RequestValidationException]
 
     async def __call__(
         self, scope: Scope, receive: Receive, send: Send
     ) -> None:
-        await self.__app(scope, receive, send)
+        await self.__core_app(scope, receive, send)
 
     @property
     def websocket_handler(self) -> Callable:
-        return self.__app.websocket
+        return self.__core_app.websocket
 
     @property
     def client(self) -> Client:
@@ -66,27 +64,8 @@ class App(FrameworkService):
             if v:
                 kwargs[k] = v
 
-        self.__app.add_middleware(
+        self.__core_app.add_middleware(
             FastAPI_CORSMiddleware,
             **kwargs
         )
         self.__is_cors_configured = True
-
-    def add_http_middleware_fn(
-        self,
-        fn: Callable
-    ) -> None:
-        self.__app.add_middleware(
-            StarletteBaseHTTPMiddleware,
-            dispatch=fn
-        )
-
-    def add_http_exception_middleware_fn(
-        self,
-        HandledException: type[Exception]
-        fn: Callable[[web.Request, Exception], web.Response]
-    ) -> None:
-        self.__app.add_middleware(
-            StarletteExceptionMiddleware,
-            handlers={HandledException: DefaultExceptionHandler().handle}
-        )

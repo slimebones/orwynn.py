@@ -5,4 +5,4 @@ from orwynn import web
 
 # Callable function which returns an awaitable, see:
 #   https://stackoverflow.com/a/59177557/14748231
-WebsocketNextCallFn = Callable[[web.Websocket], Awaitable[None]]
+WebsocketNextCall = Callable[[web.Websocket], Awaitable[None]]

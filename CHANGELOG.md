@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Features
 
+- Add websocket toolset ([8c7349a](https://github.com/ryzhovalex/orwynn/commit/8c7349adcd34abb3fa0e0114a539590c2e6fce0f) by ryzhovalex).
+- Add EndpointResponse to shortcut import ([8201a8a](https://github.com/ryzhovalex/orwynn/commit/8201a8af4fef99b0ce9eb0c35f829bb349ecb76b) by ryzhovalex).
+- Make route is not requred for Module ([48499a7](https://github.com/ryzhovalex/orwynn/commit/48499a72b9344836a182816114868594dde5867a) by ryzhovalex).
 - Go SQLAlchemy==2.0.3 ([0b35098](https://github.com/ryzhovalex/orwynn/commit/0b3509831f09e0857cbad1c698eaf2397147ed3a) by ryzhovalex).
 - Add contextualized logs ([7307fa8](https://github.com/ryzhovalex/orwynn/commit/7307fa84fd179dd3acc2485a7d5aca072d65f614) by ryzhovalex).
 - Add context management (untested) ([1885cb2](https://github.com/ryzhovalex/orwynn/commit/1885cb26ea8be690e46e6aa5001688124d86f04e) by ryzhovalex).
@@ -22,6 +25,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Bug Fixes
 
+- Middleware dispatch patterns ([2681a8e](https://github.com/ryzhovalex/orwynn/commit/2681a8e17288184703cfd229b5018b3f622a45a1) by ryzhovalex).
+- Make smarter typehint checking for route handlers ([d5b6476](https://github.com/ryzhovalex/orwynn/commit/d5b64769ced94f7d81ffd9c62fcbf06233dd629e) by ryzhovalex).
+- Remove routes for sql and mongo ([2cfc055](https://github.com/ryzhovalex/orwynn/commit/2cfc055d69d4fed154c7a082221604a7fab97372) by ryzhovalex).
 - Introduce approach to log testing and fix Log bugs ([d6f32be](https://github.com/ryzhovalex/orwynn/commit/d6f32be46142c7f5a335322b157564afcd155d9f) by ryzhovalex).
 - Remove logger handlers after tests ([a6ae0c6](https://github.com/ryzhovalex/orwynn/commit/a6ae0c693ea454c3b98cf8b8d97b9b249f077722) by ryzhovalex).
 - Change Indicator enum to string values ([5be7e35](https://github.com/ryzhovalex/orwynn/commit/5be7e35494b7d98a7c44ccb69517a0f848a2a7ae) by ryzhovalex).

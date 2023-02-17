@@ -1,10 +1,10 @@
-from orwynn.error.catching.ErrorHandler import ErrorHandler
+from orwynn.error.catching.ExceptionHandler import ExceptionHandler
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.validation import RequestValidationException
 from orwynn.web import JSONResponse, Request, Response
 
 
-class DefaultRequestValidationExceptionHandler(ErrorHandler):
+class DefaultRequestValidationExceptionHandler(ExceptionHandler):
     E = RequestValidationException
 
     def handle(

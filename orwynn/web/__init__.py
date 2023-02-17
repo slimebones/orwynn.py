@@ -31,7 +31,7 @@ JSONResponse = FastAPI_JSONResponse
 HTMLResponse = FastAPI_HTMLResponse
 Request = FastAPIRequest
 TestResponse = httpx.Response
-HTTPException = StarletteHTTPException
+HttpException = StarletteHTTPException
 
 # A request of any supported protocol
 GenericRequest = Union[

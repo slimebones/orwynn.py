@@ -10,7 +10,7 @@ from orwynn.di.DiObjectAlreadyInitializedInContainerError import (
 from orwynn.di.FinalizedDiContainerError import FinalizedDiContainerError
 from orwynn.di.is_provider import is_provider
 from orwynn.di.MissingDiObjectError import MissingDiObjectError
-from orwynn.error.catching.ErrorHandler import ErrorHandler
+from orwynn.error.catching.ExceptionHandler import ExceptionHandler
 from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.middleware.Middleware import Middleware
 from orwynn.model.Model import Model
@@ -61,9 +61,9 @@ class DiContainer:
         return result
 
     @property
-    def error_handlers(self) -> list[ErrorHandler]:
-        result: list[ErrorHandler] = self._find_objects_for_class(
-            ErrorHandler
+    def exception_handlers(self) -> list[ExceptionHandler]:
+        result: list[ExceptionHandler] = self._find_objects_for_class(
+            ExceptionHandler
         )
         return result
 

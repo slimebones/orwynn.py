@@ -5,7 +5,7 @@ from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.web.Protocol import Protocol
 
 
-class ErrorHandler:
+class ExceptionHandler:
     """Handles outcoming errors from the application.
     Method handle(...) should be redefined in subclass in order to work.
 

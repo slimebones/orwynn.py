@@ -7,7 +7,7 @@ from orwynn.boot.BootMode import BootMode
 from orwynn.worker.Worker import Worker
 
 if TYPE_CHECKING:
-    from orwynn.error.catching.ErrorHandler import ErrorHandler
+    from orwynn.error.catching.ExceptionHandler import ExceptionHandler
     from orwynn.indication.Indication import Indication
 
 
@@ -22,7 +22,7 @@ class BootProxy(Worker):
         mode: BootMode,
         api_indication: "Indication",
         apprc: AppRC,
-        ErrorHandlers: set[type["ErrorHandler"]],
+        ExceptionHandlers: set[type["ExceptionHandler"]],
         global_route: str,
         api_version: ApiVersion
     ) -> None:
@@ -31,7 +31,8 @@ class BootProxy(Worker):
         self.__mode: BootMode = mode
         self.__api_indication: Indication = api_indication
         self.__apprc: AppRC = apprc
-        self.__ErrorHandlers: set[type["ErrorHandler"]] = ErrorHandlers
+        self.__ExceptionHandlers: set[type["ExceptionHandler"]] = \
+            ExceptionHandlers
         self.__global_route: str = global_route
         self.__api_version: ApiVersion = api_version
 
@@ -48,8 +49,8 @@ class BootProxy(Worker):
         return self.__apprc
 
     @property
-    def ErrorHandlers(self) -> set[type["ErrorHandler"]]:
-        return self.__ErrorHandlers
+    def ExceptionHandlers(self) -> set[type["ExceptionHandler"]]:
+        return self.__ExceptionHandlers
 
     @property
     def global_route(self) -> str:
@@ -66,7 +67,7 @@ class BootProxy(Worker):
             "mode": self.__mode,
             "api_indication": self.__api_indication,
             "app_rc": self.__apprc,
-            "ErrorHandlers": self.__ErrorHandlers
+            "ErrorHandlers": self.__ExceptionHandlers
         }
 
     @property

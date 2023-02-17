@@ -23,7 +23,7 @@ from orwynn.mp.location import (FieldLocation, find_field_by_location,
 from orwynn.validation import (RequestValidationException, validate,
                                     validate_dict)
 from orwynn.validation.validator import Validator
-from orwynn.web import HTTPException
+from orwynn.web import HttpException
 
 _Locations = dict[Indicator, FieldLocation]
 
@@ -71,7 +71,7 @@ class Indication:
                 case Indicator.TYPE:
                     final_field = str
                 case Indicator.VALUE:
-                    if issubclass(Entity, HTTPException):
+                    if issubclass(Entity, HttpException):
                         final_field = HTTPExceptionValueSchema
                     elif issubclass(
                         Entity, RequestValidationExceptionValueSchema
@@ -139,7 +139,7 @@ class Indication:
                 case Indicator.TYPE:
                     final_field = self.__get_type_for_object(obj).value
                 case Indicator.VALUE:
-                    if isinstance(obj, HTTPException):
+                    if isinstance(obj, HttpException):
                         final_field = {
                             "status_code": obj.status_code,
                             "message": obj.detail
@@ -236,7 +236,7 @@ class Indication:
         value: dict = self.__find_value_in_mp(mp)
 
         if (
-            issubclass(Object, HTTPException)
+            issubclass(Object, HttpException)
         ):
             return Object(
                 status_code=value["status_code"],

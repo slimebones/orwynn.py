@@ -18,7 +18,7 @@ from orwynn.testing.Client import Client
 from orwynn.validation import RequestValidationException, expect, validate_re
 from orwynn.validation.re_validation_error import ReValidationError
 from orwynn.validation.validation_error import ValidationError
-from orwynn.web import HTTPException, HTTPMethod
+from orwynn.web import HttpException, HTTPMethod
 from orwynn.web.UnsupportedHTTPMethodError import UnsupportedHTTPMethodError
 from tests.std.text import DEFAULT_ID, Text
 
@@ -123,12 +123,12 @@ def test_default_404():
         404
     )
 
-    recovered_exception: HTTPException = validation.apply(
+    recovered_exception: HttpException = validation.apply(
         BootProxy.ie().api_indication.recover(
-            HTTPException,
+            HttpException,
             data
         ),
-        HTTPException
+        HttpException
     )
 
     assert recovered_exception.status_code == 404
@@ -184,12 +184,12 @@ def test_default_method_not_allowed():
         405
     )
 
-    recovered_exception: HTTPException = validation.apply(
+    recovered_exception: HttpException = validation.apply(
         BootProxy.ie().api_indication.recover(
-            HTTPException,
+            HttpException,
             data
         ),
-        HTTPException
+        HttpException
     )
 
     assert recovered_exception.status_code == 405

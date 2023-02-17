@@ -10,7 +10,7 @@ from orwynn.di.DiContainer import DiContainer
 from orwynn.di.DiObject import DiObject
 from orwynn.di.init.init_other_acceptors import init_other_acceptors
 from orwynn.di.init.init_providers import init_providers
-from orwynn.error.catching.ErrorHandler import ErrorHandler
+from orwynn.error.catching.ExceptionHandler import ExceptionHandler
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
 from orwynn.worker.Worker import Worker
@@ -96,8 +96,8 @@ class Di(Worker):
         return self.__container.all_middleware
 
     @property
-    def error_handlers(self) -> list[ErrorHandler]:
-        return self.__container.error_handlers
+    def exception_handlers(self) -> list[ExceptionHandler]:
+        return self.__container.exception_handlers
 
     def find(self, key: str) -> DiObject:
         """Returns DI object by its key.

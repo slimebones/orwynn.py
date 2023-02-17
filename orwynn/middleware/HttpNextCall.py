@@ -5,4 +5,4 @@ from orwynn.web import Request, Response
 
 # Callable function which returns an awaitable, see:
 #   https://stackoverflow.com/a/59177557/14748231
-HttpNextCallFn = Callable[[Request], Awaitable[Response]]
+HttpNextCall = Callable[[Request], Awaitable[Response]]

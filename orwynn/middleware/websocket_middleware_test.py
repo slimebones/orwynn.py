@@ -2,14 +2,14 @@ from orwynn import web
 from orwynn.boot.Boot import Boot
 from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.middleware.WebsocketMiddleware import WebsocketMiddleware
-from orwynn.middleware.WebsocketNextCallFn import WebsocketNextCallFn
+from orwynn.middleware.WebsocketNextCall import WebsocketNextCall
 from orwynn.module.Module import Module
 from orwynn.testing.Client import Client
 
 
 class Mw1(WebsocketMiddleware):
     async def process(
-        self, request: web.Websocket, call_next: WebsocketNextCallFn
+        self, request: web.Websocket, call_next: WebsocketNextCall
     ) -> None:
         await request.send_json({"value": "entry"})
         await call_next(request)

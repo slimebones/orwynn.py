@@ -2,13 +2,13 @@ from orwynn import validation, web
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HttpController import HttpController
-from orwynn.error.catching.ErrorHandler import ErrorHandler
+from orwynn.error.catching.ExceptionHandler import ExceptionHandler
 from orwynn.error.catching.ExceptionAlreadyHandledError import (
     ExceptionAlreadyHandledError,
 )
 from orwynn.error.Error import Error
 from orwynn.middleware.HttpMiddleware import HttpMiddleware
-from orwynn.middleware.HttpNextCallFn import HttpNextCallFn
+from orwynn.middleware.HttpNextCall import HttpNextCall
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.service.Service import Service
@@ -16,7 +16,7 @@ from orwynn.testing.Client import Client
 from orwynn.web import JSONResponse, Request, TestResponse
 
 
-class GeneralEh(ErrorHandler):
+class GeneralEh(ExceptionHandler):
     E = Error
 
     def handle(self, request: Request, error: Error):
@@ -41,7 +41,7 @@ def test_custom_handler():
 
     boot: Boot = Boot(
         Module(route="/", Controllers=[C1]),
-        ErrorHandlers={GeneralEh}
+        ExceptionHandlers={GeneralEh}
     )
     http: Client = boot.app.client
 
@@ -97,7 +97,7 @@ def test_as_acceptor():
         def get(self):
             raise Error("whoops!")
 
-    class Eh1(ErrorHandler):
+    class Eh1(ExceptionHandler):
         E = Error
 
         def __init__(self, cool_service: CoolService) -> None:
@@ -110,7 +110,7 @@ def test_as_acceptor():
 
     boot: Boot = Boot(
         Module(route="/", Providers=[CoolService], Controllers=[C1]),
-        ErrorHandlers={Eh1}
+        ExceptionHandlers={Eh1}
     )
     client: Client = boot.app.client
 
@@ -134,7 +134,7 @@ def test_default_in_middleware():
         async def process(
             self,
             request: web.Request,
-            call_next: HttpNextCallFn
+            call_next: HttpNextCall
         ) -> web.Response:
             raise ValueError("whoops!")
 
@@ -167,13 +167,13 @@ def test_custom_in_middleware():
         async def process(
             self,
             request: web.Request,
-            call_next: HttpNextCallFn
+            call_next: HttpNextCall
         ) -> web.Response:
             raise Error("whoops!")
 
     boot: Boot = Boot(
         Module(route="/", Controllers=[C1], Middleware=[M1]),
-        ErrorHandlers={GeneralEh}
+        ExceptionHandlers={GeneralEh}
     )
 
     r: TestResponse = boot.app.client.get("/", 401)
@@ -190,7 +190,7 @@ def test_exception_handled_twice():
     """
     Should raise an error for twice-handled exceptions.
     """
-    class Eh1(ErrorHandler):
+    class Eh1(ExceptionHandler):
         E = Error
 
     validation.expect(

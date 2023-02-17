@@ -1,9 +1,9 @@
-from orwynn.error.catching.ErrorHandler import ErrorHandler
+from orwynn.error.catching.ExceptionHandler import ExceptionHandler
 from orwynn.error.Error import Error
 from orwynn.web import JSONResponse, Request, Response
 
 
-class DefaultErrorHandler(ErrorHandler):
+class DefaultErrorHandler(ExceptionHandler):
     E = Error
 
     def handle(self, request: Request, error: Error) -> Response:

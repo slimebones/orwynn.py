@@ -1,9 +1,16 @@
+from pprint import pprint
 import typing
 from inspect import isclass
 from typing import Any, Callable, Sequence
 
 import pydantic
 
+from starlette.middleware.base import (
+    BaseHTTPMiddleware as StarletteBaseHTTPMiddleware,
+)
+from starlette.middleware.exceptions import (
+    ExceptionMiddleware as StarletteExceptionMiddleware
+)
 from orwynn import validation, web
 from orwynn.app.AlreadyRegisteredMethodError import (
     AlreadyRegisteredMethodError,
@@ -14,6 +21,10 @@ from orwynn.controller.endpoint.EndpointNotFoundError import (
     EndpointNotFoundError,
 )
 from orwynn.controller.websocket.WebsocketController import WebsocketController
+from orwynn.error.catching.DefaultHttpExceptionHandler import DefaultHttpExceptionHandler
+from orwynn.error.catching.ExceptionHandlerBuiltinHttpMiddleware import ExceptionHandlerBuiltinHttpMiddleware
+from orwynn.error.catching.ExceptionHandlerBuiltinWebsocketMiddleware import ExceptionHandlerBuiltinWebsocketMiddleware
+from orwynn.error.catching.HandlerByExceptionClass import HandlerByExceptionClass
 from orwynn.indication.Indication import Indication
 from orwynn.middleware.HttpMiddleware import HttpMiddleware
 from orwynn.middleware.Middleware import Middleware
@@ -32,13 +43,15 @@ from orwynn.router.WebsocketStack import WebsocketStack
 from orwynn.router.WrongHandlerReturnTypeError import (
     WrongHandlerReturnTypeError,
 )
-from orwynn.web import HTTPMethod
+from orwynn.web import HttpException, HTTPMethod
 from orwynn.web.UnsupportedHTTPMethodError import UnsupportedHTTPMethodError
 from orwynn.worker.Worker import Worker
 
 
 class Router(Worker):
-    """Responsible of ways how request and responses flows through the app."""
+    """
+    Manages how the requests and responses flow through the app.
+    """
     def __init__(
         self,
         app: App
@@ -205,7 +218,7 @@ class Router(Worker):
                 f"cannot accept abstract class implementation {middleware}"
             )
         elif isinstance(middleware, HttpMiddleware):
-            self.__app.add_http_middleware_fn(
+            self.__add_http_middleware_fn(
                 middleware.dispatch
             )
         elif isinstance(middleware, WebsocketMiddleware):
@@ -304,3 +317,42 @@ class Router(Worker):
                     return True
         return False
 
+    def add_http_exception_handlers(
+        self,
+        handler_by_exception_class: HandlerByExceptionClass,
+    ) -> None:
+        prepared_handlers: dict[type[Exception], Callable] = {}
+
+        for Exc_, handler in handler_by_exception_class.items():
+            prepared_handlers[Exc_] = handler.handle
+
+        self.__app._fw_add_middleware(
+            # Add base http middleware with upstream handling instead of
+            # starlette's ExceptionMiddleware (since some problems occured with
+            # the last option)
+            StarletteBaseHTTPMiddleware,
+            dispatch=ExceptionHandlerBuiltinHttpMiddleware(
+                handlers=set(handler_by_exception_class.values())
+            ).dispatch
+        )
+
+    def add_websocket_exception_handlers(
+        self,
+        handler_by_exception_class: HandlerByExceptionClass,
+    ) -> None:
+        self.__websocket_stack.add_call(
+            DispatchWebsocketHandler(
+                fn=ExceptionHandlerBuiltinWebsocketMiddleware(
+                    handlers=set(handler_by_exception_class.values())
+                ).dispatch
+            )
+        )
+
+    def __add_http_middleware_fn(
+        self,
+        fn: Callable
+    ) -> None:
+        self.__app._fw_add_middleware(
+            StarletteBaseHTTPMiddleware,
+            dispatch=fn
+        )
