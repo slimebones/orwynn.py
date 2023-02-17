@@ -158,8 +158,8 @@ def test_default_request_validation_error():
         }
     )
 
-    # Temporarily content of this exception is not checked since is not filled
-    # back in indication
+    # Temporarily content of this exception is not checked since it is not
+    # filled back to the indication
     validation.apply(
         BootProxy.ie().api_indication.recover(
             RequestValidationException,

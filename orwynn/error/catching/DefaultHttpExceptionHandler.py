@@ -1,9 +1,9 @@
-from orwynn.error.ErrorHandler import ErrorHandler
+from orwynn.error.catching.ErrorHandler import ErrorHandler
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.web import HTTPException, JSONResponse, Request, Response
 
 
-class DefaultHTTPExceptionHandler(ErrorHandler):
+class DefaultHttpExceptionHandler(ErrorHandler):
     E = HTTPException
 
     def handle(self, request: Request, error: HTTPException) -> Response:

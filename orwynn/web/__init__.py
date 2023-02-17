@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Union
 
 import httpx
 from fastapi import Request as FastAPIRequest
@@ -10,6 +11,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from orwynn import validation
 from orwynn.web.context.ContextStorage import ContextStorage
 from orwynn.web.CORS import CORS
+from orwynn.web.Protocol import Protocol
 from orwynn.web.websocket.Websocket import Websocket
 
 from .UnsupportedHTTPMethodError import UnsupportedHTTPMethodError
@@ -30,6 +32,19 @@ HTMLResponse = FastAPI_HTMLResponse
 Request = FastAPIRequest
 TestResponse = httpx.Response
 HTTPException = StarletteHTTPException
+
+# A request of any supported protocol
+GenericRequest = Union[
+    Request,
+    # The Websocket object is a representation of the request
+    Websocket
+]
+GenericResponse = Union[
+    Response,
+    # The Websocket protocol doesn't return any response in direct form from a
+    # controller - it sends it over special channel instead.
+    None
+]
 
 
 def join_routes(*routes: str) -> str:

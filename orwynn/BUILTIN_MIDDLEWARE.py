@@ -1,9 +1,3 @@
-from orwynn.error.ErrorCatchBuiltinMiddleware import (
-    ErrorCatchBuiltinMiddleware,
-)
-from orwynn.error.ErrorCatchBuiltinWebsocketMiddleware import (
-    ErrorCatchBuiltinWebsocketMiddleware,
-)
 from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
 from orwynn.middleware.BuiltinWebsocketMiddleware import (
     BuiltinWebsocketMiddleware,
@@ -24,16 +18,15 @@ from orwynn.web.websocket.ConnectionBuiltinWebsocketMiddleware import (
     ConnectionBuiltinWebsocketMiddleware,
 )
 
-# Order matters, the lowest index is initialized first
+# Order matters, the lowest index is initialized first.
+# Note that before that error handler middleware is initialized.
 BUILTIN_HTTP_MIDDLEWARE: list[type[BuiltinHttpMiddleware]] = [
-    ErrorCatchBuiltinMiddleware,
     ContextBuiltinMiddleware,
     RequestContextBuiltinMiddleware
 ]
 
 BUILTIN_WEBSOCKET_MIDDLEWARE: list[type[BuiltinWebsocketMiddleware]] = [
     ConnectionBuiltinWebsocketMiddleware,
-    ErrorCatchBuiltinWebsocketMiddleware,
     ContextBuiltinWebsocketMiddleware,
     RequestContextBuiltinWebsocketMiddleware
 ]

@@ -95,9 +95,9 @@ def __init_modules(
                 )
             )
 
-        for EH in BootProxy.ie().ErrorHandlers:
+        for Eh in BootProxy.ie().ErrorHandlers:
             container.add(
-                EH(**__collect_dependencies_for_acceptor(EH, container))
+                Eh(**__collect_dependencies_for_acceptor(Eh, container))
             )
 
 

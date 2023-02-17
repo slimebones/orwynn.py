@@ -10,7 +10,7 @@ from orwynn.di.collecting.provider_dependencies_map import (
 )
 from orwynn.di.DiContainer import DiContainer
 from orwynn.di.is_provider import is_provider
-from orwynn.di.missing_di_object_error import MissingDIObjectError
+from orwynn.di.MissingDiObjectError import MissingDiObjectError
 from orwynn.di.Provider import Provider
 from orwynn.fmt import format_chain
 
@@ -35,7 +35,7 @@ def init_providers(
     for P in provider_dependencies_map.Providers:
         try:
             container.find(P.__name__)
-        except MissingDIObjectError:
+        except MissingDiObjectError:
             _traverse(
                 StarterProvider=P,
                 mp=provider_dependencies_map,
@@ -81,7 +81,7 @@ def _traverse(
                 already_initialized_dependencies.append(
                     container.find(D.__name__)
                 )
-            except MissingDIObjectError:
+            except MissingDiObjectError:
                 already_initialized_dependencies.append(
                     _traverse(
                         StarterProvider=D,

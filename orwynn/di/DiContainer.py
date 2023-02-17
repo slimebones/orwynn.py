@@ -3,14 +3,14 @@ from typing import TypeVar
 
 from orwynn.config.Config import Config
 from orwynn.controller.Controller import Controller
-from orwynn.di.di_object_already_initialized_in_container_error import (
-    DIObjectAlreadyInitializedInContainerError,
-)
 from orwynn.di.DiObject import DiObject
-from orwynn.di.finalized_di_container_error import FinalizedDIContainerError
+from orwynn.di.DiObjectAlreadyInitializedInContainerError import (
+    DiObjectAlreadyInitializedInContainerError,
+)
+from orwynn.di.FinalizedDiContainerError import FinalizedDiContainerError
 from orwynn.di.is_provider import is_provider
-from orwynn.di.missing_di_object_error import MissingDIObjectError
-from orwynn.error.ErrorHandler import ErrorHandler
+from orwynn.di.MissingDiObjectError import MissingDiObjectError
+from orwynn.error.catching.ErrorHandler import ErrorHandler
 from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.middleware.Middleware import Middleware
 from orwynn.model.Model import Model
@@ -79,14 +79,14 @@ class DiContainer:
                 This DI object already exists in container.
         """
         if self._is_provider_populating_finalized and is_provider(type(obj)):
-            raise FinalizedDIContainerError(
+            raise FinalizedDiContainerError(
                 f"cannot add provider {obj}, container is finalized"
             )
 
         obj_class_name: str = obj.__class__.__name__
 
         if obj_class_name in self._data:
-            raise DIObjectAlreadyInitializedInContainerError(
+            raise DiObjectAlreadyInitializedInContainerError(
                 f"DI object {obj} already initialized"
             )
 
@@ -116,7 +116,7 @@ class DiContainer:
         try:
             return self._data[key]
         except KeyError as error:
-            raise MissingDIObjectError(
+            raise MissingDiObjectError(
                 f"di object for key \"{key}\" is not found"
             ) from error
 
@@ -139,7 +139,7 @@ class DiContainer:
                 result.append(v)
 
         if result == []:
-            raise MissingDIObjectError(
+            raise MissingDiObjectError(
                 "di objects for pattern \"pattern\" are not found"
             )
 
@@ -191,7 +191,7 @@ class DiContainer:
                 is_missing = True
 
         if is_missing:
-            raise MissingDIObjectError(
+            raise MissingDiObjectError(
                 f"cannot find any object for class {C}"
             )
         else:

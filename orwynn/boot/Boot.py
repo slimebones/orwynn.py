@@ -9,9 +9,6 @@ import dotenv
 
 from orwynn import validation, web
 from orwynn.app.App import App
-from orwynn.app.DefaultRequestValidationExceptionHandler import (
-    DefaultRequestValidationExceptionHandler,
-)
 from orwynn.apprc.AppRC import AppRC
 from orwynn.apprc.parse_apprc import parse_apprc
 from orwynn.boot.api_version.ApiVersion import ApiVersion
@@ -24,17 +21,9 @@ from orwynn.controller.Controller import Controller
 from orwynn.controller.http.HttpController import HttpController
 from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.di.Di import Di
-from orwynn.di.missing_di_object_error import MissingDIObjectError
-from orwynn.error.DefaultErrorHandler import DefaultErrorHandler
-from orwynn.error.DefaultExceptionHandler import DefaultExceptionHandler
-from orwynn.error.DefaultHTTPExceptionHandler import (
-    DefaultHTTPExceptionHandler,
-)
-from orwynn.error.Error import Error
-from orwynn.error.ErrorHandler import ErrorHandler
-from orwynn.error.get_non_framework_exceptions import (
-    get_non_framework_exceptions,
-)
+from orwynn.di.MissingDiObjectError import MissingDiObjectError
+from orwynn.error.catching.ErrorHandler import ErrorHandler
+from orwynn.error.catching.ErrorHandlerManager import ErrorHandlerManager
 from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.file.NotDirError import NotDirError
 from orwynn.indication.default_api_indication import default_api_indication
@@ -45,17 +34,17 @@ from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
 from orwynn.middleware.BuiltinWebsocketMiddleware import (
     BuiltinWebsocketMiddleware,
 )
+from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn.router.Router import Router
 from orwynn.validation import (
-    RequestValidationException,
     validate,
     validate_each,
 )
-from orwynn.web import CORS, HTTPException, HTTPMethod
+from orwynn.web import CORS, HTTPMethod
 from orwynn.worker.Worker import Worker
 
 
@@ -129,7 +118,7 @@ class Boot(Worker):
         dotenv_path: Path | None = None,
         api_indication: Indication | None = None,
         cors: CORS | None = None,
-        ErrorHandlers: list[type[ErrorHandler]] | None = None,
+        ErrorHandlers: set[type[ErrorHandler]] | None = None,
         apprc: AppRC | None = None,
         mode: BootMode | None = None,
         global_route: str | None = None,
@@ -146,9 +135,9 @@ class Boot(Worker):
         validate(api_indication, Indication)
         validate(cors, [CORS, NoneType])
         if ErrorHandlers is None:
-            ErrorHandlers = []
+            ErrorHandlers = set()
         validate_each(
-            ErrorHandlers, ErrorHandler, expected_sequence_type=list
+            ErrorHandlers, ErrorHandler, expected_sequence_type=set
         )
         validate(apprc, [AppRC, NoneType])
         validate(mode, [BootMode, NoneType])
@@ -213,11 +202,11 @@ class Boot(Worker):
         )
 
         # Add middleware, it should be done before the controller's
-        # adding
+        # adding due to the special websocket middleware registering
         self.__add_middleware()
 
         # Supress: Don't raise error to ease test writings
-        with contextlib.suppress(MissingDIObjectError):
+        with contextlib.suppress(MissingDiObjectError):
             self.__register_routes(self.__di.modules, self.__di.controllers)
 
         # Register websockets after adding middleware and controllers
@@ -225,8 +214,6 @@ class Boot(Worker):
 
         if cors is not None:
             self.app.configure_cors(cors)
-
-        self.__register_error_handlers()
 
     @property
     def app(self) -> App:
@@ -239,103 +226,6 @@ class Boot(Worker):
     @property
     def api_indication(self) -> Indication:
         return self.__api_indication
-
-    def __register_error_handlers(
-        self
-    ) -> None:
-        error_handlers: list[ErrorHandler]
-        try:
-            error_handlers = self.__di.error_handlers
-        except MissingDIObjectError:
-            error_handlers = []
-
-        HandledBuiltinExceptions: list[type[Exception]] = []
-        is_default_error_handled: bool = False
-
-        HandledBuiltinExceptions, is_default_error_handled = \
-            self.__collect_error_handlers_data(error_handlers)
-
-        self.__add_error_handlers(
-            error_handlers=error_handlers,
-            HandledBuiltinExceptions=HandledBuiltinExceptions,
-            is_default_error_handled=is_default_error_handled
-        )
-
-    def __collect_error_handlers_data(
-        self,
-        error_handlers: list[ErrorHandler]
-    ) -> tuple[list[type[Exception]], bool]:
-        HandledBuiltinExceptions: list[type[Exception]] = []
-        is_default_error_handled: bool = False
-
-        for error_handler in error_handlers:
-            if error_handler.E is None:
-                raise MalfunctionError()
-            elif isinstance(error_handler.E, list):
-                for E in error_handler.E:
-                    if (
-                        issubclass(E, Exception)
-                        and not issubclass(E, Error)
-                    ):
-                        HandledBuiltinExceptions.append(E)
-                    elif E is Error:
-                        is_default_error_handled = True
-            else:
-                if (
-                    issubclass(error_handler.E, Exception)
-                    and not issubclass(error_handler.E, Error)
-                ):
-                    HandledBuiltinExceptions.append(error_handler.E)
-                elif error_handler.E is Error:
-                    is_default_error_handled = True
-
-        return HandledBuiltinExceptions, is_default_error_handled
-
-    def __add_error_handlers(
-        self,
-        *,
-        error_handlers: list[ErrorHandler],
-        HandledBuiltinExceptions: list[type[Exception]],
-        is_default_error_handled: bool
-    ) -> None:
-        # FIXME: Here default exception handlers are created without DI
-        #   notifying which may raise confusion.
-
-        # For any unhandled builtin exception add default handler,
-        # also add special RequestValidationException since it's not direct
-        # subclass of exception
-        RemainingExceptionSubclasses = \
-            get_non_framework_exceptions() + [RequestValidationException]
-        for HandledException in HandledBuiltinExceptions:
-            try:
-                RemainingExceptionSubclasses.remove(HandledException)
-            except ValueError as err:
-                raise MalfunctionError() from err
-
-        # Handle special exceptions
-        if HTTPException in RemainingExceptionSubclasses:
-            RemainingExceptionSubclasses.remove(HTTPException)
-            self.app.add_error_handler(DefaultHTTPExceptionHandler())
-        if RequestValidationException in RemainingExceptionSubclasses:
-            RemainingExceptionSubclasses.remove(RequestValidationException)
-            self.app.add_error_handler(
-                DefaultRequestValidationExceptionHandler()
-            )
-
-        if RemainingExceptionSubclasses:
-            default_exception_handler: DefaultExceptionHandler = \
-                DefaultExceptionHandler()
-            default_exception_handler.set_handled_exception(
-                RemainingExceptionSubclasses
-            )
-            self.app.add_error_handler(default_exception_handler)
-
-        if not is_default_error_handled:
-            self.app.add_error_handler(DefaultErrorHandler())
-
-        # Add other handlers
-        for error_handler in error_handlers:
-            self.app.add_error_handler(error_handler)
 
     def __register_routes(
         self, modules: list[Module], controllers: list[Controller]
@@ -488,6 +378,22 @@ class Boot(Worker):
         return root_dir
 
     def __add_middleware(self) -> None:
+        error_handlers: list[ErrorHandler]
+        try:
+            error_handlers = self.__di.error_handlers
+        except MissingDiObjectError:
+            error_handlers = []
+
+        error_handler_middleware: Sequence[Middleware] = \
+            ErrorHandlerManager().get_middleware_from_handlers(
+                error_handlers
+            )
+        if len(error_handler_middleware) == 0:
+            raise MalfunctionError(
+                "error handler middleware list shouldn't be empty due to"
+                " the builtin handlers internal adding"
+            )
+
         http_builtin_middleware: Sequence[BuiltinHttpMiddleware] = [
             m() for m in BUILTIN_HTTP_MIDDLEWARE
         ]
@@ -500,12 +406,14 @@ class Boot(Worker):
         try:
             self.__router.add_middleware(
                 # Add builtin middlewares first, and others second
-                http_builtin_middleware
+                error_handler_middleware
+                + http_builtin_middleware
                 + websocket_builtin_middleware
                 + self.__di.all_middleware
             )
-        except MissingDIObjectError:
+        except MissingDiObjectError:
             self.__router.add_middleware(
-                http_builtin_middleware
+                error_handler_middleware
+                + http_builtin_middleware
                 + websocket_builtin_middleware  # type: ignore
             )

@@ -1,20 +1,27 @@
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, Union
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware as FastAPI_CORSMiddleware
+from orwynn import web
+from orwynn.error.catching.ErrorHandlerBuiltinHttpMiddleware import ErrorHandlerBuiltinHttpMiddleware
 from starlette.middleware.base import (
     BaseHTTPMiddleware as StarletteBaseHTTPMiddleware,
+)
+from starlette.middleware.exceptions import (
+    ExceptionMiddleware as StarletteExceptionMiddleware
 )
 from starlette.types import Receive, Scope, Send
 
 from orwynn import validation
+from orwynn.error.catching.DefaultExceptionHandler import DefaultExceptionHandler
 from orwynn.service.FrameworkService import FrameworkService
 from orwynn.testing.Client import Client
 from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
-from orwynn.web import CORS, HTTPMethod
+from orwynn.validation.RequestValidationException import RequestValidationException
+from orwynn.web import CORS, HTTPMethod, Response
 
 if TYPE_CHECKING:
-    from orwynn.error.ErrorHandler import ErrorHandler
+    pass
 
 
 class App(FrameworkService):
@@ -74,18 +81,12 @@ class App(FrameworkService):
             dispatch=fn
         )
 
-    def add_error_handler(self, error_handler: "ErrorHandler") -> None:
-        if error_handler.E is None:
-            raise TypeError(f"{error_handler} should define class attribute E")
-
-        if isinstance(error_handler.E, list):
-            for E in error_handler.E:
-                self.__app.add_exception_handler(
-                    E,
-                    error_handler.handle
-                )
-        else:
-            self.__app.add_exception_handler(
-                error_handler.E,
-                error_handler.handle
-            )
+    def add_http_exception_middleware_fn(
+        self,
+        HandledException: type[Exception]
+        fn: Callable[[web.Request, Exception], web.Response]
+    ) -> None:
+        self.__app.add_middleware(
+            StarletteExceptionMiddleware,
+            handlers={HandledException: DefaultExceptionHandler().handle}
+        )

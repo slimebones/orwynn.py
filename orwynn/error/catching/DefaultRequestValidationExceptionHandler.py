@@ -1,4 +1,4 @@
-from orwynn.error.ErrorHandler import ErrorHandler
+from orwynn.error.catching.ErrorHandler import ErrorHandler
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.validation import RequestValidationException
 from orwynn.web import JSONResponse, Request, Response
