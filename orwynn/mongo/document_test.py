@@ -15,7 +15,16 @@ class Item(Document):
 
 @fixture
 def run_mongo_boot():
-    Boot(Module(route="/", imports=[mongo.module]))
+    Boot(
+        Module(route="/", imports=[mongo.module]),
+        apprc={
+            "prod": {
+                "Mongo": {
+                    "database_name": "orwynn-test"
+                }
+            }
+        }
+    )
 
 
 @fixture
