@@ -1,7 +1,7 @@
 import pytest
 
 from orwynn import mp, validation
-from orwynn.apprc.AppRC import AppRC
+from orwynn.apprc.AppRc import AppRc
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
 from orwynn.config.Config import Config
@@ -21,7 +21,7 @@ class BurgerShotConfig(Config):
 
 
 @pytest.fixture
-def raw_apprc() -> AppRC:
+def raw_apprc() -> AppRc:
     return {
         "prod": {
             "BurgerShot": {
@@ -55,7 +55,7 @@ def raw_apprc() -> AppRC:
     }
 
 
-def test_prod(raw_apprc: AppRC):
+def test_prod(raw_apprc: AppRc):
     Boot(
         root_module=Module("/", Providers=[BurgerShotConfig]),
         apprc=raw_apprc,
@@ -68,7 +68,7 @@ def test_prod(raw_apprc: AppRC):
     ).dict() == mp.find("prod.BurgerShot", raw_apprc)
 
 
-def test_dev(raw_apprc: AppRC):
+def test_dev(raw_apprc: AppRc):
     Boot(
         root_module=Module("/", Providers=[BurgerShotConfig]),
         apprc=raw_apprc,
@@ -90,7 +90,7 @@ def test_dev(raw_apprc: AppRC):
     }
 
 
-def test_test(raw_apprc: AppRC):
+def test_test(raw_apprc: AppRc):
     Boot(
         root_module=Module("/", Providers=[BurgerShotConfig]),
         apprc=raw_apprc,

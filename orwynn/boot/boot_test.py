@@ -4,7 +4,7 @@ import pytest
 from pytest import fixture
 
 from orwynn import validation
-from orwynn.apprc.AppRC import AppRC
+from orwynn.apprc.AppRc import AppRc
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
 from orwynn.controller.endpoint.Endpoint import Endpoint
@@ -59,7 +59,7 @@ def set_test_mode():
 
 @fixture
 def set_std_apprc_path_env() -> None:
-    os.environ["Orwynn_AppRCPath"] = os.path.join(
+    os.environ["Orwynn_AppRcPath"] = os.path.join(
         os.getcwd(),
         "tests/std/apprc.yml"
     )
@@ -118,7 +118,7 @@ def test_nested_configs_prod(
     Boot(
         root_module=std_struct
     )
-    app_rc: AppRC = BootProxy.ie().apprc
+    app_rc: AppRc = BootProxy.ie().apprc
     text_config: TextConfig = Di.ie().find("TextConfig")
 
     assert app_rc["Text"]["words_amount"] == text_config.words_amount == 1
@@ -132,7 +132,7 @@ def test_nested_configs_dev(
     Boot(
         root_module=std_struct
     )
-    app_rc: AppRC = BootProxy.ie().apprc
+    app_rc: AppRc = BootProxy.ie().apprc
     text_config: TextConfig = Di.ie().find("TextConfig")
 
     assert app_rc["Text"]["words_amount"] == text_config.words_amount == 2
@@ -146,7 +146,7 @@ def test_nested_configs_test(
     Boot(
         root_module=std_struct
     )
-    app_rc: AppRC = BootProxy.ie().apprc
+    app_rc: AppRc = BootProxy.ie().apprc
     text_config: TextConfig = Di.ie().find("TextConfig")
 
     assert app_rc["Text"]["words_amount"] == text_config.words_amount == 3

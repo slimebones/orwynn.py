@@ -9,7 +9,7 @@ import dotenv
 
 from orwynn import validation, web
 from orwynn.app.App import App
-from orwynn.apprc.AppRC import AppRC
+from orwynn.apprc.AppRc import AppRc
 from orwynn.apprc.parse_apprc import parse_apprc
 from orwynn.boot.api_version.ApiVersion import ApiVersion
 from orwynn.boot.BootMode import BootMode
@@ -72,7 +72,7 @@ class Boot(Worker):
             List of exception handlers to add. By default framework adds
             the builtin Exception and orwynn.Error handlers.
         apprc (optional):
-            Application configuration. By default environ Orwynn_AppRCPath is
+            Application configuration. By default environ Orwynn_AppRcPath is
             checked if this arg is not given.
         mode (optional):
             Application mode. By default environ Orwynn_Mode is
@@ -95,7 +95,7 @@ class Boot(Worker):
             pass arg "mode".
         Orwynn_RootDir:
             Root directory for application. Defaults to os.getcwd()
-        Orwynn_AppRCPath:
+        Orwynn_AppRcPath:
             Path where app configuration file located. Defaults to
             "./apprc.yml". Alternatively you can pass a dictionary directly in
             "apprc" attribute.
@@ -121,7 +121,7 @@ class Boot(Worker):
         api_indication: Indication | None = None,
         cors: Cors | None = None,
         ExceptionHandlers: set[type[ExceptionHandler]] | None = None,
-        apprc: AppRC | None = None,
+        apprc: AppRc | None = None,
         mode: BootMode | None = None,
         global_route: str | None = None,
         global_modules: list[Module] | None = None,
@@ -141,7 +141,7 @@ class Boot(Worker):
         validate_each(
             ExceptionHandlers, ExceptionHandler, expected_sequence_type=set
         )
-        validate(apprc, [AppRC, NoneType])
+        validate(apprc, [AppRc, NoneType])
         validate(mode, [BootMode, NoneType])
 
         if global_route is None:
@@ -165,7 +165,7 @@ class Boot(Worker):
             self.__mode = self.__parse_mode()
         self.__root_dir: Path = self.__parse_root_dir()
         self.__api_indication: Indication = api_indication
-        self.__apprc: AppRC = parse_apprc(
+        self.__apprc: AppRc = parse_apprc(
             self.__root_dir,
             self.__mode,
             deepcopy(apprc)

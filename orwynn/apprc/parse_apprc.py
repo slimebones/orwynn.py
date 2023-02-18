@@ -5,8 +5,8 @@ from types import NoneType
 
 from orwynn import mp, validation
 from orwynn.apprc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
-from orwynn.apprc.AppRC import AppRC
-from orwynn.apprc.AppRCSearchError import AppRCSearchError
+from orwynn.apprc.AppRc import AppRc
+from orwynn.apprc.AppRcSearchError import AppRcSearchError
 from orwynn.boot.BootMode import BootMode
 from orwynn.file.yml import load_yml
 
@@ -14,8 +14,8 @@ from orwynn.file.yml import load_yml
 def parse_apprc(
     root_dir: Path,
     mode: BootMode,
-    direct_apprc: AppRC | None
-) -> AppRC:
+    direct_apprc: AppRc | None
+) -> AppRc:
     """Parses apprc dictionary.
 
     Args:
@@ -24,20 +24,20 @@ def parse_apprc(
         mode:
             Boot mode of app.
         direct_apprc:
-            AppRC raw configuration passed directly instead of path to it via
+            AppRc raw configuration passed directly instead of path to it via
             environ. This arg is not optional and should accept None directly,
             if such apprc is not present to enable environ searching way.
     """
     validation.validate(root_dir, Path)
     validation.validate(mode, BootMode)
-    validation.validate(direct_apprc, [AppRC, NoneType])
+    validation.validate(direct_apprc, [AppRc, NoneType])
 
     # All required for this enabled mode data goes here
-    final_apprc: AppRC = {}
+    final_apprc: AppRc = {}
 
     if not direct_apprc:
         rc_path_env: str = os.getenv(
-            "Orwynn_AppRCPath",
+            "Orwynn_AppRcPath",
             ""
         )
         should_raise_search_error: bool
@@ -55,7 +55,7 @@ def parse_apprc(
 
         if Path(rc_path).exists():
             # Here goes all data contained in yaml config
-            apprc: AppRC = load_yml(rc_path)
+            apprc: AppRc = load_yml(rc_path)
             __parse_into(final_apprc, apprc, should_raise_search_error, mode)
         elif (
             rc_path_env.startswith("http://")
@@ -64,7 +64,7 @@ def parse_apprc(
             raise NotImplementedError("URL sources are not yet implemented")
 
         elif should_raise_search_error:
-            raise AppRCSearchError(
+            raise AppRcSearchError(
                 f"unsupported apprc path {rc_path}"
             )
     else:
