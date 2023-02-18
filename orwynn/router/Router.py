@@ -20,7 +20,10 @@ from orwynn.controller.endpoint.EndpointNotFoundError import (
     EndpointNotFoundError,
 )
 from orwynn.controller.websocket.WebsocketController import WebsocketController
+from orwynn.error.catching.DefaultExceptionHandler import DefaultExceptionHandler
+from orwynn.error.catching.DefaultHttpExceptionHandler import DefaultHttpExceptionHandler
 from orwynn.error.catching.ExceptionHandlerBuiltinHttpMiddleware import ExceptionHandlerBuiltinHttpMiddleware
+from orwynn.error.get_exception_direct_subclasses import get_exception_direct_subclasses
 from orwynn.indication.Indication import Indication
 from orwynn.middleware.HttpMiddleware import HttpMiddleware
 from orwynn.middleware.Middleware import Middleware
@@ -39,8 +42,9 @@ from orwynn.router.WebsocketStack import WebsocketStack
 from orwynn.router.WrongHandlerReturnTypeError import (
     WrongHandlerReturnTypeError,
 )
-from orwynn.web import HttpException, HTTPMethod, JsonResponse
-from orwynn.web.UnsupportedHTTPMethodError import UnsupportedHTTPMethodError
+from orwynn.validation.RequestValidationException import RequestValidationException
+from orwynn.web import HttpException, HttpMethod, JsonResponse
+from orwynn.web.UnsupportedHttpMethodError import UnsupportedHttpMethodError
 from orwynn.worker.Worker import Worker
 
 
@@ -54,7 +58,7 @@ class Router(Worker):
     ) -> None:
         super().__init__()
         self.__app: App = app
-        self.__methods_by_route: dict[str, set[HTTPMethod]] = {}
+        self.__methods_by_route: dict[str, set[HttpMethod]] = {}
         self.__websocket_stack: WebsocketStack = WebsocketStack(
             self.__app.websocket_handler
         )
@@ -103,7 +107,7 @@ class Router(Worker):
 
 
     def register_route(
-        self, *, route: str, fn: Callable, method: HTTPMethod
+        self, *, route: str, fn: Callable, method: HttpMethod
     ) -> None:
         """Registers a fn for a route.
 
@@ -117,7 +121,7 @@ class Router(Worker):
         """
         validation.validate(route, str)
         validation.validate(fn, Callable)
-        validation.validate(method, HTTPMethod)
+        validation.validate(method, HttpMethod)
 
         app_fn: Callable | None = \
             self.__app.HTTP_METHODS_TO_REGISTERING_FUNCTIONS.get(
@@ -125,7 +129,7 @@ class Router(Worker):
             )
 
         if not app_fn:
-            raise UnsupportedHTTPMethodError(
+            raise UnsupportedHttpMethodError(
                 f"HTTP method {method} is not supported"
             )
 
@@ -213,6 +217,8 @@ class Router(Worker):
             raise TypeError(
                 f"cannot accept abstract class implementation {middleware}"
             )
+        elif isinstance(middleware, ExceptionHandlerBuiltinHttpMiddleware):
+            self.__add_exception_http_middleware(middleware)
         elif isinstance(middleware, HttpMiddleware):
             self.__add_http_middleware_fn(
                 middleware.dispatch
@@ -321,3 +327,41 @@ class Router(Worker):
             StarletteBaseHTTPMiddleware,
             dispatch=fn
         )
+
+    def __add_exception_http_middleware(
+        self,
+        middleware: ExceptionHandlerBuiltinHttpMiddleware
+    ) -> None:
+        __RemainingExceptionDirectSubclasses: set[type[Exception]] = \
+            set(get_exception_direct_subclasses())
+
+        for handler in middleware.handlers:
+            __RemainingExceptionDirectSubclasses.discard(
+                handler.HandledException
+            )
+
+            if handler.HandledException is Exception:
+                # Do not add the base exception explicitly since Starlette
+                # cannot handle it, add all it's direct subclasses instead
+                continue
+            else:
+                self.__app._fw_add_exception_handler_fn(
+                    handler.HandledException,
+                    handler.handle
+                )
+
+        for Remaining in __RemainingExceptionDirectSubclasses:
+            handle_fn: Callable
+            if Remaining is HttpException:
+                handle_fn = DefaultHttpExceptionHandler().handle
+            else:
+                # Since ramining exception direct subclasses does not contain
+                # Orwynn.Error (see get_exception_direct_subclasses()
+                # docstring) we can assign to all rest exceptions a default
+                # Exception handler
+                handle_fn = DefaultExceptionHandler().handle
+
+            self.__app._fw_add_exception_handler_fn(
+                Remaining,
+                handle_fn
+            )

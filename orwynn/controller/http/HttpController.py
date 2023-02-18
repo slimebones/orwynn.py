@@ -9,7 +9,7 @@ from orwynn.controller.MissingControllerClassAttributeError import \
     MissingControllerClassAttributeError
 from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn import validation
-from orwynn.web import HTTPMethod, UnsupportedHTTPMethodError
+from orwynn.web import HttpMethod, UnsupportedHttpMethodError
 
 
 class HttpController(Controller):
@@ -39,7 +39,7 @@ class HttpController(Controller):
     VERSION: ClassVar[Optional[int | set[int] | Literal["*"]]] = None
 
     def __init__(self) -> None:
-        self._methods: list[HTTPMethod] = []
+        self._methods: list[HttpMethod] = []
 
         if self.ROUTE is None:
             raise MissingControllerClassAttributeError(
@@ -67,8 +67,8 @@ class HttpController(Controller):
             for endpoint in self.ENDPOINTS:
                 str_method = endpoint.method.lower()
 
-                if str_method not in [e.value for e in HTTPMethod]:
-                    raise UnsupportedHTTPMethodError(
+                if str_method not in [e.value for e in HttpMethod]:
+                    raise UnsupportedHttpMethodError(
                         f"method {str_method} is not supported"
                     )
                 if str_method in collected_str_methods:
@@ -78,7 +78,7 @@ class HttpController(Controller):
                     )
 
                 collected_str_methods.append(str_method)
-                http_method: HTTPMethod = HTTPMethod(str_method)
+                http_method: HttpMethod = HttpMethod(str_method)
                 self._methods.append(http_method)
 
                 EndpointProxy.ie().add(
@@ -97,24 +97,24 @@ class HttpController(Controller):
         return self._route
 
     @property
-    def methods(self) -> list[HTTPMethod]:
+    def methods(self) -> list[HttpMethod]:
         return self._methods
 
-    def get_fn_by_http_method(self, method: HTTPMethod) -> Callable:
+    def get_fn_by_http_method(self, method: HttpMethod) -> Callable:
         fn: Callable
 
         match method:
-            case HTTPMethod.GET:
+            case HttpMethod.GET:
                 fn = self.get
-            case HTTPMethod.POST:
+            case HttpMethod.POST:
                 fn = self.post
-            case HTTPMethod.PUT:
+            case HttpMethod.PUT:
                 fn = self.put
-            case HTTPMethod.DELETE:
+            case HttpMethod.DELETE:
                 fn = self.delete
-            case HTTPMethod.PATCH:
+            case HttpMethod.PATCH:
                 fn = self.patch
-            case HTTPMethod.OPTIONS:
+            case HttpMethod.OPTIONS:
                 fn = self.options
             case _:
                 raise

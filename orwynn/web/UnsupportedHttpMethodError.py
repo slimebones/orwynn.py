@@ -1,5 +1,5 @@
 from orwynn.error.Error import Error
 
 
-class UnsupportedHTTPMethodError(Error):
+class UnsupportedHttpMethodError(Error):
     pass

@@ -19,13 +19,13 @@ from orwynn.testing.Client import Client
 from orwynn.validation import RequestValidationException, expect, validate_re
 from orwynn.validation.re_validation_error import ReValidationError
 from orwynn.validation.validation_error import ValidationError
-from orwynn.web import HttpException, HTTPMethod
-from orwynn.web.UnsupportedHTTPMethodError import UnsupportedHTTPMethodError
+from orwynn.web import HttpException, HttpMethod
+from orwynn.web.UnsupportedHttpMethodError import UnsupportedHttpMethodError
 from tests.std.text import DEFAULT_ID, Text
 
 
 def test_http_methods():
-    for method in HTTPMethod:
+    for method in HttpMethod:
         assert hasattr(HttpController, method.value)
 
 
@@ -69,7 +69,7 @@ def test_unsupported_method():
         ENDPOINTS = [Endpoint(method="donuts")]
 
     m1 = Module(route="/", Controllers=[C1])
-    expect(Boot, UnsupportedHTTPMethodError, m1)
+    expect(Boot, UnsupportedHttpMethodError, m1)
 
 
 def test_defined_twice_method():

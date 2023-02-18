@@ -179,7 +179,7 @@ def test_custom_in_middleware():
     r: TestResponse = boot.app.client.get("/", 401)
 
     recovered: Error = validation.apply(
-        BootProxy.ie().api_indication.recover(Exception, r.json()),
+        BootProxy.ie().api_indication.recover(Error, r.json()),
         Error
     )
 
@@ -197,5 +197,5 @@ def test_exception_handled_twice():
         Boot,
         ExceptionAlreadyHandledError,
         Module("/", Controllers=[RaiseErrorController]),
-        ErrorHandlers={GeneralEh, Eh1}
+        ExceptionHandlers={GeneralEh, Eh1}
     )

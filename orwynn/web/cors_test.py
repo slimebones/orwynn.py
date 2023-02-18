@@ -23,6 +23,7 @@ def test_basic():
     http: Client = boot.app.client
 
     r = http.options("/", headers={"origin": "hello"})
+    print(r.headers)
 
     assert r.headers.get("access-control-allow-origin") == "*"
 

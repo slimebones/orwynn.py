@@ -12,7 +12,7 @@ from orwynn.testing.Client import Client
 from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
 from orwynn.validation.RequestValidationException import \
     RequestValidationException
-from orwynn.web import CORS, HttpException, HTTPMethod
+from orwynn.web import CORS, HttpException, HttpMethod
 
 
 class App(FrameworkService):
@@ -20,15 +20,17 @@ class App(FrameworkService):
         self.__core_app: CoreApp = CoreApp(docs_url="/doc")
 
         self._fw_add_middleware = self.__core_app.add_middleware
+        self._fw_add_exception_handler_fn = \
+            self.__core_app.add_exception_handler
 
         self.HTTP_METHODS_TO_REGISTERING_FUNCTIONS: \
-            dict[HTTPMethod, Callable] = {
-                HTTPMethod.GET: self.__core_app.get,
-                HTTPMethod.POST: self.__core_app.post,
-                HTTPMethod.PUT: self.__core_app.put,
-                HTTPMethod.DELETE: self.__core_app.delete,
-                HTTPMethod.PATCH: self.__core_app.patch,
-                HTTPMethod.OPTIONS: self.__core_app.options
+            dict[HttpMethod, Callable] = {
+                HttpMethod.GET: self.__core_app.get,
+                HttpMethod.POST: self.__core_app.post,
+                HttpMethod.PUT: self.__core_app.put,
+                HttpMethod.DELETE: self.__core_app.delete,
+                HttpMethod.PATCH: self.__core_app.patch,
+                HttpMethod.OPTIONS: self.__core_app.options
             }
 
         self.__is_cors_configured: bool = False
@@ -36,8 +38,8 @@ class App(FrameworkService):
 
         # Remove FastAPI default exception handlers to not cross with ours -
         # since we write handlers directly via middleware
-        del self.__core_app.exception_handlers[HttpException]
-        del self.__core_app.exception_handlers[RequestValidationException]
+        # del self.__core_app.exception_handlers[HttpException]
+        # del self.__core_app.exception_handlers[RequestValidationException]
 
     async def __call__(
         self, scope: Scope, receive: Receive, send: Send

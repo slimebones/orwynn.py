@@ -45,7 +45,7 @@ from orwynn.validation import (
     validate,
     validate_each,
 )
-from orwynn.web import CORS, HTTPMethod
+from orwynn.web import CORS, HttpMethod
 from orwynn.web.Protocol import Protocol
 from orwynn.worker.Worker import Worker
 
@@ -278,7 +278,7 @@ class Boot(Worker):
     ) -> None:
         # At least one method found
         is_method_found: bool = False
-        for http_method in HTTPMethod:
+        for http_method in HttpMethod:
             # Don't register unused methods
             if http_method in controller.methods:
                 is_method_found = True

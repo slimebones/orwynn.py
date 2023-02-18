@@ -22,6 +22,10 @@ class ExceptionHandlerBuiltinHttpMiddleware(BuiltinHttpMiddleware):
         )
         self.__handlers: set[ExceptionHandler] = handlers
 
+    @property
+    def handlers(self) -> set[ExceptionHandler]:
+        return self.__handlers.copy()
+
     async def process(
         self,
         request: web.Request,

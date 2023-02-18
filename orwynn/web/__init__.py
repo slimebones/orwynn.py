@@ -14,10 +14,10 @@ from orwynn.web.CORS import CORS
 from orwynn.web.Protocol import Protocol
 from orwynn.web.websocket.Websocket import Websocket
 
-from .UnsupportedHTTPMethodError import UnsupportedHTTPMethodError
+from .UnsupportedHttpMethodError import UnsupportedHttpMethodError
 
 
-class HTTPMethod(Enum):
+class HttpMethod(Enum):
     GET = "get"
     POST = "post"
     PUT = "put"
