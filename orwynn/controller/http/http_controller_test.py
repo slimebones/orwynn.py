@@ -1,4 +1,5 @@
 from orwynn import validation
+from orwynn import web
 from orwynn.app.AlreadyRegisteredMethodError import (
     AlreadyRegisteredMethodError,
 )
@@ -116,9 +117,11 @@ def test_default_404():
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 
-    data: dict = Boot(
+    boot: Boot = Boot(
         Module(route="/", Controllers=[C1])
-    ).app.client.get_jsonify(
+    )
+
+    data: dict = boot.app.client.get_jsonify(
         "/pizza",
         404
     )

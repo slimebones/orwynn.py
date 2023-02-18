@@ -35,6 +35,7 @@ from orwynn.middleware.BuiltinWebsocketMiddleware import (
     BuiltinWebsocketMiddleware,
 )
 from orwynn.middleware.Middleware import Middleware
+from orwynn.middleware.MiddlewareRegister import MiddlewareRegister
 from orwynn.module.Module import Module
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
 from orwynn.proxy.BootProxy import BootProxy
@@ -201,10 +202,6 @@ class Boot(Worker):
         self.__router: Router = Router(
             self.app
         )
-
-        # Exception handlers should be added before middleware since we want
-        # to be exception processor layer to be the outermost one.
-        self.__add_exception_handlers()
 
         # Add middleware, it should be done before the controller's
         # adding due to the special websocket middleware registering
@@ -383,38 +380,21 @@ class Boot(Worker):
         return root_dir
 
     def __add_middleware(self) -> None:
-        http_builtin_middleware: Sequence[BuiltinHttpMiddleware] = [
-            m() for m in BUILTIN_HTTP_MIDDLEWARE
-        ]
-        websocket_builtin_middleware: Sequence[
-            BuiltinWebsocketMiddleware
-        ] = [
-            m() for m in BUILTIN_WEBSOCKET_MIDDLEWARE
-        ]
-
+        user_exception_handlers: set[ExceptionHandler]
         try:
-            self.__router.add_middleware(
-                # Add builtin middlewares first, and others second
-                http_builtin_middleware
-                + websocket_builtin_middleware
-                + self.__di.all_middleware
-            )
+            user_exception_handlers = set(self.__di.exception_handlers)
         except MissingDiObjectError:
-            self.__router.add_middleware(
-                http_builtin_middleware
-                + websocket_builtin_middleware  # type: ignore
-            )
+            user_exception_handlers = set()
 
-    def __add_exception_handlers(
-        self
-    ) -> None:
-        exception_handlers: set[ExceptionHandler]
+        user_middleware: list[Middleware]
         try:
-            exception_handlers = set(self.__di.exception_handlers)
+            user_middleware = self.__di.all_middleware
         except MissingDiObjectError:
-            exception_handlers = set()
+            user_middleware = []
 
-        ExceptionHandlerManager({
-            Protocol.HTTP: self.__router.add_http_exception_handlers,
-            Protocol.WEBSOCKET: self.__router.add_websocket_exception_handlers
-        }).register_handlers(exception_handlers)
+        MiddlewareRegister(
+            middleware_register=self.__router.add_middleware
+        ).register(
+            user_middleware=user_middleware,
+            user_exception_handlers=user_exception_handlers
+        )

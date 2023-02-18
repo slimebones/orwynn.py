@@ -24,7 +24,7 @@ class Middleware:
         validation.validate_each(
             covered_routes, str, expected_sequence_type=list
         )
-        self.__covered_routes: list[str] = covered_routes
+        self._covered_routes: list[str] = covered_routes
         self.__is_all_routes_allowed: bool = "*" in covered_routes
 
         if self.__is_all_routes_allowed and len(covered_routes) != 1:
@@ -37,7 +37,7 @@ class Middleware:
         if self.__is_all_routes_allowed:
             return True
 
-        for allowed_route in self.__covered_routes:
+        for allowed_route in self._covered_routes:
             # FIXME: Here in routes other regex-incompatible symbols may
             #   appear, but i don't know which ones at this point. Maybe we
             #   should add more advanced adjustments (replacements) or error

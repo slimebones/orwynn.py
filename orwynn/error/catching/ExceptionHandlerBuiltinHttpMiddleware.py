@@ -16,7 +16,6 @@ class ExceptionHandlerBuiltinHttpMiddleware(BuiltinHttpMiddleware):
         self,
         handlers: set[ExceptionHandler]
     ) -> None:
-        print(handlers)
         super().__init__()
         validation.validate_each(
             handlers, ExceptionHandler, expected_sequence_type=set
@@ -27,18 +26,17 @@ class ExceptionHandlerBuiltinHttpMiddleware(BuiltinHttpMiddleware):
         self,
         request: web.Request,
         call_next: HttpNextCall
-    ) -> None:
+    ) -> web.Response:
         try:
-            await call_next(request)
+            return await call_next(request)
         except Exception as err:
             # Choose according handler
             for handler in self.__handlers:
                 if isinstance(err, handler.HandledException):
-                    validation.apply(
+                    return validation.apply(
                         handler.handle(request, err),
-                        NoneType
+                        web.Response
                     )
-                else:
-                    raise MalfunctionError(
-                        f"no handler to handle an error {err}"
-                    )
+            raise MalfunctionError(
+                f"no handler to handle an error {err}"
+            )

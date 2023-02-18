@@ -10,8 +10,6 @@ from orwynn.error.catching.ExceptionAlreadyHandledError import \
     ExceptionAlreadyHandledError
 from orwynn.error.Error import Error
 from orwynn.error.MalfunctionError import MalfunctionError
-from orwynn.error.catching.HandlerByExceptionClass import HandlerByExceptionClass
-from orwynn.middleware.Middleware import Middleware
 from orwynn.web.Protocol import Protocol
 
 
@@ -23,33 +21,25 @@ class ExceptionHandlerManager:
         register_by_protocol:
             Dictionary of register functions for each protocol.
     """
-    def __init__(
-        self,
-        register_by_protocol: dict[
-            Protocol, Callable[[HandlerByExceptionClass], None]
-        ]
-    ) -> None:
-        self.__register_by_protocol: dict[
-            Protocol, Callable[[HandlerByExceptionClass], None]
-        ] = register_by_protocol
-
-    def register_handlers(
+    def get_populated_handlers_by_protocol(
         self,
         exception_handlers: set[ExceptionHandler]
-    ) -> None:
+    ) -> dict[Protocol, set[ExceptionHandler]]:
         """
-        Registers given error handlers.
+        Forms a set of handlers populated with default ones if required.
 
         Args:
             exception_handlers:
                 Set of error handlers to register.
 
         Returns:
-            List of error catch middleware.
+            Populated set of exception handlers by their protocol.
         """
+        handlers_by_protocol: dict[Protocol, set[ExceptionHandler]] = {}
+
         # Populate and register handlers separately for each protocol
         for protocol in Protocol:
-            populated_handlers: HandlerByExceptionClass = \
+            populated_handlers: set[ExceptionHandler] = \
                 self.__populate_handlers(
                     self.__get_handlers_for_protocol(
                         protocol,
@@ -57,12 +47,13 @@ class ExceptionHandlerManager:
                     )
                 )
 
-            try:
-                self.__register_by_protocol[protocol](populated_handlers)
-            except KeyError:
+            if protocol in handlers_by_protocol:
                 raise ValueError(
-                    f"no register function for a protocol {protocol}"
+                    f"protocol {protocol} handled twice"
                 )
+            handlers_by_protocol[protocol] = populated_handlers
+
+        return handlers_by_protocol
 
     def __get_handlers_for_protocol(
         self,
@@ -83,15 +74,15 @@ class ExceptionHandlerManager:
     def __populate_handlers(
         self,
         error_handlers: set[ExceptionHandler]
-    ) -> HandlerByExceptionClass:
+    ) -> set[ExceptionHandler]:
         """
         Traverses handlers to find handled Python-builtin exceptions and the
         Orwynn's default Error.
 
         Returns:
-            Dictionary of all error handlers by their exception classes.
+            Set of populated handlers.
         """
-        populated_handlers: HandlerByExceptionClass = {}
+        populated_handlers: set[ExceptionHandler] = set()
         __HandledExceptions: set[type[Exception]] = set()
 
         for eh in error_handlers:
@@ -116,20 +107,13 @@ class ExceptionHandlerManager:
                         f"unrecognized error {eh.E}"
                     )
 
-            populated_handlers.setdefault(
-                eh.E,
-                eh
-            )
-
-        # FIXME: Here below the default exception handlers are created without
-        #   the Di notifying which may raise a confusion in the next calls.
+            populated_handlers.add(eh)
 
         # Add default handlers for errors for which the custom's handlers were
         # not added
         for GenericDefaultErrorHandler in DEFAULT_EXCEPTION_HANDLERS:
             if GenericDefaultErrorHandler.E not in __HandledExceptions:
-                populated_handlers.setdefault(
-                    GenericDefaultErrorHandler.get_handled_exception_class(),
+                populated_handlers.add(
                     GenericDefaultErrorHandler()
                 )
 

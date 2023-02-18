@@ -13,14 +13,14 @@ from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.service.Service import Service
 from orwynn.testing.Client import Client
-from orwynn.web import JSONResponse, Request, TestResponse
+from orwynn.web import JsonResponse, Request, TestResponse
 
 
 class GeneralEh(ExceptionHandler):
     E = Error
 
     def handle(self, request: Request, error: Error):
-        return JSONResponse(error.api, 401)
+        return JsonResponse(error.api, 401)
 
 
 class RaiseErrorController(HttpController):
@@ -106,7 +106,7 @@ def test_as_acceptor():
         def handle(self, request: Request, error: Error) -> web.Response:
             data: dict = error.api
             data["__test_meta_info"] = self.__cool_service.do_something()
-            return JSONResponse(data, 400)
+            return JsonResponse(data, 400)
 
     boot: Boot = Boot(
         Module(route="/", Providers=[CoolService], Controllers=[C1]),

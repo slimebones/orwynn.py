@@ -18,7 +18,6 @@ class ExceptionHandlerBuiltinWebsocketMiddleware(BuiltinWebsocketMiddleware):
         handlers: set[ExceptionHandler]
     ) -> None:
         super().__init__()
-
         validation.validate_each(
             handlers, ExceptionHandler, expected_sequence_type=set
         )
@@ -35,15 +34,14 @@ class ExceptionHandlerBuiltinWebsocketMiddleware(BuiltinWebsocketMiddleware):
             # Choose according handler
             for handler in self.__handlers:
                 if isinstance(err, handler.HandledException):
-                    validation.apply(
+                    return validation.apply(
                         handler.handle(request, err),
                         NoneType
                     )
-                else:
-                    # Not recommended to raise an error since it won't be
-                    # logged properly at this layer, better to explicitly log
-                    Log.error(
-                        "malfunction at ExceptionHandler middleware"
-                        " for websocket connection: no handler to handle an"
-                        f" error {err}"
-                    )
+            # Not recommended to raise an error since it won't be
+            # logged properly at this layer, better to explicitly log
+            Log.error(
+                "malfunction at ExceptionHandler middleware"
+                " for websocket connection: no handler to handle an"
+                f" error {err}"
+            )

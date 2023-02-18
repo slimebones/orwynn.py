@@ -27,8 +27,8 @@ class HTTPMethod(Enum):
 
 
 Response = FastAPIResponse
-JSONResponse = FastAPI_JSONResponse
-HTMLResponse = FastAPI_HTMLResponse
+JsonResponse = FastAPI_JSONResponse
+HtmlResponse = FastAPI_HTMLResponse
 Request = FastAPIRequest
 TestResponse = httpx.Response
 HttpException = StarletteHTTPException
