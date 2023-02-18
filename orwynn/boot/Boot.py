@@ -3,7 +3,7 @@ import os
 from copy import deepcopy
 from pathlib import Path
 from types import NoneType
-from typing import Literal, Sequence
+from typing import Literal, Optional, Sequence
 
 import dotenv
 
@@ -45,7 +45,7 @@ from orwynn.validation import (
     validate,
     validate_each,
 )
-from orwynn.web import CORS, HttpMethod
+from orwynn.web import Cors, HttpMethod
 from orwynn.web.Protocol import Protocol
 from orwynn.worker.Worker import Worker
 
@@ -119,7 +119,7 @@ class Boot(Worker):
         *,
         dotenv_path: Path | None = None,
         api_indication: Indication | None = None,
-        cors: CORS | None = None,
+        cors: Cors | None = None,
         ExceptionHandlers: set[type[ExceptionHandler]] | None = None,
         apprc: AppRC | None = None,
         mode: BootMode | None = None,
@@ -135,7 +135,7 @@ class Boot(Worker):
         if api_indication is None:
             api_indication = default_api_indication
         validate(api_indication, Indication)
-        validate(cors, [CORS, NoneType])
+        validate(cors, [Cors, NoneType])
         if ExceptionHandlers is None:
             ExceptionHandlers = set()
         validate_each(
@@ -205,7 +205,7 @@ class Boot(Worker):
 
         # Add middleware, it should be done before the controller's
         # adding due to the special websocket middleware registering
-        self.__add_middleware()
+        self.__add_middleware(cors)
 
         # Supress: Don't raise error to ease test writings
         with contextlib.suppress(MissingDiObjectError):
@@ -213,9 +213,6 @@ class Boot(Worker):
 
         # Register websockets after adding middleware and controllers
         self.__router.register_websocket_layers()
-
-        if cors is not None:
-            self.app.configure_cors(cors)
 
     @property
     def app(self) -> App:
@@ -379,7 +376,7 @@ class Boot(Worker):
 
         return root_dir
 
-    def __add_middleware(self) -> None:
+    def __add_middleware(self, cors: Optional[Cors]) -> None:
         user_exception_handlers: set[ExceptionHandler]
         try:
             user_exception_handlers = set(self.__di.exception_handlers)
@@ -396,5 +393,6 @@ class Boot(Worker):
             middleware_register=self.__router.add_middleware
         ).register(
             user_middleware=user_middleware,
-            user_exception_handlers=user_exception_handlers
+            user_exception_handlers=user_exception_handlers,
+            cors=cors
         )

@@ -1,4 +1,4 @@
-from typing import Callable, Sequence
+from typing import Callable, Optional, Sequence
 from orwynn.BUILTIN_MIDDLEWARE import BUILTIN_HTTP_MIDDLEWARE, BUILTIN_WEBSOCKET_MIDDLEWARE
 from orwynn.error.catching.ExceptionHandler import ExceptionHandler
 from orwynn.error.catching.ExceptionHandlerBuiltinHttpMiddleware import ExceptionHandlerBuiltinHttpMiddleware
@@ -7,6 +7,7 @@ from orwynn.error.catching.ExceptionHandlerManager import ExceptionHandlerManage
 from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
 from orwynn.middleware.BuiltinWebsocketMiddleware import BuiltinWebsocketMiddleware
 from orwynn.middleware.Middleware import Middleware
+from orwynn.web.Cors import Cors
 from orwynn.web.Protocol import Protocol
 
 
@@ -19,15 +20,16 @@ class MiddlewareRegister:
     """
     def __init__(
         self,
-        middleware_register: Callable[[Sequence[Middleware]], None]
+        middleware_register: Callable
     ) -> None:
-        self.__middleware_register: Callable[[Sequence[Middleware]], None] = \
-            middleware_register
+        self.__middleware_register: Callable = middleware_register
 
     def register(
         self,
         user_middleware: list[Middleware],
-        user_exception_handlers: set[ExceptionHandler]
+        user_exception_handlers: set[ExceptionHandler],
+        *,
+        cors: Optional[Cors]
     ) -> None:
         populated_handlers_py_protocol: dict[
             Protocol, set[ExceptionHandler]
@@ -56,7 +58,8 @@ class MiddlewareRegister:
             # order between middleware of different protocols.
             http_builtin_middleware
             + websocket_builtin_middleware
-            + user_middleware
+            + user_middleware,
+            cors=cors
         )
 
     def __collect_http_builtin_middleware(

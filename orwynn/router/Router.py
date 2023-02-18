@@ -1,12 +1,13 @@
 import typing
 from inspect import isclass
-from typing import Any, Callable, Sequence
+from typing import Any, Callable, Optional, Sequence
 
 import pydantic
 
 from starlette.middleware.base import (
     BaseHTTPMiddleware as StarletteBaseHTTPMiddleware,
 )
+from fastapi.middleware.cors import CORSMiddleware as FastAPI_CORSMiddleware
 from starlette.middleware.exceptions import (
     ExceptionMiddleware as StarletteExceptionMiddleware
 )
@@ -44,6 +45,7 @@ from orwynn.router.WrongHandlerReturnTypeError import (
 )
 from orwynn.validation.RequestValidationException import RequestValidationException
 from orwynn.web import HttpException, HttpMethod, JsonResponse
+from orwynn.web.Cors import Cors
 from orwynn.web.UnsupportedHttpMethodError import UnsupportedHttpMethodError
 from orwynn.worker.Worker import Worker
 
@@ -161,9 +163,21 @@ class Router(Worker):
             )
         )(fn)
 
-    def add_middleware(self, middleware: Sequence[Middleware]) -> None:
+    def add_middleware(
+        self,
+        middleware_arr: Sequence[Middleware],
+        *,
+        cors: Optional[Cors]
+    ) -> None:
         """
         Adds middleware to the system.
+
+        Args:
+            middleware_arr:
+                Middleware list to be added to the system.
+            cors:
+                Cors object (can be None) to configure the Cors middleware on
+                the fly.
         """
         # Note that middleware here is reversed since Starlette.add_middleware
         # inserts new functions at the top of the middleware list which makes
@@ -173,37 +187,41 @@ class Router(Worker):
         # for Websockets we have own logic.
         #
         # So, first task is to separate middleware
-        http_middleware: list[HttpMiddleware] = []
-        websocket_middleware: list[WebsocketMiddleware] = []
+        http_middleware_arr: list[HttpMiddleware] = []
+        websocket_middleware_arr: list[WebsocketMiddleware] = []
 
-        for middleware_ in middleware:
-            if isinstance(middleware_, HttpMiddleware):
-                http_middleware.append(middleware_)
-            elif isinstance(middleware_, WebsocketMiddleware):
-                websocket_middleware.append(middleware_)
-            elif type(middleware_) is Middleware:
+        for middleware in middleware_arr:
+            if isinstance(middleware, HttpMiddleware):
+                http_middleware_arr.append(middleware)
+            elif isinstance(middleware, WebsocketMiddleware):
+                websocket_middleware_arr.append(middleware)
+            elif type(middleware) is Middleware:
                 raise TypeError(
-                    f"cannot register an instance {middleware_} of an abstact"
+                    f"cannot register an instance {middleware} of an abstact"
                     " class Middleware"
                 )
             else:
                 raise TypeError(
-                    f"unrecognized middleware {middleware_}"
+                    f"unrecognized middleware {middleware}"
                 )
 
+        # Add CORS middleware first
+        if cors is not None:
+            self.__add_cors_middleware(cors)
+
         # Add HTTP from reversed list to comply Starlette
-        for http_middleware_ in reversed(http_middleware):
-            self.__add_middleware(http_middleware_)
+        for http_middleware in reversed(http_middleware_arr):
+            self.__add_middleware(http_middleware)
 
         # Add Websocket normally
-        if websocket_middleware != []:
+        if websocket_middleware_arr != []:
             if self.__is_websocket_middleware_added:
                 raise ValueError(
                     "websocket middleware have been already added"
                 )
 
-            for websocket_middleware_ in websocket_middleware:
-                self.__add_middleware(websocket_middleware_)
+            for websocket_middleware in websocket_middleware_arr:
+                self.__add_middleware(websocket_middleware)
 
             self.__is_websocket_middleware_added = True
 
@@ -365,3 +383,19 @@ class Router(Worker):
                 Remaining,
                 handle_fn
             )
+
+    def __add_cors_middleware(self, cors: Cors) -> None:
+        """
+        Configures CORS policy used for the whole app.
+        """
+        validation.validate(cors, Cors)
+
+        kwargs: dict[str, Any] = {}
+        for k, v in cors.dict().items():
+            if v:
+                kwargs[k] = v
+
+        self.__app._fw_add_middleware(
+            FastAPI_CORSMiddleware,
+            **kwargs
+        )

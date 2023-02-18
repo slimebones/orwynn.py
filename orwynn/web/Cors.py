@@ -1,7 +1,7 @@
 from orwynn.model.Model import Model
 
 
-class CORS(Model):
+class Cors(Model):
     """Represents configuration for special CORS middleware."""
     allow_origins: list[str] | None = None
     allow_origin_regex: list[str] | None = None
