@@ -46,7 +46,7 @@ def __check_log_message(message: str) -> list[dict]:
         data: dict = json.loads(str(item))
         extra: dict = data["record"]["extra"]
 
-        request_data: dict = extra["websocket"]
+        request_data: dict = extra["websocket.request"]
         assert type(request_data["id"]) is str
         assert type(request_data["url"]) is str
         assert type(request_data["headers"]) is dict

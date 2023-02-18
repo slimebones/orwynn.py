@@ -13,5 +13,5 @@ class RequestContextBuiltinMiddleware(BuiltinHttpMiddleware):
         request_id: str = RequestContextId().save()
 
         # Also contextualize logs
-        with Log.contextualize(request_id=request_id):
+        with Log.contextualize(**{"http.request_id": request_id}):
             return await call_next(request)

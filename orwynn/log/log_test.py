@@ -45,7 +45,7 @@ def test_logged_request_id(writer: Writer, log_apprc_sink_to_writer: dict):
     data: dict = json.loads(str(writer.read()))
     extra: dict = data["record"]["extra"]
 
-    assert isinstance(extra["request_id"], str)
+    assert isinstance(extra["http.request_id"], str)
 
 
 def test_logged_websocket_request_id(
@@ -71,4 +71,4 @@ def test_logged_websocket_request_id(
 
     data: dict = json.loads(raw)
     extra: dict = data["record"]["extra"]
-    assert isinstance(extra["websocket_request_id"], str)
+    assert isinstance(extra["websocket.request_id"], str)

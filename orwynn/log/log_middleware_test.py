@@ -24,15 +24,15 @@ def __check_log_message(message: str) -> list[dict]:
         data: dict = json.loads(str(item))
         extra: dict = data["record"]["extra"]
 
-        request_or_response: Literal["request", "response"]
-        if "request" in extra and "response" not in extra:
-            request_or_response = "request"
-            request_data: dict = extra["request"]
+        request_or_response: Literal["http.request", "http.response"]
+        if "http.request" in extra and "http.response" not in extra:
+            request_or_response = "http.request"
+            request_data: dict = extra["http.request"]
             assert type(request_data["id"]) is str
             assert type(request_data["url"]) is str
-        elif "response" in extra and "request" not in extra:
-            request_or_response = "response"
-            response_data: dict = extra["response"]
+        elif "http.response" in extra and "http.request" not in extra:
+            request_or_response = "http.response"
+            response_data: dict = extra["http.response"]
             assert type(response_data["request_id"]) is str
             assert type(response_data["status_code"]) is int
             assert type(response_data["media_type"]) in [str, NoneType]
@@ -81,9 +81,9 @@ def test_get(
     for item in items:
         extra: dict = item["record"]["extra"]
         if "request" in extra:
-            assert extra["request"]["json"] is None
+            assert extra["http.request"]["json"] is None
         elif "response" in extra:
-            assert extra["response"]["json"] == RETURNED_DATA
+            assert extra["http.response"]["json"] == RETURNED_DATA
 
     Log.remove()
 
@@ -115,8 +115,8 @@ def test_get__error(
     for item in items:
         extra: dict = item["record"]["extra"]
         if "request" in extra:
-            assert extra["request"]["json"] is None
+            assert extra["http.request"]["json"] is None
         elif "response" in extra:
-            assert extra["response"]["json"] == Error("hello").api
+            assert extra["http.response"]["json"] == Error("hello").api
 
     Log.remove()

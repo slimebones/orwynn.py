@@ -4,7 +4,8 @@ from pydantic import validate_arguments
 from sqlalchemy import inspect
 from orwynn import validation
 
-from orwynn.error.catching.DEFAULT_EXCEPTION_HANDLERS import DEFAULT_EXCEPTION_HANDLERS
+from orwynn.error.catching.DEFAULT_EXCEPTION_HANDLERS import DEFAULT_HTTP_EXCEPTION_HANDLERS, DEFAULT_WEBSOCKET_EXCEPTION_HANDLERS
+from orwynn.error.catching.DefaultWebsocketExceptionHandler import DefaultWebsocketExceptionHandler
 from orwynn.error.catching.ExceptionHandler import ExceptionHandler
 from orwynn.error.catching.ExceptionAlreadyHandledError import \
     ExceptionAlreadyHandledError
@@ -44,7 +45,8 @@ class ExceptionHandlerManager:
                     self.__get_handlers_for_protocol(
                         protocol,
                         exception_handlers
-                    )
+                    ),
+                    protocol
                 )
 
             if protocol in handlers_by_protocol:
@@ -73,7 +75,8 @@ class ExceptionHandlerManager:
 
     def __populate_handlers(
         self,
-        error_handlers: set[ExceptionHandler]
+        error_handlers: set[ExceptionHandler],
+        protocol: Protocol
     ) -> set[ExceptionHandler]:
         """
         Traverses handlers to find handled Python-builtin exceptions and the
@@ -111,7 +114,18 @@ class ExceptionHandlerManager:
 
         # Add default handlers for errors for which the custom's handlers were
         # not added
-        for GenericDefaultErrorHandler in DEFAULT_EXCEPTION_HANDLERS:
+        DEFAULT_HANDLERS: set[type[ExceptionHandler]]
+        match protocol:
+            case Protocol.HTTP:
+                DEFAULT_HANDLERS = DEFAULT_HTTP_EXCEPTION_HANDLERS
+            case Protocol.WEBSOCKET:
+                DEFAULT_HANDLERS = DEFAULT_WEBSOCKET_EXCEPTION_HANDLERS
+            case _:
+                raise TypeError(
+                    f"unrecognized protocol {protocol}"
+                )
+
+        for GenericDefaultErrorHandler in DEFAULT_HANDLERS:
             if GenericDefaultErrorHandler.E not in __HandledExceptions:
                 populated_handlers.add(
                     GenericDefaultErrorHandler()

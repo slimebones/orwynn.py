@@ -350,6 +350,11 @@ class Router(Worker):
         self,
         middleware: ExceptionHandlerBuiltinHttpMiddleware
     ) -> None:
+        # NOTE: It may seem strange that firstly exception handlers are wrapped
+        #   into middleware and then unwrapped here for HTTP protocol, but
+        #   in this way we comply with other protocols (such as Websocket).
+        #   Adding middleware directly as BaseHTTPMiddleware is not an option
+        #   since HTTPException (such as 404 Not Found) won't be handled.
         __RemainingExceptionDirectSubclasses: set[type[Exception]] = \
             set(get_exception_direct_subclasses())
 

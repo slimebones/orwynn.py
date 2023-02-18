@@ -17,5 +17,5 @@ class RequestContextBuiltinWebsocketMiddleware(BuiltinWebsocketMiddleware):
         request_id: str = WebsocketRequestContextId().save()
 
         # Also contextualize logs
-        with Log.contextualize(websocket_request_id=request_id):
+        with Log.contextualize(**{"websocket.request_id": request_id}):
             return await call_next(request)

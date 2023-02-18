@@ -46,7 +46,7 @@ class HttpLogger:
             json_ = None
 
         extra: dict = {
-            "request": {
+            "http.request": {
                 "id": request_id,
                 # Get full URL
                 "url": request.url._url,
@@ -103,7 +103,7 @@ class HttpLogger:
             json_ = None
 
         extra: dict = {
-            "response": {
+            "http.response": {
                 "status_code": response.status_code,
                 "request_id": request_id,
                 "media_type": response.media_type,

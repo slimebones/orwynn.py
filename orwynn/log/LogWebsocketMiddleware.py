@@ -27,3 +27,6 @@ class LogWebsocketMiddleware(WebsocketMiddleware):
         )
 
         await call_next(request)
+
+        # TODO: Maybe somehow listen for websocket messages sent over the
+        #   channel?

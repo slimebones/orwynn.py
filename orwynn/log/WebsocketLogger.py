@@ -1,5 +1,6 @@
 
 
+import json
 from orwynn import validation, web
 from orwynn.log.Log import Log
 
@@ -30,7 +31,7 @@ class WebsocketLogger:
             f"{request.url.query}"
 
         extra: dict = {
-            "websocket": {
+            "websocket.request": {
                 "id": request_id,
                 # Get full URL
                 "url": request.url._url,
@@ -43,3 +44,29 @@ class WebsocketLogger:
         )
 
         return request_id
+
+    async def log_response(
+        self,
+        response_data: dict,
+        *,
+        request: web.Websocket,
+        request_id: str
+    ) -> None:
+        """
+        Logs a response linking it to the according request.
+        """
+        plain_message: str = \
+            "websocket response" \
+            f" {request.url.path}{request.url.query}:" \
+            f" {response_data}"
+
+        extra: dict = {
+            "websocket.response": {
+                "request_id": request_id,
+                "json": response_data
+            }
+        }
+
+        Log.bind(**extra).info(
+            plain_message
+        )
