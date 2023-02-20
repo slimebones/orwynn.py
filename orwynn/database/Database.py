@@ -1,4 +1,3 @@
-from typing import Any
 
 from orwynn.service.Service import Service
 
@@ -16,17 +15,3 @@ class Database(Service):
     incapsulated by Mappings. So the end user will work only with these
     mappings only.
     """
-    def find_all(self, *args, **kwargs) -> Any:
-        raise NotImplementedError()
-
-    def find_one(self, *args, **kwargs) -> Any:
-        raise NotImplementedError()
-
-    def create_one(self, *args, **kwargs) -> Any:
-        raise NotImplementedError()
-
-    def update_one(self, *args, **kwargs) -> Any:
-        raise NotImplementedError()
-
-    def remove_one(self, *args, **kwargs) -> Any:
-        raise NotImplementedError()
