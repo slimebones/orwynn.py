@@ -5,7 +5,9 @@ from orwynn.controller.Controller import Controller
 from orwynn.controller.http.HttpController import HttpController
 from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.di.acceptor import Acceptor
+from orwynn.di.check_availability import check_availability
 from orwynn.di.DiContainer import DiContainer
+from orwynn.di.DiObject import DiObject
 from orwynn.di.Provider import Provider
 from orwynn.middleware.HttpMiddleware import HttpMiddleware
 from orwynn.middleware.Middleware import Middleware
@@ -38,21 +40,23 @@ def init_other_acceptors(
 
 def __collect_dependencies_for_acceptor(
     A: type[Acceptor],
-    container: DiContainer
+    container: DiContainer,
+    acceptor_module: Module
 ) -> dict[str, Provider]:
     result: dict[str, Provider] = {}
-
     for param in inspect.signature(A).parameters.values():
         if (
             param.name == "covered_routes"
         ):
             continue
 
-        # See collect_provider_dependencies.py::_get_parameters_for_provider
+        # See collecting::get_parameters_for_provider
         if param.name in ["args", "kwargs"]:
             continue
 
-        result[param.name] = container.find(param.annotation.__name__)
+        dependency: DiObject = container.find(param.annotation.__name__)
+        check_availability(A, type(dependency), acceptor_module)
+        result[param.name] = dependency
 
     return result
 
@@ -91,13 +95,21 @@ def __init_modules(
             container.add(
                 Mw(
                     covered_routes=final_covered_routes,
-                    **__collect_dependencies_for_acceptor(Mw, container)
+                    **__collect_dependencies_for_acceptor(
+                        Mw,
+                        container,
+                        module
+                    )
                 )
             )
 
         for Eh in BootProxy.ie().ExceptionHandlers:
             container.add(
-                Eh(**__collect_dependencies_for_acceptor(Eh, container))
+                Eh(**__collect_dependencies_for_acceptor(
+                    Eh,
+                    container,
+                    module
+                ))
             )
 
 
@@ -118,7 +130,11 @@ def __init_controllers(
             )
 
         controller: Controller = C(
-            **__collect_dependencies_for_acceptor(C, container)
+            **__collect_dependencies_for_acceptor(
+                C,
+                container,
+                module
+            )
         )
         container.add(
             controller

@@ -1,13 +1,11 @@
 from orwynn.config.Config import Config
+from orwynn.di.check_availability import check_availability
 from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.di.collecting.get_parameters_for_provider import (
     get_parameters_for_provider,
 )
 from orwynn.di.collecting.provider_already_initialized_for_map_error import (
     ProviderAlreadyInitializedForMapError,
-)
-from orwynn.di.collecting.provider_availability_error import (
-    ProviderAvailabilityError,
 )
 from orwynn.di.collecting.provider_dependencies_map import (
     ProviderDependenciesMap,
@@ -17,7 +15,6 @@ from orwynn.di.NotProviderError import NotProviderError
 from orwynn.di.Provider import Provider
 from orwynn.fmt import format_chain
 from orwynn.module.Module import Module
-from orwynn.service.FrameworkService import FrameworkService
 
 
 def collect_provider_dependencies(
@@ -79,7 +76,7 @@ def _traverse(
                     FailedClass=parameter.DependencyProvider
                 )
 
-            nested_module: Module | None = _check_availability(
+            nested_module: Module | None = check_availability(
                 P,
                 parameter.DependencyProvider,
                 target_module
@@ -99,84 +96,3 @@ def _traverse(
     # Pop blocking element. For this concept see collect_modules._traverse
     # function
     chain.pop()
-
-
-def _check_availability(
-    P1: type[Provider],
-    P2: type[Provider],
-    P1_module: Module | None
-) -> Module | None:
-    # Check if P2 is available to P1, module is required to start searching
-    # from. Returns the module where P2 is located or None if P2 is a
-    # FrameworkService. Also returns None if P1 is FrameworkService and P2 is
-    # any Config because we 100% sure that Config will be available.
-
-    # If P1_module is None, this means that we entered a Framework scope and
-    # will search there.
-
-    # Note, that this function is not checking provider priorities. So it's
-    # possible to see positive output here for lower-priority provider
-    # requesting higher-priority one, which in general logic shouldn't
-    # be possible.
-
-    # Resolve cases with frameworks services right away:
-    #   - If P2 is a FrameworkService, we can be assured that it is available
-    #       for any other requested Provider, except for cases, if requested
-    #       Provider is a Config, because Config is the only class that has
-    #       higher priority than FrameworkService.
-    is_error: bool
-    res: Module | None = None
-
-    if (
-        issubclass(P1, FrameworkService) and issubclass(P2, Config)
-        or issubclass(P2, FrameworkService) and not issubclass(P1, Config)
-    ):
-        is_error = False
-    elif P1_module is not None:
-        found_module = _search_matching_provider(
-            target_module=P1_module,
-            TargetProvider=P2
-        )
-        if found_module is None:
-            is_error = True
-        else:
-            is_error = False
-            res = found_module
-    else:
-        raise ProviderAvailabilityError(
-            f"not logical to check availability between {P1} -> {P2} in"
-            + " framework's scope"
-        )
-
-    if is_error:
-        raise ProviderAvailabilityError(Provider1=P1, Provider2=P2)
-    else:
-        return res
-
-
-def _search_matching_provider(
-    target_module: Module,
-    TargetProvider: type[Provider]
-) -> Module | None:
-    # Searches for the provider in module. Returns tuple signifies module,
-    # where provider was found, or None, it it wasn't.
-
-    res: Module | None = None
-    is_found: bool = False
-
-    for P in target_module.Providers:
-        if P is TargetProvider:
-            # Available within the same module
-            is_found = True
-            res = target_module
-
-    if not is_found:
-        # Not available in the same module, check imported ones
-        for m in target_module._imports:
-            for P in m._exports:
-                if P is TargetProvider:
-                    # Available in the exports of the imported module
-                    is_found = True
-                    res = m
-
-    return res
