@@ -98,8 +98,16 @@ class Module:
         self._Middleware: list[type[MiddlewareClass]] = \
             self._parse_middleware(Middleware)
         self._imports: list["Module"] = self._parse_imports(imports)
-        # TODO: Add check if exports present in Providers
-        self._exports: list[type[Provider]] = self._parse_providers(Providers)
+
+        # Validate and assign exports
+        if not exports:
+            exports = []
+        for export in exports:
+            if not is_provider(export):
+                raise NotProviderError(
+                    f"export object {export} is not a provider"
+                )
+        self._exports: list[type[Provider]] = exports
 
     def __repr__(self) -> str:
         return "<{} \"{}\" at {}>".format(

@@ -40,9 +40,6 @@ def test_controller_dependency_unavailability():
         def get(self) -> dict:
             return {}
 
-    class Mw1(HttpMiddleware):
-        pass
-
     key_module: Module = Module("/key", Controllers=[Ctrl1])
     unavailable_module: Module = Module(Providers=[UnavailableService])
 
@@ -75,3 +72,34 @@ def test_middleware_dependency_unavailability():
         root_module=Module("/", imports=[key_module, unavailable_module])
     )
 
+
+def test_unavailability_imported_but_not_exported():
+    """
+    Check that a provider is not available if it's not exported from an
+    imported module
+    """
+    class UnavailableService(Service):
+        pass
+
+    class Ctrl1(HttpController):
+        ROUTE = "/"
+        ENDPOINTS = [
+            Endpoint(method="get")
+        ]
+
+        def __init__(self, sv: UnavailableService) -> None:
+            super().__init__()
+
+        def get(self) -> dict:
+            return {}
+
+    unavailable_module: Module = Module(Providers=[UnavailableService])
+    key_module: Module = Module(
+        "/key", Controllers=[Ctrl1], imports=[unavailable_module]
+    )
+
+    validation.expect(
+        Boot,
+        ProviderAvailabilityError,
+        root_module=Module("/", imports=[key_module, unavailable_module])
+    )

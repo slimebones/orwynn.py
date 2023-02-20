@@ -37,5 +37,6 @@ class FloatController(HttpController):
 float_module = Module(
     route="/floats",
     Providers=[FloatService],
-    Controllers=[FloatController]
+    Controllers=[FloatController],
+    exports=[FloatService]
 )

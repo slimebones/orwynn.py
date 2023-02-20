@@ -40,5 +40,6 @@ number_module = Module(
     route="/numbers",
     Providers=[NumberService],
     Controllers=[NumberController],
-    imports=[float_module]
+    imports=[float_module],
+    exports=[NumberService]
 )
