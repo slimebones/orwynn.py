@@ -45,8 +45,8 @@ from orwynn.router.WrongHandlerReturnTypeError import (
 )
 from orwynn.validation.RequestValidationException import RequestValidationException
 from orwynn.web import HttpException, HttpMethod, JsonResponse
-from orwynn.web.Cors import Cors
-from orwynn.web.UnsupportedHttpMethodError import UnsupportedHttpMethodError
+from orwynn.web.http.Cors import Cors
+from orwynn.web.http.UnsupportedHttpMethodError import UnsupportedHttpMethodError
 from orwynn.worker.Worker import Worker
 
 

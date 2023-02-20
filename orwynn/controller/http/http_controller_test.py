@@ -20,7 +20,7 @@ from orwynn.validation import RequestValidationException, expect, validate_re
 from orwynn.validation.re_validation_error import ReValidationError
 from orwynn.validation.validation_error import ValidationError
 from orwynn.web import HttpException, HttpMethod
-from orwynn.web.UnsupportedHttpMethodError import UnsupportedHttpMethodError
+from orwynn.web.http.UnsupportedHttpMethodError import UnsupportedHttpMethodError
 from tests.std.text import DEFAULT_ID, Text
 
 

@@ -7,7 +7,7 @@ from orwynn.error.catching.ExceptionHandlerManager import ExceptionHandlerManage
 from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
 from orwynn.middleware.BuiltinWebsocketMiddleware import BuiltinWebsocketMiddleware
 from orwynn.middleware.Middleware import Middleware
-from orwynn.web.Cors import Cors
+from orwynn.web.http.Cors import Cors
 from orwynn.web.Protocol import Protocol
 
 
