@@ -17,7 +17,7 @@ from orwynn.proxy.BootProxy import BootProxy
 from orwynn.testing.Client import Client
 from orwynn.validation import RequestValidationException, expect, validate_re
 from orwynn.validation.re_validation_error import ReValidationError
-from orwynn.validation.validation_error import ValidationError
+from orwynn.validation.ValidationError import ValidationError
 from orwynn.web import HttpException, HttpMethod
 from orwynn.web.http.UnsupportedHttpMethodError import (
     UnsupportedHttpMethodError,

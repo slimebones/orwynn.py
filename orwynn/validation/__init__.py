@@ -19,7 +19,7 @@ from orwynn.validation.ExpectationError import ExpectationError
 from orwynn.validation.re_validation_error import ReValidationError
 from orwynn.validation.unknown_validator_error import \
     UnknownValidatorError
-from orwynn.validation.validation_error import ValidationError
+from orwynn.validation.ValidationError import ValidationError
 from orwynn.validation.validator import Validator
 
 # WARNING: typing aliases are not currently supported so passing types like
