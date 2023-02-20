@@ -18,7 +18,7 @@ from orwynn.controller.http.HttpController import HttpController
 from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.di.Di import Di
 from orwynn.di.MissingDiObjectError import MissingDiObjectError
-from orwynn.error.catching.ExceptionHandler import ExceptionHandler
+from orwynn.error.ExceptionHandler import ExceptionHandler
 from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.file.NotDirError import NotDirError
 from orwynn.indication.default_api_indication import default_api_indication

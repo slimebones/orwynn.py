@@ -1,8 +1,8 @@
-from orwynn.error.catching.DEFAULT_EXCEPTION_HANDLERS import (
+from orwynn.error.DEFAULT_EXCEPTION_HANDLERS import (
     DEFAULT_HTTP_EXCEPTION_HANDLERS, DEFAULT_WEBSOCKET_EXCEPTION_HANDLERS)
-from orwynn.error.catching.ExceptionAlreadyHandledError import \
+from orwynn.error.ExceptionAlreadyHandledError import \
     ExceptionAlreadyHandledError
-from orwynn.error.catching.ExceptionHandler import ExceptionHandler
+from orwynn.error.ExceptionHandler import ExceptionHandler
 from orwynn.error.Error import Error
 from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.web.Protocol import Protocol

@@ -1,20 +1,20 @@
-from orwynn.error.catching.DefaultErrorHandler import DefaultErrorHandler
-from orwynn.error.catching.DefaultExceptionHandler import (
+from orwynn.error.DefaultErrorHandler import DefaultErrorHandler
+from orwynn.error.DefaultExceptionHandler import (
     DefaultExceptionHandler,
 )
-from orwynn.error.catching.DefaultHttpExceptionHandler import (
+from orwynn.error.ExceptionHandler import ExceptionHandler
+from orwynn.error.http.DefaultHttpExceptionHandler import (
     DefaultHttpExceptionHandler,
 )
-from orwynn.error.catching.DefaultRequestValidationExceptionHandler import (
+from orwynn.error.http.DefaultRequestValidationExceptionHandler import (
     DefaultRequestValidationExceptionHandler,
 )
-from orwynn.error.catching.DefaultWebsocketErrorHandler import (
+from orwynn.error.websocket.DefaultWebsocketErrorHandler import (
     DefaultWebsocketErrorHandler,
 )
-from orwynn.error.catching.DefaultWebsocketExceptionHandler import (
+from orwynn.error.websocket.DefaultWebsocketExceptionHandler import (
     DefaultWebsocketExceptionHandler,
 )
-from orwynn.error.catching.ExceptionHandler import ExceptionHandler
 
 # List of error handlers applied by default
 DEFAULT_HTTP_EXCEPTION_HANDLERS: set[type[ExceptionHandler]] = {

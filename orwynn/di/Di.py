@@ -10,7 +10,7 @@ from orwynn.di.DiContainer import DiContainer
 from orwynn.di.DiObject import DiObject
 from orwynn.di.init.init_other_acceptors import init_other_acceptors
 from orwynn.di.init.init_providers import init_providers
-from orwynn.error.catching.ExceptionHandler import ExceptionHandler
+from orwynn.error.ExceptionHandler import ExceptionHandler
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
 from orwynn.worker.Worker import Worker

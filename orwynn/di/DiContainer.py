@@ -10,7 +10,7 @@ from orwynn.di.DiObjectAlreadyInitializedInContainerError import (
 from orwynn.di.FinalizedDiContainerError import FinalizedDiContainerError
 from orwynn.di.is_provider import is_provider
 from orwynn.di.MissingDiObjectError import MissingDiObjectError
-from orwynn.error.catching.ExceptionHandler import ExceptionHandler
+from orwynn.error.ExceptionHandler import ExceptionHandler
 from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.middleware.Middleware import Middleware
 from orwynn.model.Model import Model

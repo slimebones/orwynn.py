@@ -2,7 +2,7 @@ import inspect
 from types import NoneType
 
 from orwynn import validation, web
-from orwynn.error.catching.ExceptionHandler import ExceptionHandler
+from orwynn.error.ExceptionHandler import ExceptionHandler
 from orwynn.error.find_detailed_class_for_exception import (
     find_detailed_class_for_exception,
 )
@@ -17,7 +17,7 @@ from orwynn.web.context.WebsocketRequestContextId import (
 )
 
 
-class ExceptionHandlerBuiltinWebsocketMiddleware(BuiltinWebsocketMiddleware):
+class ExceptionHandlerWebsocketMiddleware(BuiltinWebsocketMiddleware):
     """
     Handles all errors occured at Websocket layer.
     """

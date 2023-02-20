@@ -1,8 +1,8 @@
-from orwynn.error.catching.ExceptionHandlerBuiltinHttpMiddleware import (
-    ExceptionHandlerBuiltinHttpMiddleware,
+from orwynn.error.http.ExceptionHandlerHttpMiddleware import (
+    ExceptionHandlerHttpMiddleware,
 )
-from orwynn.error.catching.ExceptionHandlerBuiltinWebsocketMiddleware import (
-    ExceptionHandlerBuiltinWebsocketMiddleware,
+from orwynn.error.websocket.ExceptionHandlerWebsocketMiddleware import (
+    ExceptionHandlerWebsocketMiddleware,
 )
 from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
 from orwynn.middleware.BuiltinWebsocketMiddleware import (
@@ -26,7 +26,7 @@ from orwynn.web.websocket.ConnectionBuiltinWebsocketMiddleware import (
 
 # Order matters, the lowest index is initialized first.
 BUILTIN_HTTP_MIDDLEWARE: list[type[BuiltinHttpMiddleware]] = [
-    ExceptionHandlerBuiltinHttpMiddleware,
+    ExceptionHandlerHttpMiddleware,
     ContextBuiltinMiddleware,
     RequestContextBuiltinMiddleware
 ]
@@ -35,7 +35,7 @@ BUILTIN_WEBSOCKET_MIDDLEWARE: list[type[BuiltinWebsocketMiddleware]] = [
     # Connection middleware should be first, since the exception handlers will
     # access websocket object
     ConnectionBuiltinWebsocketMiddleware,
-    ExceptionHandlerBuiltinWebsocketMiddleware,
+    ExceptionHandlerWebsocketMiddleware,
     ContextBuiltinWebsocketMiddleware,
     RequestContextBuiltinWebsocketMiddleware
 ]

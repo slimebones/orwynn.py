@@ -12,8 +12,8 @@ from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.endpoint.EndpointResponse import EndpointResponse
 from orwynn.controller.http.HttpController import HttpController
 from orwynn.controller.websocket.WebsocketController import WebsocketController
-from orwynn.error.catching.ExceptionHandler import ExceptionHandler
 from orwynn.error.Error import Error
+from orwynn.error.ExceptionHandler import ExceptionHandler
 from orwynn.indication.Indication import Indication
 from orwynn.indication.IndicationType import IndicationType
 from orwynn.indication.Indicator import Indicator

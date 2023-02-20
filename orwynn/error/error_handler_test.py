@@ -2,11 +2,11 @@ from orwynn import validation, web
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HttpController import HttpController
-from orwynn.error.catching.ExceptionAlreadyHandledError import (
+from orwynn.error.Error import Error
+from orwynn.error.ExceptionAlreadyHandledError import (
     ExceptionAlreadyHandledError,
 )
-from orwynn.error.catching.ExceptionHandler import ExceptionHandler
-from orwynn.error.Error import Error
+from orwynn.error.ExceptionHandler import ExceptionHandler
 from orwynn.middleware.HttpMiddleware import HttpMiddleware
 from orwynn.middleware.HttpNextCall import HttpNextCall
 from orwynn.module.Module import Module

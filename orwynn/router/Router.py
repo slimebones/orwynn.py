@@ -18,17 +18,17 @@ from orwynn.controller.endpoint.EndpointNotFoundError import (
     EndpointNotFoundError,
 )
 from orwynn.controller.websocket.WebsocketController import WebsocketController
-from orwynn.error.catching.DefaultExceptionHandler import (
+from orwynn.error.DefaultExceptionHandler import (
     DefaultExceptionHandler,
-)
-from orwynn.error.catching.DefaultHttpExceptionHandler import (
-    DefaultHttpExceptionHandler,
-)
-from orwynn.error.catching.ExceptionHandlerBuiltinHttpMiddleware import (
-    ExceptionHandlerBuiltinHttpMiddleware,
 )
 from orwynn.error.get_exception_direct_subclasses import (
     get_exception_direct_subclasses,
+)
+from orwynn.error.http.DefaultHttpExceptionHandler import (
+    DefaultHttpExceptionHandler,
+)
+from orwynn.error.http.ExceptionHandlerHttpMiddleware import (
+    ExceptionHandlerHttpMiddleware,
 )
 from orwynn.indication.Indication import Indication
 from orwynn.middleware.HttpMiddleware import HttpMiddleware
@@ -241,7 +241,7 @@ class Router(Worker):
             raise TypeError(
                 f"cannot accept abstract class implementation {middleware}"
             )
-        elif isinstance(middleware, ExceptionHandlerBuiltinHttpMiddleware):
+        elif isinstance(middleware, ExceptionHandlerHttpMiddleware):
             self.__add_exception_http_middleware(middleware)
         elif isinstance(middleware, HttpMiddleware):
             self.__add_http_middleware_fn(
@@ -354,7 +354,7 @@ class Router(Worker):
 
     def __add_exception_http_middleware(
         self,
-        middleware: ExceptionHandlerBuiltinHttpMiddleware
+        middleware: ExceptionHandlerHttpMiddleware
     ) -> None:
         # NOTE: It may seem strange that firstly exception handlers are wrapped
         #   into middleware and then unwrapped here for HTTP protocol, but

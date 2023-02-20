@@ -4,15 +4,15 @@ from orwynn.BUILTIN_MIDDLEWARE import (
     BUILTIN_HTTP_MIDDLEWARE,
     BUILTIN_WEBSOCKET_MIDDLEWARE,
 )
-from orwynn.error.catching.ExceptionHandler import ExceptionHandler
-from orwynn.error.catching.ExceptionHandlerBuiltinHttpMiddleware import (
-    ExceptionHandlerBuiltinHttpMiddleware,
-)
-from orwynn.error.catching.ExceptionHandlerBuiltinWebsocketMiddleware import (
-    ExceptionHandlerBuiltinWebsocketMiddleware,
-)
-from orwynn.error.catching.ExceptionHandlerManager import (
+from orwynn.error.ExceptionHandler import ExceptionHandler
+from orwynn.error.ExceptionHandlerManager import (
     ExceptionHandlerManager,
+)
+from orwynn.error.http.ExceptionHandlerHttpMiddleware import (
+    ExceptionHandlerHttpMiddleware,
+)
+from orwynn.error.websocket.ExceptionHandlerWebsocketMiddleware import (
+    ExceptionHandlerWebsocketMiddleware,
 )
 from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
 from orwynn.middleware.BuiltinWebsocketMiddleware import (
@@ -81,7 +81,7 @@ class MiddlewareRegister:
         middleware_arr: list[BuiltinHttpMiddleware] = []
 
         for Middleware_ in BUILTIN_HTTP_MIDDLEWARE:
-            if issubclass(Middleware_, ExceptionHandlerBuiltinHttpMiddleware):
+            if issubclass(Middleware_, ExceptionHandlerHttpMiddleware):
                 middleware_arr.append(Middleware_(
                     handlers
                 ))
@@ -98,7 +98,7 @@ class MiddlewareRegister:
 
         for Middleware_ in BUILTIN_WEBSOCKET_MIDDLEWARE:
             if issubclass(
-                Middleware_, ExceptionHandlerBuiltinWebsocketMiddleware
+                Middleware_, ExceptionHandlerWebsocketMiddleware
             ):
                 middleware_arr.append(Middleware_(
                     handlers

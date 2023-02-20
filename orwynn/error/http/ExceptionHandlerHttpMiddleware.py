@@ -1,11 +1,11 @@
 
 from orwynn import validation, web
-from orwynn.error.catching.ExceptionHandler import ExceptionHandler
+from orwynn.error.ExceptionHandler import ExceptionHandler
 from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
 from orwynn.middleware.HttpNextCall import HttpNextCall
 
 
-class ExceptionHandlerBuiltinHttpMiddleware(BuiltinHttpMiddleware):
+class ExceptionHandlerHttpMiddleware(BuiltinHttpMiddleware):
     """
     Handles all errors occured at Http layer.
     """

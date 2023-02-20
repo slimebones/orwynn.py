@@ -1,4 +1,4 @@
-from orwynn.error.catching.ExceptionHandler import ExceptionHandler
+from orwynn.error.ExceptionHandler import ExceptionHandler
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.web import HttpException, JsonResponse, Request, Response
 

@@ -1,5 +1,5 @@
-from orwynn.error.catching.ExceptionHandler import ExceptionHandler
 from orwynn.error.Error import Error
+from orwynn.error.ExceptionHandler import ExceptionHandler
 from orwynn.web import JsonResponse, Request, Response
 
 
