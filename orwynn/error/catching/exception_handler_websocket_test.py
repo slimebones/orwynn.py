@@ -1,8 +1,8 @@
 from orwynn import validation, web
 from orwynn.boot.Boot import Boot
 from orwynn.controller.websocket.WebsocketController import WebsocketController
-from orwynn.error.Error import Error
 from orwynn.error.catching.ExceptionHandler import ExceptionHandler
+from orwynn.error.Error import Error
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.web.Protocol import Protocol

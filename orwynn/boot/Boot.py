@@ -3,7 +3,7 @@ import os
 from copy import deepcopy
 from pathlib import Path
 from types import NoneType
-from typing import Literal, Optional, Sequence
+from typing import Literal
 
 import dotenv
 
@@ -13,27 +13,18 @@ from orwynn.apprc.AppRc import AppRc
 from orwynn.apprc.parse_apprc import parse_apprc
 from orwynn.boot.api_version.ApiVersion import ApiVersion
 from orwynn.boot.BootMode import BootMode
-from orwynn.BUILTIN_MIDDLEWARE import (
-    BUILTIN_HTTP_MIDDLEWARE,
-    BUILTIN_WEBSOCKET_MIDDLEWARE,
-)
 from orwynn.controller.Controller import Controller
 from orwynn.controller.http.HttpController import HttpController
 from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.di.Di import Di
 from orwynn.di.MissingDiObjectError import MissingDiObjectError
 from orwynn.error.catching.ExceptionHandler import ExceptionHandler
-from orwynn.error.catching.ExceptionHandlerManager import ExceptionHandlerManager
 from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.file.NotDirError import NotDirError
 from orwynn.indication.default_api_indication import default_api_indication
 from orwynn.indication.Indication import Indication
 from orwynn.log.configure_log import configure_log
 from orwynn.log.LogConfig import LogConfig
-from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
-from orwynn.middleware.BuiltinWebsocketMiddleware import (
-    BuiltinWebsocketMiddleware,
-)
 from orwynn.middleware.Middleware import Middleware
 from orwynn.middleware.MiddlewareRegister import MiddlewareRegister
 from orwynn.module.Module import Module
@@ -46,7 +37,6 @@ from orwynn.validation import (
     validate_each,
 )
 from orwynn.web import Cors, HttpMethod
-from orwynn.web.Protocol import Protocol
 from orwynn.worker.Worker import Worker
 
 
@@ -376,7 +366,7 @@ class Boot(Worker):
 
         return root_dir
 
-    def __add_middleware(self, cors: Optional[Cors]) -> None:
+    def __add_middleware(self, cors: Cors | None) -> None:
         user_exception_handlers: set[ExceptionHandler]
         try:
             user_exception_handlers = set(self.__di.exception_handlers)

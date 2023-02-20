@@ -1,5 +1,7 @@
 from orwynn.error.Error import Error
-from orwynn.error.find_detailed_class_for_exception import find_detailed_class_for_exception
+from orwynn.error.find_detailed_class_for_exception import (
+    find_detailed_class_for_exception,
+)
 
 
 class Err1(Error): pass

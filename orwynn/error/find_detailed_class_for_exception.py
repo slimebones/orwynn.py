@@ -57,9 +57,4 @@ def __is_more_detailed(
     """
     mro1: list[type] = Exception1.mro()
 
-    if Exception2 in mro1:
-        # Exception1 has Exception2 in parents, so it makes Exception1 the more
-        # detailed.
-        return True
-    else:
-        return False
+    return (Exception2 in mro1)

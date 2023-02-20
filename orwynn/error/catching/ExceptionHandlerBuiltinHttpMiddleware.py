@@ -1,9 +1,6 @@
-from types import NoneType
 
 from orwynn import validation, web
-from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.error.catching.ExceptionHandler import ExceptionHandler
-from orwynn.log.Log import Log
 from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
 from orwynn.middleware.HttpNextCall import HttpNextCall
 
@@ -31,16 +28,6 @@ class ExceptionHandlerBuiltinHttpMiddleware(BuiltinHttpMiddleware):
         request: web.Request,
         call_next: HttpNextCall
     ) -> web.Response:
-        try:
-            return await call_next(request)
-        except Exception as err:
-            # Choose according handler
-            for handler in self.__handlers:
-                if isinstance(err, handler.HandledException):
-                    return validation.apply(
-                        handler.handle(request, err),
-                        web.Response
-                    )
-            raise MalfunctionError(
-                f"no handler to handle an error {err}"
-            )
+        # Here no actions is done at the moment since handlers are added as
+        # Starlette exception middleware.
+        return await call_next(request)

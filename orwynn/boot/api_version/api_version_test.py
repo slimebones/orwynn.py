@@ -57,13 +57,13 @@ def test_controller_version():
 
     data: dict
 
-    # data = boot.app.client.get_jsonify("/api/v1/user/message", 200)
-    # assert data["message"] == "hello v1"
+    data = boot.app.client.get_jsonify("/api/v1/user/message", 200)
+    assert data["message"] == "hello v1"
 
-    # data = boot.app.client.get_jsonify("/api/v2/user/message", 200)
-    # assert data["message"] == "hello v2"
+    data = boot.app.client.get_jsonify("/api/v2/user/message", 200)
+    assert data["message"] == "hello v2"
 
-    boot.app.client.get("/api/v3/user/message", 404)
+    data = boot.app.client.get_jsonify("/api/v3/user/message", 404)
 
 
 def test_controller_all_versions():

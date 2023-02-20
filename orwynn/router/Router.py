@@ -1,16 +1,13 @@
 import typing
 from inspect import isclass
-from typing import Any, Callable, Optional, Sequence
+from typing import Any, Callable, Sequence
 
 import pydantic
-
+from fastapi.middleware.cors import CORSMiddleware as FastAPI_CORSMiddleware
 from starlette.middleware.base import (
     BaseHTTPMiddleware as StarletteBaseHTTPMiddleware,
 )
-from fastapi.middleware.cors import CORSMiddleware as FastAPI_CORSMiddleware
-from starlette.middleware.exceptions import (
-    ExceptionMiddleware as StarletteExceptionMiddleware
-)
+
 from orwynn import validation, web
 from orwynn.app.AlreadyRegisteredMethodError import (
     AlreadyRegisteredMethodError,
@@ -21,10 +18,18 @@ from orwynn.controller.endpoint.EndpointNotFoundError import (
     EndpointNotFoundError,
 )
 from orwynn.controller.websocket.WebsocketController import WebsocketController
-from orwynn.error.catching.DefaultExceptionHandler import DefaultExceptionHandler
-from orwynn.error.catching.DefaultHttpExceptionHandler import DefaultHttpExceptionHandler
-from orwynn.error.catching.ExceptionHandlerBuiltinHttpMiddleware import ExceptionHandlerBuiltinHttpMiddleware
-from orwynn.error.get_exception_direct_subclasses import get_exception_direct_subclasses
+from orwynn.error.catching.DefaultExceptionHandler import (
+    DefaultExceptionHandler,
+)
+from orwynn.error.catching.DefaultHttpExceptionHandler import (
+    DefaultHttpExceptionHandler,
+)
+from orwynn.error.catching.ExceptionHandlerBuiltinHttpMiddleware import (
+    ExceptionHandlerBuiltinHttpMiddleware,
+)
+from orwynn.error.get_exception_direct_subclasses import (
+    get_exception_direct_subclasses,
+)
 from orwynn.indication.Indication import Indication
 from orwynn.middleware.HttpMiddleware import HttpMiddleware
 from orwynn.middleware.Middleware import Middleware
@@ -43,10 +48,11 @@ from orwynn.router.WebsocketStack import WebsocketStack
 from orwynn.router.WrongHandlerReturnTypeError import (
     WrongHandlerReturnTypeError,
 )
-from orwynn.validation.RequestValidationException import RequestValidationException
-from orwynn.web import HttpException, HttpMethod, JsonResponse
+from orwynn.web import HttpException, HttpMethod
 from orwynn.web.http.Cors import Cors
-from orwynn.web.http.UnsupportedHttpMethodError import UnsupportedHttpMethodError
+from orwynn.web.http.UnsupportedHttpMethodError import (
+    UnsupportedHttpMethodError,
+)
 from orwynn.worker.Worker import Worker
 
 
@@ -167,7 +173,7 @@ class Router(Worker):
         self,
         middleware_arr: Sequence[Middleware],
         *,
-        cors: Optional[Cors]
+        cors: Cors | None
     ) -> None:
         """
         Adds middleware to the system.

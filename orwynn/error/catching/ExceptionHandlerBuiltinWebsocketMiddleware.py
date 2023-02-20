@@ -2,16 +2,19 @@ import inspect
 from types import NoneType
 
 from orwynn import validation, web
-from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.error.catching.ExceptionHandler import ExceptionHandler
-from orwynn.error.find_detailed_class_for_exception import find_detailed_class_for_exception
-from orwynn.log.Log import Log
+from orwynn.error.find_detailed_class_for_exception import (
+    find_detailed_class_for_exception,
+)
+from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.log.WebsocketLogger import WebsocketLogger
 from orwynn.middleware.BuiltinWebsocketMiddleware import (
     BuiltinWebsocketMiddleware,
 )
 from orwynn.middleware.WebsocketNextCall import WebsocketNextCall
-from orwynn.web.context.WebsocketRequestContextId import WebsocketRequestContextId
+from orwynn.web.context.WebsocketRequestContextId import (
+    WebsocketRequestContextId,
+)
 
 
 class ExceptionHandlerBuiltinWebsocketMiddleware(BuiltinWebsocketMiddleware):
@@ -39,7 +42,7 @@ class ExceptionHandlerBuiltinWebsocketMiddleware(BuiltinWebsocketMiddleware):
     ) -> None:
         try:
             await call_next(request)
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             is_handled: bool = False
             malfunction_message: str = \
                 "malfunction at ExceptionHandler middleware" \
@@ -62,14 +65,15 @@ class ExceptionHandlerBuiltinWebsocketMiddleware(BuiltinWebsocketMiddleware):
                         malfunction_message = \
                             f"handler function {handler.handle} is not a" \
                             " coroutine"
-                        break
                     else:
                         validation.apply(
                             await handler.handle(request, err),
                             NoneType
                         )
                         is_handled = True
-                        break
+
+                    # Finally exit after the first match
+                    break
 
             if not is_handled:
                 # Not recommended to raise an error since it won't be

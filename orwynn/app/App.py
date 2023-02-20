@@ -1,17 +1,12 @@
-from typing import TYPE_CHECKING, Any, Awaitable, Callable, Union
+from typing import Callable
 
-from fastapi import FastAPI
 from starlette.types import Receive, Scope, Send
 
-from orwynn import validation, web
 from orwynn.app.CoreApp import CoreApp
-from orwynn.error.catching.DefaultHttpExceptionHandler import DefaultHttpExceptionHandler
 from orwynn.service.FrameworkService import FrameworkService
 from orwynn.testing.Client import Client
 from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
-from orwynn.validation.RequestValidationException import \
-    RequestValidationException
-from orwynn.web import Cors, HttpException, HttpMethod
+from orwynn.web import HttpMethod
 
 
 class App(FrameworkService):
@@ -36,8 +31,6 @@ class App(FrameworkService):
 
         # Remove FastAPI default exception handlers to not cross with ours -
         # since we write handlers directly via middleware
-        # del self.__core_app.exception_handlers[HttpException]
-        # del self.__core_app.exception_handlers[RequestValidationException]
 
     async def __call__(
         self, scope: Scope, receive: Receive, send: Send

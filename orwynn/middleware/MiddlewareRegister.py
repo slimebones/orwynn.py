@@ -1,11 +1,23 @@
-from typing import Callable, Optional, Sequence
-from orwynn.BUILTIN_MIDDLEWARE import BUILTIN_HTTP_MIDDLEWARE, BUILTIN_WEBSOCKET_MIDDLEWARE
+from typing import Callable, Sequence
+
+from orwynn.BUILTIN_MIDDLEWARE import (
+    BUILTIN_HTTP_MIDDLEWARE,
+    BUILTIN_WEBSOCKET_MIDDLEWARE,
+)
 from orwynn.error.catching.ExceptionHandler import ExceptionHandler
-from orwynn.error.catching.ExceptionHandlerBuiltinHttpMiddleware import ExceptionHandlerBuiltinHttpMiddleware
-from orwynn.error.catching.ExceptionHandlerBuiltinWebsocketMiddleware import ExceptionHandlerBuiltinWebsocketMiddleware
-from orwynn.error.catching.ExceptionHandlerManager import ExceptionHandlerManager
+from orwynn.error.catching.ExceptionHandlerBuiltinHttpMiddleware import (
+    ExceptionHandlerBuiltinHttpMiddleware,
+)
+from orwynn.error.catching.ExceptionHandlerBuiltinWebsocketMiddleware import (
+    ExceptionHandlerBuiltinWebsocketMiddleware,
+)
+from orwynn.error.catching.ExceptionHandlerManager import (
+    ExceptionHandlerManager,
+)
 from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
-from orwynn.middleware.BuiltinWebsocketMiddleware import BuiltinWebsocketMiddleware
+from orwynn.middleware.BuiltinWebsocketMiddleware import (
+    BuiltinWebsocketMiddleware,
+)
 from orwynn.middleware.Middleware import Middleware
 from orwynn.web.http.Cors import Cors
 from orwynn.web.Protocol import Protocol
@@ -29,7 +41,7 @@ class MiddlewareRegister:
         user_middleware: list[Middleware],
         user_exception_handlers: set[ExceptionHandler],
         *,
-        cors: Optional[Cors]
+        cors: Cors | None
     ) -> None:
         populated_handlers_py_protocol: dict[
             Protocol, set[ExceptionHandler]
