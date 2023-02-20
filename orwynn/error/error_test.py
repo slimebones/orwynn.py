@@ -1,26 +1,7 @@
-from orwynn.boot.Boot import Boot
-from orwynn.controller.endpoint.Endpoint import Endpoint
-from orwynn.controller.http.HttpController import HttpController
 from orwynn.error.Error import Error
 from orwynn.indication.Indication import Indication
 from orwynn.indication.IndicationType import IndicationType
 from orwynn.indication.Indicator import Indicator
-from orwynn.module.Module import Module
-
-
-def test_custom_status_code():
-    class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
-
-        def get(self):
-            raise Error("whoops!", status_code=401)
-
-    boot: Boot = Boot(
-        Module(route="/", Controllers=[C1])
-    )
-
-    boot.app.client.get("/", 401)
 
 
 def test_default_indication_type():

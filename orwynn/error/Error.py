@@ -14,15 +14,12 @@ class Error(Exception):
     Attributes:
         message (optional):
             Message to be attached to the error.
-        status_code (optional):
-            Status code to be retrieved by error handlers.
     """
     INDICATION_TYPE: ClassVar[IndicationType | None] = None
 
-    def __init__(self, message: str = "", status_code: int = 400) -> None:
+    def __init__(self, message: str = "") -> None:
         super().__init__(message)
         self.message = message
-        self.status_code = status_code
 
     @property
     def api(self) -> dict:

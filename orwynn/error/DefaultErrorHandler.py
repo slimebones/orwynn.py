@@ -7,4 +7,4 @@ class DefaultErrorHandler(ExceptionHandler):
     E = Error
 
     def handle(self, request: Request, error: Error) -> Response:
-        return JsonResponse(error.api, error.status_code)
+        return JsonResponse(error.api, 400)
