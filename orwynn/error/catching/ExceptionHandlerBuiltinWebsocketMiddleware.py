@@ -4,6 +4,7 @@ from types import NoneType
 from orwynn import validation, web
 from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.error.catching.ExceptionHandler import ExceptionHandler
+from orwynn.error.find_detailed_class_for_exception import find_detailed_class_for_exception
 from orwynn.log.Log import Log
 from orwynn.log.WebsocketLogger import WebsocketLogger
 from orwynn.middleware.BuiltinWebsocketMiddleware import (
@@ -46,9 +47,18 @@ class ExceptionHandlerBuiltinWebsocketMiddleware(BuiltinWebsocketMiddleware):
                 f" error {err}"
 
             # Choose according handler
+            AppropriateException: type[Exception] = \
+                find_detailed_class_for_exception(
+                    err,
+                    [handler.HandledException for handler in self.__handlers]
+                )
             for handler in self.__handlers:
-                if isinstance(err, handler.HandledException):
-                    if not inspect.iscoroutinefunction(handler.handle):
+                if handler.HandledException is AppropriateException:
+                    if not isinstance(err, handler.HandledException):
+                        malfunction_message = \
+                            f"appropriate Exception {AppropriateException}" \
+                            f" is not a parent for actual exception {err}"
+                    elif not inspect.iscoroutinefunction(handler.handle):
                         malfunction_message = \
                             f"handler function {handler.handle} is not a" \
                             " coroutine"
@@ -59,6 +69,7 @@ class ExceptionHandlerBuiltinWebsocketMiddleware(BuiltinWebsocketMiddleware):
                             NoneType
                         )
                         is_handled = True
+                        break
 
             if not is_handled:
                 # Not recommended to raise an error since it won't be
