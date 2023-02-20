@@ -25,6 +25,7 @@ from orwynn.indication.default_api_indication import default_api_indication
 from orwynn.indication.Indication import Indication
 from orwynn.log.configure_log import configure_log
 from orwynn.log.LogConfig import LogConfig
+from orwynn.middleware.GlobalMiddlewareSetup import GlobalMiddlewareSetup
 from orwynn.middleware.Middleware import Middleware
 from orwynn.middleware.MiddlewareRegister import MiddlewareRegister
 from orwynn.module.Module import Module
@@ -34,6 +35,7 @@ from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn.router.Router import Router
 from orwynn.validation import (
     validate,
+    validate_dict,
     validate_each,
 )
 from orwynn.web import Cors, HttpMethod
@@ -75,6 +77,10 @@ class Boot(Worker):
             Modules available across all other modules imported into the
             application. Note that no other instance can import a globally
             available module.
+        global_middleware (optional):
+            Map of middleware and its covered routes to apply globally. Note
+            that every initialized Provider can be accessed from such
+            middleware.
         api_version (optional):
             Object describes API versioning rules for the project. By default
             only v1 is supported.
@@ -115,6 +121,7 @@ class Boot(Worker):
         mode: BootMode | None = None,
         global_route: str | None = None,
         global_modules: list[Module] | None = None,
+        global_middleware: GlobalMiddlewareSetup | None = None,
         api_version: ApiVersion | None = None
     ) -> None:
         super().__init__()
@@ -141,6 +148,12 @@ class Boot(Worker):
         if global_modules is None:
             global_modules = []
         validate_each(global_modules, Module, expected_sequence_type=list)
+
+        if global_middleware is None:
+            global_middleware = {}
+        validate_dict(
+            global_middleware, (Middleware, list)
+        )
 
         if api_version is None:
             api_version = ApiVersion()
@@ -184,7 +197,11 @@ class Boot(Worker):
         root_module._fw_add_provider_or_skip(LogConfig)
         ##
 
-        self.__di: Di = Di(root_module, global_modules=global_modules)
+        self.__di: Di = Di(
+            root_module,
+            global_modules=global_modules,
+            global_middleware=global_middleware
+        )
 
         # Configure logging
         configure_log(validation.apply(self.__di.find("LogConfig"), LogConfig))

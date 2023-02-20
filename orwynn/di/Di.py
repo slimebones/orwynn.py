@@ -1,4 +1,5 @@
 
+
 from orwynn import validation
 from orwynn.app.App import App
 from orwynn.controller.Controller import Controller
@@ -11,6 +12,7 @@ from orwynn.di.DiObject import DiObject
 from orwynn.di.init.init_other_acceptors import init_other_acceptors
 from orwynn.di.init.init_providers import init_providers
 from orwynn.error.ExceptionHandler import ExceptionHandler
+from orwynn.middleware.GlobalMiddlewareSetup import GlobalMiddlewareSetup
 from orwynn.middleware.Middleware import Middleware
 from orwynn.module.Module import Module
 from orwynn.worker.Worker import Worker
@@ -43,12 +45,17 @@ class Di(Worker):
     Attributes:
         root_module:
             Root module of the app.
+        global_modules (optional):
+            List of modules to be applied globally.
+        global_middleware (optional):
+            Middleware setup map to be applied globally.
     """
     def __init__(
         self,
         root_module: Module,
         *,
         global_modules: list[Module] | None = None,
+        global_middleware: GlobalMiddlewareSetup | None = None
     ) -> None:
         super().__init__()
         validation.validate(root_module, Module)
@@ -57,6 +64,12 @@ class Di(Worker):
             global_modules = []
         validation.validate_each(
             global_modules, Module, expected_sequence_type=list
+        )
+
+        if global_middleware is None:
+            global_middleware = {}
+        validation.validate_dict(
+            global_middleware, (Middleware, list)
         )
 
         # So here we have generally a two stages of DI:
@@ -71,7 +84,7 @@ class Di(Worker):
         self.__container: DiContainer = init_providers(
             collect_provider_dependencies(self.modules)
         )
-        init_other_acceptors(self.__container, self.modules)
+        init_other_acceptors(self.__container, self.modules, global_middleware)
 
     @property
     def app_service(self) -> App:

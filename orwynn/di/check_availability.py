@@ -1,5 +1,5 @@
 
-from typing import Optional
+
 from orwynn.config.Config import Config
 from orwynn.di.DiObject import DiObject
 from orwynn.di.is_provider import is_provider
@@ -100,7 +100,7 @@ def __search_matching_provider(
         The module where the provider was found, or None, it it wasn't.
     """
 
-    res: Optional[Module] = None
+    res: Module | None = None
     is_found: bool = False
 
     for P in target_module.Providers:
@@ -114,7 +114,6 @@ def __search_matching_provider(
         # ones
         for m in target_module._imports:
             for P in m._exports:
-                print(m, m._exports)
                 if P is TargetProvider:
                     # Available in the exports of the imported module
                     is_found = True
