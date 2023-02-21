@@ -51,7 +51,9 @@ lint:
 		--max-complexity 10 \
 		--per-file-ignores="__init__.py:F401,*_test.py:S101,conftest.py:F401" \
 		--exclude .git,__pycache__,docs/source/conf.py,old,build,dist,.venv,.pytest_cache,.vscode \
+		--extend-exclude $(shell ls -1p orwynn/*.py | xargs echo | sed 's/ /,/g') \
 		.
+# extend-exclude: Exclude shared modules checks (especially F401)
 
 check: lint test
 
