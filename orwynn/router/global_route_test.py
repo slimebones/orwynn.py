@@ -18,7 +18,7 @@ def test_default():
 
     boot: Boot = Boot(
         root_module=Module("/user", Controllers=[C]),
-        global_route="/donuts"
+        global_http_route="/donuts"
     )
 
     boot.app.client.get_jsonify("/user/message", 200)
@@ -38,7 +38,7 @@ def test_default_version():
 
     boot: Boot = Boot(
         root_module=Module("/user", Controllers=[C]),
-        global_route="/api/v{version}",
+        global_http_route="/api/v{version}",
         api_version=ApiVersion(
             supported={1, 2, 3}
         )
@@ -60,7 +60,7 @@ def test_not_used():
 
     boot: Boot = Boot(
         root_module=Module("/user", Controllers=[C]),
-        global_route="/donuts"
+        global_http_route="/donuts"
     )
 
     boot.app.client.get_jsonify(
@@ -84,7 +84,7 @@ def test_pass_version():
 
     boot: Boot = Boot(
         root_module=Module("/user", Controllers=[C]),
-        global_route="/api/v{version}",
+        global_http_route="/api/v{version}",
         api_version=ApiVersion(
             supported={1, 2, 3}
         )

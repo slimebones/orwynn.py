@@ -20,7 +20,7 @@ def test_versioned_global_route():
 
     boot: Boot = Boot(
         root_module=Module("/user", Controllers=[C]),
-        global_route="/donuts/v{version}",
+        global_http_route="/donuts/v{version}",
     )
 
     boot.app.client.get_jsonify(
@@ -53,7 +53,7 @@ def test_controller_version():
 
     boot: Boot = Boot(
         root_module=Module("/user", Controllers=[C1, C2]),
-        global_route="/api/v{version}",
+        global_http_route="/api/v{version}",
         api_version=ApiVersion(
             supported={1, 2}
         )
@@ -87,7 +87,7 @@ def test_controller_all_versions():
 
     boot: Boot = Boot(
         root_module=Module("/user", Controllers=[C1]),
-        global_route="/api/v{version}",
+        global_http_route="/api/v{version}",
         api_version=ApiVersion(
             supported={1, 2, 3}
         )
@@ -116,7 +116,7 @@ def test_controller_several_versions():
 
     boot: Boot = Boot(
         root_module=Module("/user", Controllers=[C1]),
-        global_route="/api/v{version}",
+        global_http_route="/api/v{version}",
         api_version=ApiVersion(
             supported={1, 2, 3}
         )
@@ -146,7 +146,7 @@ def test_controller_unsupported_version():
         Boot,
         UnsupportedVersionError,
         root_module=Module("/user", Controllers=[C1]),
-        global_route="/api/v{version}",
+        global_http_route="/api/v{version}",
         api_version=ApiVersion(
             supported={1, 2}
         )
@@ -167,7 +167,7 @@ def test_controller_unsupported_version_of_many():
         Boot,
         UnsupportedVersionError,
         root_module=Module("/user", Controllers=[C1]),
-        global_route="/api/v{version}",
+        global_http_route="/api/v{version}",
         api_version=ApiVersion(
             supported={1, 2}
         )

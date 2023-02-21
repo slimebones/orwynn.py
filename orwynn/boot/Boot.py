@@ -69,7 +69,7 @@ class Boot(Worker):
         mode (optional):
             Application mode. By default environ Orwynn_Mode is
             checked if this arg is not given.
-        global_route (optional):
+        global_http_route (optional):
             Global route to be prepended to every controller's route. Defaults
             to no route. Can accept formatting "{version}" for an API version
             to be injected into route.
@@ -119,7 +119,7 @@ class Boot(Worker):
         ExceptionHandlers: set[type[ExceptionHandler]] | None = None,
         apprc: AppRc | None = None,
         mode: BootMode | None = None,
-        global_route: str | None = None,
+        global_http_route: str | None = None,
         global_modules: list[Module] | None = None,
         global_middleware: GlobalMiddlewareSetup | None = None,
         api_version: ApiVersion | None = None
@@ -141,9 +141,9 @@ class Boot(Worker):
         validate(apprc, [AppRc, NoneType])
         validate(mode, [BootMode, NoneType])
 
-        if global_route is None:
-            global_route = ""
-        validate(global_route, str)
+        if global_http_route is None:
+            global_http_route = ""
+        validate(global_http_route, str)
 
         if global_modules is None:
             global_modules = []
@@ -173,7 +173,7 @@ class Boot(Worker):
             self.__mode,
             deepcopy(apprc)
         )
-        self.__global_route: str = global_route
+        self.__global_route: str = global_http_route
         self.__api_version: ApiVersion = api_version
 
         # Init proxies
@@ -183,7 +183,7 @@ class Boot(Worker):
             api_indication=self.__api_indication,
             apprc=self.__apprc,
             ExceptionHandlers=ExceptionHandlers,
-            global_route=self.__global_route,
+            global_http_route=self.__global_route,
             api_version=self.__api_version
         )
         EndpointProxy()

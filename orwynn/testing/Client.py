@@ -293,7 +293,7 @@ class Client:
             return route
 
         api_version_obj: ApiVersion = BootProxy.ie().api_version
-        global_route: str = BootProxy.ie().global_route
+        global_route: str = BootProxy.ie().global_http_route
         final_api_version: int
 
         if api_version:

@@ -23,7 +23,7 @@ class BootProxy(Worker):
         api_indication: "Indication",
         apprc: AppRc,
         ExceptionHandlers: set[type["ExceptionHandler"]],
-        global_route: str,
+        global_http_route: str,
         api_version: ApiVersion
     ) -> None:
         super().__init__()
@@ -33,7 +33,7 @@ class BootProxy(Worker):
         self.__apprc: AppRc = apprc
         self.__ExceptionHandlers: set[type["ExceptionHandler"]] = \
             ExceptionHandlers
-        self.__global_route: str = global_route
+        self.__global_http_route: str = global_http_route
         self.__api_version: ApiVersion = api_version
 
     @property
@@ -53,8 +53,8 @@ class BootProxy(Worker):
         return self.__ExceptionHandlers
 
     @property
-    def global_route(self) -> str:
-        return self.__global_route
+    def global_http_route(self) -> str:
+        return self.__global_http_route
 
     @property
     def api_version(self) -> ApiVersion:
