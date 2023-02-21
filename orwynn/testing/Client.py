@@ -1,6 +1,9 @@
 import inspect
 from types import NoneType
 from typing import Any, Callable, Optional, Self, TypeVar
+from orwynn import web
+from orwynn.boot.api_version.ApiVersion import ApiVersion
+from orwynn.proxy.BootProxy import BootProxy
 
 from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
 from orwynn import validation
@@ -203,13 +206,13 @@ class Client:
         response: TestResponse
         test_client_method: Callable
         method: str
-        url: str
+        route: str
 
         validate(request, str)
         validate(asserted_status_code, [int, NoneType])
 
         # Request example: "get /users/1"
-        method, url = request.split(" ")
+        method, route = request.split(" ")
 
         # Also can accept uppercase "GET ..."
         method = method.lower()
@@ -234,7 +237,34 @@ class Client:
         request_kwargs.setdefault("headers", {})
         request_kwargs["headers"].update(self._binded_headers)
 
-        response: TestResponse = test_client_method(url, **request_kwargs)
+        # Craft the final url
+        is_global_route_used: bool = validation.apply(
+            request_kwargs.get("is_global_route_used", True),
+            bool
+        )
+        api_version: int | None = request_kwargs.get("api_version", None)
+        validation.validate(api_version, [int, NoneType])
+        final_url: str = self._get_final_url(
+            route,
+            is_global_route_used=is_global_route_used,
+            api_version=api_version
+        )
+        # Delete custom keys to not confuse a client's method
+        try:
+            del request_kwargs["is_global_route_used"]
+            del request_kwargs["api_version"]
+        except KeyError:
+            pass
+        try:
+            del request_kwargs["api_version"]
+        except KeyError:
+            pass
+
+        # Make a request
+        response: TestResponse = test_client_method(
+            final_url,
+            **request_kwargs
+        )
 
         validate(response, TestResponse, is_strict=True)
 
@@ -246,3 +276,42 @@ class Client:
                 f" response content is {response.content}"
 
         return response
+
+    def _get_final_url(
+        self,
+        route: str,
+        *,
+        is_global_route_used: bool,
+        api_version: int | None
+    ) -> str:
+        if not is_global_route_used and api_version is not None:
+            raise ValueError(
+                f"the global route is disabled and api version is also passed"
+                " which doesn't make sense"
+            )
+        elif not is_global_route_used:
+            return route
+
+        api_version_obj: ApiVersion = BootProxy.ie().api_version
+        global_route: str = BootProxy.ie().global_route
+        final_api_version: int
+
+        if api_version:
+            final_api_version = api_version
+        else:
+            final_api_version = api_version_obj.latest
+
+        final_global_route: str
+        try:
+            final_global_route = api_version_obj.apply_version_to_route(
+                global_route,
+                final_api_version
+            )
+        except ValueError:
+            # No {version} format block
+            final_global_route = global_route
+
+        return web.join_routes(
+            final_global_route,
+            route
+        )

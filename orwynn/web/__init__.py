@@ -54,11 +54,7 @@ def join_routes(*routes: str) -> str:
     result: str = ""
 
     for route in routes:
-        if route.count("/") > 2:
-            raise ValueError(
-                f"unconsistent use of slashes in route {route}"
-            )
-        elif route == "" or route == "/":
+        if route == "" or route == "/":
             continue
         elif route[0] != "/":
             result += "/" + route

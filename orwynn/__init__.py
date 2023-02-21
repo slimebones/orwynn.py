@@ -5,6 +5,7 @@
 # Also it's OK to include framework modules here to import, such as sql_module
 # or log_module.
 from orwynn.app.App import App
+from orwynn.boot.api_version.ApiVersion import ApiVersion
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
 from orwynn.config.Config import Config

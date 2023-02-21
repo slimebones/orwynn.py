@@ -31,6 +31,34 @@ class ApiVersion:
     def latest(self) -> int:
         return max(self.__supported)
 
+    def apply_version_to_route(
+        self,
+        route: str,
+        version: int | None = None
+    ) -> str:
+        """
+        Applied a given version to a given route.
+
+        Args:
+            route:
+                Route to apply version to.
+            version (optional):
+                Number of version to apply. By default the latest is applied.
+        """
+        if version is None:
+            version = self.latest
+        self.check_if_supported(version)
+
+        if "{version}" not in route:
+            raise ValueError(
+                "no version format block in given route to insert the version"
+            )
+
+        return route.replace(
+            "{version}",
+            str(version)
+        )
+
     def check_if_supported(self, version: int) -> None:
         """Checks if a version is supported.
 

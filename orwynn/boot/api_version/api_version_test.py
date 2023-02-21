@@ -23,7 +23,11 @@ def test_versioned_global_route():
         global_route="/donuts/v{version}",
     )
 
-    boot.app.client.get_jsonify("/donuts/v1/user/message", 200)
+    boot.app.client.get_jsonify(
+        "/donuts/v1/user/message",
+        200,
+        is_global_route_used=False
+    )
 
 
 def test_controller_version():
@@ -57,13 +61,19 @@ def test_controller_version():
 
     data: dict
 
-    data = boot.app.client.get_jsonify("/api/v1/user/message", 200)
+    data = boot.app.client.get_jsonify(
+        "/user/message", 200, api_version=1
+    )
     assert data["message"] == "hello v1"
 
-    data = boot.app.client.get_jsonify("/api/v2/user/message", 200)
+    data = boot.app.client.get_jsonify(
+        "/user/message", 200, api_version=2
+    )
     assert data["message"] == "hello v2"
 
-    data = boot.app.client.get_jsonify("/api/v3/user/message", 404)
+    data = boot.app.client.get_jsonify(
+        "/api/v3/user/message", 404, is_global_route_used=False
+    )
 
 
 def test_controller_all_versions():
@@ -85,13 +95,13 @@ def test_controller_all_versions():
 
     data: dict
 
-    data = boot.app.client.get_jsonify("/api/v1/user/message", 200)
+    data = boot.app.client.get_jsonify("/user/message", 200, api_version=1)
     assert data["message"] == "hello"
 
-    data = boot.app.client.get_jsonify("/api/v2/user/message", 200)
+    data = boot.app.client.get_jsonify("/user/message", 200, api_version=2)
     assert data["message"] == "hello"
 
-    data = boot.app.client.get_jsonify("/api/v3/user/message", 200)
+    data = boot.app.client.get_jsonify("/user/message", 200, api_version=3)
     assert data["message"] == "hello"
 
 
@@ -114,12 +124,12 @@ def test_controller_several_versions():
 
     data: dict
 
-    data = boot.app.client.get_jsonify("/api/v1/user/message", 404)
+    data = boot.app.client.get_jsonify("/user/message", 404, api_version=1)
 
-    data = boot.app.client.get_jsonify("/api/v2/user/message", 200)
+    data = boot.app.client.get_jsonify("/user/message", 200, api_version=2)
     assert data["message"] == "hello"
 
-    data = boot.app.client.get_jsonify("/api/v3/user/message", 200)
+    data = boot.app.client.get_jsonify("/user/message", 200, api_version=3)
     assert data["message"] == "hello"
 
 

@@ -152,22 +152,6 @@ def test_nested_configs_test(
     assert app_rc["Text"]["words_amount"] == text_config.words_amount == 3
 
 
-def test_global_route():
-    class C(HttpController):
-        ROUTE = "/message"
-        ENDPOINTS = [Endpoint(method="get")]
-
-        def get(self) -> dict:
-            return {"message": "hello"}
-
-    boot: Boot = Boot(
-        root_module=Module("/user", Controllers=[C]),
-        global_route="/donuts"
-    )
-
-    boot.app.client.get_jsonify("/donuts/user/message", 200)
-
-
 @pytest.fixture
 def __gmodule() -> Module:
     return Module(

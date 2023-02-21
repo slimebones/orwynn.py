@@ -332,7 +332,7 @@ class Boot(Worker):
         elif isinstance(version, str):
             if version != "*":
                 raise MalfunctionError(
-                    f"version cannot be {version}, a validatation check should"
+                    f"version cannot be {version}, a validation check should"
                     " have been performed at HTTPController"
                 )
             # Add all supported versions
@@ -344,16 +344,21 @@ class Boot(Worker):
             )
 
         for v in final_versions:
-            self.__api_version.check_if_supported(v)
+            final_global_route: str
+            try:
+                final_global_route = self.__api_version.apply_version_to_route(
+                    self.__global_route,
+                    v
+                )
+            except ValueError:
+                # No {version} format block
+                final_global_route = self.__global_route
 
             # We can concatenate routes such way since routes
             # are validated to not contain following slash
             # -> But join_routes() handles this situation, doesn't it?
             concatenated_route: str = web.join_routes(
-                self.__global_route.replace(
-                    "{version}",
-                    str(v)
-                ),
+                final_global_route,
                 module.route,
                 controller.route
             )
