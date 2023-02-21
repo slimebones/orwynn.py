@@ -4,18 +4,6 @@ Scalable web-framework with out-of-the-box architecture.
 Don't use imports from orwynn.src..., since structural changes
 there are not marked as breaking.
 """
-from orwynn.shared import (
-    controller,
-    http,
-    indication,
-    middleware,
-    mongo,
-    proxy,
-    sql,
-    testing,
-    websocket,
-)
-
 # Only base classes listed here, others go in shared module.
 from orwynn.src import validation
 from orwynn.src.app.App import App
