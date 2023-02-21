@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from types import NoneType
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.apprc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from orwynn.src.apprc.AppRc import AppRc
 from orwynn.src.apprc.AppRcSearchError import AppRcSearchError

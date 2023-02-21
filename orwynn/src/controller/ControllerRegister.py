@@ -4,7 +4,7 @@ from typing import Any, Callable, Literal
 
 import pydantic
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.app.AlreadyRegisteredMethodError import (
     AlreadyRegisteredMethodError,
 )
@@ -16,7 +16,9 @@ from orwynn.src.controller.endpoint.EndpointNotFoundError import (
     EndpointNotFoundError,
 )
 from orwynn.src.controller.http.HttpController import HttpController
-from orwynn.src.controller.websocket.WebsocketController import WebsocketController
+from orwynn.src.controller.websocket.WebsocketController import (
+    WebsocketController,
+)
 from orwynn.src.error.MalfunctionError import MalfunctionError
 from orwynn.src.indication.Indication import Indication
 from orwynn.src.model.Model import Model

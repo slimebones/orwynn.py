@@ -1,6 +1,6 @@
 import bcrypt
 
-from orwynn import validation
+from orwynn.src import validation
 
 
 def hash_password(plain_password: str, encoding: str = "utf-8") -> str:

@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.boot.Boot import Boot
 from orwynn.src.controller.endpoint.Endpoint import Endpoint
 from orwynn.src.controller.endpoint.EndpointResponse import EndpointResponse

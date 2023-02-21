@@ -1,4 +1,4 @@
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.boot.Boot import Boot
 from orwynn.src.di.Di import Di
 from orwynn.src.middleware.HttpMiddleware import HttpMiddleware

@@ -1,4 +1,4 @@
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.boot.api_version.ApiVersion import ApiVersion
 from orwynn.src.boot.api_version.UnsupportedVersionError import (
     UnsupportedVersionError,

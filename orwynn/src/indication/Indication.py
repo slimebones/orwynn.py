@@ -16,7 +16,7 @@ from orwynn.src.indication.unsupported_indicator_error import \
     UnsupportedIndicatorError
 from orwynn.src.model.Model import Model
 from orwynn.src.SUBCLASSABLES import SUBCLASSABLES
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.cls.helpers import ClassNotFoundError, find_subclass_by_name
 from orwynn.src.mp.location import (FieldLocation, find_field_by_location,
                                      find_location_by_field)

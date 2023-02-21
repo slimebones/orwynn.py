@@ -6,7 +6,9 @@ from loguru._handler import Message
 from orwynn.src.boot.Boot import Boot
 from orwynn.src.controller.endpoint.Endpoint import Endpoint
 from orwynn.src.controller.http.HttpController import HttpController
-from orwynn.src.controller.websocket.WebsocketController import WebsocketController
+from orwynn.src.controller.websocket.WebsocketController import (
+    WebsocketController,
+)
 from orwynn.src.log.Log import Log
 from orwynn.src.module.Module import Module
 from orwynn.src.testing import Writer, get_log_apprc

@@ -1,4 +1,4 @@
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.error.ExceptionHandler import ExceptionHandler
 from orwynn.src.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
 from orwynn.src.middleware.HttpNextCall import HttpNextCall

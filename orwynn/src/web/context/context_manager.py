@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 from contextvars import Token
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.web.context.ContextStorage import ContextStorage
 
 

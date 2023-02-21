@@ -1,7 +1,9 @@
 import json
 
 from orwynn.src.boot.Boot import Boot
-from orwynn.src.controller.websocket.WebsocketController import WebsocketController
+from orwynn.src.controller.websocket.WebsocketController import (
+    WebsocketController,
+)
 from orwynn.src.log.Log import Log
 from orwynn.src.log.LogWebsocketMiddleware import LogWebsocketMiddleware
 from orwynn.src.module.Module import Module

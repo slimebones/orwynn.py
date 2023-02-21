@@ -1,6 +1,6 @@
 
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.app.App import App
 from orwynn.src.controller.Controller import Controller
 from orwynn.src.di.collecting.collect_provider_dependencies import (

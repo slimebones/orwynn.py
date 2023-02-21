@@ -1,11 +1,11 @@
 from orwynn.src.di.collecting.no_dependencies_for_given_provider_error import (
     NoDependenciesForGivenProviderError,
 )
-from orwynn.src.di.collecting.provider_already_initialized_for_map_error import (
-    ProviderAlreadyInitializedForMapError,
-)
 from orwynn.src.di.collecting.provider_not_found_in_map_error import (
     ProviderNotFoundInMapError,
+)
+from orwynn.src.di.collecting.ProviderAlreadyInitializedForMapError import (
+    ProviderAlreadyInitializedForMapError,
 )
 from orwynn.src.di.Provider import Provider
 

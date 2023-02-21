@@ -2,7 +2,7 @@ from typing import Any, ClassVar, Self, TypeVar
 
 import pydantic
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.indication.IndicationType import IndicationType
 from orwynn.src.proxy.BootProxy import BootProxy
 

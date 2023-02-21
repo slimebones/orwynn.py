@@ -1,4 +1,4 @@
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.rnd.helpers import gen_id
 from orwynn.src.web.context.ContextStorage import ContextStorage
 from orwynn.src.web.context.RequestIdAlreadySavedError import (

@@ -2,7 +2,7 @@ import copy
 from types import NoneType
 from typing import Self
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.app.EmptyRouteError import EmptyRouteError
 from orwynn.src.controller.Controller import Controller
 from orwynn.src.di.circular_dependency_error import CircularDependencyError

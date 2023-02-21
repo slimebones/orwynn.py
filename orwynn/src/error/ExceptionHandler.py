@@ -1,6 +1,6 @@
 from typing import ClassVar
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.error.MalfunctionError import MalfunctionError
 from orwynn.src.web.generic import GenericRequest, GenericResponse
 from orwynn.src.web.Protocol import Protocol

@@ -5,7 +5,7 @@ from types import NoneType
 
 import dotenv
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.app.App import App
 from orwynn.src.apprc.AppRc import AppRc
 from orwynn.src.apprc.parse_apprc import parse_apprc

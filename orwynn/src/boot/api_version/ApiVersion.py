@@ -1,6 +1,6 @@
 from copy import copy
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.boot.api_version.UnsupportedVersionError import (
     UnsupportedVersionError,
 )

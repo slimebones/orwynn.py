@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from orwynn import validation
+from orwynn.src import validation
 
 
 def get_utc_timestamp() -> float:

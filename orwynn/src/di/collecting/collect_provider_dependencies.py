@@ -4,11 +4,11 @@ from orwynn.src.di.circular_dependency_error import CircularDependencyError
 from orwynn.src.di.collecting.get_parameters_for_provider import (
     get_parameters_for_provider,
 )
-from orwynn.src.di.collecting.provider_already_initialized_for_map_error import (
-    ProviderAlreadyInitializedForMapError,
-)
 from orwynn.src.di.collecting.provider_dependencies_map import (
     ProviderDependenciesMap,
+)
+from orwynn.src.di.collecting.ProviderAlreadyInitializedForMapError import (
+    ProviderAlreadyInitializedForMapError,
 )
 from orwynn.src.di.is_provider import is_provider
 from orwynn.src.di.NotProviderError import NotProviderError

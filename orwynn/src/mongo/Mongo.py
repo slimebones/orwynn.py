@@ -5,7 +5,7 @@ from pymongo.client_session import ClientSession
 from pymongo.cursor import Cursor
 from pymongo.database import Database as PymongoDatabase
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.database.Database import Database
 from orwynn.src.database.DatabaseEntityNotFoundError import (
     DatabaseEntityNotFoundError,

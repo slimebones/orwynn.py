@@ -1,6 +1,8 @@
 
 from orwynn.src.boot.Boot import Boot
-from orwynn.src.controller.websocket.WebsocketController import WebsocketController
+from orwynn.src.controller.websocket.WebsocketController import (
+    WebsocketController,
+)
 from orwynn.src.middleware.WebsocketMiddleware import WebsocketMiddleware
 from orwynn.src.middleware.WebsocketNextCall import WebsocketNextCall
 from orwynn.src.module.Module import Module

@@ -10,7 +10,7 @@ from orwynn.src.controller.http.DefinedTwiceControllerMethodError import \
 from orwynn.src.controller.MissingControllerClassAttributeError import \
     MissingControllerClassAttributeError
 from orwynn.src.proxy.EndpointProxy import EndpointProxy
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.web.http.HttpMethod import HttpMethod
 
 

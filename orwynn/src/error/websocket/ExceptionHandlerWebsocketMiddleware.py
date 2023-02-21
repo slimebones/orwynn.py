@@ -1,7 +1,7 @@
 import inspect
 from types import NoneType
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.error.ExceptionHandler import ExceptionHandler
 from orwynn.src.error.find_detailed_class_for_exception import (
     find_detailed_class_for_exception,

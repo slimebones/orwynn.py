@@ -1,6 +1,8 @@
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.boot.Boot import Boot
-from orwynn.src.controller.websocket.WebsocketController import WebsocketController
+from orwynn.src.controller.websocket.WebsocketController import (
+    WebsocketController,
+)
 from orwynn.src.error.Error import Error
 from orwynn.src.error.ExceptionHandler import ExceptionHandler
 from orwynn.src.module.Module import Module

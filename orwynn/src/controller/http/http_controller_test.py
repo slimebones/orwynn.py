@@ -1,4 +1,4 @@
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.app.AlreadyRegisteredMethodError import (
     AlreadyRegisteredMethodError,
 )
@@ -15,7 +15,11 @@ from orwynn.src.model.Model import Model
 from orwynn.src.module.Module import Module
 from orwynn.src.proxy.BootProxy import BootProxy
 from orwynn.src.testing.Client import Client
-from orwynn.src.validation import RequestValidationException, expect, validate_re
+from orwynn.src.validation import (
+    RequestValidationException,
+    expect,
+    validate_re,
+)
 from orwynn.src.validation.re_validation_error import ReValidationError
 from orwynn.src.validation.ValidationError import ValidationError
 from orwynn.src.web.http.HttpException import HttpException

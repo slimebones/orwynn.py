@@ -3,7 +3,7 @@ from typing import Any
 
 import dictdiffer
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.error.MalfunctionError import MalfunctionError
 from orwynn.src.mp.dictpp import dictpp
 

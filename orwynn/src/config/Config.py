@@ -1,7 +1,7 @@
 import re
 from typing import Any, Self
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.apprc.AppRc import AppRc
 from orwynn.src.model.Model import Model
 from orwynn.src.proxy.BootProxy import BootProxy

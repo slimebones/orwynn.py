@@ -6,7 +6,7 @@ from orwynn.src.model.Model import Model
 from orwynn.src.proxy.BootProxy import BootProxy
 
 from orwynn.src.testing.EmbeddedTestClient import EmbeddedTestClient
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.validation import validate
 from orwynn.src.web.Protocol import Protocol
 from orwynn.src.web.http.responses import TestHttpResponse

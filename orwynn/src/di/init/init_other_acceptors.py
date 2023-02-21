@@ -1,9 +1,11 @@
 import inspect
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.controller.Controller import Controller
 from orwynn.src.controller.http.HttpController import HttpController
-from orwynn.src.controller.websocket.WebsocketController import WebsocketController
+from orwynn.src.controller.websocket.WebsocketController import (
+    WebsocketController,
+)
 from orwynn.src.di.acceptor import Acceptor
 from orwynn.src.di.check_availability import check_availability
 from orwynn.src.di.DiContainer import DiContainer

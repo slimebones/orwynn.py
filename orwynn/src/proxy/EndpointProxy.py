@@ -1,6 +1,6 @@
 from typing import Callable, ItemsView
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.controller.endpoint.Endpoint import Endpoint
 from orwynn.src.controller.endpoint.EndpointNotFoundError import (
     EndpointNotFoundError,

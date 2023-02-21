@@ -5,7 +5,7 @@ import os
 
 from pytest import fixture
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.app.App import App
 from orwynn.src.app.app_test import std_app
 from orwynn.src.boot.Boot import Boot

@@ -1,7 +1,7 @@
 import re
 from typing import Any, Callable
 
-from orwynn import validation
+from orwynn.src import validation
 
 
 class Middleware:

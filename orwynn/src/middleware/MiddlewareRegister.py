@@ -5,7 +5,7 @@ from starlette.middleware.base import (
     BaseHTTPMiddleware as StarletteBaseHTTPMiddleware,
 )
 
-from orwynn import validation
+from orwynn.src import validation
 from orwynn.src.app.App import App
 from orwynn.src.BUILTIN_MIDDLEWARE import (
     BUILTIN_HTTP_MIDDLEWARE,
