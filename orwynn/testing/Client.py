@@ -1,6 +1,6 @@
 import inspect
 from types import NoneType
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, Optional, Self, TypeVar
 
 from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
 from orwynn import validation
@@ -13,11 +13,41 @@ _JsonifyExpectedType = TypeVar("_JsonifyExpectedType")
 
 
 class Client:
-    """Operates with HTTP client requests for test purposes."""
-    def __init__(self, client: EmbeddedTestClient) -> None:
-        validation.validate(client, EmbeddedTestClient)
-        self._client: EmbeddedTestClient = client
-        self.websocket = self._client.websocket_connect
+    """
+    Operates with HTTP client requests for test purposes.
+    """
+    def __init__(
+        self,
+        embedded_client: EmbeddedTestClient,
+        *,
+        binded_headers: Optional[dict[str, Any]] = None
+    ) -> None:
+        validation.validate(embedded_client, EmbeddedTestClient)
+        self._embedded_client: EmbeddedTestClient = embedded_client
+        self.websocket = self._embedded_client.websocket_connect
+
+        if binded_headers is None:
+            binded_headers = {}
+        self._binded_headers: dict[str, Any] = binded_headers
+
+    @property
+    def binded_headers(self) -> dict:
+        return self._binded_headers
+
+    def bind_headers(
+        self,
+        headers: dict[str, Any]
+    ) -> Self:
+        validation.validate_dict(headers, (str, validation.Validator.SKIP))
+
+        # Accumulate headers from this client to the new one
+        final_headers: dict[str, Any] = self._binded_headers
+        final_headers.update(headers)
+
+        return self.__class__(
+            self._embedded_client,
+            binded_headers=final_headers
+        )
 
     def get_jsonify(
         self,
@@ -186,19 +216,23 @@ class Client:
 
         match method:
             case "get":
-                test_client_method = self._client.get
+                test_client_method = self._embedded_client.get
             case "post":
-                test_client_method = self._client.post
+                test_client_method = self._embedded_client.post
             case "delete":
-                test_client_method = self._client.delete
+                test_client_method = self._embedded_client.delete
             case "put":
-                test_client_method = self._client.put
+                test_client_method = self._embedded_client.put
             case "patch":
-                test_client_method = self._client.patch
+                test_client_method = self._embedded_client.patch
             case "options":
-                test_client_method = self._client.options
+                test_client_method = self._embedded_client.options
             case _:
                 raise ValueError(f"Method {method} is not supported")
+
+        # Add binded headers
+        request_kwargs.setdefault("headers", {})
+        request_kwargs["headers"].update(self._binded_headers)
 
         response: TestResponse = test_client_method(url, **request_kwargs)
 

@@ -1,5 +1,7 @@
 from typing import Callable
 
+from orwynn.controller.http.HttpController import HttpController
+
 
 def get_log_apprc(check_fn: Callable) -> dict:
     return {
