@@ -36,20 +36,12 @@ class HttpController(Controller):
     """
     ROUTE: ClassVar[str | None] = None
     ENDPOINTS: ClassVar[list[Endpoint] | None] = None
-    VERSION: ClassVar[Optional[int | set[int] | Literal["*"]]] = None
+    VERSION: ClassVar[int | set[int] | Literal["*"] | None] = None
 
     def __init__(self) -> None:
-        self._methods: list[HttpMethod] = []
+        super().__init__()
 
-        if self.ROUTE is None:
-            raise MissingControllerClassAttributeError(
-                "you should set class attribute ROUTE for"
-                f" controller {self.__class__}"
-            )
-        else:
-            validation.validate(self.ROUTE, str)
-            validation.validate_route(self.ROUTE)
-            self._route: str = self.ROUTE
+        self._methods: list[HttpMethod] = []
 
         if self.ENDPOINTS is None:
             raise MissingControllerClassAttributeError(
@@ -85,12 +77,6 @@ class HttpController(Controller):
                     self.get_fn_by_http_method(http_method),
                     endpoint
                 )
-
-        validation.validate(self.VERSION, [int, set, NoneType, str])
-        if isinstance(self.VERSION, str) and self.VERSION != "*":
-            raise TypeError(
-                f"unrecognized VERSION {self.VERSION}"
-            )
 
     @property
     def route(self) -> str:

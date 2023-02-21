@@ -1,25 +1,20 @@
-import contextlib
 import os
 from copy import deepcopy
 from pathlib import Path
 from types import NoneType
-from typing import Literal
 
 import dotenv
 
-from orwynn import validation, web
+from orwynn import validation
 from orwynn.app.App import App
 from orwynn.apprc.AppRc import AppRc
 from orwynn.apprc.parse_apprc import parse_apprc
 from orwynn.boot.api_version.ApiVersion import ApiVersion
 from orwynn.boot.BootMode import BootMode
 from orwynn.controller.Controller import Controller
-from orwynn.controller.http.HttpController import HttpController
-from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.di.Di import Di
 from orwynn.di.MissingDiObjectError import MissingDiObjectError
 from orwynn.error.ExceptionHandler import ExceptionHandler
-from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.file.NotDirError import NotDirError
 from orwynn.indication.default_api_indication import default_api_indication
 from orwynn.indication.Indication import Indication
@@ -27,7 +22,6 @@ from orwynn.log.configure_log import configure_log
 from orwynn.log.LogConfig import LogConfig
 from orwynn.middleware.GlobalMiddlewareSetup import GlobalMiddlewareSetup
 from orwynn.middleware.Middleware import Middleware
-from orwynn.middleware.MiddlewareRegister import MiddlewareRegister
 from orwynn.module.Module import Module
 from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
 from orwynn.proxy.BootProxy import BootProxy
@@ -38,7 +32,7 @@ from orwynn.validation import (
     validate_dict,
     validate_each,
 )
-from orwynn.web import Cors, HttpMethod
+from orwynn.web.http.Cors import Cors
 from orwynn.worker.Worker import Worker
 
 
@@ -217,6 +211,15 @@ class Boot(Worker):
         # Configure logging
         configure_log(validation.apply(self.__di.find("LogConfig"), LogConfig))
 
+        self.__router: Router = self.__init_router(
+            cors=cors
+        )
+
+    def __init_router(
+        self,
+        *,
+        cors: Cors | None
+    ) -> Router:
         try:
             all_modules: list[Module] = self.__di.modules
         except MissingDiObjectError:
@@ -238,7 +241,7 @@ class Boot(Worker):
         except MissingDiObjectError:
             all_exception_handlers = []
 
-        self.__router: Router = Router(
+        return Router(
             self.app,
             global_http_route=self.__global_http_route,
             global_websocket_route=self.__global_websocket_route,

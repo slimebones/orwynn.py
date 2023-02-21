@@ -10,6 +10,7 @@ from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
 from orwynn import validation
 from orwynn.validation import validate
 from orwynn.web import TestResponse
+from orwynn.web.Protocol import Protocol
 
 # If ever you get to Python3.12, see if PEP 696 introduced, then apply
 # but for now it is in the next form
@@ -240,8 +241,9 @@ class Client:
 
         # Get finalized data
         finalized: _FinalizedRequestData = self._process_request_data(
-            route,
-            request_kwargs
+            route=route,
+            request_kwargs=request_kwargs,
+            protocol=Protocol.HTTP
         )
 
         # Make a request
@@ -263,8 +265,10 @@ class Client:
 
     def _process_request_data(
         self,
+        *,
         route: str,
-        request_kwargs: dict
+        request_kwargs: dict,
+        protocol: Protocol
     ) -> _FinalizedRequestData:
         """
         Processes a given route and request kwargs and returns finalized
@@ -276,7 +280,7 @@ class Client:
         request_kwargs.setdefault("headers", {})
         request_kwargs["headers"].update(self._binded_headers)
 
-        # Craft the final url
+        # Craft the final route
         is_global_route_used: bool = validation.apply(
             request_kwargs.get("is_global_route_used", True),
             bool
@@ -286,7 +290,8 @@ class Client:
         final_route: str = self._get_final_route(
             route,
             is_global_route_used=is_global_route_used,
-            api_version=api_version
+            api_version=api_version,
+            protocol=protocol
         )
         # Delete custom keys to not confuse a client's method
         try:
@@ -308,7 +313,8 @@ class Client:
         route: str,
         *,
         is_global_route_used: bool,
-        api_version: int | None
+        api_version: int | None,
+        protocol: Protocol
     ) -> str:
         if not is_global_route_used and api_version is not None:
             raise ValueError(
@@ -319,7 +325,11 @@ class Client:
             return route
 
         api_version_obj: ApiVersion = BootProxy.ie().api_version
-        global_route: str = BootProxy.ie().global_http_route
+
+        global_route: str = BootProxy.ie().get_global_route_for_protocol(
+            protocol
+        )
+
         final_api_version: int
 
         if api_version:
@@ -349,7 +359,8 @@ class Client:
     ) -> Any:
         finalized: _FinalizedRequestData = self._process_request_data(
             route=route,
-            request_kwargs=request_kwargs
+            request_kwargs=request_kwargs,
+            protocol=Protocol.WEBSOCKET
         )
 
         return self._embedded_client.websocket_connect(

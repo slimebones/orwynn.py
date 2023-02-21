@@ -1,14 +1,16 @@
-from typing import ClassVar
+from types import NoneType
+from typing import ClassVar, Literal
 
+from orwynn import validation
 from orwynn.controller.MissingControllerClassAttributeError import (
     MissingControllerClassAttributeError,
 )
-from orwynn.validation import validate, validate_route
 
 
 class Controller:
     """Entrypoint to some operational service."""
     ROUTE: ClassVar[str | None] = None
+    VERSION: ClassVar[int | set[int] | Literal["*"] | None] = None
 
     def __init__(self) -> None:
         if self.ROUTE is None:
@@ -17,10 +19,16 @@ class Controller:
                 f" controller {self.__class__}"
             )
         else:
-            validate(self.ROUTE, str)
-            validate_route(self.ROUTE)
-            self.__route: str = self.ROUTE
+            validation.validate(self.ROUTE, str)
+            validation.validate_route(self.ROUTE)
+            self._route: str = self.ROUTE
+
+        validation.validate(self.VERSION, [int, set, str, NoneType])
+        if isinstance(self.VERSION, str) and self.VERSION != "*":
+            raise TypeError(
+                f"unrecognized VERSION {self.VERSION}"
+            )
 
     @property
     def route(self) -> str:
-        return self.__route
+        return self._route

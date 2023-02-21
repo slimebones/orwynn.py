@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from orwynn.apprc.AppRc import AppRc
 from orwynn.boot.api_version.ApiVersion import ApiVersion
 from orwynn.boot.BootMode import BootMode
+from orwynn.web import Protocol
 from orwynn.worker.Worker import Worker
 
 if TYPE_CHECKING:
@@ -59,6 +60,10 @@ class BootProxy(Worker):
         return self.__global_http_route
 
     @property
+    def global_websocket_route(self) -> str:
+        return self.__global_websocket_route
+
+    @property
     def api_version(self) -> ApiVersion:
         return self.__api_version
 
@@ -75,3 +80,16 @@ class BootProxy(Worker):
     @property
     def data(self) -> dict:
         return dict(**self.boot_config_data, **{})
+
+    def get_global_route_for_protocol(
+        self,
+        protocol: Protocol
+    ) -> str:
+        if protocol is Protocol.HTTP:
+            return self.__global_http_route
+        elif protocol is Protocol.WEBSOCKET:
+            return self.__global_websocket_route
+        else:
+            raise TypeError(
+                f"unrecognized protocol {protocol}"
+            )

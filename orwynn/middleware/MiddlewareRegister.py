@@ -1,25 +1,35 @@
 from typing import Any, Callable, Sequence
 
 from fastapi.middleware.cors import CORSMiddleware as FastAPI_CORSMiddleware
-from starlette.middleware.base import \
-    BaseHTTPMiddleware as StarletteBaseHTTPMiddleware
+from starlette.middleware.base import (
+    BaseHTTPMiddleware as StarletteBaseHTTPMiddleware,
+)
 
 from orwynn import validation
 from orwynn.app.App import App
-from orwynn.BUILTIN_MIDDLEWARE import (BUILTIN_HTTP_MIDDLEWARE,
-                                       BUILTIN_WEBSOCKET_MIDDLEWARE)
+from orwynn.BUILTIN_MIDDLEWARE import (
+    BUILTIN_HTTP_MIDDLEWARE,
+    BUILTIN_WEBSOCKET_MIDDLEWARE,
+)
 from orwynn.error.DefaultExceptionHandler import DefaultExceptionHandler
 from orwynn.error.ExceptionHandler import ExceptionHandler
 from orwynn.error.ExceptionHandlerManager import ExceptionHandlerManager
-from orwynn.error.get_exception_direct_subclasses import get_exception_direct_subclasses
-from orwynn.error.http.DefaultHttpExceptionHandler import DefaultHttpExceptionHandler
-from orwynn.error.http.ExceptionHandlerHttpMiddleware import \
-    ExceptionHandlerHttpMiddleware
-from orwynn.error.websocket.ExceptionHandlerWebsocketMiddleware import \
-    ExceptionHandlerWebsocketMiddleware
+from orwynn.error.get_exception_direct_subclasses import (
+    get_exception_direct_subclasses,
+)
+from orwynn.error.http.DefaultHttpExceptionHandler import (
+    DefaultHttpExceptionHandler,
+)
+from orwynn.error.http.ExceptionHandlerHttpMiddleware import (
+    ExceptionHandlerHttpMiddleware,
+)
+from orwynn.error.websocket.ExceptionHandlerWebsocketMiddleware import (
+    ExceptionHandlerWebsocketMiddleware,
+)
 from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
-from orwynn.middleware.BuiltinWebsocketMiddleware import \
-    BuiltinWebsocketMiddleware
+from orwynn.middleware.BuiltinWebsocketMiddleware import (
+    BuiltinWebsocketMiddleware,
+)
 from orwynn.middleware.HttpMiddleware import HttpMiddleware
 from orwynn.middleware.Middleware import Middleware
 from orwynn.middleware.WebsocketMiddleware import WebsocketMiddleware
@@ -55,6 +65,7 @@ class MiddlewareRegister:
 
         self.__cors: Cors | None = cors
         self.__websocket_stack: WebsocketStack = websocket_stack
+        self.__is_websocket_middleware_added: bool = False
 
     def register_all(self) -> None:
         """

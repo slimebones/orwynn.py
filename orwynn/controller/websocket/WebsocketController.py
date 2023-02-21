@@ -1,4 +1,4 @@
-from typing import Callable, ClassVar
+from typing import Callable, ClassVar, Literal
 
 from orwynn import validation
 from orwynn.controller.Controller import Controller
@@ -23,6 +23,15 @@ class WebsocketController(Controller):
     Note that final route for each websocket controller method consists of
     three things: MODULE_ROUTE + CONTROLLER_ROUTE + METHOD_ROUTE.
 
+    Class-Attributes:
+        ROUTE:
+            A subroute of Module's route (where controller attached) which
+            controller will answer to. This attribute is required to be
+            defined in subclasses explicitly or an error will be raised.
+            It is allowed to be "/" to handle Module's root route requests.
+        VERSION (optional):
+            An API version the controller supports. Defaults to the latest one.
+
     Example:
     ```python
     from orwynn import WebsocketController
@@ -38,6 +47,7 @@ class WebsocketController(Controller):
     ```
     """
     ROUTE: ClassVar[str | None] = None
+    VERSION: ClassVar[int | set[int] | Literal["*"] | None] = None
 
     @classmethod
     def get_handler_subroutes(cls) -> list[str]:
@@ -52,7 +62,12 @@ class WebsocketController(Controller):
 
     @property
     def event_handlers(self) -> list[WebsocketEventHandlerMethod]:
-        """Returns all self bound event handlers started with "on_".
+        """
+        Returns all self bound event handlers started with "on_".
+
+        Note that implicitly inherited methods are not included in search. If
+        you want to inherit the parent's functionality for a handler,
+        use super() with a redefinition of the method.
         """
         events: list[WebsocketEventHandlerMethod] = []
 

@@ -1,9 +1,4 @@
 """Scalable web-framework with out-of-the-box architecture."""
-# Only base most required imports should be here to not overflow shortcut
-# imports, others can be imported from modules directly.
-#
-# Also it's OK to include framework modules here to import, such as sql_module
-# or log_module.
 from orwynn.app.App import App
 from orwynn.boot.api_version.ApiVersion import ApiVersion
 from orwynn.boot.Boot import Boot
@@ -34,4 +29,5 @@ from orwynn.sql.Sql import Sql
 from orwynn.sql.Table import Table
 from orwynn.testing.Client import Client
 from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
+from orwynn.web.http.Cors import Cors
 from orwynn.web.websocket.Websocket import Websocket
