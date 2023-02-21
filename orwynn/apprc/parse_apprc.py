@@ -3,12 +3,13 @@ import os
 from pathlib import Path
 from types import NoneType
 
-from orwynn import mp, validation
+from orwynn import validation
 from orwynn.apprc.APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from orwynn.apprc.AppRc import AppRc
 from orwynn.apprc.AppRcSearchError import AppRcSearchError
 from orwynn.boot.BootMode import BootMode
 from orwynn.file.yml import load_yml
+from orwynn.mp.helpers import patch as mp_patch
 
 
 def parse_apprc(
@@ -99,7 +100,7 @@ def __parse_into(
     for nesting_mode in APP_RC_MODE_NESTING[:mode_nesting_index + 1]:
         # Supress: We don't mind if any top-level key is missing here
         with contextlib.suppress(KeyError):
-            mp.patch(
+            mp_patch(
                 receiver,
                 source[nesting_mode.value],
                 should_deepcopy=False

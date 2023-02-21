@@ -1,6 +1,6 @@
 import pytest
 
-from orwynn import mp, validation
+from orwynn import validation
 from orwynn.apprc.AppRc import AppRc
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
@@ -8,6 +8,7 @@ from orwynn.config.Config import Config
 from orwynn.di.Di import Di
 from orwynn.model.Model import Model
 from orwynn.module.Module import Module
+from orwynn.mp.helpers import find as mp_find
 
 
 class Menu(Model):
@@ -65,7 +66,7 @@ def test_prod(raw_apprc: AppRc):
     assert validation.apply(
         Di.ie().find("BurgerShotConfig"),
         BurgerShotConfig
-    ).dict() == mp.find("prod.BurgerShot", raw_apprc)
+    ).dict() == mp_find("prod.BurgerShot", raw_apprc)
 
 
 def test_dev(raw_apprc: AppRc):

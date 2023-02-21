@@ -13,7 +13,7 @@ from orwynn.di.collecting.provider_dependencies_map import (
 from orwynn.di.is_provider import is_provider
 from orwynn.di.NotProviderError import NotProviderError
 from orwynn.di.Provider import Provider
-from orwynn.fmt import format_chain
+from orwynn.fmt.helpers import format_chain
 from orwynn.module.Module import Module
 
 

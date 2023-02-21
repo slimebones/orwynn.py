@@ -8,7 +8,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from orwynn import validation
-from orwynn.crypto import hash_password
+from orwynn.crypto.helpers import hash_password
 
 from .Sql import Sql
 from .SqlConfig import SqlConfig

@@ -6,8 +6,9 @@ from pydantic.fields import ModelField
 from pymongo.cursor import Cursor
 from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
 
-from orwynn import fmt, validation
+from orwynn import validation
 from orwynn.di.Di import Di
+from orwynn.fmt.helpers import snakefy
 from orwynn.mapping.CustomUseOfMappingReservedFieldError import (
     CustomUseOfMappingReservedFieldError,
 )
@@ -37,7 +38,7 @@ class Document(Mapping):
 
     @classmethod
     def _get_collection(cls) -> str:
-        return fmt.snakefy(cls.__name__)
+        return snakefy(cls.__name__)
 
     @classmethod
     def _get_mongo(cls) -> Mongo:

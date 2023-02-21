@@ -5,8 +5,8 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from orwynn.fmt import snakefy
-from orwynn.rnd import gen_id
+from orwynn.fmt.helpers import snakefy
+from orwynn.rnd.helpers import gen_id
 
 
 class Table(DeclarativeBase):

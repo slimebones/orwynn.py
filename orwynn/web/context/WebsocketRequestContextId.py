@@ -1,4 +1,5 @@
-from orwynn import rnd, validation
+from orwynn import validation
+from orwynn.rnd.helpers import gen_id
 from orwynn.web.context.ContextStorage import ContextStorage
 from orwynn.web.context.RequestIdAlreadySavedError import (
     RequestIdAlreadySavedError,
@@ -27,7 +28,7 @@ class WebsocketRequestContextId:
             RequestIdAlreadySavedError:
                 If the request id has been set previously.
         """
-        request_id: str = rnd.gen_id()
+        request_id: str = gen_id()
         try:
             self.__storage.get("websocket_request_id")
         except KeyError:

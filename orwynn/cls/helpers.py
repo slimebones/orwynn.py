@@ -1,14 +1,8 @@
 import functools
-import inspect
-import typing
 from typing import Any, Callable
 
-from orwynn.error.Error import Error
+from orwynn.cls.errors import ClassNotFoundError
 from orwynn.types import Class
-
-
-class ClassNotFoundError(Error):
-    pass
 
 
 def find_subclass_by_name(name: str, BaseClass: Class) -> Class:

@@ -1,4 +1,4 @@
-from orwynn.fmt import kebabify, pascalify, snakefy
+from orwynn.fmt.helpers import kebabify, pascalify, snakefy
 
 
 def test_kebabify():
