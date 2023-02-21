@@ -1,7 +1,8 @@
-from orwynn import web
 from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
 from orwynn.middleware.HttpNextCall import HttpNextCall
 from orwynn.web.context.context_manager import context_manager
+from orwynn.web.http.requests import HttpRequest
+from orwynn.web.http.responses import HttpResponse
 
 
 class ContextBuiltinMiddleware(BuiltinHttpMiddleware):
@@ -9,7 +10,7 @@ class ContextBuiltinMiddleware(BuiltinHttpMiddleware):
     cycle.
     """
     async def process(
-        self, request: web.Request, call_next: HttpNextCall
-    ) -> web.Response:
+        self, request: HttpRequest, call_next: HttpNextCall
+    ) -> HttpResponse:
         with context_manager():
             return await call_next(request)

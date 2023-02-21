@@ -1,6 +1,6 @@
-from orwynn import web
 from orwynn.middleware.Middleware import Middleware
 from orwynn.middleware.WebsocketNextCall import WebsocketNextCall
+from orwynn.web.websocket.Websocket import Websocket
 
 
 class WebsocketMiddleware(Middleware):
@@ -11,14 +11,14 @@ class WebsocketMiddleware(Middleware):
     """
     async def dispatch(
         self,
-        request: web.Websocket,
+        request: Websocket,
         call_next: WebsocketNextCall
     ) -> None:
         return await super().dispatch(request, call_next)
 
     async def process(
         self,
-        request: web.Websocket,
+        request: Websocket,
         call_next: WebsocketNextCall
     ) -> None:
         return await super().process(request, call_next)

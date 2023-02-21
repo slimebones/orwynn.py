@@ -1,10 +1,14 @@
 from orwynn.error.ExceptionHandler import ExceptionHandler
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.web import JsonResponse, Request, Response
+from orwynn.web.http.requests import HttpRequest
+from orwynn.web.http.responses import HttpResponse, JsonHttpResponse
 
 
 class DefaultExceptionHandler(ExceptionHandler):
     E = Exception
 
-    def handle(self, request: Request, error: Exception) -> Response:
-        return JsonResponse(BootProxy.ie().api_indication.digest(error), 400)
+    def handle(self, request: HttpRequest, error: Exception) -> HttpResponse:
+        return JsonHttpResponse(
+            BootProxy.ie().api_indication.digest(error),
+            400
+        )

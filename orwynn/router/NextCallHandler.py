@@ -1,11 +1,11 @@
 
 import contextlib
 
-from orwynn import web
 from orwynn.router.WebsocketHandler import (
     DispatchWebsocketHandler,
     WebsocketHandler,
 )
+from orwynn.web.websocket.Websocket import Websocket
 
 
 class NextCallHandler:
@@ -20,7 +20,7 @@ class NextCallHandler:
         self.__current_index: int = 0
         self.__handlers: list[WebsocketHandler] = handlers
 
-    async def __call__(self, websocket: web.Websocket) -> None:
+    async def __call__(self, websocket: Websocket) -> None:
         """
         Propagates a call to the next recipient in the function list.
         """

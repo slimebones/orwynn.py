@@ -1,4 +1,4 @@
-from orwynn import validation, web
+from orwynn import validation
 from orwynn.boot.Boot import Boot
 from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.error.Error import Error
@@ -6,6 +6,7 @@ from orwynn.error.ExceptionHandler import ExceptionHandler
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.web.Protocol import Protocol
+from orwynn.web.websocket.Websocket import Websocket
 
 
 class SomeWebsocketError(Error):
@@ -15,7 +16,7 @@ class SomeWebsocketError(Error):
 class Wc(WebsocketController):
     ROUTE = "/"
 
-    async def main(self, ws: web.Websocket) -> None:
+    async def main(self, ws: Websocket) -> None:
         raise SomeWebsocketError("hello")
 
 
@@ -24,7 +25,7 @@ class Eh(ExceptionHandler):
     PROTOCOL = Protocol.WEBSOCKET
 
     async def handle(
-        self, request: web.Websocket, error: SomeWebsocketError
+        self, request: Websocket, error: SomeWebsocketError
     ) -> None:
         data: dict = error.api
         data["value"]["message"] = "handled"

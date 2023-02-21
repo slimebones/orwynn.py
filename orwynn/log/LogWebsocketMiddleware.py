@@ -1,10 +1,10 @@
-from orwynn import web
 from orwynn.log.WebsocketLogger import WebsocketLogger
 from orwynn.middleware.WebsocketMiddleware import WebsocketMiddleware
 from orwynn.middleware.WebsocketNextCall import WebsocketNextCall
 from orwynn.web.context.WebsocketRequestContextId import (
     WebsocketRequestContextId,
 )
+from orwynn.web.websocket.Websocket import Websocket
 
 
 class LogWebsocketMiddleware(WebsocketMiddleware):
@@ -18,7 +18,7 @@ class LogWebsocketMiddleware(WebsocketMiddleware):
         self.__logger: WebsocketLogger = WebsocketLogger()
 
     async def process(
-        self, request: web.Websocket, call_next: WebsocketNextCall
+        self, request: Websocket, call_next: WebsocketNextCall
     ) -> None:
         request_id: str = WebsocketRequestContextId().get()
         await self.__logger.log_request(

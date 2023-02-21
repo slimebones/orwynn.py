@@ -1,14 +1,13 @@
-
-
-from orwynn import validation, web
+from orwynn import validation
 from orwynn.log.Log import Log
+from orwynn.web.websocket.Websocket import Websocket
 
 
 class WebsocketLogger:
     """Logs websocket requests."""
     async def log_request(
         self,
-        request: web.Websocket,
+        request: Websocket,
         request_id: str
     ) -> str:
         """Assigns special id to request and logs it.
@@ -22,7 +21,7 @@ class WebsocketLogger:
         Returns:
             Request assigned ID.
         """
-        validation.validate(request, web.Websocket)
+        validation.validate(request, Websocket)
         validation.validate(request_id, str)
 
         plain_message: str = \
@@ -48,7 +47,7 @@ class WebsocketLogger:
         self,
         response_data: dict,
         *,
-        request: web.Websocket,
+        request: Websocket,
         request_id: str
     ) -> None:
         """

@@ -1,6 +1,6 @@
 import inspect
 
-from orwynn import validation, web
+from orwynn import validation
 from orwynn.controller.Controller import Controller
 from orwynn.controller.http.HttpController import HttpController
 from orwynn.controller.websocket.WebsocketController import WebsocketController
@@ -17,6 +17,7 @@ from orwynn.model.Model import Model
 from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.validation import validate
+from orwynn.web.join_routes import join_routes
 
 
 class __CoveredRoutes(Model):
@@ -102,7 +103,7 @@ def __init_controllers(
             controller
         )
 
-        final_route: str = web.join_routes(
+        final_route: str = join_routes(
             module.route, controller.route
         )
         if issubclass(C, HttpController):
@@ -113,7 +114,7 @@ def __init_controllers(
             # subroute system
             for subroute in C.get_handler_subroutes():
                 websocket_covered_routes.append(
-                    web.join_routes(final_route, subroute)
+                    join_routes(final_route, subroute)
                 )
         elif type(C) is Controller:
             raise TypeError(

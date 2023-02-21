@@ -1,33 +1,24 @@
-"""Scalable web-framework with out-of-the-box architecture."""
+"""
+Scalable web-framework with out-of-the-box architecture.
+
+Use only two types of imports:
+1. from orwynn import something
+2. from orwynn.shared.[somemodule] import something
+
+Other imports such as direct ones are discouraged, since structural changes
+there are not marked as breaking.
+"""
+from orwynn import shared
+
+# Only base classes listed here, others go in shared module.
 from orwynn.app.App import App
 from orwynn.boot.api_version.ApiVersion import ApiVersion
 from orwynn.boot.Boot import Boot
 from orwynn.boot.BootMode import BootMode
 from orwynn.config.Config import Config
-from orwynn.controller.endpoint.Endpoint import Endpoint
-from orwynn.controller.endpoint.EndpointResponse import EndpointResponse
-from orwynn.controller.http.HttpController import HttpController
-from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.error.Error import Error
 from orwynn.error.ExceptionHandler import ExceptionHandler
-from orwynn.indication.Indication import Indication
-from orwynn.indication.IndicationType import IndicationType
-from orwynn.indication.Indicator import Indicator
 from orwynn.log.Log import Log
-from orwynn.middleware.HttpMiddleware import HttpMiddleware
-from orwynn.middleware.HttpNextCall import HttpNextCall
-from orwynn.middleware.WebsocketMiddleware import WebsocketMiddleware
-from orwynn.middleware.WebsocketNextCall import WebsocketNextCall
 from orwynn.model.Model import Model
 from orwynn.module.Module import Module
-from orwynn.mongo import module as mongo_module
-from orwynn.mongo.Document import Document
-from orwynn.proxy.BootProxy import BootProxy
 from orwynn.service.Service import Service
-from orwynn.sql import module as sql_module
-from orwynn.sql.Sql import Sql
-from orwynn.sql.Table import Table
-from orwynn.testing.Client import Client
-from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
-from orwynn.web.http.Cors import Cors
-from orwynn.web.websocket.Websocket import Websocket

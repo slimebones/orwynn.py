@@ -1,8 +1,8 @@
-from orwynn import web
 from orwynn.middleware.BuiltinWebsocketMiddleware import (
     BuiltinWebsocketMiddleware,
 )
 from orwynn.middleware.WebsocketNextCall import WebsocketNextCall
+from orwynn.web.websocket.Websocket import Websocket
 
 
 class ConnectionBuiltinWebsocketMiddleware(BuiltinWebsocketMiddleware):
@@ -17,7 +17,7 @@ class ConnectionBuiltinWebsocketMiddleware(BuiltinWebsocketMiddleware):
     """
 
     async def process(
-        self, request: web.Websocket, call_next: WebsocketNextCall
+        self, request: Websocket, call_next: WebsocketNextCall
     ) -> None:
         await request.accept()
         await call_next(request)

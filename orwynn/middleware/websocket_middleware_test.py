@@ -1,15 +1,16 @@
-from orwynn import web
+
 from orwynn.boot.Boot import Boot
 from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.middleware.WebsocketMiddleware import WebsocketMiddleware
 from orwynn.middleware.WebsocketNextCall import WebsocketNextCall
 from orwynn.module.Module import Module
 from orwynn.testing.Client import Client
+from orwynn.web.websocket.Websocket import Websocket
 
 
 class Mw1(WebsocketMiddleware):
     async def process(
-        self, request: web.Websocket, call_next: WebsocketNextCall
+        self, request: Websocket, call_next: WebsocketNextCall
     ) -> None:
         await request.send_json({"value": "entry"})
         await call_next(request)
@@ -18,7 +19,7 @@ class Mw1(WebsocketMiddleware):
 class Ws1(WebsocketController):
     ROUTE = "/"
 
-    async def on_message(self, websocket: web.Websocket) -> None:
+    async def on_message(self, websocket: Websocket) -> None:
         await websocket.send_json({"value": "hello"})
         await websocket.close()
 

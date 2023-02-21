@@ -6,14 +6,15 @@ from orwynn.controller.http.HttpController import HttpController
 from orwynn.middleware.HttpMiddleware import HttpMiddleware
 from orwynn.module.Module import Module
 from orwynn.testing.Client import Client
-from orwynn.web import Request, Response, TestResponse
+from orwynn.web.http.requests import HttpRequest
+from orwynn.web.http.responses import HttpResponse, TestHttpResponse
 
 
 class Mw1(HttpMiddleware):
     async def process(
-        self, request: Request, call_next: Callable
-    ) -> Response:
-        response: Response = await call_next(request)
+        self, request: HttpRequest, call_next: Callable
+    ) -> HttpResponse:
+        response: HttpResponse = await call_next(request)
         response.headers["x-test"] = "hello"
         return response
 
@@ -35,7 +36,7 @@ def test_basic():
         Middleware=[Mw1]
     ))
     http: Client = boot.app.client
-    response: TestResponse = http.get("/hello/world")
+    response: TestHttpResponse = http.get("/hello/world")
 
     assert response.headers["x-test"] == "hello"
 
@@ -56,7 +57,7 @@ def test_variable_route():
         Middleware=[Mw1]
     ))
     http: Client = boot.app.client
-    response: TestResponse = http.get("/e201")
+    response: TestHttpResponse = http.get("/e201")
 
     assert response.json()["value"] == "e201"
     assert response.headers["x-test"] == "hello"
@@ -78,7 +79,7 @@ def test_file_path_route():
         Middleware=[Mw1]
     ))
     http: Client = boot.app.client
-    response: TestResponse = http.get("/doc/pdf/1234.pdf")
+    response: TestHttpResponse = http.get("/doc/pdf/1234.pdf")
 
     assert response.json()["value"] == "doc/pdf/1234.pdf"
     assert response.headers["x-test"] == "hello"

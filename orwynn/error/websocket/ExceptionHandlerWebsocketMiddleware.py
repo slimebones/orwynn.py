@@ -1,7 +1,7 @@
 import inspect
 from types import NoneType
 
-from orwynn import validation, web
+from orwynn import validation
 from orwynn.error.ExceptionHandler import ExceptionHandler
 from orwynn.error.find_detailed_class_for_exception import (
     find_detailed_class_for_exception,
@@ -15,6 +15,7 @@ from orwynn.middleware.WebsocketNextCall import WebsocketNextCall
 from orwynn.web.context.WebsocketRequestContextId import (
     WebsocketRequestContextId,
 )
+from orwynn.web.websocket.Websocket import Websocket
 
 
 class ExceptionHandlerWebsocketMiddleware(BuiltinWebsocketMiddleware):
@@ -37,7 +38,7 @@ class ExceptionHandlerWebsocketMiddleware(BuiltinWebsocketMiddleware):
 
     async def process(
         self,
-        request: web.Websocket,
+        request: Websocket,
         call_next: WebsocketNextCall
     ) -> None:
         try:

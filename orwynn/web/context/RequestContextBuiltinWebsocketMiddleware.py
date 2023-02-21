@@ -1,4 +1,3 @@
-from orwynn import web
 from orwynn.log.Log import Log
 from orwynn.middleware.BuiltinWebsocketMiddleware import (
     BuiltinWebsocketMiddleware,
@@ -7,12 +6,13 @@ from orwynn.middleware.WebsocketNextCall import WebsocketNextCall
 from orwynn.web.context.WebsocketRequestContextId import (
     WebsocketRequestContextId,
 )
+from orwynn.web.websocket.Websocket import Websocket
 
 
 class RequestContextBuiltinWebsocketMiddleware(BuiltinWebsocketMiddleware):
     """Populates the context storage with the current request's id."""
     async def process(
-        self, request: web.Websocket, call_next: WebsocketNextCall
+        self, request: Websocket, call_next: WebsocketNextCall
     ) -> None:
         request_id: str = WebsocketRequestContextId().save()
 

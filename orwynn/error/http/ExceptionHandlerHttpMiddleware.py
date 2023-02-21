@@ -1,8 +1,9 @@
-
-from orwynn import validation, web
+from orwynn import validation
 from orwynn.error.ExceptionHandler import ExceptionHandler
 from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
 from orwynn.middleware.HttpNextCall import HttpNextCall
+from orwynn.web.http.requests import HttpRequest
+from orwynn.web.http.responses import HttpResponse
 
 
 class ExceptionHandlerHttpMiddleware(BuiltinHttpMiddleware):
@@ -25,9 +26,9 @@ class ExceptionHandlerHttpMiddleware(BuiltinHttpMiddleware):
 
     async def process(
         self,
-        request: web.Request,
+        request: HttpRequest,
         call_next: HttpNextCall
-    ) -> web.Response:
+    ) -> HttpResponse:
         # Here no actions is done at the moment since handlers are added as
         # Starlette exception middleware.
         return await call_next(request)

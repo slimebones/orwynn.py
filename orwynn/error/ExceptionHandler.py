@@ -1,7 +1,8 @@
 from typing import ClassVar
 
-from orwynn import validation, web
+from orwynn import validation
 from orwynn.error.MalfunctionError import MalfunctionError
+from orwynn.web.generic import GenericRequest, GenericResponse
 from orwynn.web.Protocol import Protocol
 
 
@@ -42,7 +43,7 @@ class ExceptionHandler:
 
     def handle(
         self,
-        request: web.GenericRequest,
+        request: GenericRequest,
         error: Exception
-    ) -> web.GenericResponse:
+    ) -> GenericResponse:
         raise NotImplementedError()

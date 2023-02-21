@@ -1,7 +1,7 @@
-from orwynn import mongo
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HttpController import HttpController
 from orwynn.module.Module import Module
+from orwynn.mongo import module
 from orwynn.mongo.Document import Document
 from orwynn.mongo.Mongo import Mongo
 from orwynn.service.Service import Service
@@ -51,5 +51,5 @@ user_module = Module(
     route="/users",
     Providers=[UserService],
     Controllers=[UsersController, UsersIdController],
-    imports=[mongo.module]
+    imports=[module.module]
 )

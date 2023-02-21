@@ -18,7 +18,8 @@ from orwynn.testing.Client import Client
 from orwynn.validation import RequestValidationException, expect, validate_re
 from orwynn.validation.re_validation_error import ReValidationError
 from orwynn.validation.ValidationError import ValidationError
-from orwynn.web import HttpException, HttpMethod
+from orwynn.web.http.HttpException import HttpException
+from orwynn.web.http.HttpMethod import HttpMethod
 from orwynn.web.http.UnsupportedHttpMethodError import (
     UnsupportedHttpMethodError,
 )

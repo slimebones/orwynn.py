@@ -49,7 +49,7 @@ lint:
 		--line-length=79 \
 		--isolated \
 		--max-complexity 10 \
-		--per-file-ignores="__init__.py:F401,*_test.py:S101,conftest.py:F401" \
+		--per-file-ignores="__init__.py:F401,*_test.py:S101,conftest.py:F401,./orwynn/shared/*:F401" \
 		--exclude .git,__pycache__,docs/source/conf.py,old,build,dist,.venv,.pytest_cache,.vscode \
 		.
 

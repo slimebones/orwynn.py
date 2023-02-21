@@ -1,4 +1,4 @@
-from orwynn import validation, web
+from orwynn import validation
 from orwynn.boot.Boot import Boot
 from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.log.LogWebsocketMiddleware import LogWebsocketMiddleware
@@ -7,6 +7,7 @@ from orwynn.web.context.UndefinedStorageError import UndefinedStorageError
 from orwynn.web.context.WebsocketRequestContextId import (
     WebsocketRequestContextId,
 )
+from orwynn.web.websocket.Websocket import Websocket
 
 
 def test_basic():
@@ -16,7 +17,7 @@ def test_basic():
     class C1(WebsocketController):
         ROUTE = "/"
 
-        async def main(self, websocket: web.Websocket) -> None:
+        async def main(self, websocket: Websocket) -> None:
             await websocket.send_json(
                 {"request_id": WebsocketRequestContextId().get()}
             )

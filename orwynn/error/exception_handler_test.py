@@ -1,4 +1,4 @@
-from orwynn import validation, web
+from orwynn import validation
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HttpController import HttpController
@@ -13,14 +13,19 @@ from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.service.Service import Service
 from orwynn.testing.Client import Client
-from orwynn.web import JsonResponse, Request, TestResponse
+from orwynn.web.http.requests import HttpRequest
+from orwynn.web.http.responses import (
+    HttpResponse,
+    JsonHttpResponse,
+    TestHttpResponse,
+)
 
 
 class GeneralEh(ExceptionHandler):
     E = Error
 
-    def handle(self, request: Request, error: Error):
-        return JsonResponse(error.api, 401)
+    def handle(self, request: HttpRequest, error: Error):
+        return JsonHttpResponse(error.api, 401)
 
 
 class RaiseErrorController(HttpController):
@@ -45,7 +50,7 @@ def test_custom_handler():
     )
     http: Client = boot.app.client
 
-    r: TestResponse = http.get("/", 401)
+    r: TestHttpResponse = http.get("/", 401)
 
     recovered_error: Error = validation.apply(
         BootProxy.ie().api_indication.recover(Error, r.json()),
@@ -68,7 +73,7 @@ def test_default_exception():
     )
     http: Client = boot.app.client
 
-    r: TestResponse = http.get("/", 400)
+    r: TestHttpResponse = http.get("/", 400)
 
     recovered_exception: Exception = validation.apply(
         BootProxy.ie().api_indication.recover(Exception, r.json()),
@@ -103,10 +108,10 @@ def test_as_acceptor():
         def __init__(self, cool_service: CoolService) -> None:
             self.__cool_service: CoolService = cool_service
 
-        def handle(self, request: Request, error: Error) -> web.Response:
+        def handle(self, request: HttpRequest, error: Error) -> HttpResponse:
             data: dict = error.api
             data["__test_meta_info"] = self.__cool_service.do_something()
-            return JsonResponse(data, 400)
+            return JsonHttpResponse(data, 400)
 
     boot: Boot = Boot(
         Module(route="/", Providers=[CoolService], Controllers=[C1]),
@@ -133,16 +138,16 @@ def test_default_in_middleware():
     class M1(HttpMiddleware):
         async def process(
             self,
-            request: web.Request,
+            request: HttpRequest,
             call_next: HttpNextCall
-        ) -> web.Response:
+        ) -> HttpResponse:
             raise ValueError("whoops!")
 
     boot: Boot = Boot(
         Module(route="/", Controllers=[C1], Middleware=[M1])
     )
 
-    r: TestResponse = boot.app.client.get("/", 400)
+    r: TestHttpResponse = boot.app.client.get("/", 400)
 
     recovered_exception: Exception = validation.apply(
         BootProxy.ie().api_indication.recover(Exception, r.json()),
@@ -166,9 +171,9 @@ def test_custom_in_middleware():
     class M1(HttpMiddleware):
         async def process(
             self,
-            request: web.Request,
+            request: HttpRequest,
             call_next: HttpNextCall
-        ) -> web.Response:
+        ) -> HttpResponse:
             raise Error("whoops!")
 
     boot: Boot = Boot(
@@ -176,7 +181,7 @@ def test_custom_in_middleware():
         ExceptionHandlers={GeneralEh}
     )
 
-    r: TestResponse = boot.app.client.get("/", 401)
+    r: TestHttpResponse = boot.app.client.get("/", 401)
 
     recovered: Error = validation.apply(
         BootProxy.ie().api_indication.recover(Error, r.json()),

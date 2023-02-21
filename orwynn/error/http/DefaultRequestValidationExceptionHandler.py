@@ -1,7 +1,8 @@
 from orwynn.error.ExceptionHandler import ExceptionHandler
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.validation import RequestValidationException
-from orwynn.web import JsonResponse, Request, Response
+from orwynn.web.http.requests import HttpRequest
+from orwynn.web.http.responses import HttpResponse, JsonHttpResponse
 
 
 class DefaultRequestValidationExceptionHandler(ExceptionHandler):
@@ -9,10 +10,10 @@ class DefaultRequestValidationExceptionHandler(ExceptionHandler):
 
     def handle(
         self,
-        request: Request,
+        request: HttpRequest,
         error: RequestValidationException
-    ) -> Response:
-        return JsonResponse(
+    ) -> HttpResponse:
+        return JsonHttpResponse(
             BootProxy.ie().api_indication.digest(error),
             422
         )

@@ -4,16 +4,18 @@ import json
 from starlette.concurrency import iterate_in_threadpool
 from starlette.responses import StreamingResponse
 
-from orwynn import validation, web
+from orwynn import validation
 from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.log.Log import Log
+from orwynn.web.http.requests import HttpRequest
+from orwynn.web.http.responses import HttpResponse
 
 
 class HttpLogger:
     """Logs HTTP requests and responses."""
     async def log_request(
         self,
-        request: web.Request,
+        request: HttpRequest,
         request_id: str
     ) -> str:
         """Assigns special id to request and logs it.
@@ -27,7 +29,7 @@ class HttpLogger:
         Returns:
             Request assigned ID.
         """
-        validation.validate(request, web.Request)
+        validation.validate(request, HttpRequest)
         validation.validate(request_id, str)
 
         plain_message: str = \
@@ -66,9 +68,9 @@ class HttpLogger:
 
     async def log_response(
         self,
-        response: web.Response,
+        response: HttpResponse,
         *,
-        request: web.Request,
+        request: HttpRequest,
         request_id: str
     ) -> None:
         """Logs a response linking it to the according request.

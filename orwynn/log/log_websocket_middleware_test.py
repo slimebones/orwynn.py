@@ -1,6 +1,5 @@
 import json
 
-from orwynn import web
 from orwynn.boot.Boot import Boot
 from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.log.Log import Log
@@ -8,6 +7,7 @@ from orwynn.log.LogWebsocketMiddleware import LogWebsocketMiddleware
 from orwynn.module.Module import Module
 from orwynn.testing import Writer
 from orwynn.testing.Client import Client
+from orwynn.web.websocket.Websocket import Websocket
 
 
 def test_get(
@@ -17,7 +17,7 @@ def test_get(
     class C1(WebsocketController):
         ROUTE = "/"
 
-        async def main(self, websocket: web.Websocket) -> None:
+        async def main(self, websocket: Websocket) -> None:
             await websocket.close()
 
     boot: Boot = Boot(

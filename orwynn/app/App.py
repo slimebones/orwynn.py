@@ -6,7 +6,7 @@ from orwynn.app.CoreApp import CoreApp
 from orwynn.service.FrameworkService import FrameworkService
 from orwynn.testing.Client import Client
 from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
-from orwynn.web import HttpMethod
+from orwynn.web.http.HttpMethod import HttpMethod
 
 
 class App(FrameworkService):

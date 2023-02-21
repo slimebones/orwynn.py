@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from orwynn.apprc.AppRc import AppRc
 from orwynn.boot.api_version.ApiVersion import ApiVersion
 from orwynn.boot.BootMode import BootMode
-from orwynn.web import Protocol
+from orwynn.web.Protocol import Protocol
 from orwynn.worker.Worker import Worker
 
 if TYPE_CHECKING:

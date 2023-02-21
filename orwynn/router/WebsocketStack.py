@@ -1,13 +1,13 @@
 import functools
 from typing import Callable
 
-from orwynn import web
 from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.router.NextCallHandler import NextCallHandler
 from orwynn.router.WebsocketHandler import (
     DispatchWebsocketHandler,
     WebsocketHandler,
 )
+from orwynn.web.websocket.Websocket import Websocket
 
 
 class WebsocketStack:
@@ -130,7 +130,7 @@ class WebsocketStack:
 
     async def __handle_entry(
         self,
-        websocket: web.Websocket,
+        websocket: Websocket,
         *,
         handlers: list[WebsocketHandler]
     ) -> None:

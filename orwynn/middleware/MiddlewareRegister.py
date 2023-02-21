@@ -35,8 +35,8 @@ from orwynn.middleware.Middleware import Middleware
 from orwynn.middleware.WebsocketMiddleware import WebsocketMiddleware
 from orwynn.router.WebsocketHandler import DispatchWebsocketHandler
 from orwynn.router.WebsocketStack import WebsocketStack
-from orwynn.web import HttpException
 from orwynn.web.http.Cors import Cors
+from orwynn.web.http.HttpException import HttpException
 from orwynn.web.Protocol import Protocol
 
 

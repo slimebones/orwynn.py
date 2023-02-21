@@ -6,12 +6,12 @@ from orwynn.mongo.Document import Document
 from orwynn.mongo.DuplicateKeyError import DuplicateKeyError
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.testing.Client import Client
-from orwynn.web import TestResponse
+from orwynn.web.http.responses import TestHttpResponse
 from tests.std.user import User
 
 
 def test_user_create(std_mongo_boot, std_http: Client):
-    r: TestResponse = std_http.post(
+    r: TestHttpResponse = std_http.post(
         "/users",
         200,
         json={
@@ -30,14 +30,14 @@ def test_reserved_mapping_field(std_mongo_boot, std_http: Client):
 
 
 def test_same_id_creation(std_mongo_boot, std_http: Client):
-    r: TestResponse = std_http.post(
+    r: TestHttpResponse = std_http.post(
         "/users",
         200,
         json={
             "name": "Mark Watney"
         }
     )
-    r2: TestResponse = std_http.post(
+    r2: TestHttpResponse = std_http.post(
         "/users",
         400,
         json={

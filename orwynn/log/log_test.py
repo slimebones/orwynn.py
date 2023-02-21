@@ -3,7 +3,6 @@ import json
 import pytest
 from loguru._handler import Message
 
-from orwynn import web
 from orwynn.boot.Boot import Boot
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.http.HttpController import HttpController
@@ -11,6 +10,7 @@ from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.log.Log import Log
 from orwynn.module.Module import Module
 from orwynn.testing import Writer, get_log_apprc
+from orwynn.web.websocket.Websocket import Websocket
 
 
 @pytest.fixture
@@ -55,7 +55,7 @@ def test_logged_websocket_request_id(
     class C1(WebsocketController):
         ROUTE = "/"
 
-        async def main(self, websocket: web.Websocket) -> None:
+        async def main(self, websocket: Websocket) -> None:
             Log.info("hello")
 
     boot: Boot = Boot(

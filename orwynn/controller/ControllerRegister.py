@@ -4,7 +4,7 @@ from typing import Any, Callable, Literal
 
 import pydantic
 
-from orwynn import validation, web
+from orwynn import validation
 from orwynn.app.AlreadyRegisteredMethodError import (
     AlreadyRegisteredMethodError,
 )
@@ -31,10 +31,11 @@ from orwynn.router.WebsocketStack import WebsocketStack
 from orwynn.router.WrongHandlerReturnTypeError import (
     WrongHandlerReturnTypeError,
 )
-from orwynn.web import HttpMethod
+from orwynn.web.http.HttpMethod import HttpMethod
 from orwynn.web.http.UnsupportedHttpMethodError import (
     UnsupportedHttpMethodError,
 )
+from orwynn.web.join_routes import join_routes
 
 
 class ControllerRegister:
@@ -230,14 +231,14 @@ class ControllerRegister:
                 # We can concatenate routes such way since routes
                 # are validated to not contain following slash
                 # -> But join_routes() handles this situation, doesn't it?
-                concatenated_route = web.join_routes(
+                concatenated_route = join_routes(
                     final_global_route,
                     module.route,
                     controller.route,
                     additional_route
                 )
             elif isinstance(controller, WebsocketController):
-                concatenated_route = web.join_routes(
+                concatenated_route = join_routes(
                     final_global_route,
                     module.route,
                     controller.route,

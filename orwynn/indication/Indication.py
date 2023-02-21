@@ -23,7 +23,7 @@ from orwynn.mp.location import (FieldLocation, find_field_by_location,
 from orwynn.validation import (RequestValidationException, validate,
                                     validate_dict)
 from orwynn.validation.validator import Validator
-from orwynn.web import HttpException
+from orwynn.web.http.HttpException import HttpException
 
 _Locations = dict[Indicator, FieldLocation]
 

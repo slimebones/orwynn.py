@@ -1,10 +1,10 @@
-from orwynn import mongo
 from orwynn.app.App import App
 from orwynn.boot.BootConfig import BootConfig
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.Provider import Provider
 from orwynn.log.LogConfig import LogConfig
 from orwynn.module.Module import Module
+from orwynn.mongo import module
 from orwynn.mongo.Mongo import Mongo
 from orwynn.mongo.MongoConfig import MongoConfig
 from tests.std.float import FloatController, FloatService, float_module
@@ -21,7 +21,7 @@ class Assertion:
         number_module,
         float_module,
         user_module,
-        mongo.module
+        module.module
     ]
     # Order of these providers doesn't matter here since set() should be
     # performed on comparison tests
