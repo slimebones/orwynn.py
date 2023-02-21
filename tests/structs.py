@@ -7,7 +7,7 @@ importing.
 """
 import pytest
 
-from orwynn.module.Module import Module
+from orwynn.src.module.Module import Module
 from tests.std.root_module import root_module as std_root_module
 
 

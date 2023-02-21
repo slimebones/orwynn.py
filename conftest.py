@@ -6,32 +6,32 @@ import os
 from pytest import fixture
 
 from orwynn import validation
-from orwynn.app.App import App
-from orwynn.app.app_test import std_app
-from orwynn.boot.Boot import Boot
-from orwynn.boot.boot_test import (
+from orwynn.src.app.App import App
+from orwynn.src.app.app_test import std_app
+from orwynn.src.boot.Boot import Boot
+from orwynn.src.boot.boot_test import (
     run_std,
     set_std_apprc_path_env,
     std_boot,
     std_mongo_boot,
 )
-from orwynn.boot.BootMode import BootMode
-from orwynn.controller.endpoint.endpoint_test import run_endpoint
-from orwynn.di.collecting.collect_modules_test import std_modules
-from orwynn.di.collecting.collect_provider_dependencies_test import (
+from orwynn.src.boot.BootMode import BootMode
+from orwynn.src.controller.endpoint.endpoint_test import run_endpoint
+from orwynn.src.di.collecting.collect_modules_test import std_modules
+from orwynn.src.di.collecting.collect_provider_dependencies_test import (
     std_provider_dependencies_map,
 )
-from orwynn.di.Di import Di
-from orwynn.di.di_test import std_di_container
-from orwynn.di.MissingDiObjectError import MissingDiObjectError
-from orwynn.log.log_test import log_apprc_sink_to_writer, writer
-from orwynn.module.Module import Module
-from orwynn.mongo.Mongo import Mongo
-from orwynn.proxy.boot_data_proxy_test import std_boot_data_proxy
-from orwynn.testing.Client import Client
-from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
-from orwynn.web.http.http_test import std_http
-from orwynn.worker.Worker import Worker
+from orwynn.src.di.Di import Di
+from orwynn.src.di.di_test import std_di_container
+from orwynn.src.di.MissingDiObjectError import MissingDiObjectError
+from orwynn.src.log.log_test import log_apprc_sink_to_writer, writer
+from orwynn.src.module.Module import Module
+from orwynn.src.mongo.Mongo import Mongo
+from orwynn.src.proxy.boot_data_proxy_test import std_boot_data_proxy
+from orwynn.src.testing.Client import Client
+from orwynn.src.testing.EmbeddedTestClient import EmbeddedTestClient
+from orwynn.src.web.http.http_test import std_http
+from orwynn.src.worker.Worker import Worker
 from tests.structs import (
     circular_module_struct,
     long_circular_module_struct,

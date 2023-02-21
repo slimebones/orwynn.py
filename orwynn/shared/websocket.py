@@ -1,1 +1,1 @@
-from orwynn.web.websocket.Websocket import Websocket
+from orwynn.src.web.websocket.Websocket import Websocket

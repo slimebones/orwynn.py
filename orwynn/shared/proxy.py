@@ -1,1 +1,1 @@
-from orwynn.proxy.BootProxy import BootProxy
+from orwynn.src.proxy.BootProxy import BootProxy

@@ -1,2 +1,2 @@
-from orwynn.mongo.Document import Document
-from orwynn.mongo.module import module
+from orwynn.src.mongo.Document import Document
+from orwynn.src.mongo.module import module

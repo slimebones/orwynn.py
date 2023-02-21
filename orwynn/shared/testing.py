@@ -1,2 +1,2 @@
-from orwynn.testing.Client import Client
-from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
+from orwynn.src.testing.Client import Client
+from orwynn.src.testing.EmbeddedTestClient import EmbeddedTestClient

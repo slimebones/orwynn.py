@@ -1,0 +1,98 @@
+from orwynn.src.config.Config import Config
+from orwynn.src.di.check_availability import check_availability
+from orwynn.src.di.circular_dependency_error import CircularDependencyError
+from orwynn.src.di.collecting.get_parameters_for_provider import (
+    get_parameters_for_provider,
+)
+from orwynn.src.di.collecting.provider_already_initialized_for_map_error import (
+    ProviderAlreadyInitializedForMapError,
+)
+from orwynn.src.di.collecting.provider_dependencies_map import (
+    ProviderDependenciesMap,
+)
+from orwynn.src.di.is_provider import is_provider
+from orwynn.src.di.NotProviderError import NotProviderError
+from orwynn.src.di.Provider import Provider
+from orwynn.src.fmt.helpers import format_chain
+from orwynn.src.module.Module import Module
+
+
+def collect_provider_dependencies(
+    modules: list[Module]
+) -> ProviderDependenciesMap:
+    """Collects providers and their dependencies from given modules.
+
+    Args:
+        modules:
+            List of modules to collect providers from.
+
+    Returns:
+        Special structure maps providers and their dependencies.
+    """
+    metamap: ProviderDependenciesMap = ProviderDependenciesMap()
+
+    # Traverse all parameters of all providers in all modules to add them in
+    # united structure
+    for module in modules:
+        for P in module.Providers:
+            # Chain is cleared for every new provider iterated
+            _traverse(P, metamap, [], module)
+
+    return metamap
+
+
+def _traverse(
+    P: type[Provider],
+    metamap: ProviderDependenciesMap,
+    chain: list[type[Provider]],
+    target_module: Module | None
+):
+    # Recursively traverses over Provider parameters, memorizing chain to
+    # find circular dependencies and saving results to metamap.  Target module
+    # required since we want to check availability between providers.
+
+    if P in chain:
+        raise CircularDependencyError(
+            # Failed provider is added second time to the chain for
+            # error descriptiveness
+            f"provider {P} occured twice in dependency chain"
+            f" {format_chain(chain + [P])}"
+        )
+    chain.append(P)
+
+    try:
+        metamap.init_provider(P)
+    except ProviderAlreadyInitializedForMapError:
+        pass
+    else:
+        for parameter in get_parameters_for_provider(P):
+            if not is_provider(parameter.DependencyProvider):
+                # Config's fields are skipped since they request various other
+                # than provider objects and will be initialized in a bit
+                # different way
+                if issubclass(P, Config):
+                    continue
+                raise NotProviderError(
+                    FailedClass=parameter.DependencyProvider
+                )
+
+            nested_module: Module | None = check_availability(
+                P,
+                parameter.DependencyProvider,
+                target_module
+            )
+            metamap.add_dependency(
+                dependency=parameter.DependencyProvider,
+                P=P
+            )
+            # And continue traversing, but deeper for fetched dependency
+            _traverse(
+                parameter.DependencyProvider,
+                metamap,
+                chain,
+                nested_module
+            )
+
+    # Pop blocking element. For this concept see collect_modules._traverse
+    # function
+    chain.pop()

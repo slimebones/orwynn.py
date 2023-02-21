@@ -1,3 +1,3 @@
-from orwynn.indication.Indication import Indication
-from orwynn.indication.IndicationType import IndicationType
-from orwynn.indication.Indicator import Indicator
+from orwynn.src.indication.Indication import Indication
+from orwynn.src.indication.IndicationType import IndicationType
+from orwynn.src.indication.Indicator import Indicator
