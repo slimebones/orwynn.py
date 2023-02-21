@@ -1,7 +1,7 @@
 export PYTEST_SHOW=all
 
 test:
-	poetry run coverage run -m pytest -x -v --ignore=tests/app -p no:warnings tests --show-capture=$(PYTEST_SHOW) --failed-first orwynn
+	poetry run coverage run -m pytest -x --ignore=tests/app -p no:warnings tests --show-capture=$(PYTEST_SHOW) --failed-first orwynn
 
 lint:
 # Ignore:
