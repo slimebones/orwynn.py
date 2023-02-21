@@ -62,4 +62,6 @@ coverage.html:
 	poetry run coverage html --show-contexts && python -m http.server -d htmlcov 8000
 
 changelog:
-	git-changelog -c angular -o CHANGELOG.md .
+# Conventional Commits is used since we use exclamation marks to sign breaking
+# commits.
+	git-changelog -c conventional -o CHANGELOG.md .
