@@ -73,6 +73,10 @@ class Boot(Worker):
             Global route to be prepended to every controller's route. Defaults
             to no route. Can accept formatting "{version}" for an API version
             to be injected into route.
+        global_websocket_route (optional):
+            Global route to be prepended to every controller's route. Defaults
+            to no route. Can accept formatting "{version}" for an API version
+            to be injected into route.
         global_imports (optional):
             Modules available across all other modules imported into the
             application. Note that no other instance can import a globally
@@ -120,6 +124,7 @@ class Boot(Worker):
         apprc: AppRc | None = None,
         mode: BootMode | None = None,
         global_http_route: str | None = None,
+        global_websocket_route: str | None = None,
         global_modules: list[Module] | None = None,
         global_middleware: GlobalMiddlewareSetup | None = None,
         api_version: ApiVersion | None = None
@@ -144,6 +149,10 @@ class Boot(Worker):
         if global_http_route is None:
             global_http_route = ""
         validate(global_http_route, str)
+
+        if global_websocket_route is None:
+            global_websocket_route = ""
+        validate(global_websocket_route, str)
 
         if global_modules is None:
             global_modules = []
@@ -173,7 +182,8 @@ class Boot(Worker):
             self.__mode,
             deepcopy(apprc)
         )
-        self.__global_route: str = global_http_route
+        self.__global_http_route: str = global_http_route
+        self.__global_websocket_route: str = global_websocket_route
         self.__api_version: ApiVersion = api_version
 
         # Init proxies
@@ -183,7 +193,8 @@ class Boot(Worker):
             api_indication=self.__api_indication,
             apprc=self.__apprc,
             ExceptionHandlers=ExceptionHandlers,
-            global_http_route=self.__global_route,
+            global_http_route=self.__global_http_route,
+            global_websocket_route=self.__global_websocket_route,
             api_version=self.__api_version
         )
         EndpointProxy()
@@ -206,20 +217,38 @@ class Boot(Worker):
         # Configure logging
         configure_log(validation.apply(self.__di.find("LogConfig"), LogConfig))
 
+        try:
+            all_modules: list[Module] = self.__di.modules
+        except MissingDiObjectError:
+            all_modules = []
+
+        try:
+            all_controllers: list[Controller] = self.__di.controllers
+        except MissingDiObjectError:
+            all_controllers = []
+
+        try:
+            all_middleware: list[Middleware] = self.__di.all_middleware
+        except MissingDiObjectError:
+            all_middleware = []
+
+        try:
+            all_exception_handlers: list[ExceptionHandler] = \
+                self.__di.exception_handlers
+        except MissingDiObjectError:
+            all_exception_handlers = []
+
         self.__router: Router = Router(
-            self.app
+            self.app,
+            global_http_route=self.__global_http_route,
+            global_websocket_route=self.__global_websocket_route,
+            api_version=self.__api_version,
+            cors=cors,
+            modules=all_modules,
+            controllers=all_controllers,
+            middleware_arr=all_middleware,
+            exception_handlers=all_exception_handlers
         )
-
-        # Add middleware, it should be done before the controller's
-        # adding due to the special websocket middleware registering
-        self.__add_middleware(cors)
-
-        # Supress: Don't raise error to ease test writings
-        with contextlib.suppress(MissingDiObjectError):
-            self.__register_routes(self.__di.modules, self.__di.controllers)
-
-        # Register websockets after adding middleware and controllers
-        self.__router.register_websocket_layers()
 
     @property
     def app(self) -> App:
@@ -232,139 +261,6 @@ class Boot(Worker):
     @property
     def api_indication(self) -> Indication:
         return self.__api_indication
-
-    def __register_routes(
-        self, modules: list[Module], controllers: list[Controller]
-    ) -> None:
-        for m in modules:
-            for C in m.Controllers:
-                self.__register_controller_class_for_module(m, C, controllers)
-
-    def __register_controller_class_for_module(
-        self,
-        m: Module,
-        C: type[Controller],
-        controllers: list[Controller]
-    ) -> None:
-        if m.route is None:
-            raise MalfunctionError(
-                f"module {m} has not route and shouldn't have added any"
-                " controllers"
-            )
-
-        is_controller_found: bool = False
-        for c in controllers:
-            if type(c) is C:
-                is_controller_found = True
-
-                if isinstance(c, HttpController):
-                    self.__register_http_for_module(c, m)
-                elif isinstance(c, WebsocketController):
-                    self.__router.add_websocket_controller(
-                        c,
-                        module_route=m.route
-                    )
-                else:
-                    raise TypeError(
-                        f"controller unsupported type {type(c)}"
-                    )
-        if not is_controller_found:
-            raise MalfunctionError(
-                f"no initialized controller found for class {C},"
-                f" but it was declared in imported module {m},"
-                " so DI should have been initialized it"
-            )
-
-    def __register_http_for_module(
-        self,
-        controller: HttpController,
-        module: Module
-    ) -> None:
-        # At least one method found
-        is_method_found: bool = False
-        for http_method in HttpMethod:
-            # Don't register unused methods
-            if http_method in controller.methods:
-                is_method_found = True
-
-                routes: set[str] = self.__get_routes_for_http_controller(
-                    controller,
-                    module
-                )
-
-                for route in routes:
-                    self.__router.register_route(
-                        route=route,
-                        fn=controller.get_fn_by_http_method(http_method),
-                        method=http_method
-                    )
-
-        if not is_method_found:
-            raise MalfunctionError(
-                f"no http methods found for controller {controller.__class__},"
-                " this shouldn't have passed validation at Controller.__init__"
-            )
-
-    def __get_routes_for_http_controller(
-        self,
-        controller: HttpController,
-        module: Module
-    ) -> set[str]:
-        """Returns all http routes which given controller accessible from.
-        """
-        if module.route is None:
-            raise MalfunctionError(
-                f"module {module} has not route and shouldn't have added any"
-                " controllers"
-            )
-
-        routes: set[str] = set()
-        final_versions: set[int] = set()
-        version: int | set[int] | None | Literal["*"] = controller.VERSION
-
-        # Get the latest version if none is specified for controller
-        if version is None:
-            final_versions.add(self.__api_version.latest)
-        elif isinstance(version, int):
-            final_versions.add(version)
-        elif isinstance(version, set):
-            final_versions.update(version)
-        elif isinstance(version, str):
-            if version != "*":
-                raise MalfunctionError(
-                    f"version cannot be {version}, a validation check should"
-                    " have been performed at HTTPController"
-                )
-            # Add all supported versions
-            final_versions.update(self.__api_version.supported)
-        else:
-            raise MalfunctionError(
-                f"unrecognized version {version}, a validation check should"
-                " have been performed at HTTPController"
-            )
-
-        for v in final_versions:
-            final_global_route: str
-            try:
-                final_global_route = self.__api_version.apply_version_to_route(
-                    self.__global_route,
-                    v
-                )
-            except ValueError:
-                # No {version} format block
-                final_global_route = self.__global_route
-
-            # We can concatenate routes such way since routes
-            # are validated to not contain following slash
-            # -> But join_routes() handles this situation, doesn't it?
-            concatenated_route: str = web.join_routes(
-                final_global_route,
-                module.route,
-                controller.route
-            )
-            routes.add(concatenated_route)
-
-        return routes
 
     def __parse_mode(self) -> BootMode:
         mode_env: str | None = os.getenv("Orwynn_Mode")
@@ -387,24 +283,3 @@ class Boot(Worker):
             )
 
         return root_dir
-
-    def __add_middleware(self, cors: Cors | None) -> None:
-        user_exception_handlers: set[ExceptionHandler]
-        try:
-            user_exception_handlers = set(self.__di.exception_handlers)
-        except MissingDiObjectError:
-            user_exception_handlers = set()
-
-        user_middleware: list[Middleware]
-        try:
-            user_middleware = self.__di.all_middleware
-        except MissingDiObjectError:
-            user_middleware = []
-
-        MiddlewareRegister(
-            middleware_register=self.__router.add_middleware
-        ).register(
-            user_middleware=user_middleware,
-            user_exception_handlers=user_exception_handlers,
-            cors=cors
-        )

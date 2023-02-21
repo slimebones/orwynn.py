@@ -13,8 +13,8 @@ class App(FrameworkService):
     def __init__(self) -> None:
         self.__core_app: CoreApp = CoreApp(docs_url="/doc")
 
-        self._fw_add_middleware = self.__core_app.add_middleware
-        self._fw_add_exception_handler_fn = \
+        self._fw_register_middleware = self.__core_app.add_middleware
+        self._fw_register_exception_handler_fn = \
             self.__core_app.add_exception_handler
 
         self.HTTP_METHODS_TO_REGISTERING_FUNCTIONS: \

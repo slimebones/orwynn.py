@@ -1,26 +1,27 @@
 import typing
 from inspect import isclass
-from typing import Any, Callable, Sequence
+from typing import Any, Callable, Literal, Sequence
 
 import pydantic
-from fastapi.middleware.cors import CORSMiddleware as FastAPI_CORSMiddleware
-from starlette.middleware.base import (
-    BaseHTTPMiddleware as StarletteBaseHTTPMiddleware,
-)
 
 from orwynn import validation, web
 from orwynn.app.AlreadyRegisteredMethodError import (
     AlreadyRegisteredMethodError,
 )
 from orwynn.app.App import App
+from orwynn.boot.api_version.ApiVersion import ApiVersion
+from orwynn.controller.Controller import Controller
 from orwynn.controller.endpoint.Endpoint import Endpoint
 from orwynn.controller.endpoint.EndpointNotFoundError import (
     EndpointNotFoundError,
 )
+from orwynn.controller.http.HttpController import HttpController
 from orwynn.controller.websocket.WebsocketController import WebsocketController
 from orwynn.error.DefaultExceptionHandler import (
     DefaultExceptionHandler,
 )
+from orwynn.error.ExceptionHandler import ExceptionHandler
+from orwynn.error.MalfunctionError import MalfunctionError
 from orwynn.error.get_exception_direct_subclasses import (
     get_exception_direct_subclasses,
 )
@@ -33,8 +34,10 @@ from orwynn.error.http.ExceptionHandlerHttpMiddleware import (
 from orwynn.indication.Indication import Indication
 from orwynn.middleware.HttpMiddleware import HttpMiddleware
 from orwynn.middleware.Middleware import Middleware
+from orwynn.middleware.MiddlewareRegister import MiddlewareRegister
 from orwynn.middleware.WebsocketMiddleware import WebsocketMiddleware
 from orwynn.model.Model import Model
+from orwynn.module.Module import Module
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.proxy.EndpointProxy import EndpointProxy
 from orwynn.router.UnmatchedEndpointEntityError import (
@@ -62,28 +65,64 @@ class Router(Worker):
     """
     def __init__(
         self,
-        app: App
+        app: App,
+        *,
+        modules: list[Module],
+        controllers: list[Controller],
+        middleware_arr: list[Middleware],
+        exception_handlers: list[ExceptionHandler],
+        cors: Cors | None,
+        global_http_route: str,
+        global_websocket_route: str,
+        api_version: ApiVersion
     ) -> None:
         super().__init__()
         self.__app: App = app
+
+        self.__modules: list[Module] = modules
+        self.__controllers: list[Controller] = controllers
+        self.__middleware_arr: list[Middleware] = middleware_arr
+        self.__exception_handlers: list[ExceptionHandler] = exception_handlers
+
+        self.__cors: Cors | None = cors
+
+        self.__global_http_route: str = global_http_route
+        self.__global_websocket_route: str = global_websocket_route
+        self.__api_version: ApiVersion = api_version
+
         self.__methods_by_route: dict[str, set[HttpMethod]] = {}
         self.__websocket_stack: WebsocketStack = WebsocketStack(
             self.__app.websocket_handler
         )
         self.__is_websocket_middleware_added: bool = False
+        self.__middleware_register: MiddlewareRegister = MiddlewareRegister(
+            app=self.__app,
+            middleware_arr=self.__middleware_arr,
+            exception_handlers=self.__exception_handlers,
+            cors=self.__cors,
+            websocket_stack=self.__websocket_stack
+        )
 
-    def register_websocket_layers(
-        self
-    ) -> None:
-        """Registers all added websocket instances to the system."""
-        self.__websocket_stack.register()
+        self.__start_registering()
 
-    def add_websocket_controller(
+    def __start_registering(self) -> None:
+        # Register middleware, it should be done before the controller's
+        # adding due to the special websocket middleware registering
+        self.__middleware_register.register_all()
+
+        # And finally controllers
+        self.__register_controllers()
+
+        # After all actions the websocket stack needs to call register action.
+        # It is populated during middleware and controller registering.
+        self.__websocket_stack.register_all()
+
+    def __add_websocket_controller(
         self, controller: WebsocketController, module_route: str
     ) -> None:
         """Add websocket controller for a route.
 
-        Attributes:
+        Args:
             controller:
                 Websocket controller to add.
             module_route:
@@ -104,7 +143,7 @@ class Router(Worker):
             method_route: str = \
                 "/" if event_handler.name == "main" else event_handler.name
             final_route: str = web.join_routes(
-                controller.route, module_route, method_route
+                module_route, controller.route, method_route
             )
             self.__websocket_stack.add_call(
                 WebsocketHandler(
@@ -113,8 +152,7 @@ class Router(Worker):
                 )
             )
 
-
-    def register_route(
+    def __register_http_route(
         self, *, route: str, fn: Callable, method: HttpMethod
     ) -> None:
         """Registers a fn for a route.
@@ -169,94 +207,142 @@ class Router(Worker):
             )
         )(fn)
 
-    def add_middleware(
-        self,
-        middleware_arr: Sequence[Middleware],
-        *,
-        cors: Cors | None
+    def __register_controllers(
+        self
     ) -> None:
+        for m in self.__modules:
+            for C in m.Controllers:
+                self.__register_controller_class_for_module(
+                    m, C
+                )
+
+    def __register_controller_class_for_module(
+        self,
+        m: Module,
+        C: type[Controller]
+    ) -> None:
+        if m.route is None:
+            raise MalfunctionError(
+                f"module {m} has not route and shouldn't have added any"
+                " controllers"
+            )
+
+        is_controller_found: bool = False
+        for c in self.__controllers:
+            if type(c) is C:
+                is_controller_found = True
+
+                if isinstance(c, HttpController):
+                    self.__register_http_controller_for_module(c, m)
+                elif isinstance(c, WebsocketController):
+                    # Websocket controllers are firstly added and only then
+                    # registered to form a correct stack
+                    self.__add_websocket_controller(
+                        c,
+                        module_route=m.route
+                    )
+                else:
+                    raise TypeError(
+                        f"controller unsupported type {type(c)}"
+                    )
+        if not is_controller_found:
+            raise MalfunctionError(
+                f"no initialized controller found for class {C},"
+                f" but it was declared in imported module {m},"
+                " so DI should have been initialized it"
+            )
+
+    def __register_http_controller_for_module(
+        self,
+        controller: HttpController,
+        module: Module
+    ) -> None:
+        # At least one method found
+        is_method_found: bool = False
+        for http_method in HttpMethod:
+            # Don't register unused methods
+            if http_method in controller.methods:
+                is_method_found = True
+
+                routes: set[str] = self.__get_routes_for_http_controller(
+                    controller,
+                    module
+                )
+
+                for route in routes:
+                    self.__register_http_route(
+                        route=route,
+                        fn=controller.get_fn_by_http_method(http_method),
+                        method=http_method
+                    )
+
+        if not is_method_found:
+            raise MalfunctionError(
+                f"no http methods found for controller {controller.__class__},"
+                " this shouldn't have passed validation at Controller.__init__"
+            )
+
+    def __get_routes_for_http_controller(
+        self,
+        controller: HttpController,
+        module: Module
+    ) -> set[str]:
         """
-        Adds middleware to the system.
-
-        Args:
-            middleware_arr:
-                Middleware list to be added to the system.
-            cors:
-                Cors object (can be None) to configure the Cors middleware on
-                the fly.
+        Returns all http routes which given controller accessible from.
         """
-        # Note that middleware here is reversed since Starlette.add_middleware
-        # inserts new functions at the top of the middleware list which makes
-        # older added middlewares executable last, which is not logical.
-        #
-        # But this reversion should be executed only for HtppMiddleware since
-        # for Websockets we have own logic.
-        #
-        # So, first task is to separate middleware
-        http_middleware_arr: list[HttpMiddleware] = []
-        websocket_middleware_arr: list[WebsocketMiddleware] = []
-
-        for middleware in middleware_arr:
-            if isinstance(middleware, HttpMiddleware):
-                http_middleware_arr.append(middleware)
-            elif isinstance(middleware, WebsocketMiddleware):
-                websocket_middleware_arr.append(middleware)
-            elif type(middleware) is Middleware:
-                raise TypeError(
-                    f"cannot register an instance {middleware} of an abstact"
-                    " class Middleware"
-                )
-            else:
-                raise TypeError(
-                    f"unrecognized middleware {middleware}"
-                )
-
-        # Add CORS middleware first
-        if cors is not None:
-            self.__add_cors_middleware(cors)
-
-        # Add HTTP from reversed list to comply Starlette
-        for http_middleware in reversed(http_middleware_arr):
-            self.__add_middleware(http_middleware)
-
-        # Add Websocket normally
-        if websocket_middleware_arr != []:
-            if self.__is_websocket_middleware_added:
-                raise ValueError(
-                    "websocket middleware have been already added"
-                )
-
-            for websocket_middleware in websocket_middleware_arr:
-                self.__add_middleware(websocket_middleware)
-
-            self.__is_websocket_middleware_added = True
-
-    def __add_middleware(self, middleware: Middleware) -> None:
-        validation.validate(middleware, Middleware)
-
-        # Note that dispatch(...) method is linked to be as entrypoint to a
-        # middleware. This will be a place where a middleware takes decision
-        # to not process request to certain endpoint or not.
-        if type(middleware) is Middleware:
-            raise TypeError(
-                f"cannot accept abstract class implementation {middleware}"
+        if module.route is None:
+            raise MalfunctionError(
+                f"module {module} has not route and shouldn't have added any"
+                " controllers"
             )
-        elif isinstance(middleware, ExceptionHandlerHttpMiddleware):
-            self.__add_exception_http_middleware(middleware)
-        elif isinstance(middleware, HttpMiddleware):
-            self.__add_http_middleware_fn(
-                middleware.dispatch
-            )
-        elif isinstance(middleware, WebsocketMiddleware):
-            self.__websocket_stack.add_call(
-                DispatchWebsocketHandler(
-                    fn=middleware.dispatch
+
+        routes: set[str] = set()
+        final_versions: set[int] = set()
+        version: int | set[int] | None | Literal["*"] = controller.VERSION
+
+        # Get the latest version if none is specified for controller
+        if version is None:
+            final_versions.add(self.__api_version.latest)
+        elif isinstance(version, int):
+            final_versions.add(version)
+        elif isinstance(version, set):
+            final_versions.update(version)
+        elif isinstance(version, str):
+            if version != "*":
+                raise MalfunctionError(
+                    f"version cannot be {version}, a validation check should"
+                    " have been performed at HTTPController"
                 )
-            )
+            # Add all supported versions
+            final_versions.update(self.__api_version.supported)
         else:
-            raise TypeError(
-                f"unrecognized middleware {middleware}"
+            raise MalfunctionError(
+                f"unrecognized version {version}, a validation check should"
+                " have been performed at HTTPController"
             )
+
+        for v in final_versions:
+            final_global_route: str
+            try:
+                final_global_route = self.__api_version.apply_version_to_route(
+                    self.__global_http_route,
+                    v
+                )
+            except ValueError:
+                # No {version} format block
+                final_global_route = self.__global_http_route
+
+            # We can concatenate routes such way since routes
+            # are validated to not contain following slash
+            # -> But join_routes() handles this situation, doesn't it?
+            concatenated_route: str = web.join_routes(
+                final_global_route,
+                module.route,
+                controller.route
+            )
+            routes.add(concatenated_route)
+
+        return routes
 
     def __parse_endpoint_spec_kwargs(
         self, spec: Endpoint | None, fn: Callable
@@ -342,71 +428,3 @@ class Router(Worker):
                 if flag:
                     return True
         return False
-
-    def __add_http_middleware_fn(
-        self,
-        fn: Callable
-    ) -> None:
-        self.__app._fw_add_middleware(
-            StarletteBaseHTTPMiddleware,
-            dispatch=fn
-        )
-
-    def __add_exception_http_middleware(
-        self,
-        middleware: ExceptionHandlerHttpMiddleware
-    ) -> None:
-        # NOTE: It may seem strange that firstly exception handlers are wrapped
-        #   into middleware and then unwrapped here for HTTP protocol, but
-        #   in this way we comply with other protocols (such as Websocket).
-        #   Adding middleware directly as BaseHTTPMiddleware is not an option
-        #   since HTTPException (such as 404 Not Found) won't be handled.
-        __RemainingExceptionDirectSubclasses: set[type[Exception]] = \
-            set(get_exception_direct_subclasses())
-
-        for handler in middleware.handlers:
-            __RemainingExceptionDirectSubclasses.discard(
-                handler.HandledException
-            )
-
-            if handler.HandledException is Exception:
-                # Do not add the base exception explicitly since Starlette
-                # cannot handle it, add all it's direct subclasses instead
-                continue
-            else:
-                self.__app._fw_add_exception_handler_fn(
-                    handler.HandledException,
-                    handler.handle
-                )
-
-        for Remaining in __RemainingExceptionDirectSubclasses:
-            handle_fn: Callable
-            if Remaining is HttpException:
-                handle_fn = DefaultHttpExceptionHandler().handle
-            else:
-                # Since ramining exception direct subclasses does not contain
-                # Orwynn.Error (see get_exception_direct_subclasses()
-                # docstring) we can assign to all rest exceptions a default
-                # Exception handler
-                handle_fn = DefaultExceptionHandler().handle
-
-            self.__app._fw_add_exception_handler_fn(
-                Remaining,
-                handle_fn
-            )
-
-    def __add_cors_middleware(self, cors: Cors) -> None:
-        """
-        Configures CORS policy used for the whole app.
-        """
-        validation.validate(cors, Cors)
-
-        kwargs: dict[str, Any] = {}
-        for k, v in cors.dict().items():
-            if v:
-                kwargs[k] = v
-
-        self.__app._fw_add_middleware(
-            FastAPI_CORSMiddleware,
-            **kwargs
-        )

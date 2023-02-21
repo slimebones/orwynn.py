@@ -3,6 +3,7 @@ from types import NoneType
 from typing import Any, Callable, Optional, Self, TypeVar
 from orwynn import web
 from orwynn.boot.api_version.ApiVersion import ApiVersion
+from orwynn.model.Model import Model
 from orwynn.proxy.BootProxy import BootProxy
 
 from orwynn.testing.EmbeddedTestClient import EmbeddedTestClient
@@ -13,6 +14,11 @@ from orwynn.web import TestResponse
 # If ever you get to Python3.12, see if PEP 696 introduced, then apply
 # but for now it is in the next form
 _JsonifyExpectedType = TypeVar("_JsonifyExpectedType")
+
+
+class _FinalizedRequestData(Model):
+    route: str
+    kwargs: dict
 
 
 class Client:
@@ -27,7 +33,6 @@ class Client:
     ) -> None:
         validation.validate(embedded_client, EmbeddedTestClient)
         self._embedded_client: EmbeddedTestClient = embedded_client
-        self.websocket = self._embedded_client.websocket_connect
 
         if binded_headers is None:
             binded_headers = {}
@@ -233,37 +238,16 @@ class Client:
             case _:
                 raise ValueError(f"Method {method} is not supported")
 
-        # Add binded headers
-        request_kwargs.setdefault("headers", {})
-        request_kwargs["headers"].update(self._binded_headers)
-
-        # Craft the final url
-        is_global_route_used: bool = validation.apply(
-            request_kwargs.get("is_global_route_used", True),
-            bool
-        )
-        api_version: int | None = request_kwargs.get("api_version", None)
-        validation.validate(api_version, [int, NoneType])
-        final_url: str = self._get_final_url(
+        # Get finalized data
+        finalized: _FinalizedRequestData = self._process_request_data(
             route,
-            is_global_route_used=is_global_route_used,
-            api_version=api_version
+            request_kwargs
         )
-        # Delete custom keys to not confuse a client's method
-        try:
-            del request_kwargs["is_global_route_used"]
-            del request_kwargs["api_version"]
-        except KeyError:
-            pass
-        try:
-            del request_kwargs["api_version"]
-        except KeyError:
-            pass
 
         # Make a request
         response: TestResponse = test_client_method(
-            final_url,
-            **request_kwargs
+            finalized.route,
+            **finalized.kwargs
         )
 
         validate(response, TestResponse, is_strict=True)
@@ -277,7 +261,49 @@ class Client:
 
         return response
 
-    def _get_final_url(
+    def _process_request_data(
+        self,
+        route: str,
+        request_kwargs: dict
+    ) -> _FinalizedRequestData:
+        """
+        Processes a given route and request kwargs and returns finalized
+        versions of them.
+        """
+        request_kwargs = request_kwargs.copy()
+
+        # Add binded headers
+        request_kwargs.setdefault("headers", {})
+        request_kwargs["headers"].update(self._binded_headers)
+
+        # Craft the final url
+        is_global_route_used: bool = validation.apply(
+            request_kwargs.get("is_global_route_used", True),
+            bool
+        )
+        api_version: int | None = request_kwargs.get("api_version", None)
+        validation.validate(api_version, [int, NoneType])
+        final_route: str = self._get_final_route(
+            route,
+            is_global_route_used=is_global_route_used,
+            api_version=api_version
+        )
+        # Delete custom keys to not confuse a client's method
+        try:
+            del request_kwargs["is_global_route_used"]
+        except KeyError:
+            pass
+        try:
+            del request_kwargs["api_version"]
+        except KeyError:
+            pass
+
+        return _FinalizedRequestData(
+            route=final_route,
+            kwargs=request_kwargs
+        )
+
+    def _get_final_route(
         self,
         route: str,
         *,
@@ -314,4 +340,19 @@ class Client:
         return web.join_routes(
             final_global_route,
             route
+        )
+
+    def websocket(
+        self,
+        route: str,
+        **request_kwargs
+    ) -> Any:
+        finalized: _FinalizedRequestData = self._process_request_data(
+            route=route,
+            request_kwargs=request_kwargs
+        )
+
+        return self._embedded_client.websocket_connect(
+            finalized.route,
+            **finalized.kwargs
         )

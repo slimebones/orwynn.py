@@ -24,6 +24,7 @@ class BootProxy(Worker):
         apprc: AppRc,
         ExceptionHandlers: set[type["ExceptionHandler"]],
         global_http_route: str,
+        global_websocket_route: str,
         api_version: ApiVersion
     ) -> None:
         super().__init__()
@@ -34,6 +35,7 @@ class BootProxy(Worker):
         self.__ExceptionHandlers: set[type["ExceptionHandler"]] = \
             ExceptionHandlers
         self.__global_http_route: str = global_http_route
+        self.__global_websocket_route: str = global_websocket_route
         self.__api_version: ApiVersion = api_version
 
     @property

@@ -84,7 +84,7 @@ class WebsocketStack:
 
         self.__handlers_by_route[handler.route].append(handler)
 
-    def register(
+    def register_all(
         self
     ) -> None:
         """
