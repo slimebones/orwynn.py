@@ -29,7 +29,7 @@ from orwynn.src.router.UnmatchedEndpointEntityError import (
     UnmatchedEndpointEntityError,
 )
 from orwynn.src.router.websocket.handlers import WebsocketHandler
-from orwynn.src.router.WebsocketStack import WebsocketStack
+from orwynn.src.router.websocket.WebsocketStack import WebsocketStack
 from orwynn.src.router.WrongHandlerReturnTypeError import (
     WrongHandlerReturnTypeError,
 )
@@ -37,7 +37,7 @@ from orwynn.src.web.http.HttpMethod import HttpMethod
 from orwynn.src.web.http.UnsupportedHttpMethodError import (
     UnsupportedHttpMethodError,
 )
-from orwynn.src.web.join_routes import join_routes
+from orwynn.src.web.url import join_routes
 
 
 class ControllerRegister:

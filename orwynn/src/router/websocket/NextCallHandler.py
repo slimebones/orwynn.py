@@ -1,11 +1,10 @@
-
 import contextlib
 
-from orwynn.src.router.websocket.handlers import (
-    DispatchWebsocketHandler,
-    WebsocketHandler,
-)
+from orwynn.src.router.websocket.handlers import (DispatchWebsocketHandler,
+                                                  WebsocketHandler)
+from orwynn.src.web.url import UrlVars
 from orwynn.src.web.websocket.Websocket import Websocket
+from ._get_handler_kwargs import get_handler_kwargs
 
 
 class NextCallHandler:
@@ -14,11 +13,13 @@ class NextCallHandler:
     """
     def __init__(
         self,
-        handlers: list[WebsocketHandler]
+        handlers: list[WebsocketHandler],
+        url_vars: UrlVars
     ) -> None:
         # Index of function being executed
         self.__current_index: int = 0
         self.__handlers: list[WebsocketHandler] = handlers
+        self.__url_vars: UrlVars = url_vars
 
     async def __call__(self, websocket: Websocket) -> None:
         """
@@ -40,11 +41,13 @@ class NextCallHandler:
                 await current_handler.fn(
                     websocket,
                     self.__class__(
-                        handlers=self.__handlers[self.__current_index+1:]
+                        handlers=self.__handlers[self.__current_index+1:],
+                        url_vars=self.__url_vars
                     )
                 )
             else:
                 await current_handler.fn(
-                    websocket
+                    websocket,
+                    **get_handler_kwargs(current_handler, self.__url_vars)
                 )
             self.__current_index += 1

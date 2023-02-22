@@ -10,7 +10,7 @@ from orwynn.src import validation
 from orwynn.src.validation import validate
 from orwynn.src.web.Protocol import Protocol
 from orwynn.src.web.http.responses import TestHttpResponse
-from orwynn.src.web.join_routes import join_routes
+from orwynn.src.web.url import join_routes
 
 # If ever you get to Python3.12, see if PEP 696 introduced, then apply
 # but for now it is in the next form

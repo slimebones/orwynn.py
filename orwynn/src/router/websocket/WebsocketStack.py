@@ -2,11 +2,13 @@ import functools
 from typing import Callable
 
 from orwynn.src.error.MalfunctionError import MalfunctionError
-from orwynn.src.router.NextCallHandler import NextCallHandler
+from orwynn.src.router.websocket.NextCallHandler import NextCallHandler
 from orwynn.src.router.websocket.handlers import (
     DispatchWebsocketHandler,
     WebsocketHandler,
 )
+from orwynn.src.web import url
+from orwynn.src.web.url import UrlVars
 from orwynn.src.web.websocket.Websocket import Websocket
 
 
@@ -124,7 +126,8 @@ class WebsocketStack:
                 self.__handlers_by_route["*"] + handlers
             self.__handler_register(route)(functools.partial(
                 self.__handle_entry,
-                handlers=final_handlers
+                _fw_handlers=final_handlers,
+                _fw_original_route=route
             ))
         self.__is_registered = True
 
@@ -132,18 +135,25 @@ class WebsocketStack:
         self,
         websocket: Websocket,
         *,
-        handlers: list[WebsocketHandler]
+        _fw_handlers: list[WebsocketHandler],
+        _fw_original_route: str
     ) -> None:
         # Execute all handlers consequently, but delegate such execution inside
         # the registered middleware
-        first_handler: WebsocketHandler = handlers[0]
+        first_handler: WebsocketHandler = _fw_handlers[0]
+
+        # Collect request kwargs from url
+        url_vars: UrlVars = url.get_vars(
+            websocket.url,
+            original_route=_fw_original_route
+        )
 
         # For middleware pass special NextCallHandler with data of all handler
         # functions ahead, except first one which is executed first.
         if isinstance(first_handler, DispatchWebsocketHandler):
             await first_handler.fn(
                 websocket,
-                NextCallHandler(handlers[1:])
+                NextCallHandler(_fw_handlers[1:], url_vars=url_vars)
             )
         # For all other generic cases, we might just call with only websocket
         # passed. But this situation rarely possible since we have added

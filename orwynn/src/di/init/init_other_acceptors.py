@@ -19,7 +19,7 @@ from orwynn.src.model.Model import Model
 from orwynn.src.module.Module import Module
 from orwynn.src.proxy.BootProxy import BootProxy
 from orwynn.src.validation import validate
-from orwynn.src.web.join_routes import join_routes
+from orwynn.src.web.url import join_routes
 
 
 class __CoveredRoutes(Model):

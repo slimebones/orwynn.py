@@ -1,4 +1,11 @@
+"""
+Works with url formatting.
+"""
 from orwynn.src import validation
+
+from ._UrlVars import UrlVars
+from ._Url import Url
+from ._get_vars import get_vars
 
 
 def join_routes(*routes: str) -> str:
@@ -20,3 +27,5 @@ def join_routes(*routes: str) -> str:
         result = "/"
 
     return result
+
+

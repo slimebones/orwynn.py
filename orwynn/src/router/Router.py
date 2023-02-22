@@ -8,7 +8,7 @@ from orwynn.src.error.ExceptionHandler import ExceptionHandler
 from orwynn.src.middleware.Middleware import Middleware
 from orwynn.src.middleware.MiddlewareRegister import MiddlewareRegister
 from orwynn.src.module.Module import Module
-from orwynn.src.router.WebsocketStack import WebsocketStack
+from orwynn.src.router.websocket.WebsocketStack import WebsocketStack
 from orwynn.src.web.http.Cors import Cors
 from orwynn.src.worker.Worker import Worker
 
