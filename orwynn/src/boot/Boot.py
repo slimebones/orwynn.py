@@ -27,6 +27,7 @@ from orwynn.src.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
 from orwynn.src.proxy.BootProxy import BootProxy
 from orwynn.src.proxy.EndpointProxy import EndpointProxy
 from orwynn.src.router.Router import Router
+from orwynn.src.testing.Client import Client
 from orwynn.src.validation import (
     validate,
     validate_dict,
@@ -256,6 +257,13 @@ class Boot(Worker):
     @property
     def app(self) -> App:
         return self.__di.app_service
+
+    @property
+    def client(self) -> Client:
+        """
+        Convenience shortcut to get testing client from the App.
+        """
+        return self.app.client
 
     @property
     def mode(self) -> BootMode:
