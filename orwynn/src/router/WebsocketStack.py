@@ -3,7 +3,7 @@ from typing import Callable
 
 from orwynn.src.error.MalfunctionError import MalfunctionError
 from orwynn.src.router.NextCallHandler import NextCallHandler
-from orwynn.src.router.WebsocketHandler import (
+from orwynn.src.router.websocket.handlers import (
     DispatchWebsocketHandler,
     WebsocketHandler,
 )

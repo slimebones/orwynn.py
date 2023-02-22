@@ -28,7 +28,7 @@ from orwynn.src.proxy.EndpointProxy import EndpointProxy
 from orwynn.src.router.UnmatchedEndpointEntityError import (
     UnmatchedEndpointEntityError,
 )
-from orwynn.src.router.WebsocketHandler import WebsocketHandler
+from orwynn.src.router.websocket.handlers import WebsocketHandler
 from orwynn.src.router.WebsocketStack import WebsocketStack
 from orwynn.src.router.WrongHandlerReturnTypeError import (
     WrongHandlerReturnTypeError,

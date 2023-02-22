@@ -1,7 +1,7 @@
 
 import contextlib
 
-from orwynn.src.router.WebsocketHandler import (
+from orwynn.src.router.websocket.handlers import (
     DispatchWebsocketHandler,
     WebsocketHandler,
 )
