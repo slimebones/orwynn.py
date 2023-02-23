@@ -1,12 +1,12 @@
-from orwynn.src.app.App import App
-from orwynn.src.boot.BootConfig import BootConfig
-from orwynn.src.di.acceptor import Acceptor
-from orwynn.src.di.Provider import Provider
-from orwynn.src.log.LogConfig import LogConfig
-from orwynn.src.module.Module import Module
-from orwynn.src.mongo import module
-from orwynn.src.mongo.Mongo import Mongo
-from orwynn.src.mongo.MongoConfig import MongoConfig
+from orwynn.app._App import App
+from orwynn.boot.BootConfig import BootConfig
+from orwynn.di.acceptor import Acceptor
+from orwynn.di.Provider import Provider
+from orwynn.log.LogConfig import LogConfig
+from orwynn.base.module.Module import Module
+from orwynn.mongo import module
+from orwynn.mongo.Mongo import Mongo
+from orwynn.mongo.MongoConfig import MongoConfig
 from tests.std.float import FloatController, FloatService, float_module
 from tests.std.number import NumberController, NumberService, number_module
 from tests.std.root_module import root_module

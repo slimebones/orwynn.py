@@ -1,14 +1,14 @@
 import lorem
 
-from orwynn.src.app.App import App
-from orwynn.src.boot.BootConfig import BootConfig
-from orwynn.src.config.Config import Config
-from orwynn.src.controller.endpoint.Endpoint import Endpoint
-from orwynn.src.controller.http.HttpController import HttpController
-from orwynn.src.model.Model import Model
-from orwynn.src.module.Module import Module
-from orwynn.src.service.Service import Service
-from orwynn.src.validation import model_validator
+from orwynn.app._App import App
+from orwynn.boot.BootConfig import BootConfig
+from orwynn.config.Config import Config
+from orwynn.base.controller.endpoint.Endpoint import Endpoint
+from orwynn.base.controller.http.HttpController import HttpController
+from orwynn.base.model.Model import Model
+from orwynn.base.module.Module import Module
+from orwynn.base.service.Service import Service
+from orwynn.util.validation import model_validator
 from tests.std.float import FloatService, float_module
 from tests.std.number import NumberService, number_module
 from tests.std.user import user_module

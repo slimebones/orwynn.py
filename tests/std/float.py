@@ -1,8 +1,8 @@
-from orwynn.src.app.App import App
-from orwynn.src.controller.endpoint.Endpoint import Endpoint
-from orwynn.src.controller.http.HttpController import HttpController
-from orwynn.src.module.Module import Module
-from orwynn.src.service.Service import Service
+from orwynn.app._App import App
+from orwynn.base.controller.endpoint.Endpoint import Endpoint
+from orwynn.base.controller.http.HttpController import HttpController
+from orwynn.base.module.Module import Module
+from orwynn.base.service.Service import Service
 
 
 class FloatService(Service):
