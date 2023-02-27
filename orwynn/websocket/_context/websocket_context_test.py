@@ -1,15 +1,11 @@
+from orwynn.context.errors import UndefinedStorageError
 from orwynn.util import validation
 from orwynn.boot._Boot import Boot
-from orwynn.base.controller.websocket.WebsocketController import (
-    WebsocketController,
-)
+from orwynn.websocket._context.WebsocketRequestContextId import WebsocketRequestContextId
+from orwynn.websocket._controller.WebsocketController import WebsocketController
 from orwynn.websocket._log.LogWebsocketMiddleware import LogWebsocketMiddleware
 from orwynn.base.module._Module import Module
-from orwynn.context.UndefinedStorageError import UndefinedStorageError
-from orwynn.websocket.context._WebsocketRequestContextId import (
-    WebsocketRequestContextId,
-)
-from orwynn.web.websocket.Websocket import Websocket
+from orwynn.websocket._Websocket import Websocket
 
 
 def test_basic():

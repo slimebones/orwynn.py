@@ -1,8 +1,7 @@
-from orwynn.boot.api_version.ApiVersion import ApiVersion
-from orwynn.boot._Boot import Boot
-from orwynn.base.controller.endpoint.Endpoint import Endpoint
-from orwynn.base.controller.http.HttpController import HttpController
-from orwynn.base.module._Module import Module
+from orwynn.apiversion import ApiVersion
+from orwynn.boot import Boot
+from orwynn.http import Endpoint, HttpController
+from orwynn.base.module import Module
 
 
 def test_default():

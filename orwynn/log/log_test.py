@@ -4,15 +4,11 @@ import pytest
 from loguru._handler import Message
 
 from orwynn.boot._Boot import Boot
-from orwynn.base.controller.endpoint.Endpoint import Endpoint
-from orwynn.base.controller.http.HttpController import HttpController
-from orwynn.base.controller.websocket.WebsocketController import (
-    WebsocketController,
-)
 from orwynn.log._Log import Log
 from orwynn.base.module._Module import Module
 from orwynn.testing import Writer, get_log_apprc
-from orwynn.web.websocket.Websocket import Websocket
+from orwynn.http import HttpController, Endpoint
+from orwynn.websocket import Websocket, WebsocketController
 
 
 @pytest.fixture

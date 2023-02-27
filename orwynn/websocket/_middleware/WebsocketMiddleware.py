@@ -1,5 +1,6 @@
 from orwynn.base.middleware import Middleware
-from orwynn.websocket import Websocket, WebsocketNextCall
+from orwynn.websocket._Websocket import Websocket
+from orwynn.websocket._middleware.WebsocketNextCall import WebsocketNextCall
 
 
 class WebsocketMiddleware(Middleware):

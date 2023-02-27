@@ -1,10 +1,6 @@
-from orwynn.websocket._log._WebsocketLogger import WebsocketLogger
-from orwynn.middleware.WebsocketMiddleware import WebsocketMiddleware
-from orwynn.middleware.WebsocketNextCall import WebsocketNextCall
-from orwynn.websocket.context._WebsocketRequestContextId import (
-    WebsocketRequestContextId,
-)
-from orwynn.web.websocket.Websocket import Websocket
+from orwynn.websocket import (Websocket, WebsocketMiddleware,
+                              WebsocketNextCall, WebsocketRequestContextId)
+from orwynn.websocket._log.WebsocketLogger import WebsocketLogger
 
 
 class LogWebsocketMiddleware(WebsocketMiddleware):

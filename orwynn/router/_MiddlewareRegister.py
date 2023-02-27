@@ -6,7 +6,8 @@ from starlette.middleware.base import \
 
 from ..base.middleware._Middleware import Middleware
 from orwynn.base.error import get_exception_direct_subclasses
-from orwynn.base.exchandler import ExceptionHandler, ExceptionHandlerManager
+from orwynn.router._ExceptionHandlerManager import ExceptionHandlerManager
+from orwynn.base.exchandler import ExceptionHandler
 from orwynn.http import (BUILTIN_HTTP_MIDDLEWARE, BuiltinHttpMiddleware, Cors,
                          DefaultExceptionHandler, DefaultHttpExceptionHandler,
                          ExceptionHandlerHttpMiddleware, HttpMiddleware)
@@ -18,8 +19,7 @@ from orwynn.websocket import (BUILTIN_WEBSOCKET_MIDDLEWARE,
                               ExceptionHandlerWebsocketMiddleware,
                               WebsocketMiddleware, WebsocketStack)
 from orwynn.websocket import routing_handlers
-if TYPE_CHECKING:
-    from orwynn.app._App import App
+from orwynn.app import App
 
 
 class MiddlewareRegister:

@@ -1,9 +1,9 @@
 from orwynn.boot._Boot import Boot
-from orwynn.base.controller.endpoint.Endpoint import Endpoint
-from orwynn.base.controller.http.HttpController import HttpController
 from orwynn.base.module._Module import Module
+from orwynn.http._controller.HttpController import HttpController
+from orwynn.http._controller.endpoint.Endpoint import Endpoint
 from orwynn.testing._Client import Client
-from orwynn.web.http.Cors import Cors
+from orwynn.http._cors.Cors import Cors
 
 
 def test_basic():

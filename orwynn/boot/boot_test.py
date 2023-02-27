@@ -6,7 +6,7 @@ from pytest import fixture
 from orwynn.util import validation
 from orwynn.apprc._AppRc import AppRc
 from orwynn.boot._Boot import Boot
-from orwynn.boot._AppMode import AppMode
+from orwynn.app import AppMode
 from orwynn.http import Endpoint, HttpController
 from orwynn._di.circular_dependency_error import CircularDependencyError
 from orwynn._di.Di import Di

@@ -1,6 +1,6 @@
 from orwynn.base.error import Error
 from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
-from orwynn.websocket import Websocket
+from orwynn.websocket._Websocket import Websocket
 
 
 class DefaultWebsocketErrorHandler(ExceptionHandler):

@@ -1,6 +1,6 @@
 from orwynn.util import validation
 from orwynn.log._Log import Log
-from orwynn.web.websocket.Websocket import Websocket
+from orwynn.websocket._Websocket import Websocket
 
 
 class WebsocketLogger:

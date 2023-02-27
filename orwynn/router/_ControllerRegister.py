@@ -5,10 +5,13 @@ from typing import TYPE_CHECKING, Any, Callable, Literal
 import pydantic
 
 from orwynn.apiversion import ApiVersion
-from ..base.controller.errors import AlreadyRegisteredMethodError
+from orwynn.app import App
 from orwynn.base.controller._Controller import Controller
+from orwynn.base.controller.errors import AlreadyRegisteredMethodError
 from orwynn.base.error import MalfunctionError
-from orwynn.http import Endpoint, HttpController, HttpMethod
+from orwynn.base.model import Model
+from orwynn.base.module import Module
+from orwynn.http import Endpoint, EndpointContainer, HttpController, HttpMethod
 from orwynn.http.errors import (EndpointNotFoundError,
                                 UnsupportedHttpMethodError)
 from orwynn.indication._Indication import Indication
@@ -16,15 +19,9 @@ from orwynn.proxy.BootProxy import BootProxy
 from orwynn.router.errors import (UnmatchedEndpointEntityError,
                                   WrongHandlerReturnTypeError)
 from orwynn.util import validation
-from orwynn.http import EndpointContainer
 from orwynn.util.url import join_routes
 from orwynn.websocket import (WebsocketController, WebsocketStack,
                               routing_handlers)
-
-if TYPE_CHECKING:
-    from orwynn.app import App
-    from orwynn.base.model import Model
-    from orwynn.base.module import Module
 
 
 class ControllerRegister:

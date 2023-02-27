@@ -2,7 +2,7 @@ from orwynn.util import validation
 from orwynn.mapping.errors import (
     CustomUseOfMappingReservedFieldError
 )
-from _Document import Document
+from orwynn.mongo._Document import Document
 from orwynn.mongo.errors import DuplicateKeyError
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.testing._Client import Client
