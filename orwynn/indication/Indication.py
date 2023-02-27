@@ -5,8 +5,8 @@ from typing import Any, ItemsView
 from orwynn.BaseSubclassable import BaseSubclassable
 from orwynn.base.error.Error import Error
 from orwynn.base.error.ErrorValueSchema import ErrorValueSchema
-from orwynn.http.schema._HttpExceptionValueSchema import HttpExceptionValueSchema
-from orwynn.http.schema._RequestValidationExceptionValueSchema import \
+from orwynn.http._schema.HttpExceptionValueSchema import HttpExceptionValueSchema
+from orwynn.http._schema.RequestValidationExceptionValueSchema import \
     RequestValidationExceptionValueSchema
 from orwynn.indication.IndicationType import IndicationType
 from orwynn.indication.digesting_error import DigestingError

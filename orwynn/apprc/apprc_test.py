@@ -1,9 +1,9 @@
 import pytest
 
 from orwynn.util import validation
-from orwynn.apprc.AppRc import AppRc
-from orwynn.boot.Boot import Boot
-from orwynn.boot.BootMode import BootMode
+from orwynn.apprc._AppRc import AppRc
+from orwynn.boot._Boot import Boot
+from orwynn.boot._BootMode import BootMode
 from orwynn.config.Config import Config
 from orwynn.di.Di import Di
 from orwynn.base.model.Model import Model

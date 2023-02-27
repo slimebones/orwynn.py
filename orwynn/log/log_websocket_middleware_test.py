@@ -1,6 +1,6 @@
 import json
 
-from orwynn.boot.Boot import Boot
+from orwynn.boot._Boot import Boot
 from orwynn.base.controller.websocket.WebsocketController import (
     WebsocketController,
 )

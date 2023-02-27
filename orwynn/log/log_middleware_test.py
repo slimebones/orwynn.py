@@ -2,7 +2,7 @@ import json
 from types import NoneType
 from typing import Literal
 
-from orwynn.boot.Boot import Boot
+from orwynn.boot._Boot import Boot
 from orwynn.base.controller.endpoint.Endpoint import Endpoint
 from orwynn.base.controller.http.HttpController import HttpController
 from orwynn.base.error.Error import Error

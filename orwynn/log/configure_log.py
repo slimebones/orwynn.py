@@ -1,6 +1,6 @@
 import sys
 from typing import Any
-from orwynn.boot.BootMode import BootMode
+from orwynn.boot._BootMode import BootMode
 from orwynn.log.Log import Log
 from orwynn.log.LogConfig import LogConfig
 from orwynn.log.LogHandler import LogHandler

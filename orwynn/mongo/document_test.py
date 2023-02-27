@@ -1,7 +1,7 @@
 from pytest import fixture
 
 from orwynn.util import validation
-from orwynn.boot.Boot import Boot
+from orwynn.boot._Boot import Boot
 from orwynn.base.module.Module import Module
 from orwynn.mongo import module
 from orwynn.mongo.Document import Document

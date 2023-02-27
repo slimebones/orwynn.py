@@ -1,7 +1,7 @@
 
 from fastapi import Header
 
-from orwynn.boot.Boot import Boot
+from orwynn.boot._Boot import Boot
 from orwynn.http import Endpoint, HttpController
 from orwynn.base.module.Module import Module
 from orwynn.testing._Client import Client

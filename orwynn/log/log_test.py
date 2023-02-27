@@ -3,7 +3,7 @@ import json
 import pytest
 from loguru._handler import Message
 
-from orwynn.boot.Boot import Boot
+from orwynn.boot._Boot import Boot
 from orwynn.base.controller.endpoint.Endpoint import Endpoint
 from orwynn.base.controller.http.HttpController import HttpController
 from orwynn.base.controller.websocket.WebsocketController import (

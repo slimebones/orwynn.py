@@ -1,4 +1,4 @@
-from orwynn.boot.Boot import Boot
+from orwynn.boot._Boot import Boot
 from orwynn.di.collecting.provider_dependencies_map import (
     ProviderDependenciesMap,
 )

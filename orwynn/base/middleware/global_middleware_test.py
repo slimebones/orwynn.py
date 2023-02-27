@@ -1,5 +1,5 @@
 from orwynn.util import validation
-from orwynn.boot.Boot import Boot
+from orwynn.boot._Boot import Boot
 from orwynn.di.Di import Di
 from orwynn.http import HttpMiddleware
 from orwynn.middleware.WebsocketMiddleware import WebsocketMiddleware

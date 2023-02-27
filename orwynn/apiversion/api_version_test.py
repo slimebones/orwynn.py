@@ -3,7 +3,7 @@ from ._ApiVersion import ApiVersion
 from ._UnsupportedVersionError import (
     UnsupportedVersionError,
 )
-from orwynn.boot.Boot import Boot
+from orwynn.boot._Boot import Boot
 from orwynn.http import Endpoint, HttpController
 from orwynn.base.module.Module import Module
 

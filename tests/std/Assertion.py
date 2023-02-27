@@ -1,5 +1,5 @@
 from orwynn.app._App import App
-from orwynn.boot.BootConfig import BootConfig
+from orwynn.boot._BootConfig import BootConfig
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.Provider import Provider
 from orwynn.log.LogConfig import LogConfig

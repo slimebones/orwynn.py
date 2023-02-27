@@ -4,11 +4,10 @@ import pytest
 from pytest import fixture
 
 from orwynn.util import validation
-from orwynn.apprc.AppRc import AppRc
-from orwynn.boot.Boot import Boot
-from orwynn.boot.BootMode import BootMode
-from orwynn.base.controller.endpoint.Endpoint import Endpoint
-from orwynn.base.controller.http.HttpController import HttpController
+from orwynn.apprc._AppRc import AppRc
+from orwynn.boot._Boot import Boot
+from orwynn.boot._BootMode import BootMode
+from orwynn.http import Endpoint, HttpController
 from orwynn.di.circular_dependency_error import CircularDependencyError
 from orwynn.di.Di import Di
 from orwynn.base.module.Module import Module

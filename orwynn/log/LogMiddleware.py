@@ -1,7 +1,7 @@
 from orwynn.log.HttpLogger import HttpLogger
 from orwynn.middleware.HttpMiddleware import HttpMiddleware
 from orwynn.middleware.HttpNextCall import HttpNextCall
-from orwynn.web.context.RequestContextId import RequestContextId
+from orwynn.http.context._HttpRequestContextId import HttpRequestContextId
 from orwynn.web.http.requests import HttpRequest
 from orwynn.web.http.responses import HttpResponse
 
@@ -19,7 +19,7 @@ class LogMiddleware(HttpMiddleware):
     async def process(
         self, request: HttpRequest, call_next: HttpNextCall
     ) -> HttpResponse:
-        request_id: str = RequestContextId().get()
+        request_id: str = HttpRequestContextId().get()
         await self.__http_logger.log_request(
             request,
             request_id

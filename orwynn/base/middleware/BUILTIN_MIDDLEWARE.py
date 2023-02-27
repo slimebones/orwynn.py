@@ -1,38 +1,33 @@
-from orwynn.base.error.http.ExceptionHandlerHttpMiddleware import (
-    ExceptionHandlerHttpMiddleware,
-)
-from orwynn.base.error.websocket.ExceptionHandlerWebsocketMiddleware import (
-    ExceptionHandlerWebsocketMiddleware,
-)
-from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
-from orwynn.middleware.BuiltinWebsocketMiddleware import (
+from orwynn.http import BuiltinHttpMiddleware, ExceptionHandlerHttpMiddleware
+from orwynn.websocket import (
     BuiltinWebsocketMiddleware,
+    ExceptionHandlerWebsocketMiddleware
 )
-from orwynn.web.context.ContextBuiltinMiddleware import (
+from orwynn.http.context._ContextBuiltinMiddleware import (
     ContextBuiltinMiddleware,
 )
-from orwynn.web.context.ContextBuiltinWebsocketMiddleware import (
+from orwynn.websocket.context._ContextBuiltinWebsocketMiddleware import (
     ContextBuiltinWebsocketMiddleware,
 )
-from orwynn.web.context.RequestContextBuiltinMiddleware import (
-    RequestContextBuiltinMiddleware,
+from orwynn.http.context._HttpRequestContextBuiltinMiddleware import (
+    HttpRequestContextBuiltinMiddleware,
 )
-from orwynn.web.context.RequestContextBuiltinWebsocketMiddleware import (
+from orwynn.websocket.context._RequestContextBuiltinWebsocketMiddleware import (
     RequestContextBuiltinWebsocketMiddleware,
 )
-from orwynn.websocket import ConnectionBuiltinWebsocketMiddleware
+from orwynn.websocket import _ConnectionBuiltinWebsocketMiddleware
 
 # Order matters, the lowest index is initialized first.
 BUILTIN_HTTP_MIDDLEWARE: list[type[BuiltinHttpMiddleware]] = [
     ExceptionHandlerHttpMiddleware,
     ContextBuiltinMiddleware,
-    RequestContextBuiltinMiddleware
+    HttpRequestContextBuiltinMiddleware
 ]
 
 BUILTIN_WEBSOCKET_MIDDLEWARE: list[type[BuiltinWebsocketMiddleware]] = [
     # Connection middleware should be first, since the exception handlers will
     # access websocket object
-    ConnectionBuiltinWebsocketMiddleware,
+    _ConnectionBuiltinWebsocketMiddleware,
     ExceptionHandlerWebsocketMiddleware,
     ContextBuiltinWebsocketMiddleware,
     RequestContextBuiltinWebsocketMiddleware

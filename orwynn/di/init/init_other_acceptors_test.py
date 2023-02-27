@@ -1,5 +1,5 @@
 from orwynn.util import validation
-from orwynn.boot.Boot import Boot
+from orwynn.boot._Boot import Boot
 from orwynn.base.controller.endpoint.Endpoint import Endpoint
 from orwynn.base.controller.http.HttpController import HttpController
 from orwynn.di.DiContainer import DiContainer
