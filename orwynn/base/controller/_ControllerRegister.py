@@ -4,40 +4,25 @@ from typing import Any, Callable, Literal
 
 import pydantic
 
-from orwynn.util import validation
-from orwynn.app._AlreadyRegisteredMethodError import (
-    AlreadyRegisteredMethodError,
-)
+from orwynn.apiversion import ApiVersion
 from orwynn.app._App import App
-from orwynn.boot.api_version.ApiVersion import ApiVersion
+from orwynn.app.errors import AlreadyRegisteredMethodError
 from orwynn.base.controller._Controller import Controller
-from orwynn.base.controller.endpoint.Endpoint import Endpoint
-from orwynn.base.controller.endpoint.EndpointNotFoundError import (
-    EndpointNotFoundError,
-)
-from orwynn.base.controller.http.HttpController import HttpController
-from orwynn.base.controller.websocket.WebsocketController import (
-    WebsocketController,
-)
 from orwynn.base.error._MalfunctionError import MalfunctionError
-from orwynn.indication._Indication import Indication
 from orwynn.base.model._Model import Model
 from orwynn.base.module._Module import Module
-from orwynn.proxy.BootProxy import BootProxy
-from orwynn.proxy.EndpointProxy import EndpointProxy
-from orwynn.router.errors import (
-    UnmatchedEndpointEntityError,
-)
-from orwynn.router.websocket.handlers import WebsocketHandler
-from orwynn.router.websocket.WebsocketStack import WebsocketStack
-from orwynn.router.WrongHandlerReturnTypeError import (
-    WrongHandlerReturnTypeError,
-)
-from orwynn.web.http.HttpMethod import HttpMethod
-from orwynn.web.http.UnsupportedHttpMethodError import (
-    UnsupportedHttpMethodError,
-)
-from orwynn.web.url import join_routes
+from orwynn.http import Endpoint, HttpController, HttpMethod
+from orwynn.http.errors import (EndpointNotFoundError,
+                                UnsupportedHttpMethodError)
+from orwynn.indication._Indication import Indication
+from orwynn.proxy._BootProxy import BootProxy
+from orwynn.proxy._EndpointProxy import EndpointProxy
+from orwynn.router.errors import (UnmatchedEndpointEntityError,
+                                  WrongHandlerReturnTypeError)
+from orwynn.util import validation
+from orwynn.util.url import join_routes
+from orwynn.websocket import (WebsocketController, WebsocketStack,
+                              routing_handlers)
 
 
 class ControllerRegister:
@@ -139,7 +124,7 @@ class ControllerRegister:
 
             for route in routes:
                 self.__websocket_stack.add_call(
-                    WebsocketHandler(
+                    routing_handlers.WebsocketHandler(
                         fn=event_handler.fn,
                         route=route
                     )

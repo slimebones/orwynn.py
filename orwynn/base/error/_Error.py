@@ -1,7 +1,7 @@
 from typing import ClassVar
 
 from orwynn.indication._IndicationType import IndicationType
-from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
+from orwynn.proxy._ApiIndicationOnlyProxy import APIIndicationOnlyProxy
 
 
 class Error(Exception):

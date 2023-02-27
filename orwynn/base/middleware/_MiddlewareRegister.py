@@ -1,43 +1,24 @@
 from typing import Any, Callable, Sequence
 
 from fastapi.middleware.cors import CORSMiddleware as FastAPI_CORSMiddleware
-from starlette.middleware.base import (
-    BaseHTTPMiddleware as StarletteBaseHTTPMiddleware,
-)
+from starlette.middleware.base import \
+    BaseHTTPMiddleware as StarletteBaseHTTPMiddleware
 
-from orwynn.util import validation
 from orwynn.app._App import App
-from orwynn.constants import (
-    BUILTIN_HTTP_MIDDLEWARE,
-    BUILTIN_WEBSOCKET_MIDDLEWARE,
-)
-from orwynn.http.exchandler._DefaultExceptionHandler import DefaultExceptionHandler
-from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
-from orwynn.base.exchandler._ExceptionHandlerManager import ExceptionHandlerManager
-from orwynn.base.error._get_exception_direct_subclasses import (
-    get_exception_direct_subclasses,
-)
-from orwynn.base.error.http.DefaultHttpExceptionHandler import (
-    DefaultHttpExceptionHandler,
-)
-from orwynn.base.error.http.ExceptionHandlerHttpMiddleware import (
-    ExceptionHandlerHttpMiddleware,
-)
-from orwynn.base.error.websocket.ExceptionHandlerWebsocketMiddleware import (
-    ExceptionHandlerWebsocketMiddleware,
-)
-from orwynn.middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
-from orwynn.middleware.BuiltinWebsocketMiddleware import (
-    BuiltinWebsocketMiddleware,
-)
-from orwynn.middleware.HttpMiddleware import HttpMiddleware
-from orwynn.middleware.Middleware import Middleware
-from orwynn.middleware.WebsocketMiddleware import WebsocketMiddleware
-from orwynn.router.websocket.handlers import DispatchWebsocketHandler
-from orwynn.router.websocket.WebsocketStack import WebsocketStack
-from orwynn.web.http.Cors import Cors
-from orwynn.web.http.HttpException import HttpException
+from orwynn.base import Middleware
+from orwynn.base.error import get_exception_direct_subclasses
+from orwynn.base.exchandler import ExceptionHandler, ExceptionHandlerManager
+from orwynn.http import (BUILTIN_HTTP_MIDDLEWARE, BuiltinHttpMiddleware, Cors,
+                         DefaultExceptionHandler, DefaultHttpExceptionHandler,
+                         ExceptionHandlerHttpMiddleware, HttpMiddleware)
+from orwynn.http.errors import HttpException
+from orwynn.util import validation
 from orwynn.util.Protocol import Protocol
+from orwynn.websocket import (BUILTIN_WEBSOCKET_MIDDLEWARE,
+                              BuiltinWebsocketMiddleware,
+                              ExceptionHandlerWebsocketMiddleware,
+                              WebsocketMiddleware, WebsocketStack)
+from orwynn.websocket import routing_handlers
 
 
 class MiddlewareRegister:
@@ -212,7 +193,7 @@ class MiddlewareRegister:
             )
         elif isinstance(middleware, WebsocketMiddleware):
             self.__websocket_stack.add_call(
-                DispatchWebsocketHandler(
+                routing_handlers.DispatchWebsocketHandler(
                     fn=middleware.dispatch
                 )
             )

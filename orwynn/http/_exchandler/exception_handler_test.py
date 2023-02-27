@@ -8,7 +8,7 @@ from orwynn.boot._Boot import Boot
 from orwynn.http import (Endpoint, HttpController, HttpMiddleware,
                          HttpNextCall, HttpRequest, HttpResponse,
                          JsonHttpResponse, TestHttpResponse)
-from orwynn.proxy.BootProxy import BootProxy
+from orwynn.proxy._BootProxy import BootProxy
 from orwynn.testing._Client import Client
 from orwynn.util import validation
 

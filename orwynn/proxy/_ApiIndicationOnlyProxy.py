@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 from orwynn.worker._Worker import Worker
 
 if TYPE_CHECKING:
-    from orwynn import Indication
+    from orwynn.indication import Indication
 
 
-class APIIndicationOnlyProxy(Worker):
+class ApiIndicationOnlyProxy(Worker):
     def __init__(self, api_indication: "Indication") -> None:
         super().__init__()
         self.api_indication = api_indication

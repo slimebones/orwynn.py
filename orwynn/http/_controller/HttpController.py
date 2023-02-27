@@ -1,16 +1,14 @@
-from types import NoneType
-from typing import Callable, ClassVar, Literal, Optional
+from typing import Callable, ClassVar, Literal
 
 from orwynn.base.controller._Controller import Controller
-from orwynn.http import UnsupportedHttpMethodError
-from .endpoint._Endpoint import Endpoint
+from orwynn.http.errors import UnsupportedHttpMethodError
+from orwynn.http import Endpoint, HttpMethod
 from .errors import \
     DefinedTwiceControllerMethodError
 from orwynn.base.controller.errors import \
     MissingControllerClassAttributeError
-from orwynn.proxy.EndpointProxy import EndpointProxy
+from orwynn.proxy._EndpointProxy import EndpointProxy
 from orwynn.util import validation
-from orwynn.web.http.HttpMethod import HttpMethod
 
 
 class HttpController(Controller):

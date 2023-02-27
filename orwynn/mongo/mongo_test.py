@@ -4,7 +4,7 @@ from orwynn.mapping.errors import (
 )
 from _Document import Document
 from orwynn.mongo.errors import DuplicateKeyError
-from orwynn.proxy.BootProxy import BootProxy
+from orwynn.proxy._BootProxy import BootProxy
 from orwynn.testing._Client import Client
 from orwynn.http import TestHttpResponse
 from tests.std.user import User

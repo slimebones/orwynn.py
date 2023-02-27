@@ -17,7 +17,7 @@ from orwynn.middleware.Middleware import Middleware
 from orwynn.middleware.WebsocketMiddleware import WebsocketMiddleware
 from orwynn.base.model._Model import Model
 from orwynn.base.module._Module import Module
-from orwynn.proxy.BootProxy import BootProxy
+from orwynn.proxy._BootProxy import BootProxy
 from orwynn.util.validation import validate
 from orwynn.web.url import join_routes
 

@@ -22,9 +22,9 @@ from orwynn.log._configure_log import configure_log
 from orwynn.log._LogConfig import LogConfig
 from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
 from orwynn.base.module._Module import Module
-from orwynn.proxy.APIIndicationOnlyProxy import APIIndicationOnlyProxy
-from orwynn.proxy.BootProxy import BootProxy
-from orwynn.proxy.EndpointProxy import EndpointProxy
+from orwynn.proxy._ApiIndicationOnlyProxy import APIIndicationOnlyProxy
+from orwynn.proxy._BootProxy import BootProxy
+from orwynn.proxy._EndpointProxy import EndpointProxy
 from orwynn.router._Router import Router
 from orwynn.testing._Client import Client
 from orwynn.util.validation import (

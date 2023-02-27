@@ -4,7 +4,7 @@ import pydantic
 
 from orwynn.util import validation
 from orwynn.indication._IndicationType import IndicationType
-from orwynn.proxy.BootProxy import BootProxy
+from orwynn.proxy._BootProxy import BootProxy
 
 RecoverType = TypeVar("RecoverType", bound="Model")
 

@@ -1,9 +1,8 @@
 from copy import copy
 
 from orwynn.util import validation
-from orwynn.boot.api_version.UnsupportedVersionError import (
-    UnsupportedVersionError,
-)
+
+from .errors import UnsupportedVersionError
 
 
 class ApiVersion:

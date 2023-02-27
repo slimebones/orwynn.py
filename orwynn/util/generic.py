@@ -1,9 +1,9 @@
 # A request of any supported protocol
 from typing import Union
 
-from orwynn.web.http.requests import HttpRequest
-from orwynn.web.http.responses import HttpResponse
-from orwynn.web.websocket.Websocket import Websocket
+from orwynn.websocket import Websocket
+from orwynn.http import HttpRequest, HttpResponse
+
 
 GenericRequest = Union[
     HttpRequest,

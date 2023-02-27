@@ -12,7 +12,7 @@ from orwynn.internal.di.circular_dependency_error import CircularDependencyError
 from orwynn.internal.di.Di import Di
 from orwynn.base.module._Module import Module
 from orwynn.mongo._Mongo import Mongo
-from orwynn.proxy.BootProxy import BootProxy
+from orwynn.proxy._BootProxy import BootProxy
 from orwynn.base.service._Service import Service
 from tests.std.text import TextConfig
 

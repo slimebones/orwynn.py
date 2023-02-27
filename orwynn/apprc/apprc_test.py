@@ -4,11 +4,11 @@ from orwynn.util import validation
 from orwynn.apprc._AppRc import AppRc
 from orwynn.boot._Boot import Boot
 from orwynn.boot._BootMode import BootMode
-from orwynn.config.Config import Config
+from orwynn.base import Config
 from orwynn.internal.di.Di import Di
 from orwynn.base.model._Model import Model
 from orwynn.base.module._Module import Module
-from orwynn.mp.helpers import find as mp_find
+from orwynn.util.mp import find as mp_find
 
 
 class Menu(Model):

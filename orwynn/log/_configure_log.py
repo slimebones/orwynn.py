@@ -4,7 +4,7 @@ from orwynn.boot._BootMode import BootMode
 from orwynn.log._Log import Log
 from orwynn.log._LogConfig import LogConfig
 from orwynn.log._LogHandler import LogHandler
-from orwynn.proxy.BootProxy import BootProxy
+from orwynn.proxy._BootProxy import BootProxy
 
 
 def configure_log(config: LogConfig) -> None:

@@ -1,6 +1,5 @@
-from orwynn.base.controller.endpoint.Endpoint import Endpoint
-from orwynn.base.controller.http.HttpController import HttpController
-from orwynn.base.module._Module import Module
+from orwynn.base import Module
+from orwynn.http import HttpController, Endpoint
 from orwynn import mongo
 from orwynn.mongo._Document import Document
 from orwynn.mongo._Mongo import Mongo

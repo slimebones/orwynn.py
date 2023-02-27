@@ -1,5 +1,5 @@
-from orwynn.base.error._DEFAULT_EXCEPTION_HANDLERS import (
-    DEFAULT_HTTP_EXCEPTION_HANDLERS, DEFAULT_WEBSOCKET_EXCEPTION_HANDLERS)
+from orwynn.http import DEFAULT_HTTP_EXCEPTION_HANDLERS
+from orwynn.websocket import DEFAULT_WEBSOCKET_EXCEPTION_HANDLERS
 from orwynn.base.error._ExceptionAlreadyHandledError import \
     ExceptionAlreadyHandledError
 from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
