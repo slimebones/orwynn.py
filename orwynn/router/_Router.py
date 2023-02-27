@@ -1,15 +1,13 @@
-
-
 from orwynn.app._App import App
-from orwynn.boot.api_version.ApiVersion import ApiVersion
+from orwynn.apiversion import ApiVersion
 from orwynn.base.controller._Controller import Controller
-from orwynn.base.controller._ControllerRegister import ControllerRegister
+from ._ControllerRegister import ControllerRegister
 from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
-from orwynn.middleware.Middleware import Middleware
-from orwynn.middleware.MiddlewareRegister import MiddlewareRegister
+from orwynn.base.middleware import Middleware
+from ._MiddlewareRegister import MiddlewareRegister
 from orwynn.base.module._Module import Module
-from orwynn.router.websocket.WebsocketStack import WebsocketStack
-from orwynn.web.http.Cors import Cors
+from orwynn.websocket import WebsocketStack
+from orwynn.http import Cors
 from orwynn.worker._Worker import Worker
 
 

@@ -1,5 +1,5 @@
 from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
-from orwynn.proxy._BootProxy import BootProxy
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.websocket import Websocket
 
 

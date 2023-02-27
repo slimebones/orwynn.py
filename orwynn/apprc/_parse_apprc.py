@@ -7,14 +7,14 @@ from orwynn.util import validation
 from ._APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from orwynn.apprc._AppRc import AppRc
 from ._AppRcSearchError import AppRcSearchError
-from orwynn.boot import BootMode
+from orwynn.app import AppMode
 from orwynn.util.yml import load_yml
 from orwynn.util.mp import patch as mp_patch
 
 
 def parse_apprc(
     root_dir: Path,
-    mode: BootMode,
+    mode: AppMode,
     direct_apprc: AppRc | None
 ) -> AppRc:
     """Parses apprc dictionary.
@@ -30,7 +30,7 @@ def parse_apprc(
             if such apprc is not present to enable environ searching way.
     """
     validation.validate(root_dir, Path)
-    validation.validate(mode, BootMode)
+    validation.validate(mode, AppMode)
     validation.validate(direct_apprc, [AppRc, NoneType])
 
     # All required for this enabled mode data goes here
@@ -80,7 +80,7 @@ def __parse_into(
     receiver: dict,
     source: dict,
     should_check_if_source_empty: bool,
-    mode: BootMode
+    mode: AppMode
 ) -> None:
     if source == {} and should_check_if_source_empty:
         raise ValueError("parsed apprc source is empty")
@@ -88,7 +88,7 @@ def __parse_into(
     # Check if apprc contains any unsupported top-level keys
     for k in receiver:
         supported_top_level_keys: list[str] = [
-            x.value for x in BootMode
+            x.value for x in AppMode
         ]
         if k not in supported_top_level_keys:
             raise ValueError(

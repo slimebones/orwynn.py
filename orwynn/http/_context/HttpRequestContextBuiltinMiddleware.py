@@ -1,7 +1,7 @@
 from orwynn.http import (BuiltinHttpMiddleware, HttpNextCall, HttpRequest,
                          HttpResponse)
-from orwynn.http.context._HttpRequestContextId import HttpRequestContextId
-from orwynn.log._Log import Log
+from orwynn.http._context.HttpRequestContextId import HttpRequestContextId
+from orwynn.log import Log
 
 
 class HttpRequestContextBuiltinMiddleware(BuiltinHttpMiddleware):

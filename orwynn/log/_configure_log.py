@@ -1,18 +1,20 @@
 import sys
-from typing import Any
-from orwynn.boot._BootMode import BootMode
+from typing import TYPE_CHECKING, Any
 from orwynn.log._Log import Log
 from orwynn.log._LogConfig import LogConfig
 from orwynn.log._LogHandler import LogHandler
-from orwynn.proxy._BootProxy import BootProxy
+from orwynn.proxy.BootProxy import BootProxy
+
+if TYPE_CHECKING:
+    from orwynn.app import AppMode
 
 
-def configure_log(config: LogConfig) -> None:
+def configure_log(config: LogConfig, *, app_mode_prod: "AppMode") -> None:
     if config.handlers:
         for handler in config.handlers:
-            __add_handler(handler)
+            __add_handler(handler, app_mode_prod)
 
-def __add_handler(handler: LogHandler) -> int:
+def __add_handler(handler: LogHandler, app_mode_prod: "AppMode") -> int:
     """Adds a new handler.
 
     Args:
@@ -40,7 +42,7 @@ def __add_handler(handler: LogHandler) -> int:
         # i.e. add it as it is
         sink = handler.sink
 
-    if BootProxy.ie().mode == BootMode.PROD:
+    if BootProxy.ie().mode == app_mode_prod:
         if handler.level is None:
             handler.level = "INFO"
         if handler.serialize is None:

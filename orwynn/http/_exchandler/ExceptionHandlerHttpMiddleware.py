@@ -1,6 +1,8 @@
 from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
-from orwynn.http import (BuiltinHttpMiddleware, HttpNextCall, HttpRequest,
-                         HttpResponse)
+from orwynn.http._middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
+from orwynn.http._middleware.HttpNextCall import HttpNextCall
+from orwynn.http._requests import HttpRequest
+from orwynn.http._responses import HttpResponse
 from orwynn.util import validation
 
 

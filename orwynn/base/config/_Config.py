@@ -1,10 +1,12 @@
 import re
-from typing import Any, Self
+from typing import TYPE_CHECKING, Any, Self
 
 from orwynn.util import validation
-from orwynn.apprc._AppRc import AppRc
 from orwynn.base.model._Model import Model
-from orwynn.proxy._BootProxy import BootProxy
+from orwynn.proxy.BootProxy import BootProxy
+
+if TYPE_CHECKING:
+    from orwynn.apprc._AppRc import AppRc
 
 
 class Config(Model):
@@ -18,7 +20,7 @@ class Config(Model):
 
         validation.validate_dict(extra, (str, validation.Validator.SKIP))
 
-        apprc: AppRc = BootProxy.ie().apprc
+        apprc: "AppRc" = BootProxy.ie().apprc
         config_kwargs: dict[str, Any] = apprc.get(
             cls._convert_name_to_rc_format(),
             {}

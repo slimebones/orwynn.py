@@ -15,19 +15,18 @@ from orwynn.boot.boot_test import (
     std_boot,
     std_mongo_boot,
 )
-from orwynn.boot._BootMode import BootMode
-from orwynn.http._endpoint.endpoint_test import run_endpoint
-from orwynn.internal.di.collecting.collect_modules_test import std_modules
-from orwynn.internal.di.collecting.collect_provider_dependencies_test import (
+from orwynn.app import AppMode
+from orwynn.http._controller.endpoint.endpoint_test import run_endpoint
+from orwynn._di.collecting.collect_modules_test import std_modules
+from orwynn._di.collecting.collect_provider_dependencies_test import (
     std_provider_dependencies_map,
 )
-from orwynn.internal.di.Di import Di
-from orwynn.internal.di.di_test import std_di_container
-from orwynn.internal.di.MissingDiObjectError import MissingDiObjectError
+from orwynn._di.Di import Di
+from orwynn._di.di_test import std_di_container
+from orwynn._di.MissingDiObjectError import MissingDiObjectError
 from orwynn.log.log_test import log_apprc_sink_to_writer, writer
 from orwynn.base.module._Module import Module
 from orwynn.mongo._Mongo import Mongo
-from orwynn.proxy.boot_data_proxy_test import std_boot_data_proxy
 from orwynn.testing._Client import Client
 from orwynn.testing._EmbeddedTestClient import EmbeddedTestClient
 from orwynn.http.http_test import std_http

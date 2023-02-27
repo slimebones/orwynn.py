@@ -2,10 +2,10 @@ from pathlib import Path
 from typing import Any, Self
 
 from orwynn.apprc._AppRc import AppRc
-from orwynn.boot._BootMode import BootMode
-from orwynn.config.Config import Config
+from orwynn.app import AppMode
+from orwynn.base.config import Config
 from orwynn.indication._Indication import Indication
-from orwynn.proxy._BootProxy import BootProxy
+from orwynn.proxy.BootProxy import BootProxy
 
 
 class BootConfig(Config):
@@ -17,7 +17,7 @@ class BootConfig(Config):
         root_dir:
             Root directory of the boot.
     """
-    mode: BootMode
+    mode: AppMode
     root_dir: Path
     api_indication: Indication
     app_rc: AppRc

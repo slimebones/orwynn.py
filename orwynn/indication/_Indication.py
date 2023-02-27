@@ -12,11 +12,11 @@ from orwynn.http.errors import HttpException
 from orwynn.indication._IndicationType import IndicationType
 from orwynn.indication.errors import UnsupportedIndicatorError
 from orwynn.util import validation
-from orwynn.util.cls import ClassNotFoundError, find_subclass_by_name
 from orwynn.util.mp.location import (FieldLocation, find_field_by_location,
                                      find_location_by_field)
-from orwynn.util.validation import (RequestValidationException, validate,
+from orwynn.util.validation import (validate,
                                     validate_dict)
+from orwynn.util.validation.errors import RequestValidationException
 from orwynn.util.validation._validator import Validator
 
 from ._Indicatable import Indicatable, IndicatableTypeVar

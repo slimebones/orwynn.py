@@ -2,3 +2,5 @@ from ._Error import Error
 from ._get_exception_direct_subclasses import get_exception_direct_subclasses
 from ._find_detailed_class_for_exception import find_detailed_class_for_exception
 from ._ErrorValueSchema import ErrorValueSchema
+from ._MalfunctionError import MalfunctionError
+from ._ExceptionAlreadyHandledError import ExceptionAlreadyHandledError

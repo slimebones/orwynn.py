@@ -1,5 +1,5 @@
 from orwynn.base.error import Error
 
 
-class UnknownBootModeError(Error):
+class UnknownAppModeError(Error):
     pass

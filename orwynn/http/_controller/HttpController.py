@@ -1,13 +1,14 @@
 from typing import Callable, ClassVar, Literal
 
+from .endpoint.Endpoint import Endpoint
 from orwynn.base.controller._Controller import Controller
+from ._HttpMethod import HttpMethod
 from orwynn.http.errors import UnsupportedHttpMethodError
-from orwynn.http import Endpoint, HttpMethod
 from .errors import \
     DefinedTwiceControllerMethodError
 from orwynn.base.controller.errors import \
     MissingControllerClassAttributeError
-from orwynn.proxy._EndpointProxy import EndpointProxy
+from .endpoint.EndpointContainer import EndpointContainer
 from orwynn.util import validation
 
 
@@ -72,7 +73,7 @@ class HttpController(Controller):
                 http_method: HttpMethod = HttpMethod(str_method)
                 self._methods.append(http_method)
 
-                EndpointProxy.ie().add(
+                EndpointContainer.ie().add(
                     self.get_fn_by_http_method(http_method),
                     endpoint
                 )

@@ -2,7 +2,7 @@ import lorem
 
 from orwynn.app._App import App
 from orwynn.boot._BootConfig import BootConfig
-from orwynn.base import Config
+from orwynn.base.config import Config
 from orwynn.http import HttpController, Endpoint
 from orwynn.base.model._Model import Model
 from orwynn.base.module._Module import Module

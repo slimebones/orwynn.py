@@ -3,7 +3,7 @@ from orwynn.util.BaseSubclassable import BaseSubclassable
 from orwynn.base.controller._Controller import Controller
 from orwynn.base.error import Error
 from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
-from orwynn.base import Middleware
+from orwynn.base.middleware import Middleware
 from orwynn.base.model._Model import Model
 from orwynn.base.service._Service import Service
 

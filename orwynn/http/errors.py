@@ -1,7 +1,7 @@
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from orwynn.base import Error
-from ._endpoint.EndpointNotFoundError import EndpointNotFoundError
+from orwynn.base.error import Error
+from ._controller.endpoint.errors import EndpointNotFoundError
 
 HttpException = StarletteHTTPException
 

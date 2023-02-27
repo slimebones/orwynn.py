@@ -7,7 +7,7 @@ from pymongo.cursor import Cursor
 from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
 
 from orwynn.util import validation
-from orwynn.internal.di.Di import Di
+from orwynn._di.Di import Di
 from orwynn.util.fmt import snakefy
 from orwynn.mapping.errors import (
     CustomUseOfMappingReservedFieldError

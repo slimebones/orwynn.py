@@ -1,4 +1,4 @@
-from orwynn.base import Config
+from orwynn.base.config import Config
 
 
 class MongoConfig(Config):

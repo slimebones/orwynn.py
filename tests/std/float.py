@@ -1,6 +1,7 @@
 from orwynn.app import App
 from orwynn.http import HttpController, Endpoint
-from orwynn.base import Module, Service
+from orwynn.base.module import Module
+from orwynn.base.service import Service
 
 
 class FloatService(Service):

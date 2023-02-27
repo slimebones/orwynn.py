@@ -13,7 +13,7 @@ from orwynn.base.controller.errors import (
 )
 from orwynn.base.model._Model import Model
 from orwynn.base.module._Module import Module
-from orwynn.proxy._BootProxy import BootProxy
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.testing._Client import Client
 from orwynn.util.validation import (
     RequestValidationException,

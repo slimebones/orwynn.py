@@ -6,13 +6,13 @@ from pytest import fixture
 from orwynn.util import validation
 from orwynn.apprc._AppRc import AppRc
 from orwynn.boot._Boot import Boot
-from orwynn.boot._BootMode import BootMode
+from orwynn.boot._AppMode import AppMode
 from orwynn.http import Endpoint, HttpController
-from orwynn.internal.di.circular_dependency_error import CircularDependencyError
-from orwynn.internal.di.Di import Di
+from orwynn._di.circular_dependency_error import CircularDependencyError
+from orwynn._di.Di import Di
 from orwynn.base.module._Module import Module
 from orwynn.mongo._Mongo import Mongo
-from orwynn.proxy._BootProxy import BootProxy
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.base.service._Service import Service
 from tests.std.text import TextConfig
 
@@ -69,7 +69,7 @@ def test_init_mode_default(std_struct: Module):
     boot: Boot = Boot(
         root_module=std_struct
     )
-    assert boot.mode == BootMode.DEV
+    assert boot.mode == AppMode.DEV
 
 
 def test_init_mode_test(std_struct: Module):
@@ -77,7 +77,7 @@ def test_init_mode_test(std_struct: Module):
     boot: Boot = Boot(
         root_module=std_struct
     )
-    assert boot.mode == BootMode.TEST
+    assert boot.mode == AppMode.TEST
 
 
 def test_init_mode_dev(std_struct: Module):
@@ -85,7 +85,7 @@ def test_init_mode_dev(std_struct: Module):
     boot: Boot = Boot(
         root_module=std_struct
     )
-    assert boot.mode == BootMode.DEV
+    assert boot.mode == AppMode.DEV
 
 
 def test_init_mode_prod(std_struct: Module):
@@ -93,7 +93,7 @@ def test_init_mode_prod(std_struct: Module):
     boot: Boot = Boot(
         root_module=std_struct
     )
-    assert boot.mode == BootMode.PROD
+    assert boot.mode == AppMode.PROD
 
 
 def test_init_incorrect_mode(std_struct: Module):

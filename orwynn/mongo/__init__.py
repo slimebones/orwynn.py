@@ -1,4 +1,4 @@
-from orwynn.base import Module
+from orwynn.base.module import Module
 from ._Mongo import Mongo
 from ._MongoConfig import MongoConfig
 from ._Document import Document

@@ -1,5 +1,5 @@
-from orwynn.base import Error
-from orwynn.base.error._ExceptionAlreadyHandledError import \
+from orwynn.base.error import Error, ExceptionAlreadyHandledError
+from orwynn.base.error import \
     ExceptionAlreadyHandledError
 from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
 from orwynn.base.module._Module import Module
@@ -8,7 +8,7 @@ from orwynn.boot._Boot import Boot
 from orwynn.http import (Endpoint, HttpController, HttpMiddleware,
                          HttpNextCall, HttpRequest, HttpResponse,
                          JsonHttpResponse, TestHttpResponse)
-from orwynn.proxy._BootProxy import BootProxy
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.testing._Client import Client
 from orwynn.util import validation
 

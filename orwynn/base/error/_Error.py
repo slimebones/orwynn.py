@@ -1,7 +1,9 @@
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar, Union
 
-from orwynn.indication._IndicationType import IndicationType
-from orwynn.proxy._ApiIndicationOnlyProxy import APIIndicationOnlyProxy
+from orwynn.proxy.ApiIndicationOnlyProxy import ApiIndicationOnlyProxy
+
+if TYPE_CHECKING:
+    from orwynn.indication import IndicationType
 
 
 class Error(Exception):
@@ -15,7 +17,7 @@ class Error(Exception):
         message (optional):
             Message to be attached to the error.
     """
-    INDICATION_TYPE: ClassVar[IndicationType | None] = None
+    INDICATION_TYPE: ClassVar[Union["IndicationType", None]] = None
 
     def __init__(self, message: str = "") -> None:
         super().__init__(message)
@@ -26,7 +28,7 @@ class Error(Exception):
         """Generates API-complying object using project's defined API
         indication.
         """
-        return APIIndicationOnlyProxy.ie().api_indication.digest(self)
+        return ApiIndicationOnlyProxy.ie().api_indication.digest(self)
 
     def dict(self, *args, **kwargs) -> dict:
         return {

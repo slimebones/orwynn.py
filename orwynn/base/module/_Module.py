@@ -1,20 +1,17 @@
 import copy
 from types import NoneType
-from typing import Self
+from typing import TYPE_CHECKING, Self
 
-from orwynn.util import validation
-from orwynn.app.errors import EmptyRouteError
-from orwynn.base.controller._Controller import Controller
-from orwynn.internal.di.circular_dependency_error import CircularDependencyError
-from orwynn.internal.di.is_provider import is_provider
-from orwynn.internal.di.NotProviderError import NotProviderError
-from orwynn.internal.di.Provider import Provider
-from orwynn.base import Middleware as MiddlewareClass
-from orwynn.base.module.errors import (
-    FrameworkServiceModuleReferenceError,
-)
+from orwynn.base.middleware import Middleware as MiddlewareClass
+from orwynn.base.module.errors import FrameworkServiceModuleReferenceError
 from orwynn.base.service._FrameworkService import FrameworkService
+from orwynn._di.circular_dependency_error import \
+    CircularDependencyError
+from orwynn.util import validation
 from orwynn.util.validation import validate, validate_route
+from orwynn.base.controller import Controller
+
+from .errors import EmptyRouteError
 
 
 class Module:
@@ -57,11 +54,11 @@ class Module:
         self,
         route: str | None = None,
         *,
-        Providers: list[type[Provider]] | None = None,
+        Providers: list[type] | None = None,
         Controllers: list[type[Controller]] | None = None,
         Middleware: list[type[MiddlewareClass]] | None = None,
         imports: list["Module"] | None = None,
-        exports: list[type[Provider]] | None = None
+        exports: list[type] | None = None
     ) -> None:
         super().__init__()
         validate(route, [str, NoneType])
@@ -89,7 +86,7 @@ class Module:
         else:
             self.__route = self.__parse_route(route)
 
-        self._Providers: list[type[Provider]] = self._parse_providers(
+        self._Providers: list[type] = self._parse_providers(
             Providers
         )
         self._Controllers: list[type[Controller]] = self._parse_controllers(
@@ -102,12 +99,7 @@ class Module:
         # Validate and assign exports
         if not exports:
             exports = []
-        for export in exports:
-            if not is_provider(export):
-                raise NotProviderError(
-                    f"export object {export} is not a provider"
-                )
-        self._exports: list[type[Provider]] = exports
+        self._exports: list[type] = exports
 
     def __repr__(self) -> str:
         return "<{} \"{}\" at {}>".format(
@@ -121,7 +113,7 @@ class Module:
         return self.__route
 
     @property
-    def Providers(self) -> list[type[Provider]]:
+    def Providers(self) -> list[type]:
         return copy.copy(self._Providers)
 
     @property
@@ -137,7 +129,7 @@ class Module:
         return copy.copy(self._imports)
 
     @property
-    def exports(self) -> list[type[Provider]]:
+    def exports(self) -> list[type]:
         return copy.copy(self._exports)
 
     @staticmethod
@@ -149,9 +141,7 @@ class Module:
 
         return route
 
-    def _fw_add_provider_or_skip(self, P: type[Provider]) -> None:
-        if not is_provider(P):
-            raise TypeError("should receive provider")
+    def _fw_add_provider_or_skip(self, P: type) -> None:
         if P not in self._Providers:
             self._Providers.append(P)
 
@@ -181,14 +171,12 @@ class Module:
 
     def _parse_providers(
         self,
-        Providers: list[type[Provider]] | None
-    ) -> list[type[Provider]]:
-        res: list[type[Provider]]
+        Providers: list[type] | None
+    ) -> list[type]:
+        res: list[type]
 
         if Providers:
             for P in Providers:
-                if not is_provider(P):
-                    raise NotProviderError(FailedClass=P)
                 if issubclass(P, FrameworkService):
                     raise FrameworkServiceModuleReferenceError(
                         f"a framework service {P} cannot be referenced in"

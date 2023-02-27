@@ -3,7 +3,7 @@ from orwynn.boot._Boot import Boot
 from orwynn.base.error import Error
 from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
 from orwynn.base.module._Module import Module
-from orwynn.proxy._BootProxy import BootProxy
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.util.Protocol import Protocol
 from orwynn.websocket import Websocket, WebsocketController
 

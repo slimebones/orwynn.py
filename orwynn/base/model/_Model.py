@@ -1,10 +1,12 @@
-from typing import Any, ClassVar, Self, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, Self, TypeVar, Union
 
 import pydantic
 
 from orwynn.util import validation
-from orwynn.indication._IndicationType import IndicationType
-from orwynn.proxy._BootProxy import BootProxy
+from orwynn.proxy.ApiIndicationOnlyProxy import ApiIndicationOnlyProxy
+
+if TYPE_CHECKING:
+    from orwynn.indication import IndicationType
 
 RecoverType = TypeVar("RecoverType", bound="Model")
 
@@ -16,7 +18,7 @@ class Model(pydantic.BaseModel):
         INDICATION_TYPE (optional):
             Type to be displayed in final response body. Defaults to OK.
     """
-    INDICATION_TYPE: ClassVar[IndicationType | None] = None
+    INDICATION_TYPE: ClassVar[Union["IndicationType", None]] = None
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
@@ -29,13 +31,13 @@ class Model(pydantic.BaseModel):
         """Generates API-complying object using project's defined API
         indication.
         """
-        return BootProxy.ie().api_indication.digest(self)
+        return ApiIndicationOnlyProxy.ie().api_indication.digest(self)
 
     @classmethod
     def recover(cls, mp: dict) -> Self:
         """Recovers model of this class using dictionary."""
         return validation.apply(
-                BootProxy.ie().api_indication.recover(
+                ApiIndicationOnlyProxy.ie().api_indication.recover(
                 cls, mp
             ),
             Model

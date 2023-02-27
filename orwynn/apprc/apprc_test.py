@@ -2,10 +2,10 @@ import pytest
 
 from orwynn.util import validation
 from orwynn.apprc._AppRc import AppRc
-from orwynn.boot._Boot import Boot
-from orwynn.boot._BootMode import BootMode
-from orwynn.base import Config
-from orwynn.internal.di.Di import Di
+from orwynn.boot import Boot
+from orwynn.app import AppMode
+from orwynn.base.config import Config
+from orwynn._di.Di import Di
 from orwynn.base.model._Model import Model
 from orwynn.base.module._Module import Module
 from orwynn.util.mp import find as mp_find
@@ -60,7 +60,7 @@ def test_prod(raw_apprc: AppRc):
     Boot(
         root_module=Module("/", Providers=[BurgerShotConfig]),
         apprc=raw_apprc,
-        mode=BootMode.PROD
+        mode=AppMode.PROD
     )
 
     assert validation.apply(
@@ -73,7 +73,7 @@ def test_dev(raw_apprc: AppRc):
     Boot(
         root_module=Module("/", Providers=[BurgerShotConfig]),
         apprc=raw_apprc,
-        mode=BootMode.DEV
+        mode=AppMode.DEV
     )
 
     assert validation.apply(
@@ -95,7 +95,7 @@ def test_test(raw_apprc: AppRc):
     Boot(
         root_module=Module("/", Providers=[BurgerShotConfig]),
         apprc=raw_apprc,
-        mode=BootMode.TEST
+        mode=AppMode.TEST
     )
 
     assert validation.apply(

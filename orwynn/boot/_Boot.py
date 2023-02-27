@@ -5,34 +5,26 @@ from types import NoneType
 
 import dotenv
 
-from orwynn.util import validation
-from orwynn.app._App import App
-from orwynn.apprc._AppRc import AppRc
-from orwynn.apprc._parse_apprc import parse_apprc
 from orwynn.apiversion import ApiVersion
-from orwynn.boot._BootMode import BootMode
-from orwynn.base.controller._Controller import Controller
-from orwynn.internal.di.Di import Di
-from orwynn.internal.di.MissingDiObjectError import MissingDiObjectError
-from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
-from orwynn.util.yml.errors import NotDirError
-from orwynn.indication._default_api_indication import default_api_indication
-from orwynn.indication._Indication import Indication
-from orwynn.log._configure_log import configure_log
-from orwynn.log._LogConfig import LogConfig
+from orwynn.app import App, AppMode
+from orwynn.apprc import AppRc, parse_apprc
+from orwynn.base.exchandler import ExceptionHandler
+from orwynn.base.module import Module
+from orwynn.base.controller import Controller
 from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
-from orwynn.base.module._Module import Module
-from orwynn.proxy._ApiIndicationOnlyProxy import APIIndicationOnlyProxy
-from orwynn.proxy._BootProxy import BootProxy
-from orwynn.proxy._EndpointProxy import EndpointProxy
-from orwynn.router._Router import Router
-from orwynn.testing._Client import Client
-from orwynn.util.validation import (
-    validate,
-    validate_dict,
-    validate_each,
-)
 from orwynn.http import Cors
+from orwynn.indication import Indication, default_api_indication
+from orwynn._di.Di import Di
+from orwynn._di.MissingDiObjectError import MissingDiObjectError
+from orwynn.log import LogConfig, configure_log
+from orwynn.proxy.BootProxy import BootProxy
+from orwynn.proxy.ApiIndicationOnlyProxy import ApiIndicationOnlyProxy
+from orwynn.http import EndpointContainer
+from orwynn.router import Router
+from orwynn.testing import Client
+from orwynn.util import validation
+from orwynn.util.validation import validate, validate_dict, validate_each
+from orwynn.util.yml.errors import NotDirError
 from orwynn.worker import Worker
 
 
@@ -116,7 +108,7 @@ class Boot(Worker):
         cors: Cors | None = None,
         ExceptionHandlers: set[type[ExceptionHandler]] | None = None,
         apprc: AppRc | None = None,
-        mode: BootMode | None = None,
+        mode: AppMode | None = None,
         global_http_route: str | None = None,
         global_websocket_route: str | None = None,
         global_modules: list[Module] | None = None,
@@ -138,7 +130,7 @@ class Boot(Worker):
             ExceptionHandlers, ExceptionHandler, expected_sequence_type=set
         )
         validate(apprc, [AppRc, NoneType])
-        validate(mode, [BootMode, NoneType])
+        validate(mode, [AppMode, NoneType])
 
         if global_http_route is None:
             global_http_route = ""
@@ -164,7 +156,7 @@ class Boot(Worker):
 
         dotenv.load_dotenv(dotenv_path, override=True)
 
-        self.__mode: BootMode
+        self.__mode: AppMode
         if mode:
             self.__mode = mode
         else:
@@ -191,8 +183,8 @@ class Boot(Worker):
             global_websocket_route=self.__global_websocket_route,
             api_version=self.__api_version
         )
-        EndpointProxy()
-        APIIndicationOnlyProxy(api_indication)
+        EndpointContainer()
+        ApiIndicationOnlyProxy(api_indication)
         ##
 
         # Add framework services
@@ -209,7 +201,10 @@ class Boot(Worker):
         )
 
         # Configure logging
-        configure_log(validation.apply(self.__di.find("LogConfig"), LogConfig))
+        configure_log(
+            validation.apply(self.__di.find("LogConfig"), LogConfig),
+            app_mode_prod=AppMode.PROD
+        )
 
         self.__router: Router = self.__init_router(
             cors=cors
@@ -265,20 +260,20 @@ class Boot(Worker):
         return self.app.client
 
     @property
-    def mode(self) -> BootMode:
+    def mode(self) -> AppMode:
         return self.__mode
 
     @property
     def api_indication(self) -> Indication:
         return self.__api_indication
 
-    def __parse_mode(self) -> BootMode:
+    def __parse_mode(self) -> AppMode:
         mode_env: str | None = os.getenv("Orwynn_Mode")
 
         if not mode_env:
-            return BootMode.DEV
+            return AppMode.DEV
         else:
-            return BootMode(mode_env)
+            return AppMode(mode_env)
 
     def __parse_root_dir(self) -> Path:
         root_dir: Path
