@@ -2,13 +2,13 @@ import inspect
 
 from pytest import fixture
 
-from orwynn.config.Config import Config
+from orwynn.base.config import Config
 from orwynn._di.collecting.collect_provider_dependencies import (
     ProviderDependenciesMap,
     collect_provider_dependencies,
 )
 from orwynn._di.collecting.ModuleCollector import ModuleCollector
-from orwynn.internal.provider.is_provider import is_provider
+from orwynn._di.is_provider import is_provider
 from orwynn._di.Provider import Provider
 from orwynn.base.module._Module import Module
 from tests.std.Assertion import Assertion

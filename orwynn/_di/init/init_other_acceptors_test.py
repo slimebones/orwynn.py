@@ -1,13 +1,12 @@
 from orwynn.util import validation
 from orwynn.boot._Boot import Boot
-from orwynn.base.controller.endpoint.Endpoint import Endpoint
-from orwynn.base.controller.http.HttpController import HttpController
+from orwynn.http import Endpoint, HttpController
 from orwynn._di.DiContainer import DiContainer
 from orwynn._di.init.init_other_acceptors import init_other_acceptors
 from orwynn._di.ProviderAvailabilityError import ProviderAvailabilityError
-from orwynn.middleware.HttpMiddleware import HttpMiddleware
-from orwynn.base.module._Module import Module
-from orwynn.base.service._Service import Service
+from orwynn.http import HttpMiddleware
+from orwynn.base.module import Module
+from orwynn.base.service import Service
 from tests.std.Assertion import Assertion
 
 

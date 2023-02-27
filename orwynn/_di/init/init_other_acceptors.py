@@ -1,25 +1,21 @@
 import inspect
 
-from orwynn.util import validation
-from orwynn.base.controller._Controller import Controller
-from orwynn.base.controller.http.HttpController import HttpController
-from orwynn.base.controller.websocket.WebsocketController import (
-    WebsocketController,
-)
 from orwynn._di.Acceptor import Acceptor
 from orwynn._di.check_availability import check_availability
 from orwynn._di.DiContainer import DiContainer
 from orwynn._di.DiObject import DiObject
 from orwynn._di.Provider import Provider
-from orwynn.middleware.GlobalMiddlewareSetup import GlobalMiddlewareSetup
-from orwynn.middleware.HttpMiddleware import HttpMiddleware
-from orwynn.middleware.Middleware import Middleware
-from orwynn.middleware.WebsocketMiddleware import WebsocketMiddleware
+from orwynn.base.controller._Controller import Controller
 from orwynn.base.model._Model import Model
 from orwynn.base.module._Module import Module
+from orwynn.http import HttpController, HttpMiddleware
+from orwynn.websocket import WebsocketMiddleware
+from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
 from orwynn.proxy.BootProxy import BootProxy
+from orwynn.util import validation
 from orwynn.util.validation import validate
-from orwynn.web.url import join_routes
+from orwynn.util.url import join_routes
+from orwynn.websocket import WebsocketController
 
 
 class __CoveredRoutes(Model):

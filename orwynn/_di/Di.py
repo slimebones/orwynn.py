@@ -12,8 +12,8 @@ from orwynn._di.DiObject import DiObject
 from orwynn._di.init.init_other_acceptors import init_other_acceptors
 from orwynn._di.init.init_providers import init_providers
 from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
-from orwynn.middleware.GlobalMiddlewareSetup import GlobalMiddlewareSetup
-from orwynn.middleware.Middleware import Middleware
+from orwynn.base.middleware import GlobalMiddlewareSetup
+from orwynn.base.middleware import Middleware
 from orwynn.base.module._Module import Module
 from orwynn.worker._Worker import Worker
 

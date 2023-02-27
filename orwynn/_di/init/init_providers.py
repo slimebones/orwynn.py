@@ -1,6 +1,6 @@
 import inspect
 
-from orwynn.config.Config import Config
+from orwynn.base.config import Config
 from orwynn._di.circular_dependency_error import CircularDependencyError
 from orwynn._di.collecting.no_dependencies_for_given_provider_error import (
     NoDependenciesForGivenProviderError,
@@ -9,10 +9,10 @@ from orwynn._di.collecting.provider_dependencies_map import (
     ProviderDependenciesMap,
 )
 from orwynn._di.DiContainer import DiContainer
-from orwynn.internal.provider.is_provider import is_provider
+from orwynn._di.is_provider import is_provider
 from orwynn._di.MissingDiObjectError import MissingDiObjectError
 from orwynn._di.Provider import Provider
-from orwynn.fmt.helpers import format_chain
+from orwynn.util.fmt import format_chain
 
 
 def init_providers(
