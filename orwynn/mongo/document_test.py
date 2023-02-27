@@ -2,10 +2,10 @@ from pytest import fixture
 
 from orwynn.util import validation
 from orwynn.boot._Boot import Boot
-from orwynn.base.module.Module import Module
-from orwynn.mongo import module
-from orwynn.mongo.Document import Document
-from orwynn.mongo.DocumentUpdateError import DocumentUpdateError
+from orwynn.base import Module
+from orwynn import mongo
+from ._Document import Document
+from .errors import DocumentUpdateError
 
 
 class Item(Document):
@@ -17,7 +17,7 @@ class Item(Document):
 @fixture
 def run_mongo_boot():
     Boot(
-        Module(route="/", imports=[module.module]),
+        Module(route="/", imports=[mongo.module]),
         apprc={
             "prod": {
                 "Mongo": {

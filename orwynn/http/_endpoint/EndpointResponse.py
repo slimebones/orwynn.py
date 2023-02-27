@@ -1,6 +1,6 @@
 
-from orwynn.indication.Indicatable import Indicatable
-from orwynn.base.model.Model import Model
+from orwynn.indication._Indicatable import Indicatable
+from orwynn.base.model._Model import Model
 
 
 class EndpointResponse(Model):

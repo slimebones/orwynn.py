@@ -3,7 +3,7 @@ from pathlib import Path
 from pytest import fixture
 
 from orwynn.boot._BootMode import BootMode
-from orwynn.indication.default_api_indication import default_api_indication
+from orwynn.indication._default_api_indication import default_api_indication
 from ._BootProxy import BootProxy
 
 

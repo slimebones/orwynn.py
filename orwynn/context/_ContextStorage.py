@@ -6,7 +6,7 @@ from .errors import (
     AlreadyInitializedStorageError,
     UndefinedStorageError
 )
-from orwynn.worker.Worker import Worker
+from orwynn.worker._Worker import Worker
 
 
 class ContextStorage(Worker):

@@ -1,11 +1,11 @@
 """
 Base classes of the framework.
 """
-from .module.Module import Module
-from .controller.Controller import Controller
-from .database.Database import Database
-from .error.Error import Error
-from .middleware.Middleware import Middleware
-from .service.Service import Service
-from .model.Model import Model
-from .config import _Config
+from .module import Module
+from .controller import Controller
+from .database import Database
+from .error import Error
+from .middleware import Middleware
+from .service import _Service
+from .model import Model
+from .config import Config

@@ -5,7 +5,7 @@ from orwynn.base.controller.endpoint.Endpoint import Endpoint
 from orwynn.base.controller.endpoint.EndpointNotFoundError import (
     EndpointNotFoundError,
 )
-from orwynn.worker.Worker import Worker
+from orwynn.worker._Worker import Worker
 
 
 class EndpointProxy(Worker):

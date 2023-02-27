@@ -3,7 +3,7 @@ from orwynn.base.controller.endpoint.Endpoint import Endpoint
 from orwynn.base.controller.http.HttpController import HttpController
 from orwynn.middleware.HttpMiddleware import HttpMiddleware
 from orwynn.middleware.HttpNextCall import HttpNextCall
-from orwynn.base.module.Module import Module
+from orwynn.base.module._Module import Module
 from orwynn.web.http.requests import HttpRequest
 from orwynn.web.http.responses import HttpResponse
 

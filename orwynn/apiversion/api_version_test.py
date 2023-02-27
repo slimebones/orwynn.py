@@ -5,7 +5,7 @@ from ._UnsupportedVersionError import (
 )
 from orwynn.boot._Boot import Boot
 from orwynn.http import Endpoint, HttpController
-from orwynn.base.module.Module import Module
+from orwynn.base.module._Module import Module
 
 # NOTE: By default there is no global route for backwards compatiblity.
 

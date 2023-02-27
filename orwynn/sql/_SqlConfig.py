@@ -1,7 +1,7 @@
 from typing import Any
 
 from orwynn.config.Config import Config
-from orwynn.base.error.MalfunctionError import MalfunctionError
+from orwynn.base.error._MalfunctionError import MalfunctionError
 
 from ._SqlDatabaseKind import SQLDatabaseKind
 

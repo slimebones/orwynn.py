@@ -1,3 +1,4 @@
+from orwynn.base import ExceptionHandler
 class DefaultErrorHandler(ExceptionHandler):
     E = Error
 

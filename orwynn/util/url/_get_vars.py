@@ -1,7 +1,7 @@
 from itertools import zip_longest
 import re
 
-from orwynn.base.error.MalfunctionError import MalfunctionError
+from orwynn.base.error._MalfunctionError import MalfunctionError
 from ._UrlVars import UrlVars
 from ._Url import Url
 

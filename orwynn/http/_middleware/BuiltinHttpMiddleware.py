@@ -1,4 +1,4 @@
-from orwynn.middleware.HttpMiddleware import HttpMiddleware
+from orwynn.http import HttpMiddleware
 
 
 class BuiltinHttpMiddleware(HttpMiddleware):

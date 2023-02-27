@@ -4,15 +4,15 @@ from orwynn.app._AlreadyRegisteredMethodError import (
     AlreadyRegisteredMethodError,
 )
 from orwynn.boot._Boot import Boot
-from .DefinedTwiceControllerMethodError import (
+from .errors import (
     DefinedTwiceControllerMethodError
 )
 from orwynn.http import HttpController
-from orwynn.base.controller.MissingControllerClassAttributeError import (
+from orwynn.base.controller.errors import (
     MissingControllerClassAttributeError,
 )
-from orwynn.base.model.Model import Model
-from orwynn.base.module.Module import Module
+from orwynn.base.model._Model import Model
+from orwynn.base.module._Module import Module
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.testing._Client import Client
 from orwynn.util.validation import (

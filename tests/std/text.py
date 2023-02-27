@@ -5,9 +5,9 @@ from orwynn.boot._BootConfig import BootConfig
 from orwynn.config.Config import Config
 from orwynn.base.controller.endpoint.Endpoint import Endpoint
 from orwynn.base.controller.http.HttpController import HttpController
-from orwynn.base.model.Model import Model
-from orwynn.base.module.Module import Module
-from orwynn.base.service.Service import Service
+from orwynn.base.model._Model import Model
+from orwynn.base.module._Module import Module
+from orwynn.base.service._Service import Service
 from orwynn.util.validation import model_validator
 from tests.std.float import FloatService, float_module
 from tests.std.number import NumberService, number_module

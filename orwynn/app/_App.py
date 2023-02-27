@@ -3,7 +3,7 @@ from typing import Callable
 from starlette.types import Receive, Scope, Send
 
 from orwynn.app._CoreApp import CoreApp
-from orwynn.base.service.FrameworkService import FrameworkService
+from orwynn.base.service._FrameworkService import FrameworkService
 from orwynn.testing._Client import Client
 from orwynn.testing._EmbeddedTestClient import EmbeddedTestClient
 from orwynn.http import HttpMethod

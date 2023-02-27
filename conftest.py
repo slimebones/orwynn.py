@@ -16,22 +16,22 @@ from orwynn.boot.boot_test import (
     std_mongo_boot,
 )
 from orwynn.boot._BootMode import BootMode
-from orwynn.base.controller.endpoint.endpoint_test import run_endpoint
-from orwynn.di.collecting.collect_modules_test import std_modules
-from orwynn.di.collecting.collect_provider_dependencies_test import (
+from orwynn.http._endpoint.endpoint_test import run_endpoint
+from orwynn.internal.di.collecting.collect_modules_test import std_modules
+from orwynn.internal.di.collecting.collect_provider_dependencies_test import (
     std_provider_dependencies_map,
 )
-from orwynn.di.Di import Di
-from orwynn.di.di_test import std_di_container
-from orwynn.di.MissingDiObjectError import MissingDiObjectError
+from orwynn.internal.di.Di import Di
+from orwynn.internal.di.di_test import std_di_container
+from orwynn.internal.di.MissingDiObjectError import MissingDiObjectError
 from orwynn.log.log_test import log_apprc_sink_to_writer, writer
-from orwynn.base.module.Module import Module
-from orwynn.mongo.Mongo import Mongo
+from orwynn.base.module._Module import Module
+from orwynn.mongo._Mongo import Mongo
 from orwynn.proxy.boot_data_proxy_test import std_boot_data_proxy
 from orwynn.testing._Client import Client
 from orwynn.testing._EmbeddedTestClient import EmbeddedTestClient
-from orwynn.web.http.http_test import std_http
-from orwynn.worker.Worker import Worker
+from orwynn.http.http_test import std_http
+from orwynn.worker._Worker import Worker
 from tests.structs import (
     circular_module_struct,
     long_circular_module_struct,

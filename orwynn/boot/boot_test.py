@@ -8,12 +8,12 @@ from orwynn.apprc._AppRc import AppRc
 from orwynn.boot._Boot import Boot
 from orwynn.boot._BootMode import BootMode
 from orwynn.http import Endpoint, HttpController
-from orwynn.di.circular_dependency_error import CircularDependencyError
-from orwynn.di.Di import Di
-from orwynn.base.module.Module import Module
-from orwynn.mongo.Mongo import Mongo
+from orwynn.internal.di.circular_dependency_error import CircularDependencyError
+from orwynn.internal.di.Di import Di
+from orwynn.base.module._Module import Module
+from orwynn.mongo._Mongo import Mongo
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.base.service.Service import Service
+from orwynn.base.service._Service import Service
 from tests.std.text import TextConfig
 
 

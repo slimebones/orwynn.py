@@ -1,5 +1,5 @@
-from orwynn.base.error.Error import Error
-from orwynn.base.exchandler.ExceptionHandler import ExceptionHandler
+from orwynn.base.error import Error
+from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
 from orwynn.websocket import Websocket
 
 

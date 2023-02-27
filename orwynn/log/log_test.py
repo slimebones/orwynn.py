@@ -9,8 +9,8 @@ from orwynn.base.controller.http.HttpController import HttpController
 from orwynn.base.controller.websocket.WebsocketController import (
     WebsocketController,
 )
-from orwynn.log.Log import Log
-from orwynn.base.module.Module import Module
+from orwynn.log._Log import Log
+from orwynn.base.module._Module import Module
 from orwynn.testing import Writer, get_log_apprc
 from orwynn.web.websocket.Websocket import Websocket
 

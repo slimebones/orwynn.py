@@ -1,12 +1,12 @@
 from orwynn.util import validation
-from orwynn.mapping.CustomUseOfMappingReservedFieldError import (
-    CustomUseOfMappingReservedFieldError,
+from orwynn.mapping.errors import (
+    CustomUseOfMappingReservedFieldError
 )
-from orwynn.mongo.Document import Document
-from orwynn.mongo.DuplicateKeyError import DuplicateKeyError
+from _Document import Document
+from orwynn.mongo.errors import DuplicateKeyError
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.testing._Client import Client
-from orwynn.web.http.responses import TestHttpResponse
+from orwynn.http import TestHttpResponse
 from tests.std.user import User
 
 

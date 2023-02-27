@@ -3,12 +3,10 @@ from types import NoneType
 from typing import Literal
 
 from orwynn.boot._Boot import Boot
-from orwynn.base.controller.endpoint.Endpoint import Endpoint
-from orwynn.base.controller.http.HttpController import HttpController
-from orwynn.base.error.Error import Error
-from orwynn.log.Log import Log
-from orwynn.log.LogMiddleware import LogMiddleware
-from orwynn.base.module.Module import Module
+from orwynn.base.error import Error
+from orwynn.log._Log import Log
+from orwynn.http import LogMiddleware, Endpoint, HttpController
+from orwynn.base.module._Module import Module
 from orwynn.testing import Writer
 from orwynn.testing._Client import Client
 

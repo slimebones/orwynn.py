@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from orwynn.worker.Worker import Worker
+from orwynn.worker._Worker import Worker
 
 if TYPE_CHECKING:
     from orwynn import Indication

@@ -1,4 +1,4 @@
-from orwynn.base.module.Module import Module
+from orwynn.base.module._Module import Module
 from orwynn.boot._Boot import Boot
 from orwynn.websocket import Websocket, WebsocketController
 

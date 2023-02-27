@@ -1,5 +1,5 @@
 from orwynn.base.controller.endpoint.EndpointResponse import EndpointResponse
-from orwynn.base.model.Model import Model
+from orwynn.base.model._Model import Model
 
 
 class Endpoint(Model):

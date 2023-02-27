@@ -1,4 +1,4 @@
-from orwynn.base.error.ErrorValueSchema import ErrorValueSchema
+from orwynn.base.errorValueSchema import ErrorValueSchema
 
 
 class RequestValidationExceptionValueSchema(ErrorValueSchema):

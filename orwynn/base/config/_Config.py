@@ -3,7 +3,7 @@ from typing import Any, Self
 
 from orwynn.util import validation
 from orwynn.apprc._AppRc import AppRc
-from orwynn.base.model.Model import Model
+from orwynn.base.model._Model import Model
 from orwynn.proxy.BootProxy import BootProxy
 
 

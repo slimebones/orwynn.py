@@ -1,4 +1,4 @@
-from orwynn.mapping.Mapping import Mapping
+from ._Mapping import Mapping
 
 
 def test_try_set_id():

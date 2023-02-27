@@ -4,7 +4,7 @@ from typing import Any
 import dictdiffer
 
 from orwynn.util import validation
-from orwynn.base.error.MalfunctionError import MalfunctionError
+from orwynn.base.error._MalfunctionError import MalfunctionError
 from ._dictpp import dictpp
 
 

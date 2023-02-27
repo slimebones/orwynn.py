@@ -1,10 +1,10 @@
 from orwynn.base.controller.endpoint.Endpoint import Endpoint
 from orwynn.base.controller.http.HttpController import HttpController
-from orwynn.base.module.Module import Module
-from orwynn.mongo import module
-from orwynn.mongo.Document import Document
-from orwynn.mongo.Mongo import Mongo
-from orwynn.base.service.Service import Service
+from orwynn.base.module._Module import Module
+from orwynn import mongo
+from orwynn.mongo._Document import Document
+from orwynn.mongo._Mongo import Mongo
+from orwynn.base.service._Service import Service
 
 
 class User(Document):
@@ -51,5 +51,5 @@ user_module = Module(
     route="/users",
     Providers=[UserService],
     Controllers=[UsersController, UsersIdController],
-    imports=[module.module]
+    imports=[mongo.module]
 )

@@ -4,12 +4,12 @@ from typing import TYPE_CHECKING
 from orwynn.apprc._AppRc import AppRc
 from orwynn.boot.api_version.ApiVersion import ApiVersion
 from orwynn.boot._BootMode import BootMode
-from orwynn.Protocol import Protocol
-from orwynn.worker.Worker import Worker
+from orwynn.util.Protocol import Protocol
+from orwynn.worker._Worker import Worker
 
 if TYPE_CHECKING:
-    from orwynn.base.exchandler.ExceptionHandler import ExceptionHandler
-    from orwynn.indication.Indication import Indication
+    from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
+    from orwynn.indication._Indication import Indication
 
 
 class BootProxy(Worker):

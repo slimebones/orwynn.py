@@ -1,4 +1,4 @@
-from orwynn.base.error.Error import Error
+from orwynn.base.error import Error
 
 
 class UnsupportedVersionError(Error):

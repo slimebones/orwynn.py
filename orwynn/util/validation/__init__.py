@@ -12,15 +12,9 @@ from typing import Any, Callable, Optional, Sized, TypeVar
 from pydantic import ValidationError as __PydanticValidationError
 from pydantic import validator as __pydantic_validator
 
-from orwynn.util.validation.RequestValidationException import \
-    RequestValidationException
-
-from orwynn.util.validation.ExpectationError import ExpectationError
-from orwynn.util.validation.re_validation_error import ReValidationError
-from orwynn.util.validation.unknown_validator_error import \
-    UnknownValidatorError
-from orwynn.util.validation.ValidationError import ValidationError
-from orwynn.util.validation.validator import Validator
+from ._validator import Validator
+from .errors import (ExpectationError, ReValidationError,
+                     UnknownValidatorError, ValidationError)
 
 # WARNING: typing aliases are not currently supported so passing types like
 #   "dict[str, Any]" to check will produce ValidationError in any case since
@@ -29,12 +23,6 @@ ValidationExpectedType = type | list[type] | Validator | Path
 ApplyExpectedType = TypeVar("ApplyExpectedType")
 model_validator = __pydantic_validator
 ModelValidationError = __PydanticValidationError
-
-
-# See in the next series...
-# def optimize(...) -> Any:
-#   def inner(...) -> Any:
-#       ...
 
 
 def validate(

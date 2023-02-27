@@ -1,24 +1,16 @@
-from orwynn.util import validation
+from orwynn.base import Error
+from orwynn.base.error._ExceptionAlreadyHandledError import \
+    ExceptionAlreadyHandledError
+from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
+from orwynn.base.module._Module import Module
+from orwynn.base.service._Service import Service
 from orwynn.boot._Boot import Boot
-from orwynn.base.controller.endpoint.Endpoint import Endpoint
-from orwynn.base.controller.http.HttpController import HttpController
-from orwynn.base.error.Error import Error
-from orwynn.base.error.ExceptionAlreadyHandledError import (
-    ExceptionAlreadyHandledError,
-)
-from orwynn.base.exchandler.ExceptionHandler import ExceptionHandler
-from orwynn.middleware.HttpMiddleware import HttpMiddleware
-from orwynn.middleware.HttpNextCall import HttpNextCall
-from orwynn.base.module.Module import Module
+from orwynn.http import (Endpoint, HttpController, HttpMiddleware,
+                         HttpNextCall, HttpRequest, HttpResponse,
+                         JsonHttpResponse, TestHttpResponse)
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.base.service.Service import Service
 from orwynn.testing._Client import Client
-from orwynn.web.http.requests import HttpRequest
-from orwynn.web.http.responses import (
-    HttpResponse,
-    JsonHttpResponse,
-    TestHttpResponse,
-)
+from orwynn.util import validation
 
 
 class GeneralEh(ExceptionHandler):

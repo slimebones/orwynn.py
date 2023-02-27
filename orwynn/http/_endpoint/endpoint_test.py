@@ -3,10 +3,10 @@ from pytest import fixture
 from orwynn.util import validation
 from orwynn.boot._Boot import Boot
 from orwynn.http import HttpController, EndpointResponse, Endpoint
-from orwynn.base.model.Model import Model
-from orwynn.base.module.Module import Module
-from orwynn.mongo import module
-from orwynn.router.UnmatchedEndpointEntityError import (
+from orwynn.base.model._Model import Model
+from orwynn.base.module._Module import Module
+from orwynn import mongo
+from orwynn.router.errors import (
     UnmatchedEndpointEntityError,
 )
 
@@ -51,7 +51,7 @@ def run_endpoint():
         Module(
             route="/",
             Controllers=[C1],
-            imports=[module.module]
+            imports=[mongo.module]
         ),
         apprc={
             "test": {
