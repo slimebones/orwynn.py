@@ -2,11 +2,9 @@ from contextvars import ContextVar, Token
 from typing import Any
 
 from orwynn.util import validation
-from .errors import (
-    AlreadyInitializedStorageError,
-    UndefinedStorageError
-)
 from orwynn.worker._Worker import Worker
+
+from .errors import AlreadyInitializedStorageError, UndefinedStorageError
 
 
 class ContextStorage(Worker):

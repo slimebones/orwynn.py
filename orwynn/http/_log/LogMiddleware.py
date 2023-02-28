@@ -1,7 +1,9 @@
-from orwynn.http import (HttpMiddleware, HttpNextCall, HttpRequest,
-                         HttpRequestContextId, HttpResponse)
-
-from ._HttpLogger import HttpLogger
+from orwynn.http._context.HttpRequestContextId import HttpRequestContextId
+from orwynn.http._log.HttpLogger import HttpLogger
+from orwynn.http._middleware.HttpMiddleware import HttpMiddleware
+from orwynn.http._middleware.HttpNextCall import HttpNextCall
+from orwynn.http._requests import HttpRequest
+from orwynn.http._responses import HttpResponse
 
 
 class LogMiddleware(HttpMiddleware):

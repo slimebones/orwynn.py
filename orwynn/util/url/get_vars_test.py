@@ -1,6 +1,6 @@
 from ._get_vars import get_vars
-from ._UrlVars import UrlVars
 from ._Url import Url
+from ._UrlVars import UrlVars
 
 
 def test_path():

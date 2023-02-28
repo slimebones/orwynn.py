@@ -1,19 +1,23 @@
 from orwynn.base.controller.errors import (
-    AlreadyRegisteredMethodError, MissingControllerClassAttributeError)
-from orwynn.http.errors import HttpException, UnsupportedHttpMethodError
+    AlreadyRegisteredMethodError,
+    MissingControllerClassAttributeError,
+)
 from orwynn.base.model import Model
 from orwynn.base.module import Module
 from orwynn.boot import Boot
 from orwynn.http import Endpoint, HttpController, HttpMethod
+from orwynn.http._controller.errors import DefinedTwiceControllerMethodError
+from orwynn.http.errors import HttpException, UnsupportedHttpMethodError
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.testing import Client
 from orwynn.util import validation
 from orwynn.util.validation import expect, validate_re
-from orwynn.util.validation.errors import (RequestValidationException,
-                                           ReValidationError, ValidationError)
+from orwynn.util.validation.errors import (
+    RequestValidationException,
+    ReValidationError,
+    ValidationError,
+)
 from tests.std.text import DEFAULT_ID, Text
-
-from orwynn.http._controller.errors import DefinedTwiceControllerMethodError
 
 
 def test_http_methods():

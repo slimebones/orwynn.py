@@ -2,8 +2,9 @@ from typing import Callable, ClassVar, Literal
 
 from orwynn.base.controller._Controller import Controller
 from orwynn.util import validation
-from orwynn.websocket._controller.WebsocketEventHandlerMethod import \
-    WebsocketEventHandlerMethod
+from orwynn.websocket._controller.WebsocketEventHandlerMethod import (
+    WebsocketEventHandlerMethod,
+)
 
 
 class WebsocketController(Controller):

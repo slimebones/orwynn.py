@@ -1,6 +1,13 @@
-from orwynn.util import validation
-from orwynn.http import Endpoint, HttpController, HttpMiddleware, HttpNextCall, HttpRequest, HttpResponse
 from orwynn.base.module._Module import Module
+from orwynn.http import (
+    Endpoint,
+    HttpController,
+    HttpMiddleware,
+    HttpNextCall,
+    HttpRequest,
+    HttpResponse,
+)
+from orwynn.util import validation
 
 
 def test_controller_added_to_no_route():

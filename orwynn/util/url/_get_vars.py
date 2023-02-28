@@ -1,9 +1,10 @@
-from itertools import zip_longest
 import re
+from itertools import zip_longest
 
 from orwynn.base.error._MalfunctionError import MalfunctionError
-from ._UrlVars import UrlVars
+
 from ._Url import Url
+from ._UrlVars import UrlVars
 
 
 def get_vars(
@@ -61,7 +62,7 @@ def _set_path_vars(
         ):
             if var_name is None or var_value is None:
                 raise MalfunctionError(
-                    f"unmatched amount of "
+                    "unmatched amount of "
                 )
 
             vars.path_vars[var_name] = var_value

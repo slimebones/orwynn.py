@@ -1,5 +1,9 @@
-from orwynn.websocket import (Websocket, WebsocketMiddleware,
-                              WebsocketNextCall, WebsocketRequestContextId)
+from orwynn.websocket import (
+    Websocket,
+    WebsocketMiddleware,
+    WebsocketNextCall,
+    WebsocketRequestContextId,
+)
 from orwynn.websocket._log.WebsocketLogger import WebsocketLogger
 
 

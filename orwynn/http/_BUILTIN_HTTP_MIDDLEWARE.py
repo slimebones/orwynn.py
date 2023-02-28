@@ -1,9 +1,11 @@
-from orwynn.http import BuiltinHttpMiddleware, ExceptionHandlerHttpMiddleware
-from ._context.ContextBuiltinMiddleware import (
-    ContextBuiltinMiddleware,
+from orwynn.http._exchandler.ExceptionHandlerHttpMiddleware import (
+    ExceptionHandlerHttpMiddleware,
 )
+from orwynn.http._middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
+
+from ._context.ContextBuiltinMiddleware import ContextBuiltinMiddleware
 from ._context.HttpRequestContextBuiltinMiddleware import (
-    HttpRequestContextBuiltinMiddleware
+    HttpRequestContextBuiltinMiddleware,
 )
 
 # Order matters, the lowest index is initialized first.

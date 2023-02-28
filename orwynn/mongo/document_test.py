@@ -1,9 +1,10 @@
 from pytest import fixture
 
-from orwynn.util import validation
-from orwynn.boot._Boot import Boot
-from orwynn.base.module import Module
 from orwynn import mongo
+from orwynn.base.module import Module
+from orwynn.boot._Boot import Boot
+from orwynn.util import validation
+
 from ._Document import Document
 from .errors import DocumentUpdateError
 

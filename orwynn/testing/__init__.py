@@ -1,4 +1,5 @@
 from typing import Callable
+
 from ._Client import Client
 from ._EmbeddedTestClient import EmbeddedTestClient
 

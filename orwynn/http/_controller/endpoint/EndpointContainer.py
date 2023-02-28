@@ -1,9 +1,10 @@
 from typing import Callable, ItemsView
 
+from orwynn.http.errors import EndpointNotFoundError
 from orwynn.util import validation
-from .Endpoint import Endpoint
-from .errors import EndpointNotFoundError
 from orwynn.worker import Worker
+
+from .Endpoint import Endpoint
 
 
 class EndpointContainer(Worker):

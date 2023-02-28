@@ -2,8 +2,14 @@ from typing import Callable
 
 from orwynn.base.module._Module import Module
 from orwynn.boot._Boot import Boot
-from orwynn.http import (Endpoint, HttpController, HttpMiddleware, HttpRequest,
-                         HttpResponse, TestHttpResponse)
+from orwynn.http import (
+    Endpoint,
+    HttpController,
+    HttpMiddleware,
+    HttpRequest,
+    HttpResponse,
+    TestHttpResponse,
+)
 from orwynn.testing._Client import Client
 
 

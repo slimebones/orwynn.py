@@ -1,8 +1,5 @@
 
 
-from orwynn.util import validation
-from orwynn.app._App import App
-from orwynn.base.controller._Controller import Controller
 from orwynn._di.collecting.collect_provider_dependencies import (
     collect_provider_dependencies,
 )
@@ -11,10 +8,13 @@ from orwynn._di.DiContainer import DiContainer
 from orwynn._di.DiObject import DiObject
 from orwynn._di.init.init_other_acceptors import init_other_acceptors
 from orwynn._di.init.init_providers import init_providers
+from orwynn.app._App import App
+from orwynn.base.controller._Controller import Controller
 from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
-from orwynn.base.middleware import GlobalMiddlewareSetup
-from orwynn.base.middleware import Middleware
+from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
 from orwynn.base.module._Module import Module
+from orwynn.log import LogConfig
+from orwynn.util import validation
 from orwynn.worker._Worker import Worker
 
 
@@ -71,6 +71,13 @@ class Di(Worker):
         validation.validate_dict(
             global_middleware, (Middleware, list)
         )
+
+        # Add framework services
+        root_module._fw_add_provider_or_skip(App)
+        # Log config is always added to configure logging, it can be built from
+        # an empty apprc too.
+        root_module._fw_add_provider_or_skip(LogConfig)
+        ##
 
         # So here we have generally a two stages of DI:
         #   1. Collecting (component "di/collecting")

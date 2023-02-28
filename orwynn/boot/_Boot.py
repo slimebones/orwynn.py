@@ -5,21 +5,20 @@ from types import NoneType
 
 import dotenv
 
+from orwynn._di.Di import Di
+from orwynn._di.MissingDiObjectError import MissingDiObjectError
 from orwynn.apiversion import ApiVersion
 from orwynn.app import App, AppMode
 from orwynn.apprc import AppRc, parse_apprc
-from orwynn.base.exchandler import ExceptionHandler
-from orwynn.base.module import Module
 from orwynn.base.controller import Controller
+from orwynn.base.exchandler import ExceptionHandler
 from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
-from orwynn.http import Cors
+from orwynn.base.module import Module
+from orwynn.http import Cors, EndpointContainer
 from orwynn.indication import Indication, default_api_indication
-from orwynn._di.Di import Di
-from orwynn._di.MissingDiObjectError import MissingDiObjectError
 from orwynn.log import LogConfig, configure_log
-from orwynn.proxy.BootProxy import BootProxy
 from orwynn.proxy.ApiIndicationOnlyProxy import ApiIndicationOnlyProxy
-from orwynn.http import EndpointContainer
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.router import Router
 from orwynn.testing import Client
 from orwynn.util import validation
@@ -185,13 +184,6 @@ class Boot(Worker):
         )
         EndpointContainer()
         ApiIndicationOnlyProxy(api_indication)
-        ##
-
-        # Add framework services
-        root_module._fw_add_provider_or_skip(App)
-        # Log config is always added to configure logging, it can be built from
-        # an empty apprc too.
-        root_module._fw_add_provider_or_skip(LogConfig)
         ##
 
         self.__di: Di = Di(

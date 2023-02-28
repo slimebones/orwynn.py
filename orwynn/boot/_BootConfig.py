@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import Any, Self
 
-from orwynn.apprc._AppRc import AppRc
 from orwynn.app import AppMode
+from orwynn.apprc._AppRc import AppRc
 from orwynn.base.config import Config
 from orwynn.indication._Indication import Indication
 from orwynn.proxy.BootProxy import BootProxy

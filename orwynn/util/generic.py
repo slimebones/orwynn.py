@@ -2,8 +2,8 @@
 from typing import TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
-    from orwynn.websocket import Websocket
     from orwynn.http import HttpRequest, HttpResponse
+    from orwynn.websocket import Websocket
 
 
 GenericRequest = Union[

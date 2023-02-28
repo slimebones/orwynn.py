@@ -5,6 +5,6 @@ from ._SqlConfig import SqlConfig
 from ._Table import Table
 
 module = Module(
-    Providers=[_Sql, _SqlConfig],
-    exports=[_Sql, _SqlConfig]
+    Providers=[Sql, SqlConfig],
+    exports=[Sql, SqlConfig]
 )

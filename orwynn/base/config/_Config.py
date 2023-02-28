@@ -1,9 +1,9 @@
 import re
 from typing import TYPE_CHECKING, Any, Self
 
-from orwynn.util import validation
 from orwynn.base.model._Model import Model
 from orwynn.proxy.BootProxy import BootProxy
+from orwynn.util import validation
 
 if TYPE_CHECKING:
     from orwynn.apprc._AppRc import AppRc

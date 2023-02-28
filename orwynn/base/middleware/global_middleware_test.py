@@ -1,9 +1,9 @@
-from orwynn.util import validation
-from orwynn.boot._Boot import Boot
 from orwynn._di.Di import Di
-from orwynn.http import HttpMiddleware
-from orwynn.websocket import WebsocketMiddleware
 from orwynn.base.module import Module
+from orwynn.boot._Boot import Boot
+from orwynn.http import HttpMiddleware
+from orwynn.util import validation
+from orwynn.websocket import WebsocketMiddleware
 
 
 def test_http():

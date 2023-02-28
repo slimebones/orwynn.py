@@ -1,14 +1,15 @@
-from orwynn.app._App import App
 from orwynn.apiversion import ApiVersion
+from orwynn.app._App import App
 from orwynn.base.controller._Controller import Controller
-from ._ControllerRegister import ControllerRegister
 from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
 from orwynn.base.middleware import Middleware
-from ._MiddlewareRegister import MiddlewareRegister
 from orwynn.base.module._Module import Module
-from orwynn.websocket import WebsocketStack
 from orwynn.http import Cors
+from orwynn.websocket import WebsocketStack
 from orwynn.worker._Worker import Worker
+
+from ._ControllerRegister import ControllerRegister
+from ._MiddlewareRegister import MiddlewareRegister
 
 
 class Router(Worker):

@@ -39,13 +39,15 @@ lint:
 #				readability.
 #		- ERA001:
 #				Allow commented-out code.
+#		- S105:
+#				Too often gives false-positive.
 #
 # Main package __init__.py shouldn't be lintered since it may contain unused
 # imports.
 	poetry run ruff \
 		--select=ALL \
 		--fix \
-		--ignore=E999,D,ANN,PT,ARG,B008,EM101,EM102,FBT,N,RET504,RET505,RET506,RET507,Q003,ISC002,ISC003,A,PGH003,RUF001,SIM108,ERA001 \
+		--ignore=E999,D,ANN,PT,ARG,B008,EM101,EM102,FBT,N,RET504,RET505,RET506,RET507,Q003,ISC002,ISC003,A,PGH003,RUF001,SIM108,ERA001,S105 \
 		--line-length=79 \
 		--isolated \
 		--max-complexity 10 \

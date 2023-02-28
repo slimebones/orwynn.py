@@ -1,8 +1,10 @@
 from orwynn.log._Log import Log
-from orwynn.websocket._context.WebsocketRequestContextId import \
-    WebsocketRequestContextId
-from orwynn.websocket._middleware.BuiltinWebsocketMiddleware import \
-    BuiltinWebsocketMiddleware
+from orwynn.websocket._context.WebsocketRequestContextId import (
+    WebsocketRequestContextId,
+)
+from orwynn.websocket._middleware.BuiltinWebsocketMiddleware import (
+    BuiltinWebsocketMiddleware,
+)
 from orwynn.websocket._middleware.WebsocketNextCall import WebsocketNextCall
 from orwynn.websocket._Websocket import Websocket
 

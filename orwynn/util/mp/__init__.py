@@ -3,8 +3,9 @@ from typing import Any
 
 import dictdiffer
 
-from orwynn.util import validation
 from orwynn.base.error._MalfunctionError import MalfunctionError
+from orwynn.util import validation
+
 from ._dictpp import dictpp
 
 

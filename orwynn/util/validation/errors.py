@@ -1,8 +1,10 @@
 from typing import Any
-from orwynn.base.error import Error
+
 from fastapi.exceptions import (
     RequestValidationError as FastAPIRequestValidationError,
 )
+
+from orwynn.base.error import Error
 
 RequestValidationException = FastAPIRequestValidationError
 

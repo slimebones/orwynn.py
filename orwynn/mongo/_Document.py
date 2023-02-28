@@ -6,18 +6,17 @@ from pydantic.fields import ModelField
 from pymongo.cursor import Cursor
 from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
 
-from orwynn.util import validation
 from orwynn._di.Di import Di
-from orwynn.util.fmt import snakefy
-from orwynn.mapping.errors import (
-    CustomUseOfMappingReservedFieldError
-)
 from orwynn.mapping._Mapping import Mapping, if_linked
-from ._ClientSession import ClientSession
-from .errors import DocumentUpdateError
-from orwynn.mongo.errors import DuplicateKeyError
+from orwynn.mapping.errors import CustomUseOfMappingReservedFieldError
 from orwynn.mongo._Mongo import Mongo
 from orwynn.mongo._MongoEntity import MongoEntity
+from orwynn.mongo.errors import DuplicateKeyError
+from orwynn.util import validation
+from orwynn.util.fmt import snakefy
+
+from ._ClientSession import ClientSession
+from .errors import DocumentUpdateError
 
 
 class Document(Mapping):

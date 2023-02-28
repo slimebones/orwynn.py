@@ -1,5 +1,6 @@
-from .EndpointResponse import EndpointResponse
 from orwynn.base.model import Model
+
+from .EndpointResponse import EndpointResponse
 
 
 class Endpoint(Model):

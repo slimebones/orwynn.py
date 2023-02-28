@@ -1,6 +1,6 @@
-from orwynn.base.config import Config
 from orwynn._di.Provider import Provider
-from orwynn.base.service import Service, FrameworkService
+from orwynn.base.config import Config
+from orwynn.base.service import FrameworkService, Service
 
 """List of builtin classes in Provider category.
 

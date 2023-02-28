@@ -1,8 +1,6 @@
 import re
 from typing import TypeVar
 
-from orwynn.base.config import Config
-from orwynn.base.controller._Controller import Controller
 from orwynn._di.DiObject import DiObject
 from orwynn._di.DiObjectAlreadyInitializedInContainerError import (
     DiObjectAlreadyInitializedInContainerError,
@@ -10,8 +8,10 @@ from orwynn._di.DiObjectAlreadyInitializedInContainerError import (
 from orwynn._di.FinalizedDiContainerError import FinalizedDiContainerError
 from orwynn._di.is_provider import is_provider
 from orwynn._di.MissingDiObjectError import MissingDiObjectError
-from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
+from orwynn.base.config import Config
+from orwynn.base.controller._Controller import Controller
 from orwynn.base.error._MalfunctionError import MalfunctionError
+from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
 from orwynn.base.middleware import Middleware
 from orwynn.base.model._Model import Model
 from orwynn.util.SUBCLASSABLES import SUBCLASSABLES

@@ -1,7 +1,7 @@
+from orwynn.base.model._Model import Model
 from orwynn.indication._Indication import Indication
 from orwynn.indication._IndicationType import IndicationType
 from orwynn.indication._Indicator import Indicator
-from orwynn.base.model._Model import Model
 
 
 def test_default_indication_type():

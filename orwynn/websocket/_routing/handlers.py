@@ -1,6 +1,7 @@
+from orwynn.base.model._Model import Model
+
 from ._DispatchWebsocketFn import DispatchWebsocketFn
 from ._GenericWebsocketFn import GenericWebsocketFn
-from orwynn.base.model._Model import Model
 
 
 class WebsocketHandler(Model):

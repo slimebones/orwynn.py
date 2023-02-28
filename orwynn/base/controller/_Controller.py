@@ -1,10 +1,10 @@
 from types import NoneType
 from typing import ClassVar, Literal
 
-from orwynn.util import validation
 from orwynn.base.controller.errors import (
     MissingControllerClassAttributeError,
 )
+from orwynn.util import validation
 
 
 class Controller:

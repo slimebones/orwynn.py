@@ -1,4 +1,6 @@
-from orwynn.websocket._middleware.WebsocketMiddleware import WebsocketMiddleware
+from orwynn.websocket._middleware.WebsocketMiddleware import (
+    WebsocketMiddleware,
+)
 
 
 class BuiltinWebsocketMiddleware(WebsocketMiddleware):

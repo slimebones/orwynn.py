@@ -3,11 +3,11 @@ import json
 import pytest
 from loguru._handler import Message
 
-from orwynn.boot._Boot import Boot
-from orwynn.log._Log import Log
 from orwynn.base.module._Module import Module
+from orwynn.boot._Boot import Boot
+from orwynn.http import Endpoint, HttpController
+from orwynn.log._Log import Log
 from orwynn.testing import Writer, get_log_apprc
-from orwynn.http import HttpController, Endpoint
 from orwynn.websocket import Websocket, WebsocketController
 
 

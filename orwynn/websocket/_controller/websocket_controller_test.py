@@ -13,11 +13,11 @@ class ArgumentedCtrl(WebsocketController):
         order: int | None = None,
         message: str | None = "welcome"
     ) -> None:
-        await ws.send_json(dict(
-            user_id=user_id,
-            message=message,
-            order=order
-        ))
+        await ws.send_json({
+            "user_id": user_id,
+            "message": message,
+            "order": order
+        })
 
 
 def test_main_route():
@@ -113,7 +113,6 @@ def test_default_query():
     with boot.client.websocket("/user/eg1") as ws:
         data: dict = ws.receive_json()
 
-        print(data)
         assert data["user_id"] == "eg1"
         assert data["message"] == "welcome"
-        assert data["order"] == None
+        assert data["order"] is None

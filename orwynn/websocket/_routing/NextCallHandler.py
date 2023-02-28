@@ -1,7 +1,7 @@
 import contextlib
 
 from orwynn.util.url import UrlVars
-from orwynn.websocket import Websocket
+from orwynn.websocket._Websocket import Websocket
 
 from ._get_handler_kwargs import get_handler_kwargs
 from .handlers import DispatchWebsocketHandler, WebsocketHandler
@@ -50,4 +50,3 @@ class NextCallHandler:
                     websocket,
                     **get_handler_kwargs(current_handler, self.__url_vars)
                 )
-            self.__current_index += 1

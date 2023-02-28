@@ -1,12 +1,12 @@
 import starlette.websockets
 
 from orwynn.apiversion import ApiVersion
-from orwynn.boot._Boot import Boot
-from .WebsocketController import (
-    WebsocketController
-)
 from orwynn.base.module._Module import Module
-from orwynn.websocket import Websocket
+from orwynn.boot import Boot
+from orwynn.websocket._controller.WebsocketController import (
+    WebsocketController,
+)
+from orwynn.websocket._Websocket import Websocket
 
 
 class WsCtrl(WebsocketController):

@@ -2,7 +2,6 @@ import inspect
 
 from pytest import fixture
 
-from orwynn.base.config import Config
 from orwynn._di.collecting.collect_provider_dependencies import (
     ProviderDependenciesMap,
     collect_provider_dependencies,
@@ -10,7 +9,9 @@ from orwynn._di.collecting.collect_provider_dependencies import (
 from orwynn._di.collecting.ModuleCollector import ModuleCollector
 from orwynn._di.is_provider import is_provider
 from orwynn._di.Provider import Provider
-from orwynn.base.module._Module import Module
+from orwynn.base.config import Config
+from orwynn.base.module import Module
+from orwynn.log import LogConfig
 from tests.std.Assertion import Assertion
 
 
@@ -22,6 +23,9 @@ def std_provider_dependencies_map(
 
 
 def test_std(std_struct: Module):
+    # Add log config by default
+    std_struct._fw_add_provider_or_skip(LogConfig)
+
     metamap: ProviderDependenciesMap = collect_provider_dependencies(
         ModuleCollector(std_struct).collected_modules
     )

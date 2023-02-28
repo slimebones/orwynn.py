@@ -3,9 +3,9 @@ Works with url formatting.
 """
 from orwynn.util import validation
 
-from ._UrlVars import UrlVars
-from ._Url import Url
 from ._get_vars import get_vars
+from ._Url import Url
+from ._UrlVars import UrlVars
 
 
 def join_routes(*routes: str) -> str:

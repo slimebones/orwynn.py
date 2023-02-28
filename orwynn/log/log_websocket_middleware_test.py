@@ -1,12 +1,12 @@
 import json
 
+from orwynn.base.module._Module import Module
 from orwynn.boot._Boot import Boot
 from orwynn.log._Log import Log
-from orwynn.websocket._log.LogWebsocketMiddleware import LogWebsocketMiddleware
-from orwynn.base.module._Module import Module
 from orwynn.testing import Writer
 from orwynn.testing._Client import Client
 from orwynn.websocket import Websocket, WebsocketController
+from orwynn.websocket._log.LogWebsocketMiddleware import LogWebsocketMiddleware
 
 
 def test_get(

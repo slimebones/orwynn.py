@@ -1,6 +1,8 @@
-from orwynn.websocket._middleware.BuiltinWebsocketMiddleware import BuiltinWebsocketMiddleware
-from orwynn.websocket._Websocket import Websocket
+from orwynn.websocket._middleware.BuiltinWebsocketMiddleware import (
+    BuiltinWebsocketMiddleware,
+)
 from orwynn.websocket._middleware.WebsocketNextCall import WebsocketNextCall
+from orwynn.websocket._Websocket import Websocket
 
 
 class ConnectionBuiltinWebsocketMiddleware(BuiltinWebsocketMiddleware):

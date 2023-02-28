@@ -1,7 +1,7 @@
 from orwynn.app._App import App
 from orwynn.base.module._Module import Module
-from orwynn.http import HttpController, Endpoint
 from orwynn.base.service._Service import Service
+from orwynn.http import Endpoint, HttpController
 from tests.std.float import FloatService, float_module
 
 

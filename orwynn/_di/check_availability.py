@@ -1,11 +1,11 @@
 
 
-from orwynn.base.config import Config
 from orwynn._di.DiObject import DiObject
 from orwynn._di.is_provider import is_provider
 from orwynn._di.NotProviderError import NotProviderError
 from orwynn._di.Provider import Provider
 from orwynn._di.ProviderAvailabilityError import ProviderAvailabilityError
+from orwynn.base.config import Config
 from orwynn.base.module._Module import Module
 from orwynn.base.service._FrameworkService import FrameworkService
 

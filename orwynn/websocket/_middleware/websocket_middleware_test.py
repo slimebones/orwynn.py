@@ -1,8 +1,12 @@
 from orwynn.base.module._Module import Module
 from orwynn.boot._Boot import Boot
 from orwynn.testing._Client import Client
-from orwynn.websocket import (Websocket, WebsocketController,
-                              WebsocketMiddleware, WebsocketNextCall)
+from orwynn.websocket import (
+    Websocket,
+    WebsocketController,
+    WebsocketMiddleware,
+    WebsocketNextCall,
+)
 
 
 class Mw1(WebsocketMiddleware):

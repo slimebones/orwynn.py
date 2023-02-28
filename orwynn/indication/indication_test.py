@@ -3,9 +3,9 @@ from typing import Any
 
 from pytest import fixture
 
+from orwynn.base.model._Model import Model
 from orwynn.indication._Indication import Indication
 from orwynn.indication._Indicator import Indicator
-from orwynn.base.model._Model import Model
 from orwynn.util.parsing import parse_key
 from tests.std.text import Text
 

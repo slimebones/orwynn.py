@@ -6,16 +6,15 @@ from orwynn._di.DiContainer import DiContainer
 from orwynn._di.DiObject import DiObject
 from orwynn._di.Provider import Provider
 from orwynn.base.controller._Controller import Controller
+from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
 from orwynn.base.model._Model import Model
 from orwynn.base.module._Module import Module
 from orwynn.http import HttpController, HttpMiddleware
-from orwynn.websocket import WebsocketMiddleware
-from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.util import validation
-from orwynn.util.validation import validate
 from orwynn.util.url import join_routes
-from orwynn.websocket import WebsocketController
+from orwynn.util.validation import validate
+from orwynn.websocket import WebsocketController, WebsocketMiddleware
 
 
 class __CoveredRoutes(Model):

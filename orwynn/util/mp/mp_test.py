@@ -1,5 +1,5 @@
-from orwynn.mp.dictpp import dictpp
-from orwynn.mp.helpers import patch
+from orwynn.util.mp import patch
+from orwynn.util.mp._dictpp import dictpp
 
 
 def test_patch():
