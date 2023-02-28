@@ -7,6 +7,9 @@ import pytest
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from orwynn import sql
+from orwynn.base.module import Module
+from orwynn.boot import Boot
 from orwynn.util import validation
 from orwynn.util.crypto import hash_password
 
@@ -222,3 +225,18 @@ def test_enum_field(_sqlite: Sql):
         assert validation.check(s.get(Item, 1)).color == Color.RED
         assert validation.check(s.get(Item, 2)).color == Color.BLUE
         assert validation.check(s.get(Item, 3)).color == Color.GREEN
+
+
+def test_config_poolclass():
+    Boot(
+        Module(imports=[sql.module]),
+        apprc={
+            "prod": {
+                "Sql": {
+                    "database_kind": "sqlite",
+                    "database_path": ":memory:",
+                    "poolclass": "StaticPool"
+                }
+            }
+        }
+    )

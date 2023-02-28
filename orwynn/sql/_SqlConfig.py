@@ -1,8 +1,10 @@
 from typing import Any
 
 from orwynn.base.config import Config
-from orwynn.base.error._MalfunctionError import MalfunctionError
+from orwynn.base.error import MalfunctionError
+from sqlalchemy.pool import StaticPool, Pool
 
+from orwynn.sql._PoolclassStr import PoolclassStr
 from ._SqlDatabaseKind import SQLDatabaseKind
 
 
@@ -14,6 +16,7 @@ class SqlConfig(Config):
     database_path: str | None = None
     database_host: str | None = None
     database_port: int | None = None
+    poolclass: PoolclassStr | None = None
 
     def __init__(self, **data: Any) -> None:
         try:
@@ -45,3 +48,14 @@ class SqlConfig(Config):
             raise MalfunctionError()
 
         super().__init__(**data)
+
+    @property
+    def real_poolclass(self) -> type[Pool] | None:
+        if self.poolclass is None:
+            return None
+
+        match self.poolclass:
+            case "StaticPool":
+                return StaticPool
+            case _:
+                raise ValueError()

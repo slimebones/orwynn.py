@@ -100,5 +100,7 @@ class Sql(Database):
                     f"unknown database {self.__config.database_kind}"
                 )
         return create_engine(
-            url, connect_args=connect_args
+            url,
+            connect_args=connect_args,
+            poolclass=self.__config.real_poolclass
         )
