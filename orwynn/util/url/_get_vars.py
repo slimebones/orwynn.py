@@ -2,9 +2,9 @@ import re
 from itertools import zip_longest
 
 from orwynn.base.error._MalfunctionError import MalfunctionError
+from orwynn.util.url._match_routes import match_routes
 
 from ._Url import Url
-from orwynn.util.url._match_routes import match_routes
 from ._UrlVars import UrlVars
 
 

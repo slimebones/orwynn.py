@@ -204,7 +204,7 @@ def test_final_routes():
             Endpoint(method="get")
         ]
 
-    boot: Boot = Boot(
+    Boot(
         Module("/donuts", Controllers=[_Ctrl]),
         global_http_route="/api/v{version}"
     )
@@ -225,7 +225,7 @@ def test_is_matching_route():
         ]
         VERSION = 2
 
-    boot: Boot = Boot(
+    Boot(
         Module("/donuts", Controllers=[_Ctrl]),
         global_http_route="/api/v{version}",
         api_version=ApiVersion(supported={1, 2, 3})
