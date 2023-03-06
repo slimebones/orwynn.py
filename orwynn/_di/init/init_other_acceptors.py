@@ -1,12 +1,8 @@
-import inspect
 
-from orwynn._di._collect_dependencies_for_acceptor import \
-    collect_dependencies_for_acceptor
-from orwynn._di.Acceptor import Acceptor
-from orwynn._di.check_availability import check_availability
+from orwynn._di._collect_dependencies_for_acceptor import (
+    collect_dependencies_for_acceptor,
+)
 from orwynn._di.DiContainer import DiContainer
-from orwynn._di.DiObject import DiObject
-from orwynn._di.Provider import Provider
 from orwynn.base.controller._Controller import Controller
 from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
 from orwynn.base.model._Model import Model

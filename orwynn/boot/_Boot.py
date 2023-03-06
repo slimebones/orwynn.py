@@ -1,3 +1,4 @@
+import contextlib
 import os
 from copy import deepcopy
 from pathlib import Path
@@ -5,8 +6,6 @@ from types import NoneType
 
 import dotenv
 
-from orwynn.bootscript import Bootscript, BootscriptWorker, CallTime
-from orwynn.bootscript.errors import NoScriptsForCallTimeError
 from orwynn._di.Di import Di
 from orwynn._di.MissingDiObjectError import MissingDiObjectError
 from orwynn.apiversion import ApiVersion
@@ -16,6 +15,8 @@ from orwynn.base.controller import Controller
 from orwynn.base.errorhandler import ErrorHandler
 from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
 from orwynn.base.module import Module
+from orwynn.bootscript import Bootscript, BootscriptWorker, CallTime
+from orwynn.bootscript.errors import NoScriptsForCallTimeError
 from orwynn.http import Cors, EndpointContainer
 from orwynn.indication import Indication, default_api_indication
 from orwynn.log import LogConfig, configure_log
@@ -169,11 +170,7 @@ class Boot(Worker):
 
         dotenv.load_dotenv(dotenv_path, override=True)
 
-        self.__mode: AppMode
-        if mode:
-            self.__mode = mode
-        else:
-            self.__mode = self.__parse_mode()
+        self.__mode: AppMode = self.__initialize_mode(mode)
         self.__root_dir: Path = self.__parse_root_dir()
         self.__api_indication: Indication = api_indication
         self.__apprc: AppRc = parse_apprc(
@@ -185,25 +182,15 @@ class Boot(Worker):
         self.__global_websocket_route: str = global_websocket_route
         self.__api_version: ApiVersion = api_version
 
-        # Init bootscript
+        # Initialize bootscript
         bootscript_worker: BootscriptWorker = BootscriptWorker(
             bootscripts=bootscripts
         )
 
-        # Init proxies
-        BootProxy(
-            root_dir=self.__root_dir,
-            mode=self.__mode,
-            api_indication=self.__api_indication,
-            apprc=self.__apprc,
+        self.__initialize_proxies(
             ErrorHandlers=ErrorHandlers,
-            global_http_route=self.__global_http_route,
-            global_websocket_route=self.__global_websocket_route,
-            api_version=self.__api_version
+            api_indication=api_indication
         )
-        EndpointContainer()
-        ApiIndicationOnlyProxy(api_indication)
-        ##
 
         self.__di: Di = Di(
             root_module,
@@ -217,19 +204,43 @@ class Boot(Worker):
             app_mode_prod=AppMode.PROD
         )
 
-        # Init routing
         self.__init_router(
             cors=cors
         )
 
         # AFTER_ALL bootscript call time
-        try:
+        with contextlib.suppress(NoScriptsForCallTimeError):
             bootscript_worker.call_by_time(
                 CallTime.AFTER_ALL,
                 self.__di._fw_container
             )
-        except NoScriptsForCallTimeError:
-            pass
+
+    def __initialize_mode(
+        self,
+        input_mode: AppMode | None
+    ) -> AppMode:
+        if input_mode:
+            return input_mode
+        else:
+            return self.__parse_mode()
+
+    def __initialize_proxies(
+        self,
+        ErrorHandlers: set[type[ErrorHandler]],
+        api_indication: Indication
+    ) -> None:
+        BootProxy(
+            root_dir=self.__root_dir,
+            mode=self.__mode,
+            api_indication=self.__api_indication,
+            apprc=self.__apprc,
+            ErrorHandlers=ErrorHandlers,
+            global_http_route=self.__global_http_route,
+            global_websocket_route=self.__global_websocket_route,
+            api_version=self.__api_version
+        )
+        EndpointContainer()
+        ApiIndicationOnlyProxy(api_indication)
 
     def __init_router(
         self,

@@ -1,4 +1,3 @@
-from typing import Any, Callable
-
+from typing import Callable
 
 BootscriptCallable = Callable[..., None]

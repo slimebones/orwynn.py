@@ -1,7 +1,7 @@
 from orwynn._di.Di import Di
-from orwynn.boot import Boot
 from orwynn.base.module import Module
 from orwynn.base.service import Service
+from orwynn.boot import Boot
 from orwynn.bootscript._Bootscript import Bootscript
 from orwynn.bootscript._CallTime import CallTime
 from orwynn.util import validation
@@ -18,7 +18,7 @@ def some_bootscript(some_service: SomeService) -> None:
 
 
 def test_basic():
-    boot: Boot = Boot(
+    Boot(
         Module(Providers=[SomeService]),
         bootscripts=[
             Bootscript(

@@ -1,12 +1,12 @@
 import inspect
 from typing import Callable
-from orwynn._di.Acceptor import Acceptor
+
+from orwynn._di.check_availability import check_availability
 from orwynn._di.DiContainer import DiContainer
 from orwynn._di.DiObject import DiObject
 from orwynn._di.Provider import Provider
-from orwynn._di.check_availability import check_availability
-from orwynn.base.module import Module
 from orwynn.base.middleware import Middleware
+from orwynn.base.module import Module
 
 
 def collect_dependencies_for_acceptor(
@@ -47,6 +47,10 @@ def collect_dependencies_for_acceptor(
             acceptor_module is not None
             and inspect.isclass(acceptor_callable)
         ):
-            check_availability(acceptor_callable, type(dependency), acceptor_module)
+            check_availability(
+                acceptor_callable,
+                type(dependency),
+                acceptor_module
+            )
 
     return result
