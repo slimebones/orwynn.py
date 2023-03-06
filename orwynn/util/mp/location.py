@@ -1,7 +1,5 @@
 from typing import Any
 
-from orwynn.base.error import Error
-
 # Location is several nested dicrionary keys joined with ".", e.g. if you have
 # dictionary:
 # ```python
@@ -10,11 +8,11 @@ from orwynn.base.error import Error
 FieldLocation = str
 
 
-class FieldNotFoundError(Error):
+class FieldNotFoundError(Exception):
     pass
 
 
-class MalformedLocationError(Error):
+class MalformedLocationError(Exception):
     pass
 
 

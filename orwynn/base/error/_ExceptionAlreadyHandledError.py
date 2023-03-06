@@ -1,7 +1,7 @@
-from orwynn.base.error import Error
 
 
-class ExceptionAlreadyHandledError(Error):
+
+class ExceptionAlreadyHandledError(Exception):
     """
     The exception class is handled more by one error handler.
     """

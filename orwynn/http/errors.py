@@ -1,13 +1,11 @@
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from orwynn.base.error import Error
-
 HttpException = StarletteHTTPException
 
 
-class UnsupportedHttpMethodError(Error):
+class UnsupportedHttpMethodError(Exception):
     pass
 
 
-class EndpointNotFoundError(Error):
+class EndpointNotFoundError(Exception):
     pass

@@ -1,5 +1,5 @@
-from orwynn.base.error import Error
 
 
-class CircularDependencyError(Error):
+
+class CircularDependencyError(Exception):
     pass

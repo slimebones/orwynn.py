@@ -1,5 +1,5 @@
-from orwynn.base.error import Error
 
 
-class NotDirError(Error):
+
+class NotDirError(Exception):
     pass

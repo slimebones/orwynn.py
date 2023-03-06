@@ -1,9 +1,9 @@
-from orwynn.base.error import Error
 
 
-class MissingControllerClassAttributeError(Error):
+
+class MissingControllerClassAttributeError(Exception):
     pass
 
 
-class AlreadyRegisteredMethodError(Error):
+class AlreadyRegisteredMethodError(Exception):
     """For the same route the method is already registered."""

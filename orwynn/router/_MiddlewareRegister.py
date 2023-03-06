@@ -234,6 +234,8 @@ class MiddlewareRegister:
         __RemainingExceptionDirectSubclasses: set[type[Exception]] = \
             set(get_exception_direct_subclasses())
 
+        custom_base_exception_handler: ExceptionHandler | None = None
+
         for handler in middleware.handlers:
             __RemainingExceptionDirectSubclasses.discard(
                 handler.HandledException
@@ -242,6 +244,7 @@ class MiddlewareRegister:
             if handler.HandledException is Exception:
                 # Do not add the base exception explicitly since Starlette
                 # cannot handle it, add all it's direct subclasses instead
+                custom_base_exception_handler = handler
                 continue
             else:
                 self.__app._fw_register_exception_handler_fn(
@@ -254,11 +257,12 @@ class MiddlewareRegister:
             if Remaining is HttpException:
                 handle_fn = DefaultHttpExceptionHandler().handle
             else:
-                # Since ramining exception direct subclasses does not contain
-                # Orwynn.Error (see get_exception_direct_subclasses()
-                # docstring) we can assign to all rest exceptions a default
-                # Exception handler
-                handle_fn = DefaultExceptionHandler().handle
+                # If custom exception handler is defined, pass it's handler,
+                # for all remaining subclasses, else use default exc handler
+                if custom_base_exception_handler:
+                    handle_fn = custom_base_exception_handler.handle
+                else:
+                    handle_fn = DefaultExceptionHandler().handle
 
             self.__app._fw_register_exception_handler_fn(
                 Remaining,

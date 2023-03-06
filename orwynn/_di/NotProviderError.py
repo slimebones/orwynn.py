@@ -1,7 +1,7 @@
-from orwynn.base.error import Error
 
 
-class NotProviderError(Error):
+
+class NotProviderError(Exception):
     def __init__(
         self,
         message: str = "",

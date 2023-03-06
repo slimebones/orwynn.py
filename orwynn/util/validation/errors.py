@@ -4,21 +4,19 @@ from fastapi.exceptions import (
     RequestValidationError as FastAPIRequestValidationError,
 )
 
-from orwynn.base.error import Error
-
 RequestValidationException = FastAPIRequestValidationError
 
 
-class ExpectationError(Error):
+class ExpectationError(Exception):
     pass
 
 
-class NothingToValidateError(Error):
+class NothingToValidateError(Exception):
     """Typically raised if an empty structure is passed to validation function.
     """
 
 
-class ReValidationError(Error):
+class ReValidationError(Exception):
     def __init__(
         self,
         message: str = "",
@@ -32,11 +30,11 @@ class ReValidationError(Error):
         super().__init__(message)
 
 
-class UnknownValidatorError(Error):
+class UnknownValidatorError(Exception):
     pass
 
 
-class ValidationError(Error):
+class ValidationError(Exception):
     def __init__(
         self,
         message: str = "",

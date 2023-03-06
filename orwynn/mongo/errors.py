@@ -1,9 +1,7 @@
 from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
 
-from orwynn.base.error import Error
 
-
-class DuplicateKeyError(Error):
+class DuplicateKeyError(Exception):
     def __init__(
         self,
         message: str = "",
@@ -14,5 +12,5 @@ class DuplicateKeyError(Error):
         super().__init__(message)
 
 
-class DocumentUpdateError(Error):
+class DocumentUpdateError(Exception):
     pass

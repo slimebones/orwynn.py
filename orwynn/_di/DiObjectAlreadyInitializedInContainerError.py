@@ -1,6 +1,6 @@
-from orwynn.base.error import Error
 
 
-class DiObjectAlreadyInitializedInContainerError(Error):
+
+class DiObjectAlreadyInitializedInContainerError(Exception):
     """DI object has been already initialized.
     """

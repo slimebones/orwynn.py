@@ -1,4 +1,4 @@
-from orwynn.base.error import (Error, ExceptionAlreadyHandledError,
+from orwynn.base.error import (ExceptionAlreadyHandledError,
                                MalfunctionError)
 from orwynn.base.exchandler import ExceptionHandler
 from orwynn.http import DEFAULT_HTTP_EXCEPTION_HANDLERS
@@ -71,8 +71,7 @@ class ExceptionHandlerManager:
         protocol: Protocol
     ) -> set[ExceptionHandler]:
         """
-        Traverses handlers to find handled Python-builtin exceptions and the
-        Orwynn's default Error.
+        Traverses handlers to find handled Python-builtin exceptions.
 
         Returns:
             Set of populated handlers.
@@ -90,12 +89,7 @@ class ExceptionHandlerManager:
                     raise ExceptionAlreadyHandledError(
                         f"exception {eh.E} is already handled"
                     )
-                elif (
-                    issubclass(eh.E, Exception)
-                    and not issubclass(eh.E, Error)
-                ):
-                    __HandledExceptions.add(eh.E)
-                elif issubclass(eh.E, Error):
+                elif issubclass(eh.E, Exception):
                     __HandledExceptions.add(eh.E)
                 else:
                     raise MalfunctionError(

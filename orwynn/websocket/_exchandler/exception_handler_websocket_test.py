@@ -1,4 +1,3 @@
-from orwynn.base.error import Error
 from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
 from orwynn.base.module._Module import Module
 from orwynn.boot._Boot import Boot
@@ -8,7 +7,7 @@ from orwynn.util.Protocol import Protocol
 from orwynn.websocket import Websocket, WebsocketController
 
 
-class SomeWebsocketError(Error):
+class SomeWebsocketError(Exception):
     pass
 
 
@@ -26,7 +25,7 @@ class Eh(ExceptionHandler):
     async def handle(
         self, request: Websocket, error: SomeWebsocketError
     ) -> None:
-        data: dict = error.api
+        data: dict = BootProxy.ie().api_indication.digest(error)
         data["value"]["message"] = "handled"
         await request.send_json(data)
 
@@ -46,7 +45,7 @@ def test_default():
             ),
             SomeWebsocketError
         )
-        assert err.message == "hello"
+        assert err.args[0] == "hello"
 
 
 def test_one_handler():
@@ -65,4 +64,4 @@ def test_one_handler():
             ),
             SomeWebsocketError
         )
-        assert err.message == "handled"
+        assert err.args[0] == "handled"

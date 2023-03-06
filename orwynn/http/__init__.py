@@ -8,7 +8,6 @@ from ._controller.HttpController import HttpController
 from ._cors.Cors import Cors
 from ._DEFAULT_HTTP_EXCEPTION_HANDLERS import DEFAULT_HTTP_EXCEPTION_HANDLERS
 from ._exchandler.default import (
-    DefaultErrorHandler,
     DefaultExceptionHandler,
     DefaultHttpExceptionHandler,
     DefaultRequestValidationExceptionHandler,

@@ -1,9 +1,9 @@
-from orwynn.base.error import Error
 
 
-class UnmatchedEndpointEntityError(Error):
+
+class UnmatchedEndpointEntityError(Exception):
     pass
 
 
-class WrongHandlerReturnTypeError(Error):
+class WrongHandlerReturnTypeError(Exception):
     pass

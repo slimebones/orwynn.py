@@ -1,4 +1,4 @@
-from orwynn.base.error import Error, ExceptionAlreadyHandledError
+from orwynn.base.error import ExceptionAlreadyHandledError
 from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
 from orwynn.base.module._Module import Module
 from orwynn.base.service._Service import Service
@@ -22,12 +22,15 @@ from orwynn.util import validation
 
 
 class GeneralEh(ExceptionHandler):
-    E = Error
+    E = Exception
 
     def handle(
-        self, request: HttpRequestContextBuiltinMiddleware, error: Error
+        self, request: HttpRequestContextBuiltinMiddleware, error: Exception
     ):
-        return JsonHttpResponse(error.api, 401)
+        return JsonHttpResponse(
+            BootProxy.ie().api_indication.digest(error),
+            401
+        )
 
 
 class RaiseErrorController(HttpController):
@@ -35,7 +38,7 @@ class RaiseErrorController(HttpController):
     ENDPOINTS = [Endpoint(method="get")]
 
     def get(self):
-        raise Error("hello")
+        raise ValueError("hello")
 
 
 def test_custom_handler():
@@ -44,7 +47,7 @@ def test_custom_handler():
         ENDPOINTS = [Endpoint(method="get")]
 
         def get(self):
-            raise Error("whoops!")
+            raise ValueError("whoops!")
 
     boot: Boot = Boot(
         Module(route="/", Controllers=[C1]),
@@ -54,12 +57,12 @@ def test_custom_handler():
 
     r: TestHttpResponse = http.get("/", 401)
 
-    recovered_error: Error = validation.apply(
-        BootProxy.ie().api_indication.recover(Error, r.json()),
-        Error
+    recovered_error: ValueError = validation.apply(
+        BootProxy.ie().api_indication.recover(ValueError, r.json()),
+        ValueError
     )
 
-    assert recovered_error.message == "whoops!"
+    assert recovered_error.args[0] == "whoops!"
 
 
 def test_default_exception():
@@ -77,9 +80,9 @@ def test_default_exception():
 
     r: TestHttpResponse = http.get("/", 400)
 
-    recovered_exception: Exception = validation.apply(
-        BootProxy.ie().api_indication.recover(Exception, r.json()),
-        Exception
+    recovered_exception: TypeError = validation.apply(
+        BootProxy.ie().api_indication.recover(TypeError, r.json()),
+        TypeError
     )
 
     assert recovered_exception.args[0] == "whoops!"
@@ -102,16 +105,20 @@ def test_as_acceptor():
         ENDPOINTS = [Endpoint(method="get")]
 
         def get(self):
-            raise Error("whoops!")
+            raise TypeError("whoops!")
 
     class Eh1(ExceptionHandler):
-        E = Error
+        E = Exception
 
         def __init__(self, cool_service: CoolService) -> None:
             self.__cool_service: CoolService = cool_service
 
-        def handle(self, request: HttpRequest, error: Error) -> HttpResponse:
-            data: dict = error.api
+        def handle(
+            self,
+            request: HttpRequest,
+            error: Exception
+        ) -> HttpResponse:
+            data: dict = BootProxy.ie().api_indication.digest(error)
             data["__test_meta_info"] = self.__cool_service.do_something()
             return JsonHttpResponse(data, 400)
 
@@ -176,7 +183,7 @@ def test_custom_in_middleware():
             request: HttpRequest,
             call_next: HttpNextCall
         ) -> HttpResponse:
-            raise Error("whoops!")
+            raise ValueError("whoops!")
 
     boot: Boot = Boot(
         Module(route="/", Controllers=[C1], Middleware=[M1]),
@@ -185,12 +192,12 @@ def test_custom_in_middleware():
 
     r: TestHttpResponse = boot.app.client.get("/", 401)
 
-    recovered: Error = validation.apply(
-        BootProxy.ie().api_indication.recover(Error, r.json()),
-        Error
+    recovered: ValueError = validation.apply(
+        BootProxy.ie().api_indication.recover(ValueError, r.json()),
+        ValueError
     )
 
-    assert recovered.message == "whoops!"
+    assert recovered.args[0] == "whoops!"
 
 
 def test_exception_handled_twice():
@@ -198,7 +205,7 @@ def test_exception_handled_twice():
     Should raise an error for twice-handled exceptions.
     """
     class Eh1(ExceptionHandler):
-        E = Error
+        E = Exception
 
     validation.expect(
         Boot,

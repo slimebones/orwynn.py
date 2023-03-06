@@ -1,4 +1,3 @@
-from ._Error import Error
 from ._ErrorValueSchema import ErrorValueSchema
 from ._ExceptionAlreadyHandledError import ExceptionAlreadyHandledError
 from ._find_detailed_class_for_exception import (

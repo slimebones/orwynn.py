@@ -1,8 +1,7 @@
 from orwynn._di.Provider import Provider
-from orwynn.base.error import Error
 
 
-class ProviderNotFoundInMapError(Error):
+class ProviderNotFoundInMapError(Exception):
     """If some requested provider not found in some metamap."""
     def __init__(
         self,

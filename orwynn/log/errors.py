@@ -1,5 +1,5 @@
-from orwynn.base.error import Error
 
 
-class ReservedExtraFieldError(Error):
+
+class ReservedExtraFieldError(Exception):
     """If reserved field passed to log extra dict."""

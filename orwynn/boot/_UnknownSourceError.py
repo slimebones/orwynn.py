@@ -1,5 +1,5 @@
-from orwynn.base.error import Error
 
 
-class UnknownSourceError(Error):
+
+class UnknownSourceError(Exception):
     pass

@@ -1,5 +1,5 @@
-from orwynn.base.error import Error
 
 
-class NoAnnotationError(Error):
+
+class NoAnnotationError(Exception):
     """If di object has attribute without annotation."""

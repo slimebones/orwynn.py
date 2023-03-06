@@ -1,8 +1,7 @@
 import json
-from enum import Enum
 from typing import Any, ItemsView
 
-from orwynn.base.error import Error, ErrorValueSchema
+from orwynn.base.error import ErrorValueSchema
 from orwynn.base.model._Model import Model
 from orwynn.http._schema.HttpExceptionValueSchema import \
     HttpExceptionValueSchema
@@ -74,12 +73,7 @@ class Indication:
                         Entity, RequestValidationExceptionValueSchema
                     ):
                         final_field = RequestValidationExceptionValueSchema
-                    elif (
-                        issubclass(Entity, Exception)
-                        and not issubclass(Entity, Error)
-                    ):
-                        final_field = ErrorValueSchema
-                    elif issubclass(Entity, Error):
+                    elif issubclass(Entity, Exception):
                         final_field = ErrorValueSchema
                     elif issubclass(Entity, Model):
                         final_field = Entity
@@ -168,14 +162,9 @@ class Indication:
                             "message": message,
                             "locations": locations
                         }
-                    elif isinstance(obj, Error):
-                        final_field = obj.dict()
-                    elif (
-                        isinstance(obj, Exception)
-                        and not isinstance(obj, Error)
-                    ):
+                    elif isinstance(obj, Exception):
                         final_field = {
-                            "message": "; ".join([str(x) for x in obj.args])
+                            "message": " ;; ".join([str(x) for x in obj.args])
                         }
                     elif isinstance(obj, Model):
                         # Since pydantic seems to not having a way to deal
@@ -246,12 +235,10 @@ class Indication:
             return Object(
                 errors=[]
             )
-        elif issubclass(Object, Error):
-            return Object(message=value["message"])
         elif (
             issubclass(Object, Exception)
         ):
-            return Object(*value["message"].split("; "))
+            return Object(*value["message"].split(" ; "))
         elif issubclass(Object, Model):
             return Object.parse_obj(value)
         else:
@@ -282,15 +269,8 @@ class Indication:
                 obj.INDICATION_TYPE,
                 IndicationType
             )
-        # For Exception indication type is always ERROR, for
-        # orwynn.Error it's ERROR by default, unless is
-        # defined otherwise in Error.INDICATION_TYPE
+        # For Exception indication type is always ERROR
         elif isinstance(obj, Exception):
             indication_type = IndicationType.ERROR
-            if isinstance(obj, Error) and obj.INDICATION_TYPE is not None:
-                indication_type = validation.apply(
-                    obj.INDICATION_TYPE,
-                    IndicationType
-                )
 
         return indication_type

@@ -1,5 +1,5 @@
-from orwynn.base.error import Error
 
 
-class MissingDiObjectError(Error):
+
+class MissingDiObjectError(Exception):
     pass

@@ -1,17 +1,17 @@
-from orwynn.base.error import Error
 
 
-class MappingIdAlreadySetError(Error):
+
+class MappingIdAlreadySetError(Exception):
     pass
 
 
-class CustomUseOfMappingReservedFieldError(Error):
+class CustomUseOfMappingReservedFieldError(Exception):
     pass
 
 
-class MappingIdNotSetError(Error):
+class MappingIdNotSetError(Exception):
     pass
 
 
-class MappingNotLinkedError(Error):
+class MappingNotLinkedError(Exception):
     """Is mapping is not linked to accoridng object in database."""

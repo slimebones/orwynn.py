@@ -1,9 +1,8 @@
 from orwynn._di.DiObject import DiObject
 from orwynn._di.Provider import Provider
-from orwynn.base.error import Error
 
 
-class ProviderAvailabilityError(Error):
+class ProviderAvailabilityError(Exception):
     """If some Provider is not visible for some other Di object."""
     def __init__(
         self,

@@ -1,8 +1,7 @@
 from orwynn._di.Provider import Provider
-from orwynn.base.error import Error
 
 
-class NoDependenciesForGivenProviderError(Error):
+class NoDependenciesForGivenProviderError(Exception):
     def __init__(
         self,
         message: str = "",

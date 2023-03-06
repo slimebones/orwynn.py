@@ -1,13 +1,13 @@
-from orwynn.base.error import Error
 
 
-class DigestingError(Error):
+
+class DigestingError(Exception):
     pass
 
 
-class UnsupportedIndicatorError(Error):
+class UnsupportedIndicatorError(Exception):
     pass
 
 
-class RecoveringError(Error):
+class RecoveringError(Exception):
     """Wasn't able to recover an object from dictionary using indication."""

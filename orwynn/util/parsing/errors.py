@@ -1,10 +1,9 @@
 from types import NoneType
 
-from orwynn.base.error import Error
 from orwynn.util.validation import validate
 
 
-class ParsingError(Error):
+class ParsingError(Exception):
     def __init__(self, message: str = "") -> None:
         super().__init__(message)
 

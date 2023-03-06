@@ -2,11 +2,11 @@ import json
 from types import NoneType
 from typing import Literal
 
-from orwynn.base.error import Error
 from orwynn.base.module._Module import Module
 from orwynn.boot._Boot import Boot
 from orwynn.http import Endpoint, HttpController, LogMiddleware
 from orwynn.log._Log import Log
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.testing import Writer
 from orwynn.testing._Client import Client
 
@@ -95,7 +95,7 @@ def test_get__error(
         ENDPOINTS = [Endpoint(method="get")]
 
         def get(self) -> dict:
-            raise Error("hello")
+            raise ValueError("hello")
 
     boot: Boot = Boot(
         Module(
@@ -115,6 +115,8 @@ def test_get__error(
         if "request" in extra:
             assert extra["http.request"]["json"] is None
         elif "response" in extra:
-            assert extra["http.response"]["json"] == Error("hello").api
+            assert \
+                extra["http.response"]["json"] \
+                == BootProxy.ie().api_indication.digest(ValueError("hello"))
 
     Log.remove()

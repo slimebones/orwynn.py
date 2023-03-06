@@ -1,11 +1,11 @@
-from orwynn.base.error import Error
 
 
-class FrameworkServiceModuleReferenceError(Error):
+
+class FrameworkServiceModuleReferenceError(Exception):
     pass
 
 
-class EmptyRouteError(Error):
+class EmptyRouteError(Exception):
     def __init__(self, message: str = "") -> None:
         if not message:
             message = "route cannot be empty"

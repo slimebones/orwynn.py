@@ -1,5 +1,5 @@
-from orwynn.base.error import Error
 
 
-class AppRcSearchError(Error):
+
+class AppRcSearchError(Exception):
     pass

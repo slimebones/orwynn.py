@@ -7,9 +7,6 @@ from ._controller.WebsocketEventHandlerMethod import (
 from ._DEFAULT_WEBSOCKET_EXCEPTION_HANDLERS import (
     DEFAULT_WEBSOCKET_EXCEPTION_HANDLERS,
 )
-from ._exchandler.DefaultWebsocketErrorHandler import (
-    DefaultWebsocketErrorHandler,
-)
 from ._exchandler.ExceptionHandlerWebsocketMiddleware import (
     ExceptionHandlerWebsocketMiddleware,
 )

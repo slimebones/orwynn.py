@@ -1,13 +1,13 @@
-from orwynn.base.error import Error
 
 
-class AlreadyInitializedStorageError(Error):
+
+class AlreadyInitializedStorageError(Exception):
     """If the context storage has been already initialized."""
 
 
-class RequestIdAlreadySavedError(Error):
+class RequestIdAlreadySavedError(Exception):
     """If the request id is attempted to be saved twice."""
 
 
-class UndefinedStorageError(Error):
+class UndefinedStorageError(Exception):
     """Storage is not set for the current context."""

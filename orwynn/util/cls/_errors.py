@@ -1,5 +1,5 @@
-from orwynn.base.error import Error
 
 
-class ClassNotFoundError(Error):
+
+class ClassNotFoundError(Exception):
     pass

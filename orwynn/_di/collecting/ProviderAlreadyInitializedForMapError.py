@@ -1,8 +1,7 @@
 from orwynn._di.Provider import Provider
-from orwynn.base.error import Error
 
 
-class ProviderAlreadyInitializedForMapError(Error):
+class ProviderAlreadyInitializedForMapError(Exception):
     """If provider already initialized in some metamap."""
     def __init__(
         self, message: str = "", FailedProvider: type[Provider] | None = None

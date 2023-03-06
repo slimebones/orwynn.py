@@ -1,7 +1,7 @@
-from orwynn.base.error import Error
 
 
-class DatabaseEntityNotFoundError(Error):
+
+class DatabaseEntityNotFoundError(Exception):
     """When requested database entity is not found."""
     def __init__(
         self,
@@ -17,5 +17,5 @@ class DatabaseEntityNotFoundError(Error):
         super().__init__(message)
 
 
-class UnknownDatabaseKindError(Error):
+class UnknownDatabaseKindError(Exception):
     pass
