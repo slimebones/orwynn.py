@@ -1,5 +1,7 @@
 import inspect
 
+from orwynn._di._collect_dependencies_for_acceptor import \
+    collect_dependencies_for_acceptor
 from orwynn._di.Acceptor import Acceptor
 from orwynn._di.check_availability import check_availability
 from orwynn._di.DiContainer import DiContainer
@@ -65,7 +67,7 @@ def __init_modules(
 
         for Eh in BootProxy.ie().ErrorHandlers:
             container.add(
-                Eh(**__collect_dependencies_for_acceptor(
+                Eh(**collect_dependencies_for_acceptor(
                     Eh,
                     container,
                     module
@@ -90,7 +92,7 @@ def __init_controllers(
             )
 
         controller: Controller = C(
-            **__collect_dependencies_for_acceptor(
+            **collect_dependencies_for_acceptor(
                 C,
                 container,
                 module
@@ -229,43 +231,10 @@ def __register_middleware_in_container(
     container.add(
         Middleware_(
             covered_routes=covered_routes_arr,
-            **__collect_dependencies_for_acceptor(
+            **collect_dependencies_for_acceptor(
                 Middleware_,
                 container,
                 module
             )
         )
     )
-
-
-def __collect_dependencies_for_acceptor(
-    A: type[Acceptor],
-    container: DiContainer,
-    acceptor_module: Module | None
-) -> dict[str, Provider]:
-    """
-    Collects all dependencies for given acceptor.
-
-    Args:
-        ...
-        acceptor_module:
-            Module to check dependencies availability from. If None, the
-            availability check won't be performed.
-    """
-    result: dict[str, Provider] = {}
-    for param in inspect.signature(A).parameters.values():
-        if (
-            param.name == "covered_routes"
-        ):
-            continue
-
-        # See collecting::get_parameters_for_provider
-        if param.name in ["args", "kwargs"]:
-            continue
-
-        dependency: DiObject = container.find(param.annotation.__name__)
-        if acceptor_module is not None:
-            check_availability(A, type(dependency), acceptor_module)
-        result[param.name] = dependency
-
-    return result
