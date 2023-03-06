@@ -141,17 +141,17 @@ class ControllerRegister:
         controller: HttpController,
         module: Module
     ) -> None:
+        routes: set[str] = self.__get_routes_for_controller(
+            controller,
+            module
+        )
+
         # At least one method found
         is_method_found: bool = False
         for http_method in HttpMethod:
             # Don't register unused methods
             if http_method in controller.methods:
                 is_method_found = True
-
-                routes: set[str] = self.__get_routes_for_controller(
-                    controller,
-                    module
-                )
 
                 for route in routes:
                     self.__register_http_route(
@@ -165,6 +165,9 @@ class ControllerRegister:
                 f"no http methods found for controller {controller.__class__},"
                 " this shouldn't have passed validation at Controller.__init__"
             )
+        else:
+            # Make the controller know about it's full routes
+            controller._fw_set_final_routes(routes)
 
     def __get_routes_for_controller(
         self,

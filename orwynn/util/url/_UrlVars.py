@@ -5,7 +5,7 @@ from ._Url import Url
 
 class UrlVars(Model):
     url: Url
-    original_route: str
+    abstract_route: str
     path_vars: dict[str, str]
     query_vars: dict[str, str]
 

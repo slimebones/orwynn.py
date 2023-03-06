@@ -96,13 +96,14 @@ def __init_controllers(
                 module
             )
         )
+        final_route: str = join_routes(
+            module.route, controller.route
+        )
+
         container.add(
             controller
         )
 
-        final_route: str = join_routes(
-            module.route, controller.route
-        )
         if issubclass(C, HttpController):
             http_covered_routes.append(final_route)
         elif issubclass(C, WebsocketController):

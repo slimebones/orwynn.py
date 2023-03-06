@@ -142,7 +142,7 @@ class WebsocketStack:
         # Collect request kwargs from url
         url_vars: url.UrlVars = url.get_vars(
             websocket.url,
-            original_route=_fw_original_route
+            abstract_route=_fw_original_route
         )
 
         # For middleware pass special NextCallHandler with data of all handler

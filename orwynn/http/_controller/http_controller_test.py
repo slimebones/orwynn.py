@@ -1,3 +1,5 @@
+from orwynn._di.Di import Di
+from orwynn.apiversion import ApiVersion
 from orwynn.base.controller.errors import (
     AlreadyRegisteredMethodError,
     MissingControllerClassAttributeError,
@@ -193,3 +195,56 @@ def test_default_method_not_allowed():
 
     assert recovered_exception.status_code == 405
     assert recovered_exception.detail == "Method Not Allowed"
+
+
+def test_final_routes():
+    class _Ctrl(HttpController):
+        ROUTE = "/{id}/tasty"
+        ENDPOINTS = [
+            Endpoint(method="get")
+        ]
+
+    boot: Boot = Boot(
+        Module("/donuts", Controllers=[_Ctrl]),
+        global_http_route="/api/v{version}"
+    )
+
+    ctrl: HttpController = validation.apply(
+        Di.ie().find("_Ctrl"),
+        HttpController
+    )
+
+    assert "/api/v1/donuts/{id}/tasty" in ctrl.final_routes
+
+
+def test_is_matching_route():
+    class _Ctrl(HttpController):
+        ROUTE = "/{id}/tasty"
+        ENDPOINTS = [
+            Endpoint(method="get")
+        ]
+        VERSION = 2
+
+    boot: Boot = Boot(
+        Module("/donuts", Controllers=[_Ctrl]),
+        global_http_route="/api/v{version}",
+        api_version=ApiVersion(supported={1, 2, 3})
+    )
+
+    ctrl: HttpController = validation.apply(
+        Di.ie().find("_Ctrl"),
+        HttpController
+    )
+
+    assert ctrl.is_matching_route("/api/v2/donuts/e67840v/tasty") is True
+
+    # Another versions should not be listed if a controller does not support
+    # them
+    assert ctrl.is_matching_route("/api/v1/donuts/e67840v/tasty") is False
+    assert ctrl.is_matching_route("/api/v3/donuts/helloworld/tasty") is False
+    ##
+
+    assert ctrl.is_matching_route("/api/v2/donuts/e67840v/tasty/gogo") is False
+    assert ctrl.is_matching_route("/api/v2/donuts/tasty") is False
+    assert ctrl.is_matching_route("/api/donuts/eb00v/tasty") is False
+    assert ctrl.is_matching_route("/donuts/eb00v/tasty") is False
