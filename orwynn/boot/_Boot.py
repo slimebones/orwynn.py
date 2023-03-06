@@ -5,7 +5,8 @@ from types import NoneType
 
 import dotenv
 
-from orwynn.bootscript import Bootscript
+from orwynn.bootscript import Bootscript, BootscriptWorker, CallTime
+from orwynn.bootscript.errors import NoScriptsForCallTimeError
 from orwynn._di.Di import Di
 from orwynn._di.MissingDiObjectError import MissingDiObjectError
 from orwynn.apiversion import ApiVersion
@@ -184,6 +185,11 @@ class Boot(Worker):
         self.__global_websocket_route: str = global_websocket_route
         self.__api_version: ApiVersion = api_version
 
+        # Init bootscript
+        bootscript_worker: BootscriptWorker = BootscriptWorker(
+            bootscripts=bootscripts
+        )
+
         # Init proxies
         BootProxy(
             root_dir=self.__root_dir,
@@ -211,9 +217,19 @@ class Boot(Worker):
             app_mode_prod=AppMode.PROD
         )
 
-        self.__router: Router = self.__init_router(
+        # Init routing
+        self.__init_router(
             cors=cors
         )
+
+        # AFTER_ALL bootscript call time
+        try:
+            bootscript_worker.call_by_time(
+                CallTime.AFTER_ALL,
+                self.__di._fw_container
+            )
+        except NoScriptsForCallTimeError:
+            pass
 
     def __init_router(
         self,

@@ -92,6 +92,10 @@ class Di(Worker):
         init_other_acceptors(self.__container, self.modules, global_middleware)
 
     @property
+    def _fw_container(self) -> DiContainer:
+        return self.__container
+
+    @property
     def app_service(self) -> App:
         return validation.apply(self.find("App"), App)
 

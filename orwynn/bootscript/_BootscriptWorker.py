@@ -1,7 +1,10 @@
+from orwynn._di.DiContainer import DiContainer
+from orwynn._di.Provider import Provider
 from orwynn.bootscript.errors import NoScriptsForCallTimeError, ScriptsAlreadyCalledError
 from orwynn.worker import Worker
 from orwynn.bootscript._Bootscript import Bootscript
 from orwynn.bootscript._CallTime import CallTime
+from orwynn._di._collect_dependencies_for_acceptor import collect_dependencies_for_acceptor
 
 
 _IsCallPerformed = bool
@@ -33,7 +36,8 @@ class BootscriptWorker(Worker):
 
     def call_by_time(
         self,
-        call_time: CallTime
+        call_time: CallTime,
+        di_container: DiContainer
     ) -> None:
         try:
             scripts_state: _ScriptsState = \
@@ -49,12 +53,18 @@ class BootscriptWorker(Worker):
                 )
             else:
                 for script in scripts_state[0]:
-                    self.__call_script(script)
+                    self.__call_script(script, di_container)
                 scripts_state = (scripts_state[0], True)
 
     def __call_script(
         self,
-        script: Bootscript
+        script: Bootscript,
+        di_container: DiContainer
     ) -> None:
-        # How to use DI?
-        pass
+        script.fn(
+            **collect_dependencies_for_acceptor(
+                acceptor_callable=script.fn,
+                container=di_container,
+                acceptor_module=None
+            )
+        )

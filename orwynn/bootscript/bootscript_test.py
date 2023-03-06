@@ -19,7 +19,7 @@ def some_bootscript(some_service: SomeService) -> None:
 
 def test_basic():
     boot: Boot = Boot(
-        Module(),
+        Module(Providers=[SomeService]),
         bootscripts=[
             Bootscript(
                 fn=some_bootscript,
