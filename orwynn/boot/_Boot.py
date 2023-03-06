@@ -5,6 +5,7 @@ from types import NoneType
 
 import dotenv
 
+from orwynn.bootscript import Bootscript
 from orwynn._di.Di import Di
 from orwynn._di.MissingDiObjectError import MissingDiObjectError
 from orwynn.apiversion import ApiVersion
@@ -73,6 +74,9 @@ class Boot(Worker):
         api_version (optional):
             Object describes API versioning rules for the project. By default
             only v1 is supported.
+        bootscripts (optional):
+            List of bootscripts to be launched at different points of boot
+            time.
 
     Environs:
         Orwynn_Mode:
@@ -112,7 +116,8 @@ class Boot(Worker):
         global_websocket_route: str | None = None,
         global_modules: list[Module] | None = None,
         global_middleware: GlobalMiddlewareSetup | None = None,
-        api_version: ApiVersion | None = None
+        api_version: ApiVersion | None = None,
+        bootscripts: list[Bootscript] | None = None
     ) -> None:
         super().__init__()
         if dotenv_path is None:
@@ -152,6 +157,14 @@ class Boot(Worker):
         if api_version is None:
             api_version = ApiVersion()
         validate(api_version, ApiVersion)
+
+        if bootscripts is None:
+            bootscripts = []
+        validate_each(
+            bootscripts,
+            Bootscript,
+            expected_sequence_type=list
+        )
 
         dotenv.load_dotenv(dotenv_path, override=True)
 
