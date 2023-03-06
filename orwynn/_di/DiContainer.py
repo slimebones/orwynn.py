@@ -11,7 +11,7 @@ from orwynn._di.MissingDiObjectError import MissingDiObjectError
 from orwynn.base.config import Config
 from orwynn.base.controller._Controller import Controller
 from orwynn.base.error._MalfunctionError import MalfunctionError
-from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
+from orwynn.base.errorhandler._ErrorHandler import ErrorHandler
 from orwynn.base.middleware import Middleware
 from orwynn.base.model._Model import Model
 from orwynn.util.SUBCLASSABLES import SUBCLASSABLES
@@ -61,9 +61,9 @@ class DiContainer:
         return result
 
     @property
-    def exception_handlers(self) -> list[ExceptionHandler]:
-        result: list[ExceptionHandler] = self._find_objects_for_class(
-            ExceptionHandler
+    def exception_handlers(self) -> list[ErrorHandler]:
+        result: list[ErrorHandler] = self._find_objects_for_class(
+            ErrorHandler
         )
         return result
 

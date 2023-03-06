@@ -63,7 +63,7 @@ def __init_modules(
             source=(module, covered_routes)
         )
 
-        for Eh in BootProxy.ie().ExceptionHandlers:
+        for Eh in BootProxy.ie().ErrorHandlers:
             container.add(
                 Eh(**__collect_dependencies_for_acceptor(
                     Eh,

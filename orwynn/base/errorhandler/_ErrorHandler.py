@@ -6,7 +6,7 @@ from orwynn.util.generic import GenericRequest, GenericResponse
 from orwynn.util.Protocol import Protocol
 
 
-class ExceptionHandler:
+class ErrorHandler:
     """Handles outcoming errors from the application.
     Method handle(...) should be redefined in subclass in order to work.
 

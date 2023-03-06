@@ -8,8 +8,8 @@ from ._context.ContextBuiltinWebsocketMiddleware import (
 from ._context.RequestContextBuiltinWebsocketMiddleware import (
     RequestContextBuiltinWebsocketMiddleware,
 )
-from ._exchandler.ExceptionHandlerWebsocketMiddleware import (
-    ExceptionHandlerWebsocketMiddleware,
+from ._errorhandler.ErrorHandlerWebsocketMiddleware import (
+    ErrorHandlerWebsocketMiddleware,
 )
 from ._middleware.BuiltinWebsocketMiddleware import BuiltinWebsocketMiddleware
 
@@ -18,6 +18,6 @@ BUILTIN_WEBSOCKET_MIDDLEWARE: list[type[BuiltinWebsocketMiddleware]] = [
     # access websocket object
     ConnectionBuiltinWebsocketMiddleware,
     ContextBuiltinWebsocketMiddleware,
-    ExceptionHandlerWebsocketMiddleware,
+    ErrorHandlerWebsocketMiddleware,
     RequestContextBuiltinWebsocketMiddleware
 ]

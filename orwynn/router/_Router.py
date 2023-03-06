@@ -1,7 +1,7 @@
 from orwynn.apiversion import ApiVersion
 from orwynn.app._App import App
 from orwynn.base.controller._Controller import Controller
-from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
+from orwynn.base.errorhandler._ErrorHandler import ErrorHandler
 from orwynn.base.middleware import Middleware
 from orwynn.base.module._Module import Module
 from orwynn.http import Cors
@@ -23,7 +23,7 @@ class Router(Worker):
         modules: list[Module],
         controllers: list[Controller],
         middleware_arr: list[Middleware],
-        exception_handlers: list[ExceptionHandler],
+        exception_handlers: list[ErrorHandler],
         cors: Cors | None,
         global_http_route: str,
         global_websocket_route: str,
@@ -35,7 +35,7 @@ class Router(Worker):
         self.__modules: list[Module] = modules
         self.__controllers: list[Controller] = controllers
         self.__middleware_arr: list[Middleware] = middleware_arr
-        self.__exception_handlers: list[ExceptionHandler] = exception_handlers
+        self.__exception_handlers: list[ErrorHandler] = exception_handlers
 
         self.__cors: Cors | None = cors
 

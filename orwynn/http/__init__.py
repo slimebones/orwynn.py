@@ -6,14 +6,14 @@ from ._controller.endpoint.EndpointContainer import EndpointContainer
 from ._controller.endpoint.EndpointResponse import EndpointResponse
 from ._controller.HttpController import HttpController
 from ._cors.Cors import Cors
-from ._DEFAULT_HTTP_EXCEPTION_HANDLERS import DEFAULT_HTTP_EXCEPTION_HANDLERS
-from ._exchandler.default import (
-    DefaultExceptionHandler,
-    DefaultHttpExceptionHandler,
-    DefaultRequestValidationExceptionHandler,
+from ._DEFAULT_HTTP_ERROR_HANDLERS import DEFAULT_HTTP_ERROR_HANDLERS
+from ._errorhandler.default import (
+    DefaultErrorHandler,
+    DefaultHttpErrorHandler,
+    DefaultRequestValidationErrorHandler,
 )
-from ._exchandler.ExceptionHandlerHttpMiddleware import (
-    ExceptionHandlerHttpMiddleware,
+from ._errorhandler.ErrorHandlerHttpMiddleware import (
+    ErrorHandlerHttpMiddleware,
 )
 from ._log.LogMiddleware import LogMiddleware
 from ._middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware

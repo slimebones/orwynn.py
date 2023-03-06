@@ -7,25 +7,25 @@ from starlette.middleware.base import (
 
 from orwynn.app import App
 from orwynn.base.error import get_exception_direct_subclasses
-from orwynn.base.exchandler import ExceptionHandler
+from orwynn.base.errorhandler import ErrorHandler
 from orwynn.base.middleware import Middleware
 from orwynn.http import (
     BUILTIN_HTTP_MIDDLEWARE,
     BuiltinHttpMiddleware,
     Cors,
-    DefaultExceptionHandler,
-    DefaultHttpExceptionHandler,
-    ExceptionHandlerHttpMiddleware,
+    DefaultErrorHandler,
+    DefaultHttpErrorHandler,
+    ErrorHandlerHttpMiddleware,
     HttpMiddleware,
 )
 from orwynn.http.errors import HttpException
-from orwynn.router._ExceptionHandlerManager import ExceptionHandlerManager
+from orwynn.router._ErrorHandlerManager import ErrorHandlerManager
 from orwynn.util import validation
 from orwynn.util.Protocol import Protocol
 from orwynn.websocket import (
     BUILTIN_WEBSOCKET_MIDDLEWARE,
     BuiltinWebsocketMiddleware,
-    ExceptionHandlerWebsocketMiddleware,
+    ErrorHandlerWebsocketMiddleware,
     WebsocketMiddleware,
     WebsocketStack,
     routing_handlers,
@@ -44,14 +44,14 @@ class MiddlewareRegister:
         *,
         app: App,
         middleware_arr: list[Middleware],
-        exception_handlers: list[ExceptionHandler],
+        exception_handlers: list[ErrorHandler],
         cors: Cors | None,
         websocket_stack: WebsocketStack,
     ) -> None:
         self.__app: App = app
 
         self.__middleware_arr: list[Middleware] = middleware_arr
-        self.__exception_handlers: set[ExceptionHandler] = set(
+        self.__exception_handlers: set[ErrorHandler] = set(
             exception_handlers
         )
 
@@ -64,8 +64,8 @@ class MiddlewareRegister:
         Registers all middleware to the system.
         """
         populated_handlers_py_protocol: dict[
-            Protocol, set[ExceptionHandler]
-        ] = ExceptionHandlerManager().get_populated_handlers_by_protocol(
+            Protocol, set[ErrorHandler]
+        ] = ErrorHandlerManager().get_populated_handlers_by_protocol(
             self.__exception_handlers
         )
 
@@ -95,12 +95,12 @@ class MiddlewareRegister:
 
     def __collect_http_builtin_middleware(
         self,
-        handlers: set[ExceptionHandler]
+        handlers: set[ErrorHandler]
     ) -> list[BuiltinHttpMiddleware]:
         middleware_arr: list[BuiltinHttpMiddleware] = []
 
         for Middleware_ in BUILTIN_HTTP_MIDDLEWARE:
-            if issubclass(Middleware_, ExceptionHandlerHttpMiddleware):
+            if issubclass(Middleware_, ErrorHandlerHttpMiddleware):
                 middleware_arr.append(Middleware_(
                     handlers
                 ))
@@ -111,13 +111,13 @@ class MiddlewareRegister:
 
     def __collect_websocket_builtin_middleware(
         self,
-        handlers: set[ExceptionHandler]
+        handlers: set[ErrorHandler]
     ) -> list[BuiltinWebsocketMiddleware]:
         middleware_arr: list[BuiltinWebsocketMiddleware] = []
 
         for Middleware_ in BUILTIN_WEBSOCKET_MIDDLEWARE:
             if issubclass(
-                Middleware_, ExceptionHandlerWebsocketMiddleware
+                Middleware_, ErrorHandlerWebsocketMiddleware
             ):
                 middleware_arr.append(Middleware_(
                     handlers
@@ -196,7 +196,7 @@ class MiddlewareRegister:
             raise TypeError(
                 f"cannot accept abstract class implementation {middleware}"
             )
-        elif isinstance(middleware, ExceptionHandlerHttpMiddleware):
+        elif isinstance(middleware, ErrorHandlerHttpMiddleware):
             self.__register_exception_http_middleware(middleware)
         elif isinstance(middleware, HttpMiddleware):
             self.__register_http_middleware_fn(
@@ -224,7 +224,7 @@ class MiddlewareRegister:
 
     def __register_exception_http_middleware(
         self,
-        middleware: ExceptionHandlerHttpMiddleware
+        middleware: ErrorHandlerHttpMiddleware
     ) -> None:
         # NOTE: It may seem strange that firstly exception handlers are wrapped
         #   into middleware and then unwrapped here for HTTP protocol, but
@@ -234,7 +234,7 @@ class MiddlewareRegister:
         __RemainingExceptionDirectSubclasses: set[type[Exception]] = \
             set(get_exception_direct_subclasses())
 
-        custom_base_exception_handler: ExceptionHandler | None = None
+        custom_base_exception_handler: ErrorHandler | None = None
 
         for handler in middleware.handlers:
             __RemainingExceptionDirectSubclasses.discard(
@@ -255,14 +255,14 @@ class MiddlewareRegister:
         for Remaining in __RemainingExceptionDirectSubclasses:
             handle_fn: Callable
             if Remaining is HttpException:
-                handle_fn = DefaultHttpExceptionHandler().handle
+                handle_fn = DefaultHttpErrorHandler().handle
             else:
                 # If custom exception handler is defined, pass it's handler,
                 # for all remaining subclasses, else use default exc handler
                 if custom_base_exception_handler:
                     handle_fn = custom_base_exception_handler.handle
                 else:
-                    handle_fn = DefaultExceptionHandler().handle
+                    handle_fn = DefaultErrorHandler().handle
 
             self.__app._fw_register_exception_handler_fn(
                 Remaining,

@@ -1,4 +1,4 @@
-from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
+from orwynn.base.errorhandler._ErrorHandler import ErrorHandler
 from orwynn.base.module._Module import Module
 from orwynn.boot._Boot import Boot
 from orwynn.proxy.BootProxy import BootProxy
@@ -18,7 +18,7 @@ class Wc(WebsocketController):
         raise SomeWebsocketError("hello")
 
 
-class Eh(ExceptionHandler):
+class Eh(ErrorHandler):
     E = SomeWebsocketError
     PROTOCOL = Protocol.WEBSOCKET
 
@@ -51,7 +51,7 @@ def test_default():
 def test_one_handler():
     boot: Boot = Boot(
         Module("/", Controllers=[Wc]),
-        ExceptionHandlers={Eh}
+        ErrorHandlers={Eh}
     )
 
     with boot.app.client.websocket("/") as ws:

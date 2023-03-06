@@ -4,11 +4,11 @@ from ._controller.WebsocketController import WebsocketController
 from ._controller.WebsocketEventHandlerMethod import (
     WebsocketEventHandlerMethod,
 )
-from ._DEFAULT_WEBSOCKET_EXCEPTION_HANDLERS import (
+from ._DEFAULT_WEBSOCKET_ERROR_HANDLERS import (
     DEFAULT_WEBSOCKET_EXCEPTION_HANDLERS,
 )
-from ._exchandler.ExceptionHandlerWebsocketMiddleware import (
-    ExceptionHandlerWebsocketMiddleware,
+from ._errorhandler.ErrorHandlerWebsocketMiddleware import (
+    ErrorHandlerWebsocketMiddleware,
 )
 from ._middleware.BuiltinWebsocketMiddleware import BuiltinWebsocketMiddleware
 from ._middleware.WebsocketMiddleware import WebsocketMiddleware

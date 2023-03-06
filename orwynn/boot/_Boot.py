@@ -11,7 +11,7 @@ from orwynn.apiversion import ApiVersion
 from orwynn.app import App, AppMode
 from orwynn.apprc import AppRc, parse_apprc
 from orwynn.base.controller import Controller
-from orwynn.base.exchandler import ExceptionHandler
+from orwynn.base.errorhandler import ErrorHandler
 from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
 from orwynn.base.module import Module
 from orwynn.http import Cors, EndpointContainer
@@ -45,7 +45,7 @@ class Boot(Worker):
         cors (optional):
             CORS policy applied to the whole application. No CORS applied by
             default.
-        ExceptionHandlers (optional):
+        ErrorHandlers (optional):
             List of exception handlers to add. By default framework adds
             the builtin Exception and orwynn.Error handlers.
         apprc (optional):
@@ -105,7 +105,7 @@ class Boot(Worker):
         dotenv_path: Path | None = None,
         api_indication: Indication | None = None,
         cors: Cors | None = None,
-        ExceptionHandlers: set[type[ExceptionHandler]] | None = None,
+        ErrorHandlers: set[type[ErrorHandler]] | None = None,
         apprc: AppRc | None = None,
         mode: AppMode | None = None,
         global_http_route: str | None = None,
@@ -123,10 +123,10 @@ class Boot(Worker):
             api_indication = default_api_indication
         validate(api_indication, Indication)
         validate(cors, [Cors, NoneType])
-        if ExceptionHandlers is None:
-            ExceptionHandlers = set()
+        if ErrorHandlers is None:
+            ErrorHandlers = set()
         validate_each(
-            ExceptionHandlers, ExceptionHandler, expected_sequence_type=set
+            ErrorHandlers, ErrorHandler, expected_sequence_type=set
         )
         validate(apprc, [AppRc, NoneType])
         validate(mode, [AppMode, NoneType])
@@ -177,7 +177,7 @@ class Boot(Worker):
             mode=self.__mode,
             api_indication=self.__api_indication,
             apprc=self.__apprc,
-            ExceptionHandlers=ExceptionHandlers,
+            ErrorHandlers=ErrorHandlers,
             global_http_route=self.__global_http_route,
             global_websocket_route=self.__global_websocket_route,
             api_version=self.__api_version
@@ -223,7 +223,7 @@ class Boot(Worker):
             all_middleware = []
 
         try:
-            all_exception_handlers: list[ExceptionHandler] = \
+            all_exception_handlers: list[ErrorHandler] = \
                 self.__di.exception_handlers
         except MissingDiObjectError:
             all_exception_handlers = []

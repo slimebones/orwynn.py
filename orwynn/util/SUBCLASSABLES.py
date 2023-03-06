@@ -1,6 +1,6 @@
 """List of classes an user can subclass from."""
 from orwynn.base.controller._Controller import Controller
-from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
+from orwynn.base.errorhandler._ErrorHandler import ErrorHandler
 from orwynn.base.middleware import Middleware
 from orwynn.base.model._Model import Model
 from orwynn.base.service._Service import Service
@@ -14,5 +14,5 @@ SUBCLASSABLES: list[BaseSubclassable] = [
     Controller,
     Middleware,
     Model,
-    ExceptionHandler
+    ErrorHandler
 ]

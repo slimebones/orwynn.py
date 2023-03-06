@@ -1,9 +1,9 @@
-from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
+from orwynn.base.errorhandler._ErrorHandler import ErrorHandler
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.websocket._Websocket import Websocket
 
 
-class DefaultWebsocketExceptionHandler(ExceptionHandler):
+class DefaultWebsocketErrorHandler(ErrorHandler):
     E = Exception
 
     async def handle(

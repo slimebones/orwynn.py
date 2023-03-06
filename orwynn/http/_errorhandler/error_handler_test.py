@@ -1,5 +1,5 @@
 from orwynn.base.error import ExceptionAlreadyHandledError
-from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
+from orwynn.base.errorhandler import ErrorHandler
 from orwynn.base.module._Module import Module
 from orwynn.base.service._Service import Service
 from orwynn.boot._Boot import Boot
@@ -21,7 +21,7 @@ from orwynn.testing import Client
 from orwynn.util import validation
 
 
-class GeneralEh(ExceptionHandler):
+class GeneralEh(ErrorHandler):
     E = Exception
 
     def handle(
@@ -51,7 +51,7 @@ def test_custom_handler():
 
     boot: Boot = Boot(
         Module(route="/", Controllers=[C1]),
-        ExceptionHandlers={GeneralEh}
+        ErrorHandlers={GeneralEh}
     )
     http: Client = boot.app.client
 
@@ -107,7 +107,7 @@ def test_as_acceptor():
         def get(self):
             raise TypeError("whoops!")
 
-    class Eh1(ExceptionHandler):
+    class Eh1(ErrorHandler):
         E = Exception
 
         def __init__(self, cool_service: CoolService) -> None:
@@ -124,7 +124,7 @@ def test_as_acceptor():
 
     boot: Boot = Boot(
         Module(route="/", Providers=[CoolService], Controllers=[C1]),
-        ExceptionHandlers={Eh1}
+        ErrorHandlers={Eh1}
     )
     client: Client = boot.app.client
 
@@ -187,7 +187,7 @@ def test_custom_in_middleware():
 
     boot: Boot = Boot(
         Module(route="/", Controllers=[C1], Middleware=[M1]),
-        ExceptionHandlers={GeneralEh}
+        ErrorHandlers={GeneralEh}
     )
 
     r: TestHttpResponse = boot.app.client.get("/", 401)
@@ -204,12 +204,12 @@ def test_exception_handled_twice():
     """
     Should raise an error for twice-handled exceptions.
     """
-    class Eh1(ExceptionHandler):
+    class Eh1(ErrorHandler):
         E = Exception
 
     validation.expect(
         Boot,
         ExceptionAlreadyHandledError,
         Module("/", Controllers=[RaiseErrorController]),
-        ExceptionHandlers={GeneralEh, Eh1}
+        ErrorHandlers={GeneralEh, Eh1}
     )

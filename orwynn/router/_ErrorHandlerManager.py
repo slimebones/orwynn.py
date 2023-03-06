@@ -1,12 +1,12 @@
 from orwynn.base.error import (ExceptionAlreadyHandledError,
                                MalfunctionError)
-from orwynn.base.exchandler import ExceptionHandler
-from orwynn.http import DEFAULT_HTTP_EXCEPTION_HANDLERS
+from orwynn.base.errorhandler import ErrorHandler
+from orwynn.http import DEFAULT_HTTP_ERROR_HANDLERS
 from orwynn.util.Protocol import Protocol
 from orwynn.websocket import DEFAULT_WEBSOCKET_EXCEPTION_HANDLERS
 
 
-class ExceptionHandlerManager:
+class ErrorHandlerManager:
     """
     Controls the error flow setup for the system.
 
@@ -16,8 +16,8 @@ class ExceptionHandlerManager:
     """
     def get_populated_handlers_by_protocol(
         self,
-        exception_handlers: set[ExceptionHandler]
-    ) -> dict[Protocol, set[ExceptionHandler]]:
+        exception_handlers: set[ErrorHandler]
+    ) -> dict[Protocol, set[ErrorHandler]]:
         """
         Forms a set of handlers populated with default ones if required.
 
@@ -28,11 +28,11 @@ class ExceptionHandlerManager:
         Returns:
             Populated set of exception handlers by their protocol.
         """
-        handlers_by_protocol: dict[Protocol, set[ExceptionHandler]] = {}
+        handlers_by_protocol: dict[Protocol, set[ErrorHandler]] = {}
 
         # Populate and register handlers separately for each protocol
         for protocol in Protocol:
-            populated_handlers: set[ExceptionHandler] = \
+            populated_handlers: set[ErrorHandler] = \
                 self.__populate_handlers(
                     self.__get_handlers_for_protocol(
                         protocol,
@@ -52,12 +52,12 @@ class ExceptionHandlerManager:
     def __get_handlers_for_protocol(
         self,
         protocol: Protocol,
-        error_handlers: set[ExceptionHandler]
-    ) -> set[ExceptionHandler]:
+        error_handlers: set[ErrorHandler]
+    ) -> set[ErrorHandler]:
         """
         Collects all handlers for the given protocol.
         """
-        final_set: set[ExceptionHandler] = set()
+        final_set: set[ErrorHandler] = set()
 
         for eh in error_handlers:
             if eh.PROTOCOL is protocol:
@@ -67,16 +67,16 @@ class ExceptionHandlerManager:
 
     def __populate_handlers(
         self,
-        error_handlers: set[ExceptionHandler],
+        error_handlers: set[ErrorHandler],
         protocol: Protocol
-    ) -> set[ExceptionHandler]:
+    ) -> set[ErrorHandler]:
         """
         Traverses handlers to find handled Python-builtin exceptions.
 
         Returns:
             Set of populated handlers.
         """
-        populated_handlers: set[ExceptionHandler] = set()
+        populated_handlers: set[ErrorHandler] = set()
         __HandledExceptions: set[type[Exception]] = set()
 
         for eh in error_handlers:
@@ -100,10 +100,10 @@ class ExceptionHandlerManager:
 
         # Add default handlers for errors for which the custom's handlers were
         # not added
-        DEFAULT_HANDLERS: set[type[ExceptionHandler]]
+        DEFAULT_HANDLERS: set[type[ErrorHandler]]
         match protocol:
             case Protocol.HTTP:
-                DEFAULT_HANDLERS = DEFAULT_HTTP_EXCEPTION_HANDLERS
+                DEFAULT_HANDLERS = DEFAULT_HTTP_ERROR_HANDLERS
             case Protocol.WEBSOCKET:
                 DEFAULT_HANDLERS = DEFAULT_WEBSOCKET_EXCEPTION_HANDLERS
             case _:

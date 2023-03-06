@@ -1,4 +1,4 @@
-from orwynn.base.exchandler import ExceptionHandler
+from orwynn.base.errorhandler import ErrorHandler
 from orwynn.http._requests import HttpRequest
 from orwynn.http._responses import HttpResponse, JsonHttpResponse
 from orwynn.http.errors import HttpException
@@ -6,7 +6,7 @@ from orwynn.proxy.BootProxy import BootProxy
 from orwynn.util.validation.errors import RequestValidationException
 
 
-class DefaultRequestValidationExceptionHandler(ExceptionHandler):
+class DefaultRequestValidationErrorHandler(ErrorHandler):
     E = RequestValidationException
 
     def handle(
@@ -20,7 +20,7 @@ class DefaultRequestValidationExceptionHandler(ExceptionHandler):
         )
 
 
-class DefaultExceptionHandler(ExceptionHandler):
+class DefaultErrorHandler(ErrorHandler):
     E = Exception
 
     def handle(self, request: HttpRequest, error: Exception) -> HttpResponse:
@@ -30,7 +30,7 @@ class DefaultExceptionHandler(ExceptionHandler):
         )
 
 
-class DefaultHttpExceptionHandler(ExceptionHandler):
+class DefaultHttpErrorHandler(ErrorHandler):
     E = HttpException
 
     def handle(

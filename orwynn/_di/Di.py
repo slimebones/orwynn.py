@@ -8,7 +8,7 @@ from orwynn._di.init.init_other_acceptors import init_other_acceptors
 from orwynn._di.init.init_providers import init_providers
 from orwynn.app._App import App
 from orwynn.base.controller._Controller import Controller
-from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
+from orwynn.base.errorhandler._ErrorHandler import ErrorHandler
 from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
 from orwynn.base.module._Module import Module
 from orwynn.log import LogConfig
@@ -114,7 +114,7 @@ class Di(Worker):
         return self.__container.all_middleware
 
     @property
-    def exception_handlers(self) -> list[ExceptionHandler]:
+    def exception_handlers(self) -> list[ErrorHandler]:
         return self.__container.exception_handlers
 
     def find(self, key: str) -> DiObject:

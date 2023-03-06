@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from orwynn.apiversion import ApiVersion
     from orwynn.app import AppMode
     from orwynn.apprc import AppRc
-    from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
+    from orwynn.base.errorhandler._ErrorHandler import ErrorHandler
     from orwynn.indication._Indication import Indication
 
 
@@ -23,7 +23,7 @@ class BootProxy(Worker):
         mode: "AppMode",
         api_indication: "Indication",
         apprc: "AppRc",
-        ExceptionHandlers: set[type["ExceptionHandler"]],
+        ErrorHandlers: set[type["ErrorHandler"]],
         global_http_route: str,
         global_websocket_route: str,
         api_version: "ApiVersion"
@@ -33,8 +33,8 @@ class BootProxy(Worker):
         self.__mode: AppMode = mode
         self.__api_indication: Indication = api_indication
         self.__apprc: AppRc = apprc
-        self.__ExceptionHandlers: set[type["ExceptionHandler"]] = \
-            ExceptionHandlers
+        self.__ErrorHandlers: set[type["ErrorHandler"]] = \
+            ErrorHandlers
         self.__global_http_route: str = global_http_route
         self.__global_websocket_route: str = global_websocket_route
         self.__api_version: ApiVersion = api_version
@@ -52,8 +52,8 @@ class BootProxy(Worker):
         return self.__apprc
 
     @property
-    def ExceptionHandlers(self) -> set[type["ExceptionHandler"]]:
-        return self.__ExceptionHandlers
+    def ErrorHandlers(self) -> set[type["ErrorHandler"]]:
+        return self.__ErrorHandlers
 
     @property
     def global_http_route(self) -> str:
@@ -74,7 +74,7 @@ class BootProxy(Worker):
             "mode": self.__mode,
             "api_indication": self.__api_indication,
             "app_rc": self.__apprc,
-            "ErrorHandlers": self.__ExceptionHandlers
+            "ErrorHandlers": self.__ErrorHandlers
         }
 
     @property

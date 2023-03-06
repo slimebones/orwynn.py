@@ -1,4 +1,4 @@
-from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
+from orwynn.base.errorhandler._ErrorHandler import ErrorHandler
 from orwynn.http._middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
 from orwynn.http._middleware.HttpNextCall import HttpNextCall
 from orwynn.http._requests import HttpRequest
@@ -6,22 +6,22 @@ from orwynn.http._responses import HttpResponse
 from orwynn.util import validation
 
 
-class ExceptionHandlerHttpMiddleware(BuiltinHttpMiddleware):
+class ErrorHandlerHttpMiddleware(BuiltinHttpMiddleware):
     """
     Handles all errors occured at Http layer.
     """
     def __init__(
         self,
-        handlers: set[ExceptionHandler]
+        handlers: set[ErrorHandler]
     ) -> None:
         super().__init__()
         validation.validate_each(
-            handlers, ExceptionHandler, expected_sequence_type=set
+            handlers, ErrorHandler, expected_sequence_type=set
         )
-        self.__handlers: set[ExceptionHandler] = handlers
+        self.__handlers: set[ErrorHandler] = handlers
 
     @property
-    def handlers(self) -> set[ExceptionHandler]:
+    def handlers(self) -> set[ErrorHandler]:
         return self.__handlers.copy()
 
     async def process(

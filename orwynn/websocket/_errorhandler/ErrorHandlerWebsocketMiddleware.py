@@ -5,7 +5,7 @@ from orwynn.base.error._find_detailed_class_for_exception import (
     find_detailed_class_for_exception,
 )
 from orwynn.base.error._MalfunctionError import MalfunctionError
-from orwynn.base.exchandler._ExceptionHandler import ExceptionHandler
+from orwynn.base.errorhandler._ErrorHandler import ErrorHandler
 from orwynn.util import validation
 from orwynn.websocket._context.WebsocketRequestContextId import (
     WebsocketRequestContextId,
@@ -18,22 +18,22 @@ from orwynn.websocket._middleware.WebsocketNextCall import WebsocketNextCall
 from orwynn.websocket._Websocket import Websocket
 
 
-class ExceptionHandlerWebsocketMiddleware(BuiltinWebsocketMiddleware):
+class ErrorHandlerWebsocketMiddleware(BuiltinWebsocketMiddleware):
     """
     Handles all errors occured at Websocket layer.
     """
     def __init__(
         self,
-        handlers: set[ExceptionHandler]
+        handlers: set[ErrorHandler]
     ) -> None:
         super().__init__()
         validation.validate_each(
-            handlers, ExceptionHandler, expected_sequence_type=set
+            handlers, ErrorHandler, expected_sequence_type=set
         )
-        self.__handlers: set[ExceptionHandler] = handlers
+        self.__handlers: set[ErrorHandler] = handlers
 
     @property
-    def handlers(self) -> set[ExceptionHandler]:
+    def handlers(self) -> set[ErrorHandler]:
         return self.__handlers.copy()
 
     async def process(
@@ -46,7 +46,7 @@ class ExceptionHandlerWebsocketMiddleware(BuiltinWebsocketMiddleware):
         except Exception as err:  # noqa: BLE001
             is_handled: bool = False
             malfunction_message: str = \
-                "malfunction at ExceptionHandler middleware" \
+                "malfunction at ErrorHandler middleware" \
                 " for a websocket connection: no handler to handle an" \
                 f" error {err}"
 
