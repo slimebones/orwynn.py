@@ -1,6 +1,7 @@
 from orwynn.base.error import ExceptionAlreadyHandledError
 from orwynn.base.errorhandler import ErrorHandler
-from orwynn.base.module._Module import Module
+from orwynn.base.module import Module
+from orwynn.base.model import Model
 from orwynn.base.service._Service import Service
 from orwynn.boot._Boot import Boot
 from orwynn.http._context.HttpRequestContextBuiltinMiddleware import (
@@ -18,6 +19,7 @@ from orwynn.http._responses import (
 )
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.testing import Client
+from orwynn._testingtools import GetHttpController, IdGetHttpController, Item
 from orwynn.util import validation
 
 
@@ -213,3 +215,26 @@ def test_exception_handled_twice():
         Module("/", Controllers=[RaiseErrorController]),
         ErrorHandlers={GeneralEh, Eh1}
     )
+
+
+def test_pydantic_validation_error_is_catched():
+    """
+    Should catch pydantic.ValidationError too, despite it's internal multiple
+    inheritance.
+    """
+    class _Ctrl(HttpController):
+        ROUTE = "/"
+        ENDPOINTS = [
+            Endpoint(method="get")
+        ]
+
+        def get(self) -> dict:
+            # Invoke a validation error
+            Item(name="item", price="whocares")  # type: ignore
+            return {}
+
+    boot: Boot = Boot(
+        Module("/", Controllers=[_Ctrl])
+    )
+
+    boot.app.client.get_jsonify("/", 400)
