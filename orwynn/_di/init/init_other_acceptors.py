@@ -54,6 +54,8 @@ def __init_modules(
         source=global_middleware
     )
 
+    _init_all_error_handlers(container)
+
     for module in modules:
         covered_routes: __CoveredRoutes = __init_controllers(container, module)
         __init_middleware(
@@ -61,14 +63,18 @@ def __init_modules(
             source=(module, covered_routes)
         )
 
-        for Eh in BootProxy.ie().ErrorHandlers:
-            container.add(
-                Eh(**collect_dependencies_for_acceptor(
-                    Eh,
-                    container,
-                    module
-                ))
-            )
+
+def _init_all_error_handlers(
+    container: DiContainer
+) -> None:
+    for Eh in BootProxy.ie().ErrorHandlers:
+        container.add(
+            Eh(**collect_dependencies_for_acceptor(
+                Eh,
+                container,
+                None
+            ))
+        )
 
 
 def __init_controllers(
