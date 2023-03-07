@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from fastapi import FastAPI
 from fastapi.middleware.asyncexitstack import AsyncExitStackMiddleware
 from starlette.middleware import Middleware
@@ -5,8 +7,14 @@ from starlette.middleware.errors import ServerErrorMiddleware
 from starlette.middleware.exceptions import ExceptionMiddleware
 from starlette.types import ASGIApp
 
+from orwynn.app._ApiRouter import ApiRouter
+
 
 class CoreApp(FastAPI):
+    def __init__(self, **kwargs) -> None:
+        with patch("fastapi.routing.APIRouter", new=ApiRouter):
+            super().__init__(**kwargs)
+
     def build_middleware_stack(self) -> ASGIApp:
         # Duplicate/override from Starlette to add AsyncExitStackMiddleware
         # inside of ExceptionMiddleware, inside of custom user middlewares

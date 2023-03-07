@@ -15,6 +15,7 @@ class App(FrameworkService):
         self._fw_register_middleware = self.__core_app.add_middleware
         self._fw_register_exception_handler_fn = \
             self.__core_app.add_exception_handler
+        self._fw_websocket_handler = self.__core_app.websocket
 
         self.HTTP_METHODS_TO_REGISTERING_FUNCTIONS: \
             dict[HttpMethod, Callable] = {
@@ -35,10 +36,6 @@ class App(FrameworkService):
         self, scope: Scope, receive: Receive, send: Send
     ) -> None:
         await self.__core_app(scope, receive, send)
-
-    @property
-    def websocket_handler(self) -> Callable:
-        return self.__core_app.websocket
 
     @property
     def client(self) -> Client:

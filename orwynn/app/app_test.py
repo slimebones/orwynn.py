@@ -1,7 +1,9 @@
 from pytest import fixture
 
 from orwynn.app._App import App
-from orwynn.boot._Boot import Boot
+from orwynn.base.module import Module
+from orwynn.boot import Boot
+from orwynn.websocket import Websocket, WebsocketController
 
 
 @fixture
@@ -19,3 +21,28 @@ def test_openapi(run_endpoint):
         path["responses"]["201"]["description"] == "Best response description"
     assert \
         path["responses"]["201"]["description"] == "Best response description"
+
+
+def test_get_dependant_patch_against_websocket():
+    """
+    Should correctly operate for websocket controllers and builtin middleware.
+    """
+
+    # FIXME:
+    #   Due to strange reasons, this test works fine in orwynn environment,
+    #   but gives an error related to fastapi.dependencies.utils.get_dependant
+    #   function, which cannot handle _fw_handlers and other framework's
+    #   related arguments.
+
+    class WsCtrl(WebsocketController):
+        ROUTE = "/"
+
+        async def main(self, websocket: Websocket) -> None:
+            await websocket.send_json({"message": "hello"})
+
+    boot: Boot = Boot(
+        Module("/", Controllers=[WsCtrl])
+    )
+
+    with boot.app.client.websocket("/") as ws:
+        ws.receive_json()

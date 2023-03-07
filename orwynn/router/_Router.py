@@ -40,7 +40,7 @@ class Router(Worker):
         self.__cors: Cors | None = cors
 
         self.__websocket_stack: WebsocketStack = WebsocketStack(
-            self.__app.websocket_handler
+            self.__app._fw_websocket_handler
         )
 
         self.__middleware_register: MiddlewareRegister = MiddlewareRegister(
