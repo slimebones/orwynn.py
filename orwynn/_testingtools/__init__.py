@@ -1,5 +1,5 @@
 from orwynn.base.model import Model
-from orwynn.http import Endpoint, HttpController
+from orwynn.http import Endpoint, HttpController, HttpRequest
 
 GET_DATA: dict = {"message": "hello"}
 
@@ -22,6 +22,19 @@ class IdGetHttpController(HttpController):
 
     def get(self, id: str) -> dict:
         return {"id": id}
+
+
+class HeadersGetHttpController(HttpController):
+    """
+    Returns all accepted headers.
+    """
+    ROUTE = "/"
+    ENDPOINTS = [
+        Endpoint(method="get")
+    ]
+
+    def get(self, request: HttpRequest) -> dict:
+        return {k: v for k, v in request.headers.items()}
 
 
 class Item(Model):

@@ -30,14 +30,16 @@ class Client:
         self,
         embedded_client: EmbeddedTestClient,
         *,
-        binded_headers: Optional[dict[str, Any]] = None
+        binded_headers: dict[str, str] | None = None
     ) -> None:
         validation.validate(embedded_client, EmbeddedTestClient)
         self._embedded_client: EmbeddedTestClient = embedded_client
 
         if binded_headers is None:
             binded_headers = {}
-        self._binded_headers: dict[str, Any] = binded_headers
+        # Do copy here again for an additional safety, although headers copying
+        # is already done at bind_headers() method.
+        self._binded_headers: dict[str, str] = binded_headers.copy()
 
     @property
     def binded_headers(self) -> dict:
@@ -45,12 +47,15 @@ class Client:
 
     def bind_headers(
         self,
-        headers: dict[str, Any]
+        headers: dict[str, str]
     ) -> Self:
-        validation.validate_dict(headers, (str, validation.Validator.SKIP))
+        validation.validate_dict(headers, (str, str))
 
-        # Accumulate headers from this client to the new one
-        final_headers: dict[str, Any] = self._binded_headers
+        # Accumulate headers from this client to the new one.
+        #
+        # Also copy binded headers to not stack them after multiple
+        # bind_headers() calls.
+        final_headers: dict[str, str] = self._binded_headers.copy()
         final_headers.update(headers)
 
         return self.__class__(

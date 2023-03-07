@@ -1,8 +1,8 @@
-
 from fastapi import Header
 
+from orwynn._testingtools import HeadersGetHttpController
 from orwynn.base.module._Module import Module
-from orwynn.boot._Boot import Boot
+from orwynn.boot import Boot
 from orwynn.http import Endpoint, HttpController
 from orwynn.testing._Client import Client
 
@@ -63,3 +63,26 @@ def test_bind_headers_accumulate():
     data: dict = binded.get_jsonify("/")
     assert data["x-testing"] == "hello"
     assert data["x-tmp"] == "world"
+
+def test_multiple_bind_headers():
+    """
+    Shouldn't stack bind headers in the original client for subsequent
+    bind_headers() calls.
+    """
+    boot: Boot = Boot(
+        Module("/", Controllers=[HeadersGetHttpController])
+    )
+
+    binded_1: Client = boot.app.client.bind_headers({
+        "x-testing": "hello"
+    })
+
+    binded_2: Client = binded_1.bind_headers({
+        "x-tmp": "world"
+    })
+
+    assert binded_1.binded_headers == {"x-testing": "hello"}
+    assert binded_2.binded_headers == {
+        "x-testing": "hello",
+        "x-tmp": "world"
+    }
