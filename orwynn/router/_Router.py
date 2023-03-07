@@ -4,9 +4,9 @@ from orwynn.base.controller._Controller import Controller
 from orwynn.base.errorhandler._ErrorHandler import ErrorHandler
 from orwynn.base.middleware import Middleware
 from orwynn.base.module._Module import Module
+from orwynn.base.worker._Worker import Worker
 from orwynn.http import Cors
 from orwynn.websocket import WebsocketStack
-from orwynn.worker._Worker import Worker
 
 from ._ControllerRegister import ControllerRegister
 from ._MiddlewareRegister import MiddlewareRegister

@@ -16,6 +16,7 @@ from orwynn.app import AppMode
 from orwynn.app._App import App
 from orwynn.app.app_test import std_app
 from orwynn.base.module._Module import Module
+from orwynn.base.worker._Worker import Worker
 from orwynn.boot._Boot import Boot
 from orwynn.boot.boot_test import (
     run_std,
@@ -30,7 +31,6 @@ from orwynn.mongo._Mongo import Mongo
 from orwynn.testing._Client import Client
 from orwynn.testing._EmbeddedTestClient import EmbeddedTestClient
 from orwynn.util import validation
-from orwynn.worker._Worker import Worker
 from tests.structs import (
     circular_module_struct,
     long_circular_module_struct,

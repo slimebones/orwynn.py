@@ -1,5 +1,5 @@
-from orwynn.http import Endpoint, HttpController
 from orwynn.base.model import Model
+from orwynn.http import Endpoint, HttpController
 
 GET_DATA: dict = {"message": "hello"}
 

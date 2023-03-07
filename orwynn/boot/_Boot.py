@@ -15,6 +15,7 @@ from orwynn.base.controller import Controller
 from orwynn.base.errorhandler import ErrorHandler
 from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
 from orwynn.base.module import Module
+from orwynn.base.worker import Worker
 from orwynn.bootscript import Bootscript, BootscriptWorker, CallTime
 from orwynn.bootscript.errors import NoScriptsForCallTimeError
 from orwynn.http import Cors, EndpointContainer
@@ -27,7 +28,6 @@ from orwynn.testing import Client
 from orwynn.util import validation
 from orwynn.util.validation import validate, validate_dict, validate_each
 from orwynn.util.yml.errors import NotDirError
-from orwynn.worker import Worker
 
 
 class Boot(Worker):

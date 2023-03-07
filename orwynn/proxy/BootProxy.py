@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from orwynn.base.worker import Worker
 from orwynn.util.Protocol import Protocol
-from orwynn.worker import Worker
 
 if TYPE_CHECKING:
     from orwynn.apiversion import ApiVersion

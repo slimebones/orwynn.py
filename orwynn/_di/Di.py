@@ -11,9 +11,9 @@ from orwynn.base.controller._Controller import Controller
 from orwynn.base.errorhandler._ErrorHandler import ErrorHandler
 from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
 from orwynn.base.module._Module import Module
+from orwynn.base.worker._Worker import Worker
 from orwynn.log import LogConfig
 from orwynn.util import validation
-from orwynn.worker._Worker import Worker
 
 
 class Di(Worker):

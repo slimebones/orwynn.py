@@ -2,13 +2,13 @@ from orwynn._di._collect_dependencies_for_acceptor import (
     collect_dependencies_for_acceptor,
 )
 from orwynn._di.DiContainer import DiContainer
+from orwynn.base.worker import Worker
 from orwynn.bootscript._Bootscript import Bootscript
 from orwynn.bootscript._CallTime import CallTime
 from orwynn.bootscript.errors import (
     NoScriptsForCallTimeError,
     ScriptsAlreadyCalledError,
 )
-from orwynn.worker import Worker
 
 _IsCallPerformed = bool
 # Represents bootscripts sorted by their call time and followed by

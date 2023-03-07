@@ -1,7 +1,7 @@
+from orwynn._testingtools import Item
 from orwynn.base.error import ExceptionAlreadyHandledError
 from orwynn.base.errorhandler import ErrorHandler
 from orwynn.base.module import Module
-from orwynn.base.model import Model
 from orwynn.base.service._Service import Service
 from orwynn.boot._Boot import Boot
 from orwynn.http._context.HttpRequestContextBuiltinMiddleware import (
@@ -19,7 +19,6 @@ from orwynn.http._responses import (
 )
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.testing import Client
-from orwynn._testingtools import GetHttpController, IdGetHttpController, Item
 from orwynn.util import validation
 
 
