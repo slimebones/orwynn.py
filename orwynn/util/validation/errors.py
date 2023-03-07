@@ -21,7 +21,8 @@ class ReValidationError(Exception):
         self,
         message: str = "",
         failed_obj: Any | None = None,
-        pattern: str | None = None
+        pattern: str | None = None,
+        *args
     ) -> None:
         if not message and failed_obj is not None and pattern is not None:
             message = \
@@ -40,6 +41,7 @@ class ValidationError(Exception):
         message: str = "",
         failed_obj: Any | None = None,
         expected_type: type | list[type] | None = None,
+        *args
     ) -> None:
         if (
             not message

@@ -6,7 +6,7 @@ from pytest import fixture
 from orwynn.base.model._Model import Model
 from orwynn.indication._Indication import Indication
 from orwynn.indication._Indicator import Indicator
-from orwynn.util.parsing import parse_key
+from orwynn.util import validation
 from tests.std.text import Text
 
 
@@ -24,8 +24,8 @@ def test_digest_default(default_indication: Indication):
         Text(text="hello")
     )
 
-    mp_type: str = parse_key("type", digested_mp, str)
-    mp_value: dict = parse_key("value", digested_mp, dict)
+    mp_type: str = validation.apply(digested_mp["type"], str)
+    mp_value: dict = validation.apply(digested_mp["value"], dict)
 
     assert mp_type == "ok"
     Text.parse_obj(mp_value)
@@ -80,7 +80,7 @@ def test_digest_enum(default_indication: Indication):
         )
     )
 
-    mp_value: dict = parse_key("value", digested_mp, dict)
+    mp_value: dict = validation.apply(digested_mp["value"], dict)
 
     # Enum fields should be converted to values
     assert mp_value["color"] == "red"

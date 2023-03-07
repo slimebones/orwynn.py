@@ -3,10 +3,8 @@ from typing import Any
 
 import dictdiffer
 
-from orwynn.base.error._MalfunctionError import MalfunctionError
 from orwynn.util import validation
-
-from ._dictpp import dictpp
+from orwynn.util.mp._dictpp import dictpp
 
 
 def find(location: str, mp: dict) -> Any:
@@ -85,7 +83,7 @@ def patch(
 
         elif event_name == "change":
             if location == "":
-                raise MalfunctionError(
+                raise ValueError(
                     "on change events location shouldn't be empty"
                 )
             patched[location] = change[1]

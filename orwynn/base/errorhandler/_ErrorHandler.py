@@ -1,8 +1,8 @@
 from typing import ClassVar
 
 from orwynn.base.error._MalfunctionError import MalfunctionError
+from orwynn.helpers.generic import GenericRequest, GenericResponse
 from orwynn.util import validation
-from orwynn.util.generic import GenericRequest, GenericResponse
 from orwynn.util.Protocol import Protocol
 
 

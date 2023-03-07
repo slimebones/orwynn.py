@@ -1,9 +1,9 @@
-from orwynn.base.model._Model import Model
+from pydantic import BaseModel
 
-from ._Url import Url
+from orwynn.util.url._Url import Url
 
 
-class UrlVars(Model):
+class UrlVars(BaseModel):
     url: Url
     abstract_route: str
     path_vars: dict[str, str]

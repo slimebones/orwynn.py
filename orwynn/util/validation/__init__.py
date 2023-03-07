@@ -1,7 +1,5 @@
-"""Collection of validation functions.
-
-In future the framework might introduce special flags (or read Python's
-optimization flag -O) to not execute such functions.
+"""
+Collection of validation functions.
 """
 import re
 import typing
@@ -9,11 +7,11 @@ from inspect import isclass
 from pathlib import Path
 from typing import Any, Callable, Optional, Sized, TypeVar
 
-from pydantic import ValidationError as __PydanticValidationError
-from pydantic import validator as __pydantic_validator
+from pydantic import ValidationError as _PydanticValidationError
+from pydantic import validator as _pydantic_validator
 
-from ._validator import Validator
-from .errors import (ExpectationError, ReValidationError,
+from orwynn.util.validation._validator import Validator
+from orwynn.util.validation.errors import (ExpectationError, ReValidationError,
                      UnknownValidatorError, ValidationError)
 
 # WARNING: typing aliases are not currently supported so passing types like
@@ -21,8 +19,8 @@ from .errors import (ExpectationError, ReValidationError,
 #   direct runtime comparison is made.
 ValidationExpectedType = type | list[type] | Validator | Path
 ApplyExpectedType = TypeVar("ApplyExpectedType")
-model_validator = __pydantic_validator
-ModelValidationError = __PydanticValidationError
+model_validator = _pydantic_validator
+ModelValidationError = _PydanticValidationError
 
 
 def validate(

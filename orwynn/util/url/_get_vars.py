@@ -1,11 +1,9 @@
 import re
 from itertools import zip_longest
 
-from orwynn.base.error._MalfunctionError import MalfunctionError
 from orwynn.util.url._match_routes import match_routes
-
-from ._Url import Url
-from ._UrlVars import UrlVars
+from orwynn.util.url._Url import Url
+from orwynn.util.url._UrlVars import UrlVars
 
 
 def get_vars(
@@ -60,7 +58,7 @@ def _set_path_vars(
             path_var_names, path_match.groups()
         ):
             if var_name is None or var_value is None:
-                raise MalfunctionError(
+                raise ValueError(
                     "unmatched amount of variable names and it's values in"
                     " given abstract and real routes"
                 )
