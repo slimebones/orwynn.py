@@ -294,6 +294,7 @@ class ControllerRegister:
                 for response in spec.responses:
                     if (
                         response.status_code == spec.default_status_code
+                        and response.Entity is not dict
                         and response.Entity is not fn_return_typehint
                     ):
                         raise UnmatchedEndpointEntityError(
