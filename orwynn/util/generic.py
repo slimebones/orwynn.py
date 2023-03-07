@@ -1,4 +1,5 @@
 # A request of any supported protocol
+from enum import Enum
 from typing import TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
@@ -17,3 +18,16 @@ GenericResponse = Union[
     # controller - it sends it over special channel instead.
     None
 ]
+
+
+class RequestMethod(Enum):
+    """
+    All possible request methods.
+    """
+    GET = "get"
+    POST = "post"
+    PUT = "put"
+    DELETE = "delete"
+    PATCH = "patch"
+    OPTIONS = "options"
+    WEBSOCKET = "websocket"
