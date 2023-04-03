@@ -7,12 +7,14 @@ from orwynn.base.controller.errors import (
 from orwynn.base.model import Model
 from orwynn.base.module import Module
 from orwynn.boot import Boot
-from orwynn.http import Endpoint, HttpController, HttpMethod
+from orwynn.helpers.web import REQUEST_METHOD_BY_PROTOCOL
+from orwynn.http import Endpoint, HttpController
 from orwynn.http._controller.errors import DefinedTwiceControllerMethodError
 from orwynn.http.errors import HttpException, UnsupportedHttpMethodError
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.testing import Client
 from orwynn.utils import validation
+from orwynn.utils.Protocol import Protocol
 from orwynn.utils.validation import expect, validate_re
 from orwynn.utils.validation.errors import (
     RequestValidationException,
@@ -23,7 +25,7 @@ from tests.std.text import DEFAULT_ID, Text
 
 
 def test_http_methods():
-    for method in HttpMethod:
+    for method in REQUEST_METHOD_BY_PROTOCOL[Protocol.HTTP]:
         assert hasattr(HttpController, method.value)
 
 

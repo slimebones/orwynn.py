@@ -11,7 +11,8 @@ from orwynn.base.controller.errors import AlreadyRegisteredMethodError
 from orwynn.base.error import MalfunctionError
 from orwynn.base.model import Model
 from orwynn.base.module import Module
-from orwynn.http import Endpoint, EndpointContainer, HttpController, HttpMethod
+from orwynn.helpers.web import REQUEST_METHOD_BY_PROTOCOL, RequestMethod
+from orwynn.http import Endpoint, EndpointContainer, HttpController
 from orwynn.http.errors import (
     EndpointNotFoundError,
     UnsupportedHttpMethodError,
@@ -23,6 +24,7 @@ from orwynn.router.errors import (
     WrongHandlerReturnTypeError,
 )
 from orwynn.utils import validation
+from orwynn.utils.Protocol import Protocol
 from orwynn.utils.url import join_routes
 from orwynn.websocket import (
     WebsocketController,
@@ -50,7 +52,7 @@ class ControllerRegister:
 
         self.__modules: list[Module] = modules
         self.__controllers: list[Controller] = controllers
-        self.__methods_by_route: dict[str, set[HttpMethod]] = {}
+        self.__methods_by_route: dict[str, set[RequestMethod]] = {}
 
         self.__global_http_route: str = global_http_route
         self.__global_websocket_route: str = global_websocket_route
@@ -148,9 +150,12 @@ class ControllerRegister:
 
         # At least one method found
         is_method_found: bool = False
-        for http_method in HttpMethod:
+        for http_method in RequestMethod:
             # Don't register unused methods
-            if http_method in controller.methods:
+            if (
+                http_method in controller.methods
+                and http_method in REQUEST_METHOD_BY_PROTOCOL[Protocol.HTTP]
+            ):
                 is_method_found = True
 
                 for route in routes:
@@ -361,7 +366,7 @@ class ControllerRegister:
         return False
 
     def __register_http_route(
-        self, *, route: str, fn: Callable, method: HttpMethod
+        self, *, route: str, fn: Callable, method: RequestMethod
     ) -> None:
         """Registers a fn for a route.
 
@@ -375,7 +380,7 @@ class ControllerRegister:
         """
         validation.validate(route, str)
         validation.validate(fn, Callable)
-        validation.validate(method, HttpMethod)
+        validation.validate(method, RequestMethod)
 
         app_fn: Callable | None = \
             self.__app.HTTP_METHODS_TO_REGISTERING_FUNCTIONS.get(

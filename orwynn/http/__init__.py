@@ -1,6 +1,5 @@
 from ._BUILTIN_HTTP_MIDDLEWARE import BUILTIN_HTTP_MIDDLEWARE
 from ._context.HttpRequestContextId import HttpRequestContextId
-from ._controller._HttpMethod import HttpMethod
 from ._controller.endpoint.Endpoint import Endpoint
 from ._controller.endpoint.EndpointContainer import EndpointContainer
 from ._controller.endpoint.EndpointResponse import EndpointResponse

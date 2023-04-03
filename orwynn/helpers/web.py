@@ -2,6 +2,8 @@
 from enum import Enum
 from typing import TYPE_CHECKING, Union
 
+from orwynn.utils.Protocol import Protocol
+
 if TYPE_CHECKING:
     from orwynn.http import HttpRequest, HttpResponse
     from orwynn.websocket import Websocket
@@ -31,3 +33,18 @@ class RequestMethod(Enum):
     PATCH = "patch"
     OPTIONS = "options"
     WEBSOCKET = "websocket"
+
+
+REQUEST_METHOD_BY_PROTOCOL: dict[Protocol, list[RequestMethod]] = {
+    Protocol.HTTP: [
+        RequestMethod.GET,
+        RequestMethod.POST,
+        RequestMethod.PUT,
+        RequestMethod.DELETE,
+        RequestMethod.PATCH,
+        RequestMethod.OPTIONS,
+    ],
+    Protocol.WEBSOCKET: [
+        RequestMethod.WEBSOCKET
+    ]
+}

@@ -4,7 +4,7 @@ from starlette.types import Receive, Scope, Send
 
 from orwynn.app._CoreApp import CoreApp
 from orwynn.base.service._FrameworkService import FrameworkService
-from orwynn.http import HttpMethod
+from orwynn.helpers.web import RequestMethod
 from orwynn.testing import Client, EmbeddedTestClient
 
 
@@ -18,13 +18,13 @@ class App(FrameworkService):
         self._fw_websocket_handler = self.__core_app.websocket
 
         self.HTTP_METHODS_TO_REGISTERING_FUNCTIONS: \
-            dict[HttpMethod, Callable] = {
-                HttpMethod.GET: self.__core_app.get,
-                HttpMethod.POST: self.__core_app.post,
-                HttpMethod.PUT: self.__core_app.put,
-                HttpMethod.DELETE: self.__core_app.delete,
-                HttpMethod.PATCH: self.__core_app.patch,
-                HttpMethod.OPTIONS: self.__core_app.options
+            dict[RequestMethod, Callable] = {
+                RequestMethod.GET: self.__core_app.get,
+                RequestMethod.POST: self.__core_app.post,
+                RequestMethod.PUT: self.__core_app.put,
+                RequestMethod.DELETE: self.__core_app.delete,
+                RequestMethod.PATCH: self.__core_app.patch,
+                RequestMethod.OPTIONS: self.__core_app.options
             }
 
         self.__client: Client = Client(EmbeddedTestClient(self.__core_app))

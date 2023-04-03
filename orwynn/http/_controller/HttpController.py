@@ -1,8 +1,10 @@
 from typing import Callable, ClassVar, Literal
 
+from orwynn.helpers.web import REQUEST_METHOD_BY_PROTOCOL, RequestMethod
+
 from .endpoint.Endpoint import Endpoint
 from orwynn.base.controller._Controller import Controller
-from ._HttpMethod import HttpMethod
+from orwynn.utils.Protocol import Protocol
 from orwynn.http.errors import UnsupportedHttpMethodError
 from .errors import \
     DefinedTwiceControllerMethodError
@@ -41,7 +43,7 @@ class HttpController(Controller):
     def __init__(self) -> None:
         super().__init__()
 
-        self._methods: list[HttpMethod] = []
+        self._methods: list[RequestMethod] = []
 
         if self.ENDPOINTS is None:
             raise MissingControllerClassAttributeError(
@@ -59,7 +61,11 @@ class HttpController(Controller):
             for endpoint in self.ENDPOINTS:
                 str_method = endpoint.method.lower()
 
-                if str_method not in [e.value for e in HttpMethod]:
+                http_methods: list[RequestMethod] = [
+                    method.value
+                    for method in REQUEST_METHOD_BY_PROTOCOL[Protocol.HTTP]
+                ]
+                if str_method not in http_methods:
                     raise UnsupportedHttpMethodError(
                         f"method {str_method} is not supported"
                     )
@@ -70,7 +76,14 @@ class HttpController(Controller):
                     )
 
                 collected_str_methods.append(str_method)
-                http_method: HttpMethod = HttpMethod(str_method)
+                http_method: RequestMethod = RequestMethod(str_method)
+
+                if (
+                    http_method
+                    not in REQUEST_METHOD_BY_PROTOCOL[Protocol.HTTP]
+                ):
+                    raise ValueError(f"cannot accept method {http_method}")
+
                 self._methods.append(http_method)
 
                 EndpointContainer.ie().add(
@@ -83,24 +96,24 @@ class HttpController(Controller):
         return self._route
 
     @property
-    def methods(self) -> list[HttpMethod]:
+    def methods(self) -> list[RequestMethod]:
         return self._methods
 
-    def get_fn_by_http_method(self, method: HttpMethod) -> Callable:
+    def get_fn_by_http_method(self, method: RequestMethod) -> Callable:
         fn: Callable
 
         match method:
-            case HttpMethod.GET:
+            case RequestMethod.GET:
                 fn = self.get
-            case HttpMethod.POST:
+            case RequestMethod.POST:
                 fn = self.post
-            case HttpMethod.PUT:
+            case RequestMethod.PUT:
                 fn = self.put
-            case HttpMethod.DELETE:
+            case RequestMethod.DELETE:
                 fn = self.delete
-            case HttpMethod.PATCH:
+            case RequestMethod.PATCH:
                 fn = self.patch
-            case HttpMethod.OPTIONS:
+            case RequestMethod.OPTIONS:
                 fn = self.options
             case _:
                 raise
