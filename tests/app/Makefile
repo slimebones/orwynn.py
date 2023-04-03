@@ -1,2 +1,2 @@
 dev:
-	poetry run uvicorn __init__.py:create_app --factory
+	poetry run uvicorn --factory main:create_app
