@@ -1,5 +1,4 @@
 from orwynn._di.check_availability import check_availability
-from orwynn._di.circular_dependency_error import CircularDependencyError
 from orwynn._di.collecting.get_parameters_for_provider import (
     get_parameters_for_provider,
 )
@@ -14,6 +13,7 @@ from orwynn._di.NotProviderError import NotProviderError
 from orwynn._di.Provider import Provider
 from orwynn.base.config import Config
 from orwynn.base.module import Module
+from orwynn.base.module.errors import CircularDependencyError
 from orwynn.util.fmt import format_chain
 
 

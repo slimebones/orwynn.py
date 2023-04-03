@@ -2,15 +2,16 @@ import copy
 from types import NoneType
 from typing import Self
 
-from orwynn._di.circular_dependency_error import CircularDependencyError
 from orwynn.base.controller import Controller
 from orwynn.base.middleware import Middleware as MiddlewareClass
-from orwynn.base.module.errors import FrameworkServiceModuleReferenceError
+from orwynn.base.module.errors import (
+    CircularDependencyError,
+    EmptyRouteError,
+    FrameworkServiceModuleReferenceError,
+)
 from orwynn.base.service._FrameworkService import FrameworkService
 from orwynn.util import validation
 from orwynn.util.validation import validate, validate_route
-
-from .errors import EmptyRouteError
 
 
 class Module:

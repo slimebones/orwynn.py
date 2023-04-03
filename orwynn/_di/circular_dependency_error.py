@@ -1,5 +1,0 @@
-
-
-
-class CircularDependencyError(Exception):
-    pass

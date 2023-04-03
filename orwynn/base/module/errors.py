@@ -1,4 +1,5 @@
-
+class CircularDependencyError(Exception):
+    pass
 
 
 class FrameworkServiceModuleReferenceError(Exception):
