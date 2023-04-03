@@ -11,11 +11,9 @@ fastapi = "0.88.0"
 uvicorn = {extras = ["standard"], version = "0.20.0"}
 loguru = "0.6.0"
 pyyaml = "6.0"
-pytest = "7.2.0"
 pyjwt = "2.6.0"
 httpx = "0.23.1"
 colorama = "0.4.6"
-coverage = "6.5.0"
 pymongo = "4.3.3"
 python-dotenv = "0.21.0"
 bcrypt = "4.0.1"
@@ -30,6 +28,8 @@ psycopg2 = "2.9.5"
 lorem = "0.1.1"
 ruff = "0.0.215"
 git-changelog = "1.0.0"
+coverage = "6.5.0"
+pytest = "7.2.0"
 
 [build-system]
 requires = ["poetry-core"]
