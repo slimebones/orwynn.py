@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Self, TypeVar, Union
 import pydantic
 
 from orwynn.proxy.ApiIndicationOnlyProxy import ApiIndicationOnlyProxy
-from orwynn.util import validation
+from orwynn.utils import validation
 
 if TYPE_CHECKING:
     from orwynn.indication import IndicationType

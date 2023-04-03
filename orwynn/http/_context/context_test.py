@@ -7,7 +7,7 @@ from orwynn.http import (
     HttpRequestContextId,
     LogMiddleware,
 )
-from orwynn.util import validation
+from orwynn.utils import validation
 
 
 def test_basic():

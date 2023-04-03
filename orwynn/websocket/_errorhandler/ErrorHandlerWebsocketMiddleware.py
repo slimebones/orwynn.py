@@ -6,7 +6,7 @@ from orwynn.base.error._find_detailed_class_for_exception import (
 )
 from orwynn.base.error._MalfunctionError import MalfunctionError
 from orwynn.base.errorhandler._ErrorHandler import ErrorHandler
-from orwynn.util import validation
+from orwynn.utils import validation
 from orwynn.websocket._context.WebsocketRequestContextId import (
     WebsocketRequestContextId,
 )

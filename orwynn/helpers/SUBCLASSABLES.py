@@ -4,7 +4,7 @@ from orwynn.base.errorhandler._ErrorHandler import ErrorHandler
 from orwynn.base.middleware import Middleware
 from orwynn.base.model._Model import Model
 from orwynn.base.service._Service import Service
-from orwynn.util.BaseSubclassable import BaseSubclassable
+from orwynn.utils.BaseSubclassable import BaseSubclassable
 
 # Note that here listed the most basic classes. E.g. Config is not listed
 # since it is a derivative from the Model and on the stage of DI

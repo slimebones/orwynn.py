@@ -5,8 +5,8 @@ from typing import ClassVar, Literal
 from orwynn.base.controller.errors import (
     MissingControllerClassAttributeError,
 )
-from orwynn.util import validation
-from orwynn.util.url import match_routes
+from orwynn.utils import validation
+from orwynn.utils.url import match_routes
 
 
 class Controller:

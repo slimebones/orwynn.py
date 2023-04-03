@@ -6,11 +6,11 @@ from orwynn.base.model._Model import Model
 from orwynn.proxy.BootProxy import BootProxy
 
 from orwynn.testing._EmbeddedTestClient import EmbeddedTestClient
-from orwynn.util import validation
-from orwynn.util.validation import validate
-from orwynn.util.Protocol import Protocol
+from orwynn.utils import validation
+from orwynn.utils.validation import validate
+from orwynn.utils.Protocol import Protocol
 from orwynn.http import TestHttpResponse
-from orwynn.util.url import join_routes
+from orwynn.utils.url import join_routes
 
 # If ever you get to Python3.12, see if PEP 696 introduced, then apply
 # but for now it is in the next form

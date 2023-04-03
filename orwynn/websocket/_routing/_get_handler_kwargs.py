@@ -2,7 +2,7 @@ import inspect
 import typing
 from types import NoneType, UnionType
 
-from orwynn.util.url import UrlVars
+from orwynn.utils.url import UrlVars
 from orwynn.websocket._Websocket import Websocket
 
 from .handlers import WebsocketHandler

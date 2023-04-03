@@ -8,7 +8,7 @@ from orwynn.http import Endpoint, EndpointResponse, HttpController
 from orwynn.router.errors import (
     UnmatchedEndpointEntityError,
 )
-from orwynn.util import validation
+from orwynn.utils import validation
 
 
 @fixture

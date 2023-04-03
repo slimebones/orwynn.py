@@ -1,7 +1,7 @@
 from orwynn.base.module import Module
 from orwynn.base.module.errors import CircularDependencyError
-from orwynn.util import validation
-from orwynn.util.fmt import format_chain
+from orwynn.utils import validation
+from orwynn.utils.fmt import format_chain
 
 
 class ModuleCollector:

@@ -5,7 +5,7 @@ from orwynn.base.module import Module
 from orwynn.base.service import Service
 from orwynn.boot._Boot import Boot
 from orwynn.http import Endpoint, HttpController, HttpMiddleware
-from orwynn.util import validation
+from orwynn.utils import validation
 from tests.std.Assertion import Assertion
 
 

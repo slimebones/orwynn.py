@@ -2,7 +2,7 @@ from typing import Callable, ItemsView
 
 from orwynn.base.worker import Worker
 from orwynn.http.errors import EndpointNotFoundError
-from orwynn.util import validation
+from orwynn.utils import validation
 
 from .Endpoint import Endpoint
 

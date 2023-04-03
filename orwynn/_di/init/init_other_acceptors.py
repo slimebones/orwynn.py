@@ -9,9 +9,9 @@ from orwynn.base.model._Model import Model
 from orwynn.base.module._Module import Module
 from orwynn.http import HttpController, HttpMiddleware
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.util import validation
-from orwynn.util.url import join_routes
-from orwynn.util.validation import validate
+from orwynn.utils import validation
+from orwynn.utils.url import join_routes
+from orwynn.utils.validation import validate
 from orwynn.websocket import WebsocketController, WebsocketMiddleware
 
 

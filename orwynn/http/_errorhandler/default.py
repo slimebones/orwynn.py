@@ -3,7 +3,7 @@ from orwynn.http._requests import HttpRequest
 from orwynn.http._responses import HttpResponse, JsonHttpResponse
 from orwynn.http.errors import HttpException
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.util.validation.errors import RequestValidationException
+from orwynn.utils.validation.errors import RequestValidationException
 
 
 class DefaultRequestValidationErrorHandler(ErrorHandler):

@@ -9,7 +9,7 @@ from orwynn.base.database import Database
 from orwynn.base.database.errors import DatabaseEntityNotFoundError
 from orwynn.mongo._MongoConfig import MongoConfig
 from orwynn.mongo._MongoEntity import MongoEntity
-from orwynn.util import validation
+from orwynn.utils import validation
 
 
 class Mongo(Database):

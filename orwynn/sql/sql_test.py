@@ -10,8 +10,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from orwynn import sql
 from orwynn.base.module import Module
 from orwynn.boot import Boot
-from orwynn.util import validation
-from orwynn.util.crypto import hash_password
+from orwynn.utils import validation
+from orwynn.utils.crypto import hash_password
 
 from ._Sql import Sql
 from ._SqlConfig import SqlConfig

@@ -2,7 +2,7 @@ from orwynn.base.error import (ExceptionAlreadyHandledError,
                                MalfunctionError)
 from orwynn.base.errorhandler import ErrorHandler
 from orwynn.http import DEFAULT_HTTP_ERROR_HANDLERS
-from orwynn.util.Protocol import Protocol
+from orwynn.utils.Protocol import Protocol
 from orwynn.websocket import DEFAULT_WEBSOCKET_EXCEPTION_HANDLERS
 
 

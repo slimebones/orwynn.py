@@ -2,7 +2,7 @@ from contextlib import contextmanager
 from contextvars import Token
 
 from orwynn.context._ContextStorage import ContextStorage
-from orwynn.util import validation
+from orwynn.utils import validation
 
 
 @contextmanager

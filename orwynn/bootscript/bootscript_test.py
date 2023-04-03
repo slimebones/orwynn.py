@@ -4,7 +4,7 @@ from orwynn.base.service import Service
 from orwynn.boot import Boot
 from orwynn.bootscript._Bootscript import Bootscript
 from orwynn.bootscript._CallTime import CallTime
-from orwynn.util import validation
+from orwynn.utils import validation
 
 
 class SomeService(Service):

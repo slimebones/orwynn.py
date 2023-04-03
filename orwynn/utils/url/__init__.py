@@ -1,8 +1,8 @@
 """
 Works with url formatting.
 """
-from orwynn.util import validation
-from orwynn.util.url._match_routes import match_routes
+from orwynn.utils import validation
+from orwynn.utils.url._match_routes import match_routes
 
 from ._get_vars import get_vars
 from ._Url import Url

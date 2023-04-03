@@ -30,7 +30,7 @@ from orwynn.log.log_test import log_apprc_sink_to_writer, writer
 from orwynn.mongo._Mongo import Mongo
 from orwynn.testing._Client import Client
 from orwynn.testing._EmbeddedTestClient import EmbeddedTestClient
-from orwynn.util import validation
+from orwynn.utils import validation
 from tests.structs import (
     circular_module_struct,
     long_circular_module_struct,

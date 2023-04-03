@@ -3,8 +3,8 @@ from typing import Any
 
 import dictdiffer
 
-from orwynn.util import validation
-from orwynn.util.mp._dictpp import dictpp
+from orwynn.utils import validation
+from orwynn.utils.mp._dictpp import dictpp
 
 
 def find(location: str, mp: dict) -> Any:

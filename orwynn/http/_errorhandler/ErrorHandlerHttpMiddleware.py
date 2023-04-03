@@ -3,7 +3,7 @@ from orwynn.http._middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
 from orwynn.http._middleware.HttpNextCall import HttpNextCall
 from orwynn.http._requests import HttpRequest
 from orwynn.http._responses import HttpResponse
-from orwynn.util import validation
+from orwynn.utils import validation
 
 
 class ErrorHandlerHttpMiddleware(BuiltinHttpMiddleware):

@@ -7,8 +7,8 @@ from orwynn.base.config import Config
 from orwynn.base.model._Model import Model
 from orwynn.base.module._Module import Module
 from orwynn.boot import Boot
-from orwynn.util import validation
-from orwynn.util.mp import find as mp_find
+from orwynn.utils import validation
+from orwynn.utils.mp import find as mp_find
 
 
 class Menu(Model):

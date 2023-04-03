@@ -1,6 +1,6 @@
 from copy import copy
 
-from orwynn.util import validation
+from orwynn.utils import validation
 
 from .errors import UnsupportedVersionError
 

@@ -1,7 +1,7 @@
 from orwynn.base.module._Module import Module
 from orwynn.boot._Boot import Boot
 from orwynn.context.errors import UndefinedStorageError
-from orwynn.util import validation
+from orwynn.utils import validation
 from orwynn.websocket._context.WebsocketRequestContextId import (
     WebsocketRequestContextId,
 )

@@ -10,8 +10,8 @@ from orwynn.base.module.errors import (
     FrameworkServiceModuleReferenceError,
 )
 from orwynn.base.service._FrameworkService import FrameworkService
-from orwynn.util import validation
-from orwynn.util.validation import validate, validate_route
+from orwynn.utils import validation
+from orwynn.utils.validation import validate, validate_route
 
 
 class Module:

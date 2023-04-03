@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from orwynn.util.url._Url import Url
+from orwynn.utils.url._Url import Url
 
 
 class UrlVars(BaseModel):

@@ -13,7 +13,7 @@ from orwynn.boot._Boot import Boot
 from orwynn.http import Endpoint, HttpController
 from orwynn.mongo._Mongo import Mongo
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.util import validation
+from orwynn.utils import validation
 from tests.std.text import TextConfig
 
 

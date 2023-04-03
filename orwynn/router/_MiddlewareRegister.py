@@ -20,8 +20,8 @@ from orwynn.http import (
 )
 from orwynn.http.errors import HttpException
 from orwynn.router._ErrorHandlerManager import ErrorHandlerManager
-from orwynn.util import validation
-from orwynn.util.Protocol import Protocol
+from orwynn.utils import validation
+from orwynn.utils.Protocol import Protocol
 from orwynn.websocket import (
     BUILTIN_WEBSOCKET_MIDDLEWARE,
     BuiltinWebsocketMiddleware,

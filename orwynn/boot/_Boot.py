@@ -25,9 +25,9 @@ from orwynn.proxy.ApiIndicationOnlyProxy import ApiIndicationOnlyProxy
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.router import Router
 from orwynn.testing import Client
-from orwynn.util import validation
-from orwynn.util.validation import validate, validate_dict, validate_each
-from orwynn.util.yml.errors import NotDirError
+from orwynn.utils import validation
+from orwynn.utils.validation import validate, validate_dict, validate_each
+from orwynn.utils.yml.errors import NotDirError
 
 
 class Boot(Worker):

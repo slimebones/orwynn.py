@@ -12,7 +12,7 @@ from orwynn._di.MissingDiObjectError import MissingDiObjectError
 from orwynn._di.Provider import Provider
 from orwynn.base.config import Config
 from orwynn.base.module.errors import CircularDependencyError
-from orwynn.util.fmt import format_chain
+from orwynn.utils.fmt import format_chain
 
 
 def init_providers(

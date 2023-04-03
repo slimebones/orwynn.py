@@ -5,9 +5,9 @@ from types import NoneType
 
 from orwynn.app import AppMode
 from orwynn.apprc._AppRc import AppRc
-from orwynn.util import validation
-from orwynn.util.mp import patch as mp_patch
-from orwynn.util.yml import load_yml
+from orwynn.utils import validation
+from orwynn.utils.mp import patch as mp_patch
+from orwynn.utils.yml import load_yml
 
 from ._APP_RC_MODE_NESTING import APP_RC_MODE_NESTING
 from ._AppRcSearchError import AppRcSearchError

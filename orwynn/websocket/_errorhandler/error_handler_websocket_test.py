@@ -2,8 +2,8 @@ from orwynn.base.errorhandler._ErrorHandler import ErrorHandler
 from orwynn.base.module._Module import Module
 from orwynn.boot._Boot import Boot
 from orwynn.proxy.BootProxy import BootProxy
-from orwynn.util import validation
-from orwynn.util.Protocol import Protocol
+from orwynn.utils import validation
+from orwynn.utils.Protocol import Protocol
 from orwynn.websocket import Websocket, WebsocketController
 
 

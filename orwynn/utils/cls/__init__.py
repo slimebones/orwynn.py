@@ -1,7 +1,7 @@
 import functools
 from typing import Any, Callable
 
-from orwynn.util.types import Class
+from orwynn.utils.types import Class
 
 from ._errors import ClassNotFoundError
 

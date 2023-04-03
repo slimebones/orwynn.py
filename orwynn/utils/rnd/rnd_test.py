@@ -1,4 +1,4 @@
-from orwynn.util.rnd import gen_id
+from orwynn.utils.rnd import gen_id
 
 
 def test_makeid():

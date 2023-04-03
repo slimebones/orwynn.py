@@ -1,7 +1,7 @@
 from orwynn.context import ContextStorage
 from orwynn.context.errors import RequestIdAlreadySavedError
-from orwynn.util import validation
-from orwynn.util.rnd import gen_id
+from orwynn.utils import validation
+from orwynn.utils.rnd import gen_id
 
 
 class HttpRequestContextId:

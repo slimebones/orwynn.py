@@ -1,5 +1,5 @@
 from orwynn.log._Log import Log
-from orwynn.util import validation
+from orwynn.utils import validation
 from orwynn.websocket._Websocket import Websocket
 
 

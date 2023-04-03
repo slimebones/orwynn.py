@@ -3,7 +3,7 @@ from pytest import fixture
 from orwynn._di.collecting.ModuleCollector import ModuleCollector
 from orwynn.base.module._Module import Module
 from orwynn.base.module.errors import CircularDependencyError
-from orwynn.util.validation import expect
+from orwynn.utils.validation import expect
 from tests.std.Assertion import Assertion
 
 

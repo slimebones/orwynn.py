@@ -7,7 +7,7 @@ from orwynn.base.module._Module import Module
 from orwynn.base.service._Service import Service
 from orwynn.boot._BootConfig import BootConfig
 from orwynn.http import Endpoint, HttpController
-from orwynn.util.validation import model_validator
+from orwynn.utils.validation import model_validator
 from tests.std.float import FloatService, float_module
 from tests.std.number import NumberService, number_module
 from tests.std.user import user_module

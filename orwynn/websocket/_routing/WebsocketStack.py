@@ -2,7 +2,7 @@ import functools
 from typing import Callable
 
 from orwynn.base.error._MalfunctionError import MalfunctionError
-from orwynn.util import url
+from orwynn.utils import url
 from orwynn.websocket._Websocket import Websocket
 
 from .handlers import DispatchWebsocketHandler, WebsocketHandler

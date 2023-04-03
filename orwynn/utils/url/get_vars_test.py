@@ -1,6 +1,6 @@
-from orwynn.util.url._get_vars import get_vars
-from orwynn.util.url._Url import Url
-from orwynn.util.url._UrlVars import UrlVars
+from orwynn.utils.url._get_vars import get_vars
+from orwynn.utils.url._Url import Url
+from orwynn.utils.url._UrlVars import UrlVars
 
 
 def test_path():

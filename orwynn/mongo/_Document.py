@@ -12,8 +12,8 @@ from orwynn.mapping.errors import CustomUseOfMappingReservedFieldError
 from orwynn.mongo._Mongo import Mongo
 from orwynn.mongo._MongoEntity import MongoEntity
 from orwynn.mongo.errors import DuplicateKeyError
-from orwynn.util import validation
-from orwynn.util.fmt import snakefy
+from orwynn.utils import validation
+from orwynn.utils.fmt import snakefy
 
 from ._ClientSession import ClientSession
 from .errors import DocumentUpdateError

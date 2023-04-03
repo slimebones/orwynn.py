@@ -1,6 +1,6 @@
 import contextlib
 
-from orwynn.util.url import UrlVars
+from orwynn.utils.url import UrlVars
 from orwynn.websocket._Websocket import Websocket
 
 from ._get_handler_kwargs import get_handler_kwargs

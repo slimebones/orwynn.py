@@ -1,9 +1,9 @@
 import re
 from itertools import zip_longest
 
-from orwynn.util.url._match_routes import match_routes
-from orwynn.util.url._Url import Url
-from orwynn.util.url._UrlVars import UrlVars
+from orwynn.utils.url._match_routes import match_routes
+from orwynn.utils.url._Url import Url
+from orwynn.utils.url._UrlVars import UrlVars
 
 
 def get_vars(

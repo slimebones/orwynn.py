@@ -10,9 +10,11 @@ from typing import Any, Callable, Optional, Sized, TypeVar
 from pydantic import ValidationError as _PydanticValidationError
 from pydantic import validator as _pydantic_validator
 
-from orwynn.util.validation._validator import Validator
-from orwynn.util.validation.errors import (ExpectationError, ReValidationError,
-                     UnknownValidatorError, ValidationError)
+from orwynn.utils.validation._validator import Validator
+from orwynn.utils.validation.errors import (ExpectationError,
+                                            ReValidationError,
+                                            UnknownValidatorError,
+                                            ValidationError)
 
 # WARNING: typing aliases are not currently supported so passing types like
 #   "dict[str, Any]" to check will produce ValidationError in any case since

@@ -7,7 +7,7 @@ from orwynn.http import (
     HttpRequest,
     HttpResponse,
 )
-from orwynn.util import validation
+from orwynn.utils import validation
 
 
 def test_controller_added_to_no_route():

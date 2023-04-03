@@ -1,6 +1,6 @@
 import pytest
 
-from orwynn.util.cls import bind_first_arg, bind_first_arg_async
+from orwynn.utils.cls import bind_first_arg, bind_first_arg_async
 
 
 def test_bind_first_arg():

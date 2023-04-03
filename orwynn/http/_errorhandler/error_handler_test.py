@@ -19,7 +19,7 @@ from orwynn.http._responses import (
 )
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.testing import Client
-from orwynn.util import validation
+from orwynn.utils import validation
 
 
 class GeneralEh(ErrorHandler):

@@ -14,7 +14,7 @@ from orwynn._di.Provider import Provider
 from orwynn.base.config import Config
 from orwynn.base.module import Module
 from orwynn.base.module.errors import CircularDependencyError
-from orwynn.util.fmt import format_chain
+from orwynn.utils.fmt import format_chain
 
 
 def collect_provider_dependencies(

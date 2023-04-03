@@ -12,9 +12,9 @@ from orwynn.http._controller.errors import DefinedTwiceControllerMethodError
 from orwynn.http.errors import HttpException, UnsupportedHttpMethodError
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.testing import Client
-from orwynn.util import validation
-from orwynn.util.validation import expect, validate_re
-from orwynn.util.validation.errors import (
+from orwynn.utils import validation
+from orwynn.utils.validation import expect, validate_re
+from orwynn.utils.validation.errors import (
     RequestValidationException,
     ReValidationError,
     ValidationError,

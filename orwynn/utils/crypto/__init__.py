@@ -7,7 +7,7 @@ See password hashing https://stackoverflow.com/a/23768422/14748231
 """
 import bcrypt
 
-from orwynn.util import validation
+from orwynn.utils import validation
 
 
 def hash_password(plain_password: str, encoding: str = "utf-8") -> str:

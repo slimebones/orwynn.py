@@ -6,7 +6,7 @@ from pytest import fixture
 from orwynn.base.model._Model import Model
 from orwynn.indication._Indication import Indication
 from orwynn.indication._Indicator import Indicator
-from orwynn.util import validation
+from orwynn.utils import validation
 from tests.std.text import Text
 
 

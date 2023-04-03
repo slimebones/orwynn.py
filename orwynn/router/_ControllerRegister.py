@@ -22,8 +22,8 @@ from orwynn.router.errors import (
     UnmatchedEndpointEntityError,
     WrongHandlerReturnTypeError,
 )
-from orwynn.util import validation
-from orwynn.util.url import join_routes
+from orwynn.utils import validation
+from orwynn.utils.url import join_routes
 from orwynn.websocket import (
     WebsocketController,
     WebsocketStack,

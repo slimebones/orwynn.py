@@ -1,7 +1,7 @@
 from orwynn.base.module._Module import Module
 from orwynn.boot._Boot import Boot
 from orwynn.http import Endpoint, HttpController
-from orwynn.util import validation
+from orwynn.utils import validation
 
 from ._ApiVersion import ApiVersion
 from .errors import UnsupportedVersionError

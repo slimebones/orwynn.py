@@ -8,7 +8,7 @@ from orwynn.base.error import MalfunctionError
 from orwynn.http._requests import HttpRequest
 from orwynn.http._responses import HttpResponse
 from orwynn.log import Log
-from orwynn.util import validation
+from orwynn.utils import validation
 
 
 class HttpLogger:

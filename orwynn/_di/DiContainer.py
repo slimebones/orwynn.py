@@ -15,7 +15,7 @@ from orwynn.base.errorhandler._ErrorHandler import ErrorHandler
 from orwynn.base.middleware import Middleware
 from orwynn.base.model._Model import Model
 from orwynn.helpers.SUBCLASSABLES import SUBCLASSABLES
-from orwynn.util.validation import validate
+from orwynn.utils.validation import validate
 
 _InnerObj = TypeVar("_InnerObj")
 
