@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "orwynn"
-version = "1.0.0b1"
+version = "1.0.0b2"
 description = "Scalable web-framework with out-of-the-box architecture"
 authors = ["ryzhovalex <thed4rkof@gmail.com>"]
 readme = "README.md"
