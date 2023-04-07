@@ -52,10 +52,10 @@ class Boot(Worker):
             List of exception handlers to add. By default framework adds
             the builtin Exception and orwynn.Error handlers.
         apprc (optional):
-            Application configuration. By default environ Orwynn_AppRcPath is
+            Application configuration. By default environ ORWYNN_APPRC_PATH is
             checked if this arg is not given.
         mode (optional):
-            Application mode. By default environ Orwynn_Mode is
+            Application mode. By default environ ORWYNN_MODE is
             checked if this arg is not given.
         global_http_route (optional):
             Global route to be prepended to every controller's route. Defaults
@@ -81,12 +81,12 @@ class Boot(Worker):
             time.
 
     Environs:
-        Orwynn_Mode:
+        ORWYNN_MODE:
             Boot mode for application. Defaults to DEV. Alternatively you can
             pass arg "mode".
         Orwynn_RootDir:
             Root directory for application. Defaults to os.getcwd()
-        Orwynn_AppRcPath:
+        ORWYNN_APPRC_PATH:
             Path where app configuration file located. Defaults to
             "./apprc.yml". Alternatively you can pass a dictionary directly in
             "apprc" attribute.
@@ -300,7 +300,7 @@ class Boot(Worker):
         return self.__api_indication
 
     def __parse_mode(self) -> AppMode:
-        mode_env: str | None = os.getenv("Orwynn_Mode")
+        mode_env: str | None = os.getenv("ORWYNN_MODE")
 
         if not mode_env:
             return AppMode.DEV

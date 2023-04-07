@@ -43,29 +43,29 @@ def std_mongo_boot(std_struct: Module) -> Boot:
 
 @fixture
 def set_prod_mode():
-    os.environ["Orwynn_Mode"] = "prod"
+    os.environ["ORWYNN_MODE"] = "prod"
 
 
 @fixture
 def set_dev_mode():
-    os.environ["Orwynn_Mode"] = "dev"
+    os.environ["ORWYNN_MODE"] = "dev"
 
 
 @fixture
 def set_test_mode():
-    os.environ["Orwynn_Mode"] = "test"
+    os.environ["ORWYNN_MODE"] = "test"
 
 
 @fixture
 def set_std_apprc_path_env() -> None:
-    os.environ["Orwynn_AppRcPath"] = os.path.join(
+    os.environ["ORWYNN_APPRC_PATH"] = os.path.join(
         os.getcwd(),
         "tests/std/apprc.yml"
     )
 
 
 def test_init_mode_default(std_struct: Module):
-    os.environ["Orwynn_Mode"] = ""
+    os.environ["ORWYNN_MODE"] = ""
     boot: Boot = Boot(
         root_module=std_struct
     )
@@ -73,7 +73,7 @@ def test_init_mode_default(std_struct: Module):
 
 
 def test_init_mode_test(std_struct: Module):
-    os.environ["Orwynn_Mode"] = "test"
+    os.environ["ORWYNN_MODE"] = "test"
     boot: Boot = Boot(
         root_module=std_struct
     )
@@ -81,7 +81,7 @@ def test_init_mode_test(std_struct: Module):
 
 
 def test_init_mode_dev(std_struct: Module):
-    os.environ["Orwynn_Mode"] = "dev"
+    os.environ["ORWYNN_MODE"] = "dev"
     boot: Boot = Boot(
         root_module=std_struct
     )
@@ -89,7 +89,7 @@ def test_init_mode_dev(std_struct: Module):
 
 
 def test_init_mode_prod(std_struct: Module):
-    os.environ["Orwynn_Mode"] = "prod"
+    os.environ["ORWYNN_MODE"] = "prod"
     boot: Boot = Boot(
         root_module=std_struct
     )
@@ -97,7 +97,7 @@ def test_init_mode_prod(std_struct: Module):
 
 
 def test_init_incorrect_mode(std_struct: Module):
-    os.environ["Orwynn_Mode"] = "helloworld"
+    os.environ["ORWYNN_MODE"] = "helloworld"
     validation.expect(Boot, ValueError, root_module=std_struct)
 
 

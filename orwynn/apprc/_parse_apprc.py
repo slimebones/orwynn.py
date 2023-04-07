@@ -39,7 +39,7 @@ def parse_apprc(
 
     if not direct_apprc:
         rc_path_env: str = os.getenv(
-            "Orwynn_AppRcPath",
+            "ORWYNN_APPRC_PATH",
             ""
         )
         should_raise_search_error: bool

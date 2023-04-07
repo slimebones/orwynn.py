@@ -41,7 +41,7 @@ from tests.structs import (
 
 @fixture(autouse=True)
 def run_around_tests():
-    os.environ["Orwynn_Mode"] = "test"
+    os.environ["ORWYNN_MODE"] = "test"
 
     yield
 
@@ -57,6 +57,6 @@ def __discardWorkers(W: type[Worker] = Worker):
     for NestedW in W.__subclasses__():
         __discardWorkers(NestedW)
     W.discard(should_validate=False)
-    os.environ["Orwynn_Mode"] = ""
+    os.environ["ORWYNN_MODE"] = ""
     os.environ["Orwynn_RootDir"] = ""
-    os.environ["Orwynn_AppRcPath"] = ""
+    os.environ["ORWYNN_APPRC_PATH"] = ""
