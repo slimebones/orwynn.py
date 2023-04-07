@@ -1,4 +1,5 @@
 from enum import Enum
+
 from orwynn.base.error._errcode import get_error_code
 from orwynn.utils import validation
 
