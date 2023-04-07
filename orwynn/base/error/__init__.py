@@ -5,3 +5,4 @@ from ._find_detailed_class_for_exception import (
 )
 from ._get_exception_direct_subclasses import get_exception_direct_subclasses
 from ._MalfunctionError import MalfunctionError
+from orwynn.base.error._errcode import get_error_code, ErrorCode

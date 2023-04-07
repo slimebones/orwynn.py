@@ -87,3 +87,30 @@ def test_digest_enum(default_indication: Indication):
     assert mp_value["priority"] == 1
 
     Item.parse_obj(mp_value)
+
+
+def test_digest_error(default_indication: Indication):
+    """
+    Should digest error into API with external error code.
+    """
+    class ErrorCode(Enum):
+        SIMPLE_CASE = "SIMPLE_CASE"
+        ADVANCED_CASE = "ADVANCED_CASE"
+
+    class SimpleError(Exception):
+        CODE = ErrorCode.SIMPLE_CASE
+
+    class AdvancedError(Exception):
+        CODE = ErrorCode.ADVANCED_CASE
+
+    data: dict
+
+    data = default_indication.digest(SimpleError("hello world"))
+    assert data["type"] == "error"
+    assert data["value"]["message"] == "hello world"
+    assert data["value"]["error_code"] == ErrorCode.SIMPLE_CASE.value
+
+    data = default_indication.digest(AdvancedError("hello world"))
+    assert data["type"] == "error"
+    assert data["value"]["message"] == "hello world"
+    assert data["value"]["error_code"] == ErrorCode.ADVANCED_CASE.value

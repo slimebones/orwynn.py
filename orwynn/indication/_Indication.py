@@ -1,6 +1,8 @@
+from enum import Enum
 import json
 from typing import Any, ItemsView
 
+from orwynn.base.error import get_error_code, ErrorCode
 from orwynn.base.error import ErrorValueSchema
 from orwynn.base.model._Model import Model
 from orwynn.http._schema.HttpExceptionValueSchema import \
@@ -164,7 +166,10 @@ class Indication:
                         }
                     elif isinstance(obj, Exception):
                         final_field = {
-                            "message": " ;; ".join([str(x) for x in obj.args])
+                            "message": " ;; ".join([str(x) for x in obj.args]),
+                            "error_code": self.__get_final_error_code(
+                                obj
+                            )
                         }
                     elif isinstance(obj, Model):
                         # Since pydantic seems to not having a way to deal
@@ -274,3 +279,37 @@ class Indication:
             indication_type = IndicationType.ERROR
 
         return indication_type
+
+    def __get_final_error_code(self, err: Exception) -> int | str | None:
+        try:
+            error_code: ErrorCode = get_error_code(err)
+        except AttributeError:
+            return None
+
+        final_error_code: int | str
+
+        if isinstance(error_code, Enum):
+            enum_value: Any = error_code.value
+            try:
+                validation.validate(
+                    enum_value,
+                    [int, str]
+                )
+            except validation.ValidationError as err:
+                raise validation.ValidationError(
+                    f"enum {error_code} contains unsupported by error codes"
+                    f" type: {type(enum_value)}, only str or int are"
+                    " supported"
+                )
+
+            final_error_code = enum_value
+
+        else:
+            if not type(error_code) is int or not type(error_code) is str:
+                raise validation.ValidationError(
+                    "error code should be int, str or enum,"
+                    f" got {type(error_code)}"
+                )
+            final_error_code = error_code
+
+        return final_error_code
