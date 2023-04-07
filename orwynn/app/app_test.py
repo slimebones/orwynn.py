@@ -46,3 +46,37 @@ def test_get_dependant_patch_against_websocket():
 
     with boot.app.client.websocket("/") as ws:
         ws.receive_json()
+
+
+def test_custom_docs_route():
+    boot: Boot = Boot(
+        Module("/"),
+        apprc={
+            "prod": {
+                "App": {
+                    "docs_route": "/mydocs"
+                }
+            }
+        }
+    )
+
+    # TODO: maybe to add checking that this is truly OpenAPI page returned,
+    #       but now i'm too lazy for this
+    boot.app.client.get("/mydocs", 200)
+
+
+def test_custom_redoc_route():
+    boot: Boot = Boot(
+        Module("/"),
+        apprc={
+            "prod": {
+                "App": {
+                    "redoc_route": "/myredoc"
+                }
+            }
+        }
+    )
+
+    # TODO: maybe to add checking that this is truly ReDoc page returned,
+    #       but now i'm too lazy for this
+    boot.app.client.get("/myredoc", 200)
