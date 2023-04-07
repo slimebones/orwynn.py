@@ -16,7 +16,7 @@ class Controller:
 
     def __init__(self) -> None:
         # Actual route for the controller assigned at boottime
-        self._final_routes: set[str] | None = None
+        self._final_routes: set[str] = set()
 
         if self.ROUTE is None:
             raise MissingControllerClassAttributeError(
@@ -36,7 +36,7 @@ class Controller:
 
     @property
     def final_routes(self) -> set[str]:
-        if self._final_routes is None:
+        if len(self._final_routes) == 0:
             raise ValueError(
                 "final routes is not set for this controller"
             )
@@ -69,7 +69,5 @@ class Controller:
 
         return False
 
-    def _fw_set_final_routes(self, value: set[str]) -> None:
-        if self._final_routes is not None:
-            raise ValueError("final route already set")
-        self._final_routes = value
+    def _fw_update_final_routes(self, value: set[str]) -> None:
+        self._final_routes.update(value)

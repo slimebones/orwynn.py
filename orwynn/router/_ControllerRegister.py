@@ -130,6 +130,8 @@ class ControllerRegister:
                 additional_route=method_route
             )
 
+            controller._fw_update_final_routes(routes)
+
             for route in routes:
                 self.__websocket_stack.add_call(
                     routing_handlers.WebsocketHandler(
@@ -172,7 +174,7 @@ class ControllerRegister:
             )
         else:
             # Make the controller know about it's full routes
-            controller._fw_set_final_routes(routes)
+            controller._fw_update_final_routes(routes)
 
     def __get_routes_for_controller(
         self,

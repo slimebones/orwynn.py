@@ -18,7 +18,7 @@ class WebsocketController(Controller):
     transformed to kebab-case.
 
     You can define a special method called "main" - it will be assigned under
-    controller's namespace itself.
+    controller's namespace itself (see Example for details).
 
     Note that final route for each websocket controller method consists of
     three things: MODULE_ROUTE + CONTROLLER_ROUTE + METHOD_ROUTE.
@@ -38,6 +38,9 @@ class WebsocketController(Controller):
 
     class MyWSController(WebsocketController):
         ROUTE = "/chat"
+
+        def main(...):  # -> "/chat"
+            ...
 
         def on_connect(...):  # -> "/chat/connect"
             ...
