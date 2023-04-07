@@ -38,7 +38,7 @@ class Controller:
     def final_routes(self) -> set[str]:
         if len(self._final_routes) == 0:
             raise ValueError(
-                "final routes is not set for this controller"
+                f"final routes is not set for controller {self}"
             )
         return self._final_routes.copy()
 
