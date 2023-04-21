@@ -1,3 +1,6 @@
+
+from fastapi import Query, Request
+
 from orwynn._di.Di import Di
 from orwynn.apiversion import ApiVersion
 from orwynn.base.controller.errors import (
@@ -250,3 +253,36 @@ def test_is_matching_route():
     assert ctrl.is_matching_route("/api/v2/donuts/tasty") is False
     assert ctrl.is_matching_route("/api/donuts/eb00v/tasty") is False
     assert ctrl.is_matching_route("/donuts/eb00v/tasty") is False
+
+
+def test_multiple_query_params():
+    """
+    Should correctly parse list of query params.
+    """
+    class _Ctrl(HttpController):
+        ROUTE = "/items"
+        ENDPOINTS = [
+            Endpoint(method="get")
+        ]
+
+        def get(
+            self,
+            request: Request,
+            q: list[str] | None = Query(None)
+        ) -> dict:
+            return {
+                "q": q
+            }
+
+    boot: Boot = Boot(
+        Module("/", Controllers=[_Ctrl])
+    )
+
+    data: dict = boot.client.get_jsonify(
+        "/items?q=1&q=2",
+        200
+    )
+
+    assert data == {
+        "q": ["1", "2"]
+    }
