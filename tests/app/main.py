@@ -2,13 +2,29 @@ from orwynn.apiversion import ApiVersion
 from orwynn.app import App
 from orwynn.base import Module
 from orwynn.boot import Boot
+from orwynn.http import HttpController, Endpoint, EndpointResponse
+
+
+class DonutsController(HttpController):
+    ROUTE = "/donuts"
+    ENDPOINTS = [
+        Endpoint(
+            method="get",
+            summary="Donuts!",
+            tags=["donut"]
+        )
+    ]
 
 
 def create_root_module() -> Module:
     return Module(
         "/",
-        Providers=[],
-        Controllers=[],
+        Providers=[
+
+        ],
+        Controllers=[
+            DonutsController
+        ],
         imports=[
         ]
     )
