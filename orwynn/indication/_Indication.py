@@ -305,7 +305,10 @@ class Indication:
             final_error_code = enum_value
 
         else:
-            if not type(error_code) is int or not type(error_code) is str:
+            if (
+                not isinstance(error_code, int)
+                and not isinstance(error_code, str)
+            ):
                 raise validation.ValidationError(
                     "error code should be int, str or enum,"
                     f" got {type(error_code)}"

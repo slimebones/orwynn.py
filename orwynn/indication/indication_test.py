@@ -103,6 +103,12 @@ def test_digest_error(default_indication: Indication):
     class AdvancedError(Exception):
         CODE = ErrorCode.ADVANCED_CASE
 
+    class IntError(Exception):
+        CODE = 5
+
+    class StrError(Exception):
+        CODE = "hello"
+
     data: dict
 
     data = default_indication.digest(SimpleError("hello world"))
@@ -114,3 +120,13 @@ def test_digest_error(default_indication: Indication):
     assert data["type"] == "error"
     assert data["value"]["message"] == "hello world"
     assert data["value"]["error_code"] == ErrorCode.ADVANCED_CASE.value
+
+    data = default_indication.digest(IntError("hello world"))
+    assert data["type"] == "error"
+    assert data["value"]["message"] == "hello world"
+    assert data["value"]["error_code"] == 5
+
+    data = default_indication.digest(StrError("hello world"))
+    assert data["type"] == "error"
+    assert data["value"]["message"] == "hello world"
+    assert data["value"]["error_code"] == "hello"
