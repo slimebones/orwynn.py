@@ -1,3 +1,4 @@
+from fastapi import Query
 from orwynn.apiversion import ApiVersion
 from orwynn.app import App
 from orwynn.base import Module
@@ -15,8 +16,17 @@ class DonutsController(HttpController):
         )
     ]
 
-    def get(self) -> dict:
-        return {"donuts": 1}
+    def get(
+        self,
+        ids: list[str] | None = Query(None),
+        amount: int | None = None,
+        kind: str | None = None,
+    ) -> dict:
+        return {
+            "ids": ids,
+            "amount": amount,
+            "kind": kind
+        }
 
 
 def create_root_module() -> Module:
