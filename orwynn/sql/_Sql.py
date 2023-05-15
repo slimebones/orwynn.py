@@ -20,7 +20,11 @@ class Sql(Database):
     ) -> None:
         super().__init__()
         self.__config = config
-        self.__engine: Engine = self.__create_engine()
+        self.__engine: Engine = self._create_engine()
+
+    @property
+    def engine(self) -> Engine:
+        return self.__engine
 
     @property
     def session(self) -> Session:
@@ -37,7 +41,7 @@ class Sql(Database):
         """
         Table.metadata.create_all(
             self.__engine,
-            tables=self.__collect_sqla_tables(*tables)
+            tables=self._collect_sqla_tables(*tables)
         )
 
     def drop_tables(self, *tables: type[Table]) -> None:
@@ -50,10 +54,10 @@ class Sql(Database):
         """
         Table.metadata.drop_all(
             self.__engine,
-            tables=self.__collect_sqla_tables(*tables)
+            tables=self._collect_sqla_tables(*tables)
         )
 
-    def __collect_sqla_tables(
+    def _collect_sqla_tables(
         self,
         *tables: type[Table]
     ) -> Optional[Sequence[SQLAlchemyTable]]:
@@ -64,7 +68,7 @@ class Sql(Database):
                 sqla_tables.append(table.__table__)  # type: ignore
         return sqla_tables
 
-    def __create_engine(self) -> Engine:
+    def _create_engine(self) -> Engine:
         url: str
         connect_args: dict = {}
         final_kwargs: dict = {}
