@@ -40,6 +40,10 @@ class BootProxy(Worker):
         self.__api_version: ApiVersion = api_version
 
     @property
+    def root_dir(self) -> Path:
+        return self.__root_dir
+
+    @property
     def mode(self) -> "AppMode":
         return self.__mode
 
