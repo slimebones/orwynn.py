@@ -67,6 +67,8 @@ class Sql(Database):
     def __create_engine(self) -> Engine:
         url: str
         connect_args: dict = {}
+        final_kwargs: dict = {}
+
         match self.__config.database_kind:
             case SQLDatabaseKind.POSTGRESQL:
                 url = \
@@ -99,8 +101,13 @@ class Sql(Database):
                 raise TypeError(
                     f"unknown database {self.__config.database_kind}"
                 )
+
+        final_kwargs["connect_args"] = connect_args
+        final_kwargs["poolclass"] = self.__config.real_poolclass
+        if self.__config.pool_size:
+            final_kwargs["pool_size"] = self.__config.pool_size
+
         return create_engine(
             url,
-            connect_args=connect_args,
-            poolclass=self.__config.real_poolclass
+            **final_kwargs
         )

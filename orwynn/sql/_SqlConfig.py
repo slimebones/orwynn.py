@@ -17,6 +17,7 @@ class SqlConfig(Config):
     database_host: str | None = None
     database_port: int | None = None
     poolclass: PoolclassStr | None = None
+    pool_size: int | None = None
 
     def __init__(self, **data: Any) -> None:
         try:
