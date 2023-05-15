@@ -1,4 +1,5 @@
 from fastapi import Query
+
 from orwynn.apiversion import ApiVersion
 from orwynn.app import App
 from orwynn.base import Module
