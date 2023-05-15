@@ -327,12 +327,6 @@ class ControllerRegister:
                             fn_return_typehint
                         )
                     }
-                elif fn_return_typehint not in [dict, None]:
-                    raise WrongHandlerReturnTypeError(
-                        f"route handler {fn} should have either Model, dict"
-                        f" or None return type, got {fn_return_typehint}"
-                        " instead"
-                    )
                 else:
                     result["response_model"] = None
 
