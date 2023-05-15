@@ -20,6 +20,7 @@ from ._middleware.HttpMiddleware import HttpMiddleware
 from ._middleware.HttpNextCall import HttpNextCall
 from ._requests import HttpRequest
 from ._responses import (
+    FileHttpResponse,
     HtmlHttpResponse,
     HttpResponse,
     JsonHttpResponse,

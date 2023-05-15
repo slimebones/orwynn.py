@@ -21,7 +21,6 @@ from orwynn.indication._Indication import Indication
 from orwynn.proxy.BootProxy import BootProxy
 from orwynn.router.errors import (
     UnmatchedEndpointEntityError,
-    WrongHandlerReturnTypeError,
 )
 from orwynn.utils import validation
 from orwynn.utils.Protocol import Protocol
