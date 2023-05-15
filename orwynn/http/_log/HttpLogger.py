@@ -79,7 +79,10 @@ class HttpLogger:
         # logic.
         response_body: str
         if isinstance(response, StreamingResponse):
-            response_body: str = await self.__get_response_body(response)
+            try:
+                response_body: str = await self.__get_response_body(response)
+            except UnicodeDecodeError:
+                response_body = ""
         else:
             # Interestingly, even returned explicitly JSONResponse handled here
             # as StreamingResponse, so maybe there is not need to handle
@@ -95,13 +98,18 @@ class HttpLogger:
             f" {request.url.path}{request.url.query}:" \
             f" {response_body}"
         json_: dict | None
-        json_ = validation.apply(
-            json.loads(
-                response_body
-            ),
-            dict
-        )
-        if not json_:
+
+        content_type: str = response.headers.get("content-type", "")
+        if "application/json" in content_type:
+            json_ = validation.apply(
+                json.loads(
+                    response_body
+                ),
+                dict
+            )
+            if not json_:
+                json_ = None
+        else:
             json_ = None
 
         extra: dict = {

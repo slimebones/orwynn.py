@@ -2,7 +2,7 @@ from orwynn.apiversion import ApiVersion
 from orwynn.app import App
 from orwynn.base import Module
 from orwynn.boot import Boot
-from orwynn.http import Endpoint, HttpController
+from orwynn.http import Endpoint, HttpController, LogMiddleware
 
 
 class DonutsController(HttpController):
@@ -14,6 +14,9 @@ class DonutsController(HttpController):
             tags=["donut"]
         )
     ]
+
+    def get(self) -> dict:
+        return {"donuts": 1}
 
 
 def create_root_module() -> Module:
@@ -36,6 +39,9 @@ def create_boot() -> Boot:
         global_http_route="/api/v{version}",
         global_websocket_route="/ws/v{version}",
         api_version=ApiVersion(supported={1}),
+        global_middleware={
+            LogMiddleware: ["*"]
+        }
     )
 
 
