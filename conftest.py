@@ -25,7 +25,7 @@ from orwynn.boot.boot_test import (
     std_mongo_boot,
 )
 from orwynn.http._controller.endpoint.endpoint_test import run_endpoint
-from orwynn.http.http_test import std_http
+from orwynn.http.testing import std_http
 from orwynn.log.log_test import log_apprc_sink_to_writer, writer
 from orwynn.mongo._Mongo import Mongo
 from orwynn.testing._Client import Client

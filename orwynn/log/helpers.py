@@ -3,7 +3,7 @@ import contextlib
 from orwynn.log._Log import Log
 
 
-def reraise_catch(error: Exception):
+def catch_error(error: Exception):
     """Reraise error and catch it by logger."""
     # TODO: Find way to remove this last function from exception stack to not
     #   be displayed

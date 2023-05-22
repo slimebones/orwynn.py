@@ -25,6 +25,7 @@ from ._responses import (
     HttpResponse,
     JsonHttpResponse,
     TestHttpResponse,
+    RedirectHttpResponse
 )
 from ._schema.HttpExceptionValueSchema import HttpExceptionValueSchema
 from ._schema.RequestValidationExceptionValueSchema import (

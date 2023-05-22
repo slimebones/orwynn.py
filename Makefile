@@ -1,6 +1,6 @@
 export PYTEST_SHOW=all
 
-test-app.dev:
+testapp.dev:
 	cd tests/app && $(MAKE) dev
 
 test:

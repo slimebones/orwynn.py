@@ -249,7 +249,7 @@ class MiddlewareRegister:
             else:
                 self.__app._fw_register_exception_handler_fn(
                     handler.HandledException,
-                    handler.handle
+                    handler._fw_handle_wrapper
                 )
 
         for Remaining in __RemainingExceptionDirectSubclasses:
@@ -260,9 +260,10 @@ class MiddlewareRegister:
                 # If custom exception handler is defined, pass it's handler,
                 # for all remaining subclasses, else use default exc handler
                 if custom_base_exception_handler:
-                    handle_fn = custom_base_exception_handler.handle
+                    handle_fn = \
+                        custom_base_exception_handler._fw_handle_wrapper
                 else:
-                    handle_fn = DefaultErrorHandler().handle
+                    handle_fn = DefaultErrorHandler()._fw_handle_wrapper
 
             self.__app._fw_register_exception_handler_fn(
                 Remaining,

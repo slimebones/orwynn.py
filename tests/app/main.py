@@ -4,7 +4,7 @@ from orwynn.apiversion import ApiVersion
 from orwynn.app import App
 from orwynn.base import Module
 from orwynn.boot import Boot
-from orwynn.http import Endpoint, HttpController, LogMiddleware
+from orwynn.http import Endpoint, HttpController, LogMiddleware, RedirectHttpResponse
 
 
 class DonutsController(HttpController):
@@ -30,6 +30,18 @@ class DonutsController(HttpController):
         }
 
 
+class GoawayRedirectController(HttpController):
+    ROUTE = "/goaway"
+    ENDPOINTS = [
+        Endpoint(
+            method="get"
+        )
+    ]
+
+    def get(self) -> RedirectHttpResponse:
+        return RedirectHttpResponse("https://google.com")
+
+
 def create_root_module() -> Module:
     return Module(
         "/",
@@ -37,7 +49,8 @@ def create_root_module() -> Module:
 
         ],
         Controllers=[
-            DonutsController
+            DonutsController,
+            GoawayRedirectController
         ],
         imports=[
         ]
@@ -53,7 +66,7 @@ def create_boot() -> Boot:
         global_middleware={
             LogMiddleware: ["*"]
         }
-    )
+    )  # type: ignore #worker
 
 
 def create_app() -> App:

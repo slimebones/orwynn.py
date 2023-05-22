@@ -2,6 +2,7 @@ from typing import ClassVar
 
 from orwynn.base.error._MalfunctionError import MalfunctionError
 from orwynn.helpers.web import GenericRequest, GenericResponse
+from orwynn.log.helpers import catch_error
 from orwynn.utils import validation
 from orwynn.utils.Protocol import Protocol
 
@@ -15,9 +16,13 @@ class ErrorHandler:
             Exception or a list of handled Exceptions.
         PROTOCOL:
             Protocol the handler works with.
+        IS_ERROR_CATCH_LOGGED:
+            Whether the handled errors should be automatically logged by
+            Log.catch. Defaults to True.
     """
     E: ClassVar[type[Exception] | None] = None
     PROTOCOL: Protocol = Protocol.HTTP
+    IS_ERROR_CATCH_LOGGED: bool = True
 
     def __init__(self) -> None:
         if self.E is None:
@@ -40,6 +45,20 @@ class ErrorHandler:
     @property
     def HandledException(self) -> type[Exception]:
         return self.__class__.get_handled_exception_class()
+
+    def _fw_handle_wrapper(
+        self,
+        request: GenericRequest,
+        error: Exception
+    ) -> GenericResponse:
+        """
+        Actual handler called on error occuring.
+
+        Inside it should always propagate the control to self.handle.
+        """
+        if self.IS_ERROR_CATCH_LOGGED:
+            catch_error(error)
+        return self.handle(request, error)
 
     def handle(
         self,

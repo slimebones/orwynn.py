@@ -1,6 +1,6 @@
 from fastapi import Header
 
-from orwynn._testingtools import HeadersGetHttpController
+from orwynn._testingtools import HeadersGetController
 from orwynn.base.module._Module import Module
 from orwynn.boot import Boot
 from orwynn.http import Endpoint, HttpController
@@ -70,7 +70,7 @@ def test_multiple_bind_headers():
     bind_headers() calls.
     """
     boot: Boot = Boot(
-        Module("/", Controllers=[HeadersGetHttpController])
+        Module("/", Controllers=[HeadersGetController])
     )
 
     binded_1: Client = boot.app.client.bind_headers({

@@ -1,10 +1,10 @@
 from orwynn.base.model import Model
-from orwynn.http import Endpoint, HttpController, HttpRequest
+from orwynn.http import Endpoint, HttpController, HttpRequest, RedirectHttpResponse
 
 GET_DATA: dict = {"message": "hello"}
 
 
-class GetHttpController(HttpController):
+class GetController(HttpController):
     ROUTE = "/"
     ENDPOINTS = [
         Endpoint(method="get")
@@ -14,7 +14,7 @@ class GetHttpController(HttpController):
         return GET_DATA
 
 
-class IdGetHttpController(HttpController):
+class IdGetController(HttpController):
     ROUTE = "/{id}"
     ENDPOINTS = [
         Endpoint(method="get")
@@ -24,7 +24,7 @@ class IdGetHttpController(HttpController):
         return {"id": id}
 
 
-class HeadersGetHttpController(HttpController):
+class HeadersGetController(HttpController):
     """
     Returns all accepted headers.
     """
@@ -35,6 +35,18 @@ class HeadersGetHttpController(HttpController):
 
     def get(self, request: HttpRequest) -> dict:
         return {k: v for k, v in request.headers.items()}
+
+
+class RedirectController(HttpController):
+    ROUTE = "/"
+    ENDPOINTS = [
+        Endpoint(
+            method="get"
+        )
+    ]
+
+    def get(self) -> RedirectHttpResponse:
+        return RedirectHttpResponse("https://google.com")
 
 
 class Item(Model):
