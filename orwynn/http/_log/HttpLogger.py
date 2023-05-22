@@ -81,7 +81,7 @@ class HttpLogger:
         if isinstance(response, StreamingResponse):
             try:
                 response_body: str = await self.__get_response_body(response)
-            except UnicodeDecodeError:
+            except (UnicodeDecodeError, IndexError):
                 response_body = ""
         else:
             # Interestingly, even returned explicitly JSONResponse handled here

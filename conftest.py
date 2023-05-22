@@ -24,6 +24,7 @@ from orwynn.boot.boot_test import (
     std_boot,
     std_mongo_boot,
 )
+from orwynn.helpers.ENVIRONS import ENVIRONS
 from orwynn.http._controller.endpoint.endpoint_test import run_endpoint
 from orwynn.http.testing import std_http
 from orwynn.log.log_test import log_apprc_sink_to_writer, writer
@@ -50,13 +51,18 @@ def run_around_tests():
     #   TypeError: DI wasn't initialized, skip
     with contextlib.suppress(MissingDiObjectError, TypeError):
         validation.apply(Di.ie().find("Mongo"), Mongo).drop_database()
-    __discardWorkers()
+    _discardWorkers()
 
 
-def __discardWorkers(W: type[Worker] = Worker):
+def _discardWorkers(W: type[Worker] = Worker):
     for NestedW in W.__subclasses__():
-        __discardWorkers(NestedW)
+        _discardWorkers(NestedW)
     W.discard(should_validate=False)
-    os.environ["ORWYNN_MODE"] = ""
-    os.environ["Orwynn_RootDir"] = ""
-    os.environ["ORWYNN_APPRC_PATH"] = ""
+
+    _delete_environs()
+
+
+def _delete_environs():
+    for environ in ENVIRONS:
+        with contextlib.suppress(KeyError):
+            del os.environ[environ]
