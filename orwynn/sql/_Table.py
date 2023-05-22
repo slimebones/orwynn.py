@@ -26,17 +26,17 @@ class Table(DeclarativeBase):
     _id: Mapped[str] = mapped_column(default=gen_id, unique=True)
 
     @hybrid_property
-    def sql_id(self) -> int:
-        return self._sql_id
+    def sid(self) -> int:
+        return self._sid
 
     @declared_attr.cascading  # type: ignore
-    def _sql_id(cls) -> Mapped[int]:
+    def _sid(cls) -> Mapped[int]:
         parent: type[Self] = cls._get_parent_class()
         if parent is Table:
             return mapped_column(primary_key=True)
         else:
             return mapped_column(
-                ForeignKey(snakefy(parent.__name__) + "._sql_id"),
+                ForeignKey(snakefy(parent.__name__) + "._sid"),
                 primary_key=True
             )
 
