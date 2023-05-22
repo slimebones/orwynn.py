@@ -12,3 +12,11 @@ def catch_error(error: Exception):
     # up the stack
     with contextlib.suppress(Exception), Log.catch(reraise=False):
         raise error
+
+
+catchr = Log.catch(reraise=True)
+"""
+Shortcut for Log.catch(reraise=True).
+
+Does not accept additional arguments.
+"""
