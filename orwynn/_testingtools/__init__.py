@@ -1,5 +1,10 @@
 from orwynn.base.model import Model
-from orwynn.http import Endpoint, HttpController, HttpRequest, RedirectHttpResponse
+from orwynn.http import (
+    Endpoint,
+    HttpController,
+    HttpRequest,
+    RedirectHttpResponse,
+)
 
 GET_DATA: dict = {"message": "hello"}
 

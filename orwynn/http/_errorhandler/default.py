@@ -1,4 +1,3 @@
-import traceback
 from orwynn.base.errorhandler import ErrorHandler
 from orwynn.http._requests import HttpRequest
 from orwynn.http._responses import HttpResponse, JsonHttpResponse

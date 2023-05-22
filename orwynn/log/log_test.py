@@ -37,7 +37,7 @@ def test_logged_request_id(writer: Writer, log_apprc_sink_to_writer: dict):
     boot: Boot = Boot(
         Module("/", Controllers=[C1]),
         apprc=log_apprc_sink_to_writer
-    )
+    )  # type: ignore #worker
 
     boot.app.client.get("/", 200)
     data: dict = json.loads(str(writer.read()))
@@ -59,7 +59,7 @@ def test_logged_websocket_request_id(
     boot: Boot = Boot(
         Module("/", Controllers=[C1]),
         apprc=log_apprc_sink_to_writer
-    )
+    )  # type: ignore #worker
 
     with boot.app.client.websocket("/"):
         pass

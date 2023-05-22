@@ -1,7 +1,6 @@
 from orwynn.base import Module
 from orwynn.boot import Boot
-from orwynn.http import HttpController, Endpoint
-
+from orwynn.http import Endpoint, HttpController
 from orwynn.http._responses import RedirectHttpResponse, TestHttpResponse
 
 
@@ -22,8 +21,8 @@ def test_redirect():
         Module("/", Controllers=[LocalController])
     )  # type: ignore
 
-    response: TestHttpResponse = boot.app.client.get("/", 307)
+    response: TestHttpResponse = boot.app.client.get(
+        "/", 307, follow_redirects=False
+    )
 
-    print(response.headers)
-
-    assert 0, "OK"
+    assert response.headers.get("location", "") =="https://google.com"

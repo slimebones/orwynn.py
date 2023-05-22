@@ -1,8 +1,10 @@
+import os
 from typing import ClassVar
 
 from orwynn.base.error._MalfunctionError import MalfunctionError
 from orwynn.helpers.web import GenericRequest, GenericResponse
 from orwynn.log.helpers import catch_error
+from orwynn.proxy.BootProxy import BootProxy
 from orwynn.utils import validation
 from orwynn.utils.Protocol import Protocol
 
@@ -56,7 +58,15 @@ class ErrorHandler:
 
         Inside it should always propagate the control to self.handle.
         """
-        if self.IS_ERROR_CATCH_LOGGED:
+        if (
+            self.IS_ERROR_CATCH_LOGGED
+            # check without an AppMode importing due to circular issues
+            and BootProxy.ie().mode.value != "test"
+            and not os.getenv(
+                "ORWYNN_IS_CATCH_LOGGING_ENABLED_IN_TESTS",
+                False
+            )
+        ):
             catch_error(error)
         return self.handle(request, error)
 

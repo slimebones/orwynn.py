@@ -68,7 +68,7 @@ def test_get(
             route="/", Controllers=[C1], Middleware=[LogMiddleware]
         ),
         apprc=log_apprc_sink_to_writer
-    )
+    )  # type: ignore #worker
     client: Client = boot.app.client
     client.get(
         "/",
@@ -102,7 +102,7 @@ def test_get__error(
             route="/", Controllers=[C1], Middleware=[LogMiddleware]
         ),
         apprc=log_apprc_sink_to_writer
-    )
+    )  # type: ignore #worker
     client: Client = boot.app.client
     client.get(
         "/",

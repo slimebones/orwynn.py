@@ -4,7 +4,12 @@ from orwynn.apiversion import ApiVersion
 from orwynn.app import App
 from orwynn.base import Module
 from orwynn.boot import Boot
-from orwynn.http import Endpoint, HttpController, LogMiddleware, RedirectHttpResponse
+from orwynn.http import (
+    Endpoint,
+    HttpController,
+    LogMiddleware,
+    RedirectHttpResponse,
+)
 
 
 class DonutsController(HttpController):
