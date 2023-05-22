@@ -1,6 +1,6 @@
 ENVIRONS: set[str] = {
     "ORWYNN_MODE",
-    "Orwynn_RootDir",
+    "ORWYNN_ROOT_DIR",
     "ORWYNN_APPRC_PATH",
     "ORWYNN_IS_CATCH_LOGGING_ENABLED_IN_TESTS"
 }

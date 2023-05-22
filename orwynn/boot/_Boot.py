@@ -84,7 +84,7 @@ class Boot(Worker):
         ORWYNN_MODE:
             Boot mode for application. Defaults to DEV. Alternatively you can
             pass arg "mode".
-        Orwynn_RootDir:
+        ORWYNN_ROOT_DIR:
             Root directory for application. Defaults to os.getcwd()
         ORWYNN_APPRC_PATH:
             Path where app configuration file located. Defaults to
@@ -309,7 +309,7 @@ class Boot(Worker):
 
     def __parse_root_dir(self) -> Path:
         root_dir: Path
-        root_dir_env: str = os.getenv("Orwynn_RootDir", "")
+        root_dir_env: str = os.getenv("ORWYNN_ROOT_DIR", "")
 
         root_dir = \
             Path(os.getcwd()) if not root_dir_env else Path(root_dir_env)
