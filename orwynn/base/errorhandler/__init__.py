@@ -1,1 +1,1 @@
-from ._ErrorHandler import ErrorHandler
+from .errorhandler import ErrorHandler

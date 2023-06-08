@@ -1,7 +1,7 @@
 import starlette.websockets
 
 from orwynn.apiversion import ApiVersion
-from orwynn.base.module._Module import Module
+from orwynn.base.module.module import Module
 from orwynn.boot import Boot
 from orwynn.websocket._controller.WebsocketController import (
     WebsocketController,

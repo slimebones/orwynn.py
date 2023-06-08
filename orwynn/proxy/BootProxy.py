@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from orwynn.apiversion import ApiVersion
     from orwynn.app import AppMode
     from orwynn.apprc import AppRc
-    from orwynn.base.errorhandler._ErrorHandler import ErrorHandler
+    from orwynn.base.errorhandler.errorhandler import ErrorHandler
     from orwynn.indication._Indication import Indication
 
 

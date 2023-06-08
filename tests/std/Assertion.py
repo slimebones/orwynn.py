@@ -1,6 +1,6 @@
 from orwynn import mongo
-from orwynn._di.Acceptor import Acceptor
-from orwynn._di.Provider import Provider
+from orwynn.di.acceptor import Acceptor
+from orwynn.di.provider import Provider
 from orwynn.app import App, AppConfig
 from orwynn.base.module import Module
 from orwynn.boot import BootConfig

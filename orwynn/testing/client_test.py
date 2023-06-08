@@ -1,7 +1,7 @@
 from fastapi import Header
 
-from orwynn._testingtools import HeadersGetController
-from orwynn.base.module._Module import Module
+from orwynn.testingtools import HeadersGetController
+from orwynn.base.module.module import Module
 from orwynn.boot import Boot
 from orwynn.http import Endpoint, HttpController
 from orwynn.testing._Client import Client

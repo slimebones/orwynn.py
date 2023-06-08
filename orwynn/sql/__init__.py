@@ -1,4 +1,4 @@
-from orwynn.base.module._Module import Module
+from orwynn.base.module.module import Module
 
 from ._Sql import Sql
 from ._SqlConfig import SqlConfig

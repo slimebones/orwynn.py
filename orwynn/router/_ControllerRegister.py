@@ -6,7 +6,7 @@ import pydantic
 
 from orwynn.apiversion import ApiVersion
 from orwynn.app import App
-from orwynn.base.controller._Controller import Controller
+from orwynn.base.controller.controller import Controller
 from orwynn.base.controller.errors import AlreadyRegisteredMethodError
 from orwynn.base.error import MalfunctionError
 from orwynn.base.model import Model

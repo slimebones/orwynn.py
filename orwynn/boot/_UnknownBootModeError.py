@@ -1,5 +1,0 @@
-
-
-
-class UnknownAppModeError(Exception):
-    pass

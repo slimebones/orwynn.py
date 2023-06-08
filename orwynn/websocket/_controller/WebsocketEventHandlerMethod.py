@@ -1,6 +1,6 @@
 from typing import Callable
 
-from orwynn.base.model._Model import Model
+from orwynn.base.model.model import Model
 
 
 class WebsocketEventHandlerMethod(Model):

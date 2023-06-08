@@ -1,7 +1,7 @@
 
 from fastapi import Query, Request
 
-from orwynn._di.Di import Di
+from orwynn.di.di import Di
 from orwynn.apiversion import ApiVersion
 from orwynn.base.controller.errors import (
     AlreadyRegisteredMethodError,

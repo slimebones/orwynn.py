@@ -1,5 +1,0 @@
-
-
-
-class UnknownSourceError(Exception):
-    pass

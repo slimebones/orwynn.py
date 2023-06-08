@@ -1,3 +1,3 @@
-from orwynn.bootscript._Bootscript import Bootscript
-from orwynn.bootscript._BootscriptWorker import BootscriptWorker
-from orwynn.bootscript._CallTime import CallTime
+from orwynn.bootscript.bootscript import Bootscript
+from orwynn.bootscript.worker import BootscriptWorker
+from orwynn.bootscript.calltime import CallTime

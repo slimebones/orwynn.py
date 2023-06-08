@@ -1,7 +1,7 @@
 from typing import Callable
 
-from orwynn.base.module._Module import Module
-from orwynn.boot._Boot import Boot
+from orwynn.base.module.module import Module
+from orwynn.boot.boot import Boot
 from orwynn.http import (
     Endpoint,
     HttpController,

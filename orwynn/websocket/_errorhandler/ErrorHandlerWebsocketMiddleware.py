@@ -1,11 +1,11 @@
 import inspect
 from types import NoneType
 
-from orwynn.base.error._find_detailed_class_for_exception import (
+from orwynn.base.error.utils import (
     find_detailed_class_for_exception,
 )
-from orwynn.base.error._MalfunctionError import MalfunctionError
-from orwynn.base.errorhandler._ErrorHandler import ErrorHandler
+from orwynn.base.error.errors import MalfunctionError
+from orwynn.base.errorhandler.errorhandler import ErrorHandler
 from orwynn.utils import validation
 from orwynn.websocket._context.WebsocketRequestContextId import (
     WebsocketRequestContextId,

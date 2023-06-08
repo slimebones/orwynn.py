@@ -1,4 +1,4 @@
-from orwynn._di.Di import Di
+from orwynn.di.di import Di
 from orwynn.apiversion import ApiVersion
 from orwynn.base import Module
 from orwynn.boot import Boot

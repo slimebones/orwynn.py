@@ -1,2 +1,2 @@
-from ._FrameworkService import FrameworkService
-from ._Service import Service
+from .framework import FrameworkService
+from .service import Service

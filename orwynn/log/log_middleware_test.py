@@ -2,8 +2,8 @@ import json
 from types import NoneType
 from typing import Literal
 
-from orwynn.base.module._Module import Module
-from orwynn.boot._Boot import Boot
+from orwynn.base.module.module import Module
+from orwynn.boot.boot import Boot
 from orwynn.http import Endpoint, HttpController, LogMiddleware
 from orwynn.log._Log import Log
 from orwynn.proxy.BootProxy import BootProxy

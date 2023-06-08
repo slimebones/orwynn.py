@@ -4,7 +4,7 @@ from typing import Any, ItemsView
 
 from orwynn.base.error import get_error_code, ErrorCode
 from orwynn.base.error import ErrorValueSchema
-from orwynn.base.model._Model import Model
+from orwynn.base.model.model import Model
 from orwynn.http._schema.HttpExceptionValueSchema import \
     HttpExceptionValueSchema
 from orwynn.http._schema.RequestValidationExceptionValueSchema import \

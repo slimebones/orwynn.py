@@ -5,20 +5,20 @@ import os
 
 from pytest import fixture
 
-from orwynn._di.collecting.collect_modules_test import std_modules
-from orwynn._di.collecting.collect_provider_dependencies_test import (
+from orwynn.di.collecting.test_modules import std_modules
+from orwynn.di.collecting.test_provider_dependencies import (
     std_provider_dependencies_map,
 )
-from orwynn._di.Di import Di
-from orwynn._di.di_test import std_di_container
-from orwynn._di.MissingDiObjectError import MissingDiObjectError
+from orwynn.di.di import Di
+from orwynn.di.testing import std_di_container
+from orwynn.di.errors import MissingDiObjectError
 from orwynn.app import AppMode
-from orwynn.app._App import App
-from orwynn.app.app_test import std_app
-from orwynn.base.module._Module import Module
-from orwynn.base.worker._Worker import Worker
-from orwynn.boot._Boot import Boot
-from orwynn.boot.boot_test import (
+from orwynn.app.app import App
+from orwynn.app.test_main import std_app
+from orwynn.base.module.module import Module
+from orwynn.base.worker.worker import Worker
+from orwynn.boot.boot import Boot
+from orwynn.boot.test_main import (
     run_std,
     set_std_apprc_path_env,
     std_boot,

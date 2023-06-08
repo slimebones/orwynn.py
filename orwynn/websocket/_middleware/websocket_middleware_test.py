@@ -1,5 +1,5 @@
-from orwynn.base.module._Module import Module
-from orwynn.boot._Boot import Boot
+from orwynn.base.module.module import Module
+from orwynn.boot.boot import Boot
 from orwynn.testing._Client import Client
 from orwynn.websocket import (
     Websocket,

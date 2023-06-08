@@ -1,3 +1,3 @@
-from ._App import App
-from ._AppConfig import AppConfig
-from ._AppMode import AppMode
+from .app import App
+from .config import AppConfig
+from .mode import AppMode

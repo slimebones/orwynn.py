@@ -1,9 +1,9 @@
 from pytest import fixture
 
 from orwynn import mongo
-from orwynn.base.model._Model import Model
-from orwynn.base.module._Module import Module
-from orwynn.boot._Boot import Boot
+from orwynn.base.model.model import Model
+from orwynn.base.module.module import Module
+from orwynn.boot.boot import Boot
 from orwynn.http import Endpoint, EndpointResponse, HttpController
 from orwynn.router.errors import (
     UnmatchedEndpointEntityError,

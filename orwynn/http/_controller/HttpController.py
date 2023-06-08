@@ -3,7 +3,7 @@ from typing import Callable, ClassVar, Literal
 from orwynn.helpers.web import REQUEST_METHOD_BY_PROTOCOL, RequestMethod
 
 from .endpoint.Endpoint import Endpoint
-from orwynn.base.controller._Controller import Controller
+from orwynn.base.controller.controller import Controller
 from orwynn.utils.Protocol import Protocol
 from orwynn.http.errors import UnsupportedHttpMethodError
 from .errors import \

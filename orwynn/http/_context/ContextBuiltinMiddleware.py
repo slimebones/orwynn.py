@@ -1,4 +1,4 @@
-from orwynn.context._context_manager import context_manager
+from orwynn.context.manager import context_manager
 from orwynn.http._middleware.BuiltinHttpMiddleware import BuiltinHttpMiddleware
 from orwynn.http._middleware.HttpNextCall import HttpNextCall
 from orwynn.http._requests import HttpRequest

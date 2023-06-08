@@ -1,2 +1,2 @@
-from ._GlobalMiddlewareSetup import GlobalMiddlewareSetup
-from ._Middleware import Middleware
+from .globalsetup import GlobalMiddlewareSetup
+from .middleware import Middleware

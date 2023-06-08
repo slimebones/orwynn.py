@@ -2,7 +2,7 @@ from pytest import fixture
 
 from orwynn import mongo
 from orwynn.base.module import Module
-from orwynn.boot._Boot import Boot
+from orwynn.boot.boot import Boot
 from orwynn.utils import validation
 
 from ._Document import Document

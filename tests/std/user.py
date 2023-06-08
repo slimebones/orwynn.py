@@ -1,6 +1,6 @@
 from orwynn import mongo
 from orwynn.base.module import Module
-from orwynn.base.service._Service import Service
+from orwynn.base.service.service import Service
 from orwynn.http import Endpoint, HttpController
 from orwynn.mongo._Document import Document
 from orwynn.mongo._Mongo import Mongo

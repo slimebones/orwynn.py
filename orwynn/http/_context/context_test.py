@@ -1,5 +1,5 @@
-from orwynn.base.module._Module import Module
-from orwynn.boot._Boot import Boot
+from orwynn.base.module.module import Module
+from orwynn.boot.boot import Boot
 from orwynn.context.errors import UndefinedStorageError
 from orwynn.http import (
     Endpoint,

@@ -1,2 +1,2 @@
-from ._Boot import Boot
-from ._BootConfig import BootConfig
+from .boot import Boot
+from .config import BootConfig
