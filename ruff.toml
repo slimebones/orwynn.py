@@ -1,0 +1,80 @@
+select = ["ALL"]
+
+fix = true
+line-length = 79
+respect-gitignore = true
+
+exclude = [
+    "docs/source/conf.py",
+    ".vscode"
+]
+
+ignore = [
+    # Doesn't recognize new "match" syntax
+    "E999",
+
+    # Do not restrict calling functions in defaults (fastapi requirement).
+    "D",
+
+    # Do not restrict calling functions in defaults (fastapi requirement).
+    "B008",
+
+    # Why is it bad to pass string literal directly to exception raised?
+    "EM101",
+    "EM102",
+
+    # Passing PascalCase names is allowed.
+    "N",
+
+    # Sometimes it's typehinting-wise to declare variable and assign it
+    # in different logical branches before returning.
+    "RET504",
+
+    # Not clear why first branch of if-elif-else should not contain raise
+    # statement.
+    "RET505",
+    "RET506",
+
+    # It's ok to have "continue" and then "else: raise...".
+    "RET507",
+
+    # Escaping inner quotes to not change outer ones is OK.
+    "Q003",
+
+    # No strict rules for string concatenation.
+    "ISC002",
+    "ISC003",
+
+    # Builtin shadowing is allowed in local contexts.
+    "A",
+
+    # To not search for specific error code on type ignoring.
+    "PGH003",
+
+    # Do not replace symbols in false-positive scenario.
+    "RUF001",
+
+    # Ternary operator often breaks line-length limit and decreases
+    # readability.
+    "SIM108",
+
+    # Allow commented-out code.
+    "ERA001",
+
+    # Too often gives false-positive.
+    "S105",
+
+    "ANN",
+    "PT",
+    "ARG",
+    "FBT",
+]
+
+[per-file-ignores]
+"__init__.py" = ["F401"]
+"test_*.py" = ["S101"]
+"testing.py" = ["S101"]
+"conftest.py" = ["S101", "F401", "F811"]
+
+[mccabe]
+max-complexity = 10
