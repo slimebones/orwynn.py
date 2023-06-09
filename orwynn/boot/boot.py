@@ -6,8 +6,6 @@ from types import NoneType
 
 import dotenv
 
-from orwynn.di.di import Di
-from orwynn.di.errors import MissingDiObjectError
 from orwynn.apiversion import ApiVersion
 from orwynn.app import App, AppMode
 from orwynn.apprc import AppRc, parse_apprc
@@ -18,11 +16,13 @@ from orwynn.base.module import Module
 from orwynn.base.worker import Worker
 from orwynn.bootscript import Bootscript, BootscriptWorker, CallTime
 from orwynn.bootscript.errors import NoScriptsForCallTimeError
+from orwynn.di.di import Di
+from orwynn.di.errors import MissingDiObjectError
 from orwynn.http import Cors, EndpointContainer
 from orwynn.indication import Indication, default_api_indication
 from orwynn.log import LogConfig, configure_log
-from orwynn.proxy.indicationonly import ApiIndicationOnlyProxy
 from orwynn.proxy.boot import BootProxy
+from orwynn.proxy.indicationonly import ApiIndicationOnlyProxy
 from orwynn.router import Router
 from orwynn.testing import Client
 from orwynn.utils import validation

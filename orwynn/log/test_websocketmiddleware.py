@@ -6,7 +6,7 @@ from orwynn.log.log import Log
 from orwynn.testing import Writer
 from orwynn.testing.client import Client
 from orwynn.websocket import Websocket, WebsocketController
-from orwynn.websocket._log.middleware import LogWebsocketMiddleware
+from orwynn.websocket.log.middleware import LogWebsocketMiddleware
 
 
 def test_get(

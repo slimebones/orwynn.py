@@ -3,13 +3,13 @@ import os
 import pytest
 from pytest import fixture
 
-from orwynn.di.di import Di
 from orwynn.app import AppMode
 from orwynn.apprc.apprc import AppRc
-from orwynn.base.module.module import Module
 from orwynn.base.module.errors import CircularDependencyError
+from orwynn.base.module.module import Module
 from orwynn.base.service.service import Service
 from orwynn.boot.boot import Boot
+from orwynn.di.di import Di
 from orwynn.http import Endpoint, HttpController
 from orwynn.mongo.mongo import Mongo
 from orwynn.proxy.boot import BootProxy

@@ -1,6 +1,6 @@
 from orwynn.context.manager import context_manager
 from orwynn.http import HttpNextCall, HttpRequest, HttpResponse
-from orwynn.websocket._middleware.builtin import (
+from orwynn.websocket.middleware.builtin import (
     BuiltinWebsocketMiddleware,
 )
 

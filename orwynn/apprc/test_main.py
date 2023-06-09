@@ -1,12 +1,12 @@
 import pytest
 
-from orwynn.di.di import Di
 from orwynn.app import AppMode
 from orwynn.apprc.apprc import AppRc
 from orwynn.base.config import Config
 from orwynn.base.model.model import Model
 from orwynn.base.module.module import Module
 from orwynn.boot import Boot
+from orwynn.di.di import Di
 from orwynn.utils import validation
 from orwynn.utils.mp import find as mp_find
 

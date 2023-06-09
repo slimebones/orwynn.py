@@ -1,7 +1,6 @@
 
 from fastapi import Query, Request
 
-from orwynn.di.di import Di
 from orwynn.apiversion import ApiVersion
 from orwynn.base.controller.errors import (
     AlreadyRegisteredMethodError,
@@ -10,6 +9,7 @@ from orwynn.base.controller.errors import (
 from orwynn.base.model import Model
 from orwynn.base.module import Module
 from orwynn.boot import Boot
+from orwynn.di.di import Di
 from orwynn.helpers.web import REQUEST_METHOD_BY_PROTOCOL
 from orwynn.http import Endpoint, HttpController
 from orwynn.http.controller.errors import DefinedTwiceControllerMethodError

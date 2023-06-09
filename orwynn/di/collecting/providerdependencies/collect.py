@@ -1,19 +1,19 @@
+from orwynn.base.config import Config
+from orwynn.base.module import Module
+from orwynn.base.module.errors import CircularDependencyError
 from orwynn.di.availability import check_availability
+from orwynn.di.collecting.errors import (
+    ProviderAlreadyInitializedForMapError,
+)
 from orwynn.di.collecting.helpers import (
     get_parameters_for_provider,
 )
 from orwynn.di.collecting.providerdependencies.map import (
     ProviderDependenciesMap,
 )
-from orwynn.di.collecting.errors import (
-    ProviderAlreadyInitializedForMapError,
-)
-from orwynn.di.isprovider import is_provider
 from orwynn.di.errors import NotProviderError
+from orwynn.di.isprovider import is_provider
 from orwynn.di.provider import Provider
-from orwynn.base.config import Config
-from orwynn.base.module import Module
-from orwynn.base.module.errors import CircularDependencyError
 from orwynn.utils.fmt import format_chain
 
 

@@ -1,5 +1,7 @@
 import inspect
 
+from orwynn.base.config import Config
+from orwynn.base.module.errors import CircularDependencyError
 from orwynn.di.collecting.no_dependencies_for_given_provider_error import (
     NoDependenciesForGivenProviderError,
 )
@@ -7,11 +9,9 @@ from orwynn.di.collecting.providerdependenciesmap import (
     ProviderDependenciesMap,
 )
 from orwynn.di.container import DiContainer
-from orwynn.di.isprovider import is_provider
 from orwynn.di.errors import MissingDiObjectError
+from orwynn.di.isprovider import is_provider
 from orwynn.di.provider import Provider
-from orwynn.base.config import Config
-from orwynn.base.module.errors import CircularDependencyError
 from orwynn.utils.fmt import format_chain
 
 

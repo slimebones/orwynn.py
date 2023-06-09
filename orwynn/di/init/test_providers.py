@@ -1,10 +1,10 @@
+from orwynn.base.module.module import Module
+from orwynn.boot.boot import Boot
 from orwynn.di.collecting.providerdependenciesmap import (
     ProviderDependenciesMap,
 )
 from orwynn.di.container import DiContainer
 from orwynn.di.init.providers import init_providers
-from orwynn.base.module.module import Module
-from orwynn.boot.boot import Boot
 from tests.std.assertion import Assertion
 
 

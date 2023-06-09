@@ -2,13 +2,13 @@ from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.context.errors import UndefinedStorageError
 from orwynn.utils import validation
-from orwynn.websocket._context.id import (
+from orwynn.websocket.context.id import (
     WebsocketRequestContextId,
 )
-from orwynn.websocket._controller.controller import (
+from orwynn.websocket.controller.controller import (
     WebsocketController,
 )
-from orwynn.websocket._log.middleware import LogWebsocketMiddleware
+from orwynn.websocket.log.middleware import LogWebsocketMiddleware
 from orwynn.websocket.websocket import Websocket
 
 

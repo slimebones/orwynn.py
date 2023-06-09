@@ -1,19 +1,19 @@
 import re
 from typing import TypeVar
 
-from orwynn.di.object import DiObject
-from orwynn.di.DiObjectAlreadyInitializedInContainerError import (
-    DiObjectAlreadyInitializedInContainerError,
-)
-from orwynn.di.FinalizedDiContainerError import FinalizedDiContainerError
-from orwynn.di.isprovider import is_provider
-from orwynn.di.errors import MissingDiObjectError
 from orwynn.base.config import Config
 from orwynn.base.controller.controller import Controller
 from orwynn.base.error.errors import MalfunctionError
 from orwynn.base.errorhandler.errorhandler import ErrorHandler
 from orwynn.base.middleware import Middleware
 from orwynn.base.model.model import Model
+from orwynn.di.DiObjectAlreadyInitializedInContainerError import (
+    DiObjectAlreadyInitializedInContainerError,
+)
+from orwynn.di.errors import MissingDiObjectError
+from orwynn.di.FinalizedDiContainerError import FinalizedDiContainerError
+from orwynn.di.isprovider import is_provider
+from orwynn.di.object import DiObject
 from orwynn.helpers.SUBCLASSABLES import SUBCLASSABLES
 from orwynn.utils.validation import validate
 

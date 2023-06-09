@@ -1,4 +1,4 @@
-from orwynn.websocket._middleware.middleware import (
+from orwynn.websocket.middleware.middleware import (
     WebsocketMiddleware,
 )
 

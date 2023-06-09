@@ -1,7 +1,7 @@
 from orwynn.base.errorhandler import ErrorHandler
+from orwynn.http.errors import HttpException
 from orwynn.http.requests import HttpRequest
 from orwynn.http.responses import HttpResponse, JsonHttpResponse
-from orwynn.http.errors import HttpException
 from orwynn.proxy.boot import BootProxy
 from orwynn.utils.validation.errors import RequestValidationException
 

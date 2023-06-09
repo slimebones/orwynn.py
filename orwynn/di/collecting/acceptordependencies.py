@@ -1,12 +1,12 @@
 import inspect
 from typing import Callable
 
+from orwynn.base.middleware import Middleware
+from orwynn.base.module import Module
 from orwynn.di.availability import check_availability
 from orwynn.di.container import DiContainer
 from orwynn.di.object import DiObject
 from orwynn.di.provider import Provider
-from orwynn.base.middleware import Middleware
-from orwynn.base.module import Module
 
 
 def collect_dependencies_for_acceptor(

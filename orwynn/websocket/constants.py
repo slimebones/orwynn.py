@@ -1,22 +1,21 @@
-from orwynn.websocket._middleware.connectionbuiltin import (
+from orwynn.base.errorhandler import ErrorHandler
+from orwynn.websocket.middleware.connectionbuiltin import (
     ConnectionBuiltinWebsocketMiddleware,
 )
 
-from ._context.middleware.builtin import (
+from .context.middleware.builtin import (
     ContextBuiltinWebsocketMiddleware,
 )
-from ._context.middleware.contextbuiltin import (
+from .context.middleware.contextbuiltin import (
     RequestContextBuiltinWebsocketMiddleware,
 )
-from ._errorhandler.middleware import (
-    ErrorHandlerWebsocketMiddleware,
-)
-from ._middleware.builtin import BuiltinWebsocketMiddleware
-from orwynn.base.errorhandler import ErrorHandler
-
-from ._errorhandler.default import (
+from .errorhandler.default import (
     DefaultWebsocketErrorHandler,
 )
+from .errorhandler.middleware import (
+    ErrorHandlerWebsocketMiddleware,
+)
+from .middleware.builtin import BuiltinWebsocketMiddleware
 
 DEFAULT_WEBSOCKET_EXCEPTION_HANDLERS: set[type[ErrorHandler]] = {
     DefaultWebsocketErrorHandler,

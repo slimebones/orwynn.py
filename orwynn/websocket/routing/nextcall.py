@@ -3,8 +3,8 @@ import contextlib
 from orwynn.utils.url import UrlVars
 from orwynn.websocket.websocket import Websocket
 
-from .helpers import get_handler_kwargs
 from .handlers import DispatchWebsocketHandler, WebsocketHandler
+from .helpers import get_handler_kwargs
 
 
 class NextCallHandler:

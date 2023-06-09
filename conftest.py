@@ -5,13 +5,6 @@ import os
 
 from pytest import fixture
 
-from orwynn.di.collecting.test_modules import std_modules
-from orwynn.di.collecting.test_provider_dependencies import (
-    std_provider_dependencies_map,
-)
-from orwynn.di.di import Di
-from orwynn.di.testing import std_di_container
-from orwynn.di.errors import MissingDiObjectError
 from orwynn.app import AppMode
 from orwynn.app.app import App
 from orwynn.app.test_main import std_app
@@ -24,6 +17,13 @@ from orwynn.boot.test_main import (
     std_boot,
     std_mongo_boot,
 )
+from orwynn.di.collecting.test_modules import std_modules
+from orwynn.di.collecting.test_provider_dependencies import (
+    std_provider_dependencies_map,
+)
+from orwynn.di.di import Di
+from orwynn.di.errors import MissingDiObjectError
+from orwynn.di.testing import std_di_container
 from orwynn.helpers.constants import ENVIRONS
 from orwynn.http.controller.endpoint.test_main import run_endpoint
 from orwynn.http.testing import std_http

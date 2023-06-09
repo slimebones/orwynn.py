@@ -4,7 +4,7 @@ from orwynn.websocket import (
     WebsocketNextCall,
     WebsocketRequestContextId,
 )
-from orwynn.websocket._log.logger import WebsocketLogger
+from orwynn.websocket.log.logger import WebsocketLogger
 
 
 class LogWebsocketMiddleware(WebsocketMiddleware):

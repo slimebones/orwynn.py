@@ -7,11 +7,11 @@ from pymongo.cursor import Cursor
 from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
 
 from orwynn.di.di import Di
-from orwynn.mapping.mapping import Mapping, if_linked
 from orwynn.mapping.errors import CustomUseOfMappingReservedFieldError
-from orwynn.mongo.mongo import Mongo
+from orwynn.mapping.mapping import Mapping, if_linked
 from orwynn.mongo.entity import MongoEntity
 from orwynn.mongo.errors import DuplicateKeyError
+from orwynn.mongo.mongo import Mongo
 from orwynn.utils import validation
 from orwynn.utils.fmt import snakefy
 

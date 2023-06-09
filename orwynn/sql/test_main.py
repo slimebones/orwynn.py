@@ -13,9 +13,9 @@ from orwynn.boot import Boot
 from orwynn.utils import validation
 from orwynn.utils.crypto import hash_password
 
-from .sql import Sql
 from .config import SqlConfig
 from .databasekind import SQLDatabaseKind
+from .sql import Sql
 from .table import Table
 
 

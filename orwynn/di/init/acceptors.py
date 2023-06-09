@@ -1,12 +1,12 @@
 
-from orwynn.di.collecting.acceptordependencies import (
-    collect_dependencies_for_acceptor,
-)
-from orwynn.di.container import DiContainer
 from orwynn.base.controller.controller import Controller
 from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
 from orwynn.base.model.model import Model
 from orwynn.base.module.module import Module
+from orwynn.di.collecting.acceptordependencies import (
+    collect_dependencies_for_acceptor,
+)
+from orwynn.di.container import DiContainer
 from orwynn.http import HttpController, HttpMiddleware
 from orwynn.proxy.boot import BootProxy
 from orwynn.utils import validation

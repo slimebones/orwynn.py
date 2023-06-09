@@ -1,7 +1,7 @@
 from orwynn.base.module.module import Module
 
-from .sql import Sql
 from .config import SqlConfig
+from .sql import Sql
 from .table import Table
 
 module = Module(

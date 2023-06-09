@@ -1,9 +1,9 @@
 from orwynn import mongo
-from orwynn.di.acceptor import Acceptor
-from orwynn.di.provider import Provider
 from orwynn.app import App, AppConfig
 from orwynn.base.module import Module
 from orwynn.boot import BootConfig
+from orwynn.di.acceptor import Acceptor
+from orwynn.di.provider import Provider
 from orwynn.log import LogConfig
 from orwynn.mongo import Mongo, MongoConfig
 from tests.std.float import FloatController, FloatService, float_module

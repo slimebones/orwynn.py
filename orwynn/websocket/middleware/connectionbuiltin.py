@@ -1,7 +1,7 @@
-from orwynn.websocket._middleware.builtin import (
+from orwynn.websocket.middleware.builtin import (
     BuiltinWebsocketMiddleware,
 )
-from orwynn.websocket._middleware.nextcall import WebsocketNextCall
+from orwynn.websocket.middleware.nextcall import WebsocketNextCall
 from orwynn.websocket.websocket import Websocket
 
 
