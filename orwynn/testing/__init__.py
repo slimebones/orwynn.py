@@ -1,7 +1,7 @@
 from typing import Callable
 
-from ._Client import Client
-from ._EmbeddedTestClient import EmbeddedTestClient
+from .client import Client
+from .embeddedclient import EmbeddedTestClient
 
 
 def get_log_apprc(check_fn: Callable) -> dict:

@@ -10,7 +10,7 @@ from typing import Any, Callable, Optional, Sized, TypeVar
 from pydantic import ValidationError as _PydanticValidationError
 from pydantic import validator as _pydantic_validator
 
-from orwynn.utils.validation._validator import Validator
+from orwynn.utils.validation.validator import Validator
 from orwynn.utils.validation.errors import (ExpectationError,
                                             ReValidationError,
                                             UnknownValidatorError,

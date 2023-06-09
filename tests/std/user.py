@@ -2,8 +2,8 @@ from orwynn import mongo
 from orwynn.base.module import Module
 from orwynn.base.service.service import Service
 from orwynn.http import Endpoint, HttpController
-from orwynn.mongo._Document import Document
-from orwynn.mongo._Mongo import Mongo
+from orwynn.mongo.document import Document
+from orwynn.mongo.mongo import Mongo
 
 
 class User(Document):

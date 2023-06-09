@@ -5,7 +5,7 @@ from orwynn.di.container import DiContainer
 from orwynn.di.init.providers import init_providers
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
-from tests.std.Assertion import Assertion
+from tests.std.assertion import Assertion
 
 
 def test_std(

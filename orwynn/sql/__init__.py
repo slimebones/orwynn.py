@@ -1,8 +1,8 @@
 from orwynn.base.module.module import Module
 
-from ._Sql import Sql
-from ._SqlConfig import SqlConfig
-from ._Table import Table
+from .sql import Sql
+from .config import SqlConfig
+from .table import Table
 
 module = Module(
     Providers=[Sql, SqlConfig],

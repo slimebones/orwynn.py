@@ -14,7 +14,7 @@ from orwynn.di.provider import Provider
 from orwynn.base.config import Config
 from orwynn.base.module import Module
 from orwynn.log import LogConfig
-from tests.std.Assertion import Assertion
+from tests.std.assertion import Assertion
 
 
 @fixture

@@ -1,6 +1,6 @@
 import contextlib
 
-from orwynn.log._Log import Log
+from orwynn.log.log import Log
 
 
 def catch_error(error: Exception):

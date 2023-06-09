@@ -3,10 +3,10 @@ from orwynn.base.service import Service
 from orwynn.boot.boot import Boot
 from orwynn.di.container import DiContainer
 from orwynn.di.init.acceptors import init_other_acceptors
-from orwynn.di.ProviderAvailabilityError import ProviderAvailabilityError
+from orwynn.di.errors import ProviderAvailabilityError
 from orwynn.http import Endpoint, HttpController, HttpMiddleware
 from orwynn.utils import validation
-from tests.std.Assertion import Assertion
+from tests.std.assertion import Assertion
 
 
 def test_std(

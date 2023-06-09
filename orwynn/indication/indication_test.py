@@ -4,8 +4,8 @@ from typing import Any
 from pytest import fixture
 
 from orwynn.base.model.model import Model
-from orwynn.indication._Indication import Indication
-from orwynn.indication._Indicator import Indicator
+from orwynn.indication.indication import Indication
+from orwynn.indication.indicator import Indicator
 from orwynn.utils import validation
 from tests.std.text import Text
 

@@ -1,8 +1,8 @@
 from orwynn.base.module import Module
 
-from ._Document import Document
-from ._Mongo import Mongo
-from ._MongoConfig import MongoConfig
+from .document import Document
+from .mongo import Mongo
+from .config import MongoConfig
 
 module = Module(
     Providers=[Mongo, MongoConfig],

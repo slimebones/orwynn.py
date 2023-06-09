@@ -11,8 +11,8 @@ from orwynn.base.module.errors import CircularDependencyError
 from orwynn.base.service.service import Service
 from orwynn.boot.boot import Boot
 from orwynn.http import Endpoint, HttpController
-from orwynn.mongo._Mongo import Mongo
-from orwynn.proxy.BootProxy import BootProxy
+from orwynn.mongo.mongo import Mongo
+from orwynn.proxy.boot import BootProxy
 from orwynn.utils import validation
 from tests.std.text import TextConfig
 

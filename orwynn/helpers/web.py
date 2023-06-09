@@ -2,7 +2,7 @@
 from enum import Enum
 from typing import TYPE_CHECKING, Union
 
-from orwynn.utils.Protocol import Protocol
+from orwynn.utils.protocol import Protocol
 
 if TYPE_CHECKING:
     from orwynn.http import HttpRequest, HttpResponse

@@ -24,13 +24,13 @@ from orwynn.boot.test_main import (
     std_boot,
     std_mongo_boot,
 )
-from orwynn.helpers.ENVIRONS import ENVIRONS
-from orwynn.http._controller.endpoint.endpoint_test import run_endpoint
+from orwynn.helpers.constants import ENVIRONS
+from orwynn.http.controller.endpoint.test_main import run_endpoint
 from orwynn.http.testing import std_http
-from orwynn.log.log_test import log_apprc_sink_to_writer, writer
-from orwynn.mongo._Mongo import Mongo
-from orwynn.testing._Client import Client
-from orwynn.testing._EmbeddedTestClient import EmbeddedTestClient
+from orwynn.log.test_main import log_apprc_sink_to_writer, writer
+from orwynn.mongo.mongo import Mongo
+from orwynn.testing.client import Client
+from orwynn.testing.embeddedclient import EmbeddedTestClient
 from orwynn.utils import validation
 from tests.structs import (
     circular_module_struct,

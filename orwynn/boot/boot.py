@@ -21,8 +21,8 @@ from orwynn.bootscript.errors import NoScriptsForCallTimeError
 from orwynn.http import Cors, EndpointContainer
 from orwynn.indication import Indication, default_api_indication
 from orwynn.log import LogConfig, configure_log
-from orwynn.proxy.ApiIndicationOnlyProxy import ApiIndicationOnlyProxy
-from orwynn.proxy.BootProxy import BootProxy
+from orwynn.proxy.indicationonly import ApiIndicationOnlyProxy
+from orwynn.proxy.boot import BootProxy
 from orwynn.router import Router
 from orwynn.testing import Client
 from orwynn.utils import validation

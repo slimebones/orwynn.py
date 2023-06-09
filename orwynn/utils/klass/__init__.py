@@ -3,7 +3,7 @@ from typing import Any, Callable
 
 from orwynn.utils.types import Class
 
-from ._errors import ClassNotFoundError
+from .errors import ClassNotFoundError
 
 
 def find_subclass_by_name(name: str, BaseClass: Class) -> Class:

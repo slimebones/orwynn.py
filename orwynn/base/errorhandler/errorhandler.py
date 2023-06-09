@@ -4,9 +4,9 @@ from typing import ClassVar
 from orwynn.base.error.errors import MalfunctionError
 from orwynn.helpers.web import GenericRequest, GenericResponse
 from orwynn.log.helpers import catch_error
-from orwynn.proxy.BootProxy import BootProxy
+from orwynn.proxy.boot import BootProxy
 from orwynn.utils import validation
-from orwynn.utils.Protocol import Protocol
+from orwynn.utils.protocol import Protocol
 
 
 class ErrorHandler:

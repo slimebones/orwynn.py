@@ -1,1 +1,1 @@
-from ._Mapping import Mapping
+from .mapping import Mapping

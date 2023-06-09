@@ -4,8 +4,8 @@ from typing import Any, Self
 from orwynn.app import AppMode
 from orwynn.apprc.apprc import AppRc
 from orwynn.base.config import Config
-from orwynn.indication._Indication import Indication
-from orwynn.proxy.BootProxy import BootProxy
+from orwynn.indication.indication import Indication
+from orwynn.proxy.boot import BootProxy
 
 
 class BootConfig(Config):

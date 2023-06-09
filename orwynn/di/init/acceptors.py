@@ -8,7 +8,7 @@ from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
 from orwynn.base.model.model import Model
 from orwynn.base.module.module import Module
 from orwynn.http import HttpController, HttpMiddleware
-from orwynn.proxy.BootProxy import BootProxy
+from orwynn.proxy.boot import BootProxy
 from orwynn.utils import validation
 from orwynn.utils.url import join_routes
 from orwynn.utils.validation import validate

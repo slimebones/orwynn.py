@@ -2,7 +2,7 @@ import re
 from typing import TYPE_CHECKING, Any, Self
 
 from orwynn.base.model.model import Model
-from orwynn.proxy.BootProxy import BootProxy
+from orwynn.proxy.boot import BootProxy
 from orwynn.utils import validation
 
 if TYPE_CHECKING:
