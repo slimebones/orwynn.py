@@ -167,7 +167,7 @@ class Indication:
                     elif isinstance(obj, Exception):
                         final_field = {
                             "message": " ;; ".join([str(x) for x in obj.args]),
-                            "error_code": self.__get_final_error_code(
+                            "code": self.__get_final_error_code(
                                 obj
                             )
                         }

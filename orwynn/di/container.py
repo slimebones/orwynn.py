@@ -9,9 +9,9 @@ from orwynn.base.middleware import Middleware
 from orwynn.base.model.model import Model
 from orwynn.di.errors import (
     DiObjectAlreadyInitializedInContainerError,
+    FinalizedDiContainerError,
+    MissingDiObjectError,
 )
-from orwynn.di.errors import MissingDiObjectError
-from orwynn.di.errors import FinalizedDiContainerError
 from orwynn.di.isprovider import is_provider
 from orwynn.di.object import DiObject
 from orwynn.helpers.constants import SUBCLASSABLES

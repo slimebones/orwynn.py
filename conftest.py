@@ -17,10 +17,10 @@ from orwynn.boot.test_main import (
     std_boot,
     std_mongo_boot,
 )
-from orwynn.di.collecting.test_modules import std_modules
 from orwynn.di.collecting.providerdependencies.test_main import (
     std_provider_dependencies_map,
 )
+from orwynn.di.collecting.test_modules import std_modules
 from orwynn.di.di import Di
 from orwynn.di.errors import MissingDiObjectError
 from orwynn.di.testing import std_di_container

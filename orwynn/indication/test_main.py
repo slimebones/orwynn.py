@@ -114,19 +114,19 @@ def test_digest_error(default_indication: Indication):
     data = default_indication.digest(SimpleError("hello world"))
     assert data["type"] == "error"
     assert data["value"]["message"] == "hello world"
-    assert data["value"]["error_code"] == ErrorCode.SIMPLE_CASE.value
+    assert data["value"]["code"] == ErrorCode.SIMPLE_CASE.value
 
     data = default_indication.digest(AdvancedError("hello world"))
     assert data["type"] == "error"
     assert data["value"]["message"] == "hello world"
-    assert data["value"]["error_code"] == ErrorCode.ADVANCED_CASE.value
+    assert data["value"]["code"] == ErrorCode.ADVANCED_CASE.value
 
     data = default_indication.digest(IntError("hello world"))
     assert data["type"] == "error"
     assert data["value"]["message"] == "hello world"
-    assert data["value"]["error_code"] == 5
+    assert data["value"]["code"] == 5
 
     data = default_indication.digest(StrError("hello world"))
     assert data["type"] == "error"
     assert data["value"]["message"] == "hello world"
-    assert data["value"]["error_code"] == "hello"
+    assert data["value"]["code"] == "hello"

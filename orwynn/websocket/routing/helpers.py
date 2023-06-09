@@ -1,7 +1,6 @@
 import inspect
 import typing
 from types import NoneType, UnionType
-from orwynn.log.log import Log
 
 from orwynn.utils.url import UrlVars
 from orwynn.websocket.websocket import Websocket

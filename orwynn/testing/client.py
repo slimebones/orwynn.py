@@ -99,7 +99,9 @@ class Client:
         expected_type: type[_JsonifyExpectedType] = dict,
         **kwargs
     ) -> _JsonifyExpectedType:
-        r: "TestHttpResponse" = self.delete(url, asserted_status_code, **kwargs)
+        r: "TestHttpResponse" = self.delete(
+            url, asserted_status_code, **kwargs
+        )
         data: Any = r.json()
         validate(data, expected_type)
         return data
@@ -138,7 +140,9 @@ class Client:
         expected_type: type[_JsonifyExpectedType] = dict,
         **kwargs
     ) -> _JsonifyExpectedType:
-        r: "TestHttpResponse" = self.options(url, asserted_status_code, **kwargs)
+        r: "TestHttpResponse" = self.options(
+            url, asserted_status_code, **kwargs
+        )
         data: Any = r.json()
         validate(data, expected_type)
         return data
