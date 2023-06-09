@@ -54,11 +54,11 @@ def test_find_all(create_two_items: list[Item]):
 
 
 def test_find_one(create_item: Item):
-    assert Item.find_one({"id": create_item.id}) is create_item
+    assert Item.find_one({"id": create_item.id}) == create_item
 
 
 def test_remove(create_two_items: list[Item]):
-    assert create_two_items[0].remove() is create_two_items[0]
+    assert create_two_items[0].remove() == create_two_items[0]
     assert len(list(Item.find_all())) == 1
 
 

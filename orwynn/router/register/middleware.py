@@ -6,7 +6,7 @@ from starlette.middleware.base import (
 )
 
 from orwynn.app import App
-from orwynn.base.error import get_exception_direct_subclasses
+from orwynn.base.error.utils import get_exception_direct_subclasses
 from orwynn.base.errorhandler import ErrorHandler
 from orwynn.base.middleware import Middleware
 from orwynn.http import (

@@ -30,7 +30,7 @@ def test_basic():
         route="/hello",
         Controllers=[Ws1],
         Middleware=[Mw1]
-    ))  # type: ignore @worker
+    ))
     client: Client = boot.app.client
 
     with client.websocket("/hello/message") as ws:

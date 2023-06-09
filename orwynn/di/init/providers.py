@@ -2,10 +2,10 @@ import inspect
 
 from orwynn.base.config import Config
 from orwynn.base.module.errors import CircularDependencyError
-from orwynn.di.collecting.no_dependencies_for_given_provider_error import (
+from orwynn.di.collecting.errors import (
     NoDependenciesForGivenProviderError,
 )
-from orwynn.di.collecting.providerdependenciesmap import (
+from orwynn.di.collecting.providerdependencies.map import (
     ProviderDependenciesMap,
 )
 from orwynn.di.container import DiContainer
@@ -118,7 +118,7 @@ def _traverse(
     else:
         result_provider = StarterProvider(
             *already_initialized_dependencies
-        )
+        )  # type: ignore
 
     container.add(result_provider)
     return result_provider

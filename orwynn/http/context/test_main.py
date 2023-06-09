@@ -27,7 +27,7 @@ def test_basic():
             Controllers=[C1],
             Middleware=[LogMiddleware]
         )
-    )  # type: ignore @worker
+    )
 
     validation.expect(
         HttpRequestContextId().get,

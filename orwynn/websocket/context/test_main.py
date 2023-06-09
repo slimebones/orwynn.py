@@ -30,7 +30,7 @@ def test_basic():
             Controllers=[C1],
             Middleware=[LogWebsocketMiddleware]
         )
-    )  # type: ignore @worker
+    )
 
     validation.expect(
         WebsocketRequestContextId().get,

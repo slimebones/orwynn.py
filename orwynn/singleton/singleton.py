@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import contextlib
-from typing import TypeVar
+from typing import Any, TypeVar
 
 SingletonInstance = TypeVar("SingletonInstance")
 
@@ -14,7 +14,7 @@ class SingletonMeta(type):
     """
     __instances: dict[type, object] = {}
 
-    def __call__(cls, *args, **kwargs):
+    def __call__(cls, *args, **kwargs) -> Any:
         if cls not in cls.__instances:
             cls.__instances[cls] = super().__call__(*args, **kwargs)
         return cls.__instances[cls]

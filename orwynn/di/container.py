@@ -7,14 +7,14 @@ from orwynn.base.error.errors import MalfunctionError
 from orwynn.base.errorhandler.errorhandler import ErrorHandler
 from orwynn.base.middleware import Middleware
 from orwynn.base.model.model import Model
-from orwynn.di.DiObjectAlreadyInitializedInContainerError import (
+from orwynn.di.errors import (
     DiObjectAlreadyInitializedInContainerError,
 )
 from orwynn.di.errors import MissingDiObjectError
-from orwynn.di.FinalizedDiContainerError import FinalizedDiContainerError
+from orwynn.di.errors import FinalizedDiContainerError
 from orwynn.di.isprovider import is_provider
 from orwynn.di.object import DiObject
-from orwynn.helpers.SUBCLASSABLES import SUBCLASSABLES
+from orwynn.helpers.constants import SUBCLASSABLES
 from orwynn.utils.validation import validate
 
 _InnerObj = TypeVar("_InnerObj")

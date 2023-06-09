@@ -45,7 +45,7 @@ def test_main_route():
     client = Boot(Module(
         route="/",
         Controllers=[WS1]
-    )).app.client  # type: ignore @worker
+    )).app.client
 
     with client.websocket("/hello") as ws:
         data = ws.receive_json()
@@ -64,7 +64,7 @@ def test_custom_route():
     client = Boot(Module(
         route="/",
         Controllers=[WS1]
-    )).app.client  # type: ignore @worker
+    )).app.client
 
     with client.websocket("/hello/message") as ws:
         data = ws.receive_json()
@@ -91,7 +91,7 @@ def test_several_routes():
     client = Boot(Module(
         route="/",
         Controllers=[WS1]
-    )).app.client  # type: ignore @worker
+    )).app.client
 
     with client.websocket("/hello") as ws:
         data = ws.receive_json()
@@ -109,7 +109,7 @@ def test_several_routes():
 def test_arguments():
     boot: Boot = Boot(
         Module("/", Controllers=[ArgumentedCtrl])
-    )  # type: ignore @worker
+    )
 
     with boot.client.websocket("/user/eg1?message=hello&order=2") as ws:
         data: dict = ws.receive_json()
@@ -122,7 +122,7 @@ def test_arguments():
 def test_default_query():
     boot: Boot = Boot(
         Module("/", Controllers=[ArgumentedCtrl])
-    )  # type: ignore @worker
+    )
 
     with boot.client.websocket("/user/eg1") as ws:
         data: dict = ws.receive_json()

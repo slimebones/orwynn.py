@@ -1,6 +1,6 @@
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
-from orwynn.di.collecting.providerdependenciesmap import (
+from orwynn.di.collecting.providerdependencies.map import (
     ProviderDependenciesMap,
 )
 from orwynn.di.container import DiContainer

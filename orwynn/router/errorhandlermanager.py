@@ -1,5 +1,5 @@
-from orwynn.base.error import (ExceptionAlreadyHandledError,
-                               MalfunctionError)
+from orwynn.base.error.errors import (ExceptionAlreadyHandledError,
+                                      MalfunctionError)
 from orwynn.base.errorhandler import ErrorHandler
 from orwynn.http import DEFAULT_HTTP_ERROR_HANDLERS
 from orwynn.utils.protocol import Protocol

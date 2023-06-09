@@ -1,6 +1,6 @@
 import inspect
 from types import NoneType
-from typing import Any, Callable, Optional, Self, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Optional, Self, TypeVar
 from orwynn.apiversion import ApiVersion
 from orwynn.base.model.model import Model
 from orwynn.proxy.boot import BootProxy
@@ -9,8 +9,10 @@ from orwynn.testing.embeddedclient import EmbeddedTestClient
 from orwynn.utils import validation
 from orwynn.utils.validation import validate
 from orwynn.utils.protocol import Protocol
-from orwynn.http import TestHttpResponse
 from orwynn.utils.url import join_routes
+
+if TYPE_CHECKING:
+    from orwynn.http import TestHttpResponse
 
 # If ever you get to Python3.12, see if PEP 696 introduced, then apply
 # but for now it is in the next form
@@ -71,7 +73,7 @@ class Client:
         expected_type: type[_JsonifyExpectedType] = dict,
         **kwargs
     ) -> _JsonifyExpectedType:
-        r: TestHttpResponse = self.get(url, asserted_status_code, **kwargs)
+        r: "TestHttpResponse" = self.get(url, asserted_status_code, **kwargs)
         data: Any = r.json()
         validate(data, expected_type)
         return data
@@ -84,7 +86,7 @@ class Client:
         expected_type: type[_JsonifyExpectedType] = dict,
         **kwargs
     ) -> _JsonifyExpectedType:
-        r: TestHttpResponse = self.post(url, asserted_status_code, **kwargs)
+        r: "TestHttpResponse" = self.post(url, asserted_status_code, **kwargs)
         data: Any = r.json()
         validate(data, expected_type)
         return data
@@ -97,7 +99,7 @@ class Client:
         expected_type: type[_JsonifyExpectedType] = dict,
         **kwargs
     ) -> _JsonifyExpectedType:
-        r: TestHttpResponse = self.delete(url, asserted_status_code, **kwargs)
+        r: "TestHttpResponse" = self.delete(url, asserted_status_code, **kwargs)
         data: Any = r.json()
         validate(data, expected_type)
         return data
@@ -110,7 +112,7 @@ class Client:
         expected_type: type[_JsonifyExpectedType] = dict,
         **kwargs
     ) -> _JsonifyExpectedType:
-        r: TestHttpResponse = self.put(url, asserted_status_code, **kwargs)
+        r: "TestHttpResponse" = self.put(url, asserted_status_code, **kwargs)
         data: Any = r.json()
         validate(data, expected_type)
         return data
@@ -123,7 +125,7 @@ class Client:
         expected_type: type[_JsonifyExpectedType] = dict,
         **kwargs
     ) -> _JsonifyExpectedType:
-        r: TestHttpResponse = self.patch(url, asserted_status_code, **kwargs)
+        r: "TestHttpResponse" = self.patch(url, asserted_status_code, **kwargs)
         data: Any = r.json()
         validate(data, expected_type)
         return data
@@ -136,7 +138,7 @@ class Client:
         expected_type: type[_JsonifyExpectedType] = dict,
         **kwargs
     ) -> _JsonifyExpectedType:
-        r: TestHttpResponse = self.options(url, asserted_status_code, **kwargs)
+        r: "TestHttpResponse" = self.options(url, asserted_status_code, **kwargs)
         data: Any = r.json()
         validate(data, expected_type)
         return data
@@ -146,7 +148,7 @@ class Client:
         url: str,
         asserted_status_code: int | None = None,
         **kwargs
-    ) -> TestHttpResponse:
+    ) -> "TestHttpResponse":
         # Join method name and function to call inner resolver
         # inspect.stack() is for resolving self method name, ref:
         #   https://stackoverflow.com/a/5067654
@@ -158,7 +160,7 @@ class Client:
         url: str,
         asserted_status_code: int | None = None,
         **kwargs
-    ) -> TestHttpResponse:
+    ) -> "TestHttpResponse":
         return self._get_test_response(
             inspect.stack(), url, asserted_status_code, **kwargs)
 
@@ -167,7 +169,7 @@ class Client:
         url: str,
         asserted_status_code: int | None = None,
         **kwargs
-    ) -> TestHttpResponse:
+    ) -> "TestHttpResponse":
         return self._get_test_response(
             inspect.stack(), url, asserted_status_code, **kwargs)
 
@@ -176,7 +178,7 @@ class Client:
         url: str,
         asserted_status_code: int | None = None,
         **kwargs
-    ) -> TestHttpResponse:
+    ) -> "TestHttpResponse":
         return self._get_test_response(
             inspect.stack(), url, asserted_status_code, **kwargs)
 
@@ -185,7 +187,7 @@ class Client:
         url: str,
         asserted_status_code: int | None = None,
         **kwargs
-    ) -> TestHttpResponse:
+    ) -> "TestHttpResponse":
         return self._get_test_response(
             inspect.stack(), url, asserted_status_code, **kwargs)
 
@@ -194,7 +196,7 @@ class Client:
         url: str,
         asserted_status_code: int | None = None,
         **kwargs
-    ) -> TestHttpResponse:
+    ) -> "TestHttpResponse":
         return self._get_test_response(
             inspect.stack(), url, asserted_status_code, **kwargs)
 
@@ -204,7 +206,7 @@ class Client:
         url: str,
         asserted_status_code: int | None,
         **kwargs
-    ) -> TestHttpResponse:
+    ) -> "TestHttpResponse":
         request: str = " ".join([stack[0][3], url])
         return self._resolve_request(request, asserted_status_code, **kwargs)
 
@@ -213,8 +215,8 @@ class Client:
         request: str,
         asserted_status_code: int | None,
         **request_kwargs
-    ) -> TestHttpResponse:
-        response: TestHttpResponse
+    ) -> "TestHttpResponse":
+        response: "TestHttpResponse"
         test_client_method: Callable
         method: str
         route: str
@@ -252,12 +254,10 @@ class Client:
         )
 
         # Make a request
-        response: TestHttpResponse = test_client_method(
+        response: "TestHttpResponse" = test_client_method(
             finalized.route,
             **finalized.kwargs
         )
-
-        validate(response, TestHttpResponse, is_strict=True)
 
         if asserted_status_code is not None:
             assert \

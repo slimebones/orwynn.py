@@ -3,7 +3,7 @@ from orwynn.boot.boot import Boot
 from orwynn.http import Endpoint, HttpController
 from orwynn.utils import validation
 
-from ._ApiVersion import ApiVersion
+from . import ApiVersion
 from .errors import UnsupportedVersionError
 
 # NOTE: By default there is no global route for backwards compatiblity.

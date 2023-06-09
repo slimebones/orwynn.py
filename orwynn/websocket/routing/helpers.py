@@ -1,6 +1,7 @@
 import inspect
 import typing
-from types import NoneType
+from types import NoneType, UnionType
+from orwynn.log.log import Log
 
 from orwynn.utils.url import UrlVars
 from orwynn.websocket.websocket import Websocket
@@ -35,6 +36,7 @@ def get_handler_kwargs(
     """
     kwargs: HandlerKwargs = {}
 
+
     for param in inspect.signature(handler.fn).parameters.values():
         _check_if_duplicate(
             kwargs=kwargs,
@@ -43,14 +45,23 @@ def get_handler_kwargs(
 
         if param.annotation is Websocket:
             continue
-        elif isinstance(param.annotation, _AllowedTypes):
+        elif (
+            type(param.annotation) is UnionType
+            and any([
+                a in _AllowedTypes
+                    for a in typing.get_args(param.annotation)
+            ])
+        ):
             _set_union_param(
                 kwargs=kwargs,
                 param=param,
                 handler=handler,
                 url_vars=url_vars
             )
-        elif param.annotation in _AllowedTypes:
+        elif (
+            type(param.annotation) is type
+            and param.annotation in _AllowedTypes
+        ):
             _set_regular_param(
                 kwargs=kwargs,
                 param=param,
@@ -71,12 +82,6 @@ def _set_regular_param(
     param: inspect.Parameter,
     url_vars: UrlVars
 ) -> None:
-    if param.annotation not in _AllowedTypes:
-        raise TypeError(
-            f"unsupported type of param {param.name} annotation:"
-            f" {param.annotation}"
-        )
-
     try:
         path_var_value: str = url_vars.path_vars[param.name]
     except KeyError as err:

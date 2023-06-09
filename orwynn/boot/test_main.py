@@ -26,7 +26,7 @@ class _GService(Service):
 def std_boot(std_struct: Module) -> Boot:
     return Boot(
         root_module=std_struct
-    )  # type: ignore @worker
+    )
 
 
 @fixture
@@ -38,7 +38,7 @@ def run_std(std_struct: Module):
 def std_mongo_boot(std_struct: Module) -> Boot:
     return Boot(
         root_module=std_struct
-    )  # type: ignore @worker
+    )
 
 
 @fixture
@@ -68,7 +68,7 @@ def test_init_mode_default(std_struct: Module):
     os.environ["ORWYNN_MODE"] = ""
     boot: Boot = Boot(
         root_module=std_struct
-    )  # type: ignore @worker
+    )
     assert boot.mode == AppMode.DEV
 
 
@@ -76,7 +76,7 @@ def test_init_mode_test(std_struct: Module):
     os.environ["ORWYNN_MODE"] = "test"
     boot: Boot = Boot(
         root_module=std_struct
-    )  # type: ignore @worker
+    )
     assert boot.mode == AppMode.TEST
 
 
@@ -84,7 +84,7 @@ def test_init_mode_dev(std_struct: Module):
     os.environ["ORWYNN_MODE"] = "dev"
     boot: Boot = Boot(
         root_module=std_struct
-    )  # type: ignore @worker
+    )
     assert boot.mode == AppMode.DEV
 
 
@@ -92,7 +92,7 @@ def test_init_mode_prod(std_struct: Module):
     os.environ["ORWYNN_MODE"] = "prod"
     boot: Boot = Boot(
         root_module=std_struct
-    )  # type: ignore @worker
+    )
     assert boot.mode == AppMode.PROD
 
 
@@ -176,7 +176,7 @@ def test_global_modules(
     boot: Boot = Boot(
         root_module=Module("/", Controllers=[C1]),
         global_modules=[__gmodule]
-    )  # type: ignore @worker
+    )
 
     data: dict = boot.app.client.get_jsonify("/", 200)
 
