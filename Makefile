@@ -20,4 +20,4 @@ coverage.html:
 changelog:
 # Conventional Commits is used since we use exclamation marks to sign breaking
 # commits.
-	git-changelog -c conventional -o CHANGELOG.md .
+	poetry run git-changelog -c conventional -o CHANGELOG.md .

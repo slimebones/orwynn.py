@@ -6,9 +6,154 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
-## [0.4.0a0](https://github.com/ryzhovalex/orwynn/releases/tag/0.4.0a0) - 2023-02-21
+## Unreleased
 
-<small>[Compare with 0.3.7](https://github.com/ryzhovalex/orwynn/compare/0.3.7...0.4.0a0)</small>
+<small>[Compare with latest](https://github.com/ryzhovalex/orwynn/compare/1.0.0b4...HEAD)</small>
+
+### Bug Fixes
+
+- types checking across the framework ([62f011c](https://github.com/ryzhovalex/orwynn/commit/62f011c5e0459136bcd4095e5a6f30d837500e1a) by ryzhovalex).
+
+### Code Refactoring
+
+- rename error_code -> code ([47f117f](https://github.com/ryzhovalex/orwynn/commit/47f117f4e4b6fd921d32ca62d11c94224aa810a7) by ryzhovalex).
+- additional changes to lint ([f7db643](https://github.com/ryzhovalex/orwynn/commit/f7db64364b703a9d674bf27c41bef8ecfc19d251) by ryzhovalex).
+- global refactoring to recommended naming ([bb2fba1](https://github.com/ryzhovalex/orwynn/commit/bb2fba1540c744e13527282e933462bcdbfac9c1) by ryzhovalex).
+
+<!-- insertion marker -->
+## [1.0.0b4](https://github.com/ryzhovalex/orwynn/releases/tag/1.0.0b4) - 2023-05-22
+
+<small>[Compare with 1.0.0b3](https://github.com/ryzhovalex/orwynn/compare/1.0.0b3...1.0.0b4)</small>
+
+### Features
+
+- App.core_app property ([46d079e](https://github.com/ryzhovalex/orwynn/commit/46d079efde4179be6311709f4a81519cd70435a6) by ryzhovalex).
+- catchr shortcut ([581e572](https://github.com/ryzhovalex/orwynn/commit/581e5726b94465a9d87b2e18a1ea641de6c20f13) by ryzhovalex).
+- error log catching at handlers ([f2b5f04](https://github.com/ryzhovalex/orwynn/commit/f2b5f04ff1131d26a507c72883bdc17ae9b1f57f) by ryzhovalex).
+
+### Bug Fixes
+
+- redirect blocking due to HttpLogger problem ([efcb5f5](https://github.com/ryzhovalex/orwynn/commit/efcb5f5cb101c3d29330792ed0362cba7575af21) by ryzhovalex).
+- catch log at error hanlders in tests ([63e2c70](https://github.com/ryzhovalex/orwynn/commit/63e2c7009239082d97d0151f4246224740a14152) by ryzhovalex).
+
+### Code Refactoring
+
+- rename unproperly formatted environ ([55aedec](https://github.com/ryzhovalex/orwynn/commit/55aedec61d4f02440b5e68a78865c323bb34f7ec) by ryzhovalex).
+- rename sql_id to sid ([b43d360](https://github.com/ryzhovalex/orwynn/commit/b43d360d3897054cab917f13400112776a62a830) by ryzhovalex).
+
+## [1.0.0b3](https://github.com/ryzhovalex/orwynn/releases/tag/1.0.0b3) - 2023-05-15
+
+<small>[Compare with 1.0.0b2](https://github.com/ryzhovalex/orwynn/compare/1.0.0b2...1.0.0b3)</small>
+
+### Features
+
+- root_dir property for boot proxy ([6ecc68a](https://github.com/ryzhovalex/orwynn/commit/6ecc68afd6bc8644f83cfdc7f6398b781d31798b) by ryzhovalex).
+- multiple query for examle ([5f87d69](https://github.com/ryzhovalex/orwynn/commit/5f87d696d68993167b786ba916d322ed9e9a3ff4) by ryzhovalex).
+- file http response ([c728dd4](https://github.com/ryzhovalex/orwynn/commit/c728dd42999e9d341b543631cf1ffe5cddd424e6) by ryzhovalex).
+- decrease privacy of Sql ([30426ed](https://github.com/ryzhovalex/orwynn/commit/30426ed4f3d17ffb45b47bfe8af0ef7e77275afb) by ryzhovalex).
+- additional arguments to sql create engine ([dbf1b59](https://github.com/ryzhovalex/orwynn/commit/dbf1b59d71cf294a69e77de0ccf274fd142d66a8) by ryzhovalex).
+- add example deps ([5e4119c](https://github.com/ryzhovalex/orwynn/commit/5e4119c877fe837a2e49082475596af702e3152a) by ryzhovalex).
+- extend example ([634b147](https://github.com/ryzhovalex/orwynn/commit/634b1478bc9e17368e7b5a4216ac3193daec0cb2) by ryzhovalex).
+
+### Bug Fixes
+
+- lint ([3358aa7](https://github.com/ryzhovalex/orwynn/commit/3358aa7103d4f6d0deca12a0d751fee7f54a8e26) by ryzhovalex).
+- remove error for wrong return handler type ([efd65d6](https://github.com/ryzhovalex/orwynn/commit/efd65d6c28fd296e5c0f048a9505f6298f947ffd) by ryzhovalex).
+- error code digesting ([7287b9f](https://github.com/ryzhovalex/orwynn/commit/7287b9f1118f472abb2dca10380b30c6c9a539b1) by ryzhovalex).
+- log json decoding ([f32aa5e](https://github.com/ryzhovalex/orwynn/commit/f32aa5e886fd791be27679dc6e6021a653c2675d) by ryzhovalex).
+- remove code workspace ([bddfa68](https://github.com/ryzhovalex/orwynn/commit/bddfa6894c0a025c1939cbf78750f403281a04be) by ryzhovalex).
+
+## [1.0.0b2](https://github.com/ryzhovalex/orwynn/releases/tag/1.0.0b2) - 2023-04-07
+
+<small>[Compare with 1.0.0b1](https://github.com/ryzhovalex/orwynn/compare/1.0.0b1...1.0.0b2)</small>
+
+### Features
+
+- add formatting for error message ([d0885b1](https://github.com/ryzhovalex/orwynn/commit/d0885b1ed1f146ae9cbc350f6d7350c8015c231c) by ryzhovalex).
+- add possibility to set own docs and redoc route ([14771e4](https://github.com/ryzhovalex/orwynn/commit/14771e4a5b904a303e548b8c3e59b7e001b71e37) by ryzhovalex).
+- error codes ([7e5b169](https://github.com/ryzhovalex/orwynn/commit/7e5b1698bcfeb15babd5ac43fbd0de180812c107) by ryzhovalex).
+
+### Bug Fixes
+
+- no final routes were set for ws controller ([d16d522](https://github.com/ryzhovalex/orwynn/commit/d16d522ee7a3a57d6890a0b2640de820684dcb0b) by ryzhovalex).
+
+### Code Refactoring
+
+- rename ucls -> klass ([3cd46c1](https://github.com/ryzhovalex/orwynn/commit/3cd46c1b5134cb46af51102fe6e85648f4f9af08) by ryzhovalex).
+- change environs name formatting ([f986522](https://github.com/ryzhovalex/orwynn/commit/f986522d02fcd6bbdf8f6a10bd29b3f5c3191e65) by ryzhovalex).
+
+## [1.0.0b1](https://github.com/ryzhovalex/orwynn/releases/tag/1.0.0b1) - 2023-04-03
+
+<small>[Compare with 1.0.0a4](https://github.com/ryzhovalex/orwynn/compare/1.0.0a4...1.0.0b1)</small>
+
+### Bug Fixes
+
+- incorrect condition for controller handler return typehint ([fd02547](https://github.com/ryzhovalex/orwynn/commit/fd02547b0c3c5a4afe9468be7b6bec16b7c2b164) by ryzhovalex).
+- circular import problem on uvicorn app factory launch, also create an example app ([8f675cd](https://github.com/ryzhovalex/orwynn/commit/8f675cdee0bc8fa42468d71ee189792a5e156444) by ryzhovalex).
+
+### Code Refactoring
+
+- add REQUEST_METHODS_BY_PROTOCOL instead of HttpMethod and WebsocketMethod ([ac0f36a](https://github.com/ryzhovalex/orwynn/commit/ac0f36af570a6db4f0abe53386423ad240f3614c) by ryzhovalex).
+- rename cls -> ucls ([40f8623](https://github.com/ryzhovalex/orwynn/commit/40f862354c118fedd7aefca2d6c0389f5e00bb92) by ryzhovalex).
+- rename util -> utils ([5e60f9e](https://github.com/ryzhovalex/orwynn/commit/5e60f9ebcdc557c9ed2c3c62b61da58ed6e11ab8) by ryzhovalex).
+- dependency versions setup ([48315ce](https://github.com/ryzhovalex/orwynn/commit/48315cecb859eeeb17befbe02a09bd46fd81610d) by ryzhovalex).
+- move circular error to module ([8cf52f5](https://github.com/ryzhovalex/orwynn/commit/8cf52f566c84acc6c95432eaac3dd14208639fec) by ryzhovalex).
+
+## [1.0.0a4](https://github.com/ryzhovalex/orwynn/releases/tag/1.0.0a4) - 2023-03-07
+
+<small>[Compare with 1.0.0a3](https://github.com/ryzhovalex/orwynn/compare/1.0.0a3...1.0.0a4)</small>
+
+### Features
+
+- Add base module's import shortcuts ([0fdbfec](https://github.com/ryzhovalex/orwynn/commit/0fdbfecc57ae76dbe2ed9923ef15207d620aecd9) by ryzhovalex).
+- Add request method ([48dc93b](https://github.com/ryzhovalex/orwynn/commit/48dc93bdfe6125123009a7da6361d014598baa88) by ryzhovalex).
+- bootscripts ([22ca6ce](https://github.com/ryzhovalex/orwynn/commit/22ca6ce2de8e941f2c721cc27f5b7bc3418430fb) by ryzhovalex).
+- Add controller's final routes ([9f477c2](https://github.com/ryzhovalex/orwynn/commit/9f477c24e7cca51da5167d8911f68425129eb062) by ryzhovalex).
+
+### Bug Fixes
+
+- Client stacking binded headers ([ba173d6](https://github.com/ryzhovalex/orwynn/commit/ba173d663e986043a6f501164243f98902a1cf13) by ryzhovalex).
+- Error handlers got initialized twice ([83b4e96](https://github.com/ryzhovalex/orwynn/commit/83b4e96ec5950e56566df216080595559b2461db) by ryzhovalex).
+- Resolve fastapi get_dependant issue ([36bbaba](https://github.com/ryzhovalex/orwynn/commit/36bbabadacb79d38a36ead903750bbab46d6fd1d) by ryzhovalex).
+- Add exception for dict return types of controllers ([4fd17c9](https://github.com/ryzhovalex/orwynn/commit/4fd17c9e05d6caca5585624549a23224b831a0b8) by ryzhovalex).
+
+### Code Refactoring
+
+- Move worker module to base folder ([26520da](https://github.com/ryzhovalex/orwynn/commit/26520da34f12890a2d6c4c8cf9f4796597ed7a0c) by ryzhovalex).
+- Restructure util and helpers ([4063532](https://github.com/ryzhovalex/orwynn/commit/40635328e231d204b337f9d034c21a7335cd059b) by ryzhovalex).
+- Pass linter ([6c82561](https://github.com/ryzhovalex/orwynn/commit/6c82561773b88afb5f904e3c01ab6cfe87133bff) by ryzhovalex).
+- Rename ExceptionHandler -> ErrorHandler ([74d5a38](https://github.com/ryzhovalex/orwynn/commit/74d5a38e1ac375f97138a7d38b91d46d11b2d4c4) by ryzhovalex).
+- Remove Error ([0365571](https://github.com/ryzhovalex/orwynn/commit/0365571387da4829fab7a62cad6bc13fcb72da37) by ryzhovalex).
+
+## [1.0.0a3](https://github.com/ryzhovalex/orwynn/releases/tag/1.0.0a3) - 2023-02-28
+
+<small>[Compare with 1.0.0a2](https://github.com/ryzhovalex/orwynn/compare/1.0.0a2...1.0.0a3)</small>
+
+### Features
+
+- Add option to pass poolclass to sql ([ce9c7bf](https://github.com/ryzhovalex/orwynn/commit/ce9c7bfa7804a350a4d9c7867119ddf07242fc24) by ryzhovalex).
+- Add support for websocket path and query variables ([67f45b6](https://github.com/ryzhovalex/orwynn/commit/67f45b68ace74bdc7167cee2ed164a87888e7377) by ryzhovalex).
+
+### Code Refactoring
+
+- Restructure project layout ([3294d0b](https://github.com/ryzhovalex/orwynn/commit/3294d0bcd2faf0aededd86fa2fe4f7f960e11e92) by ryzhovalex).
+- Move websocket handlers ([ccce226](https://github.com/ryzhovalex/orwynn/commit/ccce22649d21a92cc3da94202dd11344673c5ba1) by ryzhovalex).
+
+## [1.0.0a2](https://github.com/ryzhovalex/orwynn/releases/tag/1.0.0a2) - 2023-02-21
+
+<small>[Compare with 1.0.0a1](https://github.com/ryzhovalex/orwynn/compare/1.0.0a1...1.0.0a2)</small>
+
+### Code Refactoring
+
+- Unpack shared module ([98a2ef1](https://github.com/ryzhovalex/orwynn/commit/98a2ef1f81035c42fa9250b381ed94ad00d6059f) by ryzhovalex).
+
+## [1.0.0a1](https://github.com/ryzhovalex/orwynn/releases/tag/1.0.0a1) - 2023-02-21
+
+<small>[Compare with 1.0.0a0](https://github.com/ryzhovalex/orwynn/compare/1.0.0a0...1.0.0a1)</small>
+
+## [1.0.0a0](https://github.com/ryzhovalex/orwynn/releases/tag/1.0.0a0) - 2023-02-21
+
+<small>[Compare with 0.3.7](https://github.com/ryzhovalex/orwynn/compare/0.3.7...1.0.0a0)</small>
 
 ### Features
 
@@ -54,6 +199,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Code Refactoring
 
+- Add src subfolder ([9fffc4d](https://github.com/ryzhovalex/orwynn/commit/9fffc4d131b54e8d72c24ddc3bf2af85f6f38e9e) by ryzhovalex).
 - Remove __init__ imports ([53121d5](https://github.com/ryzhovalex/orwynn/commit/53121d5270f0e27d1dcff5561cf0f2adfd78fc1e) by ryzhovalex).
 - Make separation for global_http_route ([004af23](https://github.com/ryzhovalex/orwynn/commit/004af232b7705ed56e92129c74bc6d79d534070c) by ryzhovalex).
 - Rename file for ValidationError ([2216425](https://github.com/ryzhovalex/orwynn/commit/2216425821b5243fdd19f7697dbb542c5d78c285) by ryzhovalex).
