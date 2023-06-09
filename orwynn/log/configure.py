@@ -29,9 +29,9 @@ def __add_handler(handler: LogHandler, app_mode_prod: "AppMode") -> int:
         # For apprc-based configuration parse some string literals into
         # actual objects.
         match handler.sink:
-            case "stdout":
+            case "$stdout":
                 sink = sys.stdout
-            case "stderr":
+            case "$stderr":
                 sink = sys.stderr
             case _:
                 # For all other string cases consider the sink as a file

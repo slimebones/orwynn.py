@@ -1,14 +1,16 @@
 from datetime import time, timedelta
-from typing import Any, Callable
+from typing import Callable
 
 from orwynn.base.model.model import Model
+from orwynn.log.types import LogMessage
+from orwynn.utils.types import CashOperator
 
 
 class LogHandler(Model):
     # Only mattering for default values fields are added from loguru, others
     # are moved to kwargs dict. Fields set to None by default will be assigned
     # at runtime depending on some conditions
-    sink: Any
+    sink: str | CashOperator | Callable[[LogMessage], None]
     level: int | str | None = None
     format: str | Callable = \
         "{time:%Y.%m.%d at %H:%M:%S.%f%z}" \
