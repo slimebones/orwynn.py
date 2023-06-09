@@ -18,7 +18,7 @@ from orwynn.bootscript import Bootscript, BootscriptWorker, CallTime
 from orwynn.bootscript.errors import NoScriptsForCallTimeError
 from orwynn.di.di import Di
 from orwynn.di.errors import MissingDiObjectError
-from orwynn.http import Cors, EndpointContainer
+from orwynn.http import EndpointContainer
 from orwynn.indication import Indication, default_api_indication
 from orwynn.log import LogConfig, configure_log
 from orwynn.proxy.boot import BootProxy
@@ -45,9 +45,6 @@ class Boot(Worker):
             Indication object used as a convention for outcoming API
             structures. Defaults to predefined by framework's indication
             convention.
-        cors (optional):
-            CORS policy applied to the whole application. No CORS applied by
-            default.
         ErrorHandlers (optional):
             List of exception handlers to add. By default framework adds
             the builtin Exception and orwynn.Error handlers.
@@ -110,7 +107,6 @@ class Boot(Worker):
         *,
         dotenv_path: Path | None = None,
         api_indication: Indication | None = None,
-        cors: Cors | None = None,
         ErrorHandlers: set[type[ErrorHandler]] | None = None,
         apprc: AppRc | None = None,
         mode: AppMode | None = None,
@@ -129,7 +125,6 @@ class Boot(Worker):
         if api_indication is None:
             api_indication = default_api_indication
         validate(api_indication, Indication)
-        validate(cors, [Cors, NoneType])
         if ErrorHandlers is None:
             ErrorHandlers = set()
         validate_each(
@@ -198,14 +193,12 @@ class Boot(Worker):
             global_middleware=global_middleware
         )
 
+        self.__init_router()
+
         # Configure logging
         configure_log(
             validation.apply(self.__di.find("LogConfig"), LogConfig),
             app_mode_prod=AppMode.PROD
-        )
-
-        self.__init_router(
-            cors=cors
         )
 
         # AFTER_ALL bootscript call time
@@ -242,11 +235,7 @@ class Boot(Worker):
         EndpointContainer()
         ApiIndicationOnlyProxy(api_indication)
 
-    def __init_router(
-        self,
-        *,
-        cors: Cors | None
-    ) -> Router:
+    def __init_router(self) -> Router:
         try:
             all_modules: list[Module] = self.__di.modules
         except MissingDiObjectError:
@@ -273,7 +262,6 @@ class Boot(Worker):
             global_http_route=self.__global_http_route,
             global_websocket_route=self.__global_websocket_route,
             api_version=self.__api_version,
-            cors=cors,
             modules=all_modules,
             controllers=all_controllers,
             middleware_arr=all_middleware,

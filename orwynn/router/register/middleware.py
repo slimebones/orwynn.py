@@ -1,6 +1,5 @@
-from typing import Any, Callable, Sequence
+from typing import Callable, Sequence
 
-from fastapi.middleware.cors import CORSMiddleware as FastAPI_CORSMiddleware
 from starlette.middleware.base import (
     BaseHTTPMiddleware as StarletteBaseHTTPMiddleware,
 )
@@ -12,7 +11,6 @@ from orwynn.base.middleware import Middleware
 from orwynn.http import (
     BUILTIN_HTTP_MIDDLEWARE,
     BuiltinHttpMiddleware,
-    Cors,
     DefaultErrorHandler,
     DefaultHttpErrorHandler,
     ErrorHandlerHttpMiddleware,
@@ -45,7 +43,6 @@ class MiddlewareRegister:
         app: App,
         middleware_arr: list[Middleware],
         exception_handlers: list[ErrorHandler],
-        cors: Cors | None,
         websocket_stack: WebsocketStack,
     ) -> None:
         self.__app: App = app
@@ -55,7 +52,6 @@ class MiddlewareRegister:
             exception_handlers
         )
 
-        self.__cors: Cors | None = cors
         self.__websocket_stack: WebsocketStack = websocket_stack
         self.__is_websocket_middleware_added: bool = False
 
@@ -167,9 +163,6 @@ class MiddlewareRegister:
                     f"unrecognized middleware {middleware}"
                 )
 
-        # Add CORS middleware first
-        self.__register_cors_middleware()
-
         # Add HTTP from reversed list to comply Starlette
         for http_middleware in reversed(http_middleware_arr):
             self.__register_middleware_unit(http_middleware)
@@ -269,21 +262,3 @@ class MiddlewareRegister:
                 Remaining,
                 handle_fn
             )
-
-    def __register_cors_middleware(self) -> None:
-        """
-        Configures CORS policy used for the whole app.
-        """
-        if self.__cors is None:
-            return
-        validation.validate(self.__cors, Cors)
-
-        kwargs: dict[str, Any] = {}
-        for k, v in self.__cors.dict().items():
-            if v:
-                kwargs[k] = v
-
-        self.__app._fw_register_middleware(
-            FastAPI_CORSMiddleware,
-            **kwargs
-        )

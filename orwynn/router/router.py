@@ -5,7 +5,6 @@ from orwynn.base.errorhandler.errorhandler import ErrorHandler
 from orwynn.base.middleware import Middleware
 from orwynn.base.module.module import Module
 from orwynn.base.worker.worker import Worker
-from orwynn.http import Cors
 from orwynn.websocket import WebsocketStack
 
 from .register.controller import ControllerRegister
@@ -24,7 +23,6 @@ class Router(Worker):
         controllers: list[Controller],
         middleware_arr: list[Middleware],
         exception_handlers: list[ErrorHandler],
-        cors: Cors | None,
         global_http_route: str,
         global_websocket_route: str,
         api_version: ApiVersion
@@ -37,8 +35,6 @@ class Router(Worker):
         self.__middleware_arr: list[Middleware] = middleware_arr
         self.__exception_handlers: list[ErrorHandler] = exception_handlers
 
-        self.__cors: Cors | None = cors
-
         self.__websocket_stack: WebsocketStack = WebsocketStack(
             self.__app._fw_websocket_handler
         )
@@ -47,7 +43,6 @@ class Router(Worker):
             app=self.__app,
             middleware_arr=self.__middleware_arr,
             exception_handlers=self.__exception_handlers,
-            cors=self.__cors,
             websocket_stack=self.__websocket_stack
         )
         self.__controller_register: ControllerRegister = ControllerRegister(
