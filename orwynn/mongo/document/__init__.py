@@ -15,8 +15,8 @@ from orwynn.mongo.mongo import Mongo
 from orwynn.utils import validation
 from orwynn.utils.fmt import snakefy
 
-from .clientsession import ClientSession
-from .errors import DocumentUpdateError
+from ..clientsession import ClientSession
+from ..errors import DocumentUpdateError, UnsetIdDocumentError
 
 
 class Document(Mapping):
@@ -84,6 +84,15 @@ class Document(Mapping):
                 **kwargs
             )
         )
+
+    def getid(self) -> str:
+        if self.id is None:
+            raise UnsetIdDocumentError(
+                explanation="cannot get an id",
+                document=self
+            )
+        else:
+            return self.id
 
     @if_linked
     def create(
