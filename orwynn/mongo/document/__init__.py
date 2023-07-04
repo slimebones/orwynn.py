@@ -162,6 +162,30 @@ class Document(Mapping):
             )
         )
 
+    @classmethod
+    def _parse_document(cls, document: MongoEntity) -> Self:
+        """Parses document to specified Model."""
+        return cls.parse_obj(cls._adjust_id_from_mongo(document))
+
+    @staticmethod
+    def _adjust_id_to_mongo(data: dict) -> dict:
+        if "id" in data:
+            input_id: Any = data["id"]
+            if input_id is not None:
+                if isinstance(input_id, str):
+                    data["_id"] = ObjectId(input_id)
+                elif isinstance(input_id, dict):
+            del data["id"]
+        return data
+
+    @staticmethod
+    def _adjust_id_from_mongo(data: dict) -> dict:
+        if "_id" in data:
+            if data["_id"] is not None:
+                data["id"] = str(data["_id"])
+            del data["_id"]
+        return data
+
     def __validate_update_dict(self, dct: dict) -> None:
         # WARNING: Don't use any removable checks like "assert" or "validation"
         #   since checks here should be performed in any case to avoid
@@ -180,25 +204,3 @@ class Document(Mapping):
                 raise DocumentUpdateError(
                     f"key {k} is not present in document fields"
                 )
-
-    @staticmethod
-    def _adjust_id_to_mongo(data: dict) -> dict:
-        if "id" in data:
-            if data["id"] is not None:
-                id: str = validation.apply(data["id"], str)
-                data["_id"] = ObjectId(id)
-            del data["id"]
-        return data
-
-    @staticmethod
-    def _adjust_id_from_mongo(data: dict) -> dict:
-        if "_id" in data:
-            if data["_id"] is not None:
-                data["id"] = str(data["_id"])
-            del data["_id"]
-        return data
-
-    @classmethod
-    def _parse_document(cls, document: MongoEntity) -> Self:
-        """Parses document to specified Model."""
-        return cls.parse_obj(cls._adjust_id_from_mongo(document))

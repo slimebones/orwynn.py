@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
 
 if TYPE_CHECKING:
@@ -32,4 +32,20 @@ class UnsetIdDocumentError(Exception):
     ) -> None:
         message: str = \
             f"{explanation}: id for document <{document}> has not been set yet"
+        super().__init__(message)
+
+
+class UnsupportedQueryTypeError(Exception):
+    """
+    Type of given query is unsupported.
+    """
+    def __init__(
+        self,
+        *,
+        key: str,
+        unsupported_value: Any
+    ) -> None:
+        message: str = \
+            f"query for key <{key}> has an unsupported value" \
+            f" <{unsupported_value}>"
         super().__init__(message)
