@@ -1,3 +1,4 @@
+import copy
 from types import NoneType
 from typing import Any, Iterable, Self
 
@@ -46,14 +47,6 @@ class Document(Mapping):
         super().__init__(**data)
 
     @classmethod
-    def _get_collection(cls) -> str:
-        return snakefy(cls.__name__)
-
-    @classmethod
-    def _get_mongo(cls) -> Mongo:
-        return validation.apply(Di.ie().find("Mongo"), Mongo)
-
-    @classmethod
     def start_session(cls, **kwargs) -> ClientSession:
         # Tip: In future here you can add per-document class defined session
         #   options to apply, so @classmethod is used instead of @staticmethod
@@ -65,13 +58,12 @@ class Document(Mapping):
         query: dict | None = None,
         **kwargs
     ) -> Iterable[Self]:
-        if query is None:
-            query = {}
-        validation.validate(query, dict)
+        _query: dict = cls._parse_query(query)
+        validation.validate(_query, dict)
 
         cursor: Cursor = cls._get_mongo().find_all(
             cls._get_collection(),
-            cls._adjust_id_to_mongo(query),
+            cls._adjust_id_to_mongo(_query),
             **kwargs
         )
 
@@ -83,14 +75,13 @@ class Document(Mapping):
         query: dict | None = None,
         **kwargs
     ) -> Self:
-        if query is None:
-            query = {}
-        validation.validate(query, dict)
+        _query: dict = cls._parse_query(query)
+        validation.validate(_query, dict)
 
         return cls._parse_document(
             cls._get_mongo().find_one(
                 cls._get_collection(),
-                cls._adjust_id_to_mongo(query),
+                cls._adjust_id_to_mongo(_query),
                 **kwargs
             )
         )
@@ -157,10 +148,10 @@ class Document(Mapping):
 
         operation: dict = {}
         if set is not None:
-            self.__validate_update_dict(set)
+            self._validate_update_dict(set)
             operation["$set"] = set
         if inc is not None:
-            self.__validate_update_dict(inc)
+            self._validate_update_dict(inc)
             operation["$inc"] = inc
 
         return self._parse_document(
@@ -171,6 +162,14 @@ class Document(Mapping):
                 **kwargs
             )
         )
+
+    @classmethod
+    def _get_collection(cls) -> str:
+        return snakefy(cls.__name__)
+
+    @classmethod
+    def _get_mongo(cls) -> Mongo:
+        return validation.apply(Di.ie().find("Mongo"), Mongo)
 
     @classmethod
     def _parse_document(cls, document: MongoEntity) -> Self:
@@ -195,6 +194,10 @@ class Document(Mapping):
         return data
 
     @staticmethod
+    def _parse_query(query: dict | None) -> dict:
+        return {} if query is None else copy.copy(query)
+
+    @staticmethod
     def _adjust_id_from_mongo(data: dict) -> dict:
         if "_id" in data:
             if data["_id"] is not None:
@@ -202,7 +205,7 @@ class Document(Mapping):
             del data["_id"]
         return data
 
-    def __validate_update_dict(self, dct: dict) -> None:
+    def _validate_update_dict(self, dct: dict) -> None:
         # WARNING: Don't use any removable checks like "assert" or "validation"
         #   since checks here should be performed in any case to avoid
         #   passing of dangerous updates to db.
