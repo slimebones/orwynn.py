@@ -24,11 +24,17 @@ from orwynn.utils.fmt import snakefy
 
 
 class Document(Mapping):
-    """Mapping to work with MongoDB.
+    """
+    Mapping to work with MongoDB.
 
     Itself is some model representing MongoDB document and also has some class
     methods to manipulate with related document in DB and translate it from/to
     mapping.
+
+    The ID of the document on creating is always a string, not ObjectId for
+    adjusting convenience. Under the hood a convertation str->ObjectId is
+    performed before saving to MongoDB and backwards ObjectId->str before
+    forming the document from MongoDB data.
     """
     def __init__(self, **data: Any) -> None:
         for k in data:
