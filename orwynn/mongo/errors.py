@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, Any
+
 from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
 
 if TYPE_CHECKING:

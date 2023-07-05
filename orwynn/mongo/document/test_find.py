@@ -1,13 +1,5 @@
-from pytest import fixture
 
-from orwynn import mongo
-from orwynn.base.module import Module
-from orwynn.boot.boot import Boot
 from orwynn.mongo.testing import Item
-from orwynn.utils import validation
-
-from . import Document
-from ..errors import DocumentUpdateError
 
 
 def test_one(document_1: Item, document_2: Item):
@@ -15,10 +7,8 @@ def test_one(document_1: Item, document_2: Item):
 
 
 def test_all(document_1: Item, document_2: Item):
-    assert set(item.id for item in Item.find_all()) == set([
-        document_1.id,
-        document_2.id
-    ])
+    assert {item.id for item in Item.find_all()} == {document_1.id,
+        document_2.id}
 
 
 def test_all_limited(document_1: Item, document_2: Item):

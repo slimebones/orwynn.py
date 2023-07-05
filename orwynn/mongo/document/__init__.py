@@ -10,15 +10,17 @@ from orwynn.di.di import Di
 from orwynn.helpers.errors import UnsupportedError
 from orwynn.mapping.errors import CustomUseOfMappingReservedFieldError
 from orwynn.mapping.mapping import Mapping, if_linked
+from orwynn.mongo.clientsession import ClientSession
 from orwynn.mongo.document.helpers import convert_to_object_id
 from orwynn.mongo.entity import MongoEntity
-from orwynn.mongo.errors import DuplicateKeyError
+from orwynn.mongo.errors import (
+    DocumentUpdateError,
+    DuplicateKeyError,
+    UnsetIdDocumentError,
+)
 from orwynn.mongo.mongo import Mongo
 from orwynn.utils import validation
 from orwynn.utils.fmt import snakefy
-
-from ..clientsession import ClientSession
-from ..errors import DocumentUpdateError, UnsetIdDocumentError
 
 
 class Document(Mapping):
@@ -175,9 +177,7 @@ class Document(Mapping):
             input_id_value: Any = data["id"]
             if input_id_value is not None:
                 if (
-                    isinstance(input_id_value, str)
-                    or isinstance(input_id_value, dict)
-                    or isinstance(input_id_value, list)
+                    isinstance(input_id_value, (str, dict, list))
                 ):
                     data["_id"] = convert_to_object_id(input_id_value)
                 else:

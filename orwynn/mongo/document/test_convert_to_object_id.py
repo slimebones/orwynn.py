@@ -1,4 +1,5 @@
 from bson import ObjectId
+
 from orwynn.mongo.document.errors import InvalidIdError
 from orwynn.mongo.document.helpers import convert_to_object_id
 from orwynn.utils import validation
@@ -50,9 +51,7 @@ def test_list():
 
     assert type(result) is list
     assert len(result) == 2
-    assert set([str(x) for x in result]) == set([
-        str(object_id_1), str(object_id_2)
-    ])
+    assert {str(x) for x in result} == {str(object_id_1), str(object_id_2)}
 
 
 def test_invalid_id():
