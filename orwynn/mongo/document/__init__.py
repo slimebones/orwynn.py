@@ -9,6 +9,7 @@ from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
 from orwynn.di.di import Di
 from orwynn.mapping.errors import CustomUseOfMappingReservedFieldError
 from orwynn.mapping.mapping import Mapping, if_linked
+from orwynn.mongo.document.helpers import convert_to_object_id
 from orwynn.mongo.entity import MongoEntity
 from orwynn.mongo.errors import DuplicateKeyError
 from orwynn.mongo.mongo import Mongo
@@ -175,6 +176,7 @@ class Document(Mapping):
                 if isinstance(input_id, str):
                     data["_id"] = ObjectId(input_id)
                 elif isinstance(input_id, dict):
+                    data["_id"] = convert_to_object_id(input_id)
             del data["id"]
         return data
 

@@ -1,33 +1,42 @@
 from typing import Any
 
 from bson import ObjectId
+from bson.errors import InvalidId
 
 from orwynn.helpers.errors import UnsupportedError
+from orwynn.mongo.document.errors import InvalidIdError
+from orwynn.utils.types import CommonType
 
 
-def convert_ids(obj: dict) -> dict:
+def convert_to_object_id(obj: CommonType) -> CommonType | ObjectId:
     """
-    Takes an object and converts all string values found there to ids.
+    Converts an object to ObjectId compliant.
 
-    If a nested data containers is found (dictionaries or lists are only
-    supported), a recursive convertation for them are performed.
+    If the object is:
+    - string: It is passed directly to ObjectId()
+    - dict: All values are recursively converted using this method.
+    - list: All items are recursively converted using this method.
+    - other types: Nothing will be done.
+
+    Returns:
+        ObjectId-compliant representation of the given object.
     """
-    result: dict = {}
+    result: CommonType | ObjectId
 
-    for k, v in obj:
-        new_value: Any
-        if type(v) is str:
-            new_value = ObjectId(v)
-        elif type(v) is dict:
-            new_value = convert_ids(v)
-        elif type(v) is list:
-            new_value = [convert_ids(x) for x in v]
-        else:
-            raise UnsupportedError(
-                title="document id query type",
-                value=type(v)
-            )
-
-        result[k] = new_value
+    if type(obj) is str:
+        try:
+            result = ObjectId(obj)
+        except InvalidId as error:
+            raise InvalidIdError(
+                invalid_id=obj
+            ) from error
+    elif type(obj) is dict:
+        result = type(obj)()
+        for k, v in obj.items():
+            result[k] = convert_to_object_id(v)
+    elif type(obj) is list:
+        result = type(obj)([convert_to_object_id(x) for x in obj])
+    else:
+        result = obj
 
     return result

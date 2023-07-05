@@ -2,6 +2,7 @@
 """
 from typing import Any, Callable, TypeVar
 
+CommonType = TypeVar("CommonType")
 Class = TypeVar("Class", bound=type)
 DecoratedCallable = TypeVar("DecoratedCallable", bound=Callable[..., Any])
 
