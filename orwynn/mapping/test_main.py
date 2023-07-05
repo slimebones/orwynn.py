@@ -1,10 +1,29 @@
+from orwynn.mapping.errors import UnsetIdMappingError
+from orwynn.utils import validation
+
 from .mapping import Mapping
 
 
-def test_try_set_id():
-    class M1(Mapping):
-        number: int
+class _M1(Mapping):
+    number: int
 
-    m: Mapping = M1(id="helloworld", number=1)
+
+def test_try_set_id():
+    m: Mapping = _M1(id="helloworld", number=1)
 
     assert m.id == "helloworld"
+
+
+def test_get_id():
+    m: Mapping = _M1(id="helloworld", number=2)
+
+    assert m.getid() == "helloworld"
+
+
+def test_get_id_unset():
+    m: Mapping = _M1(number=2)
+
+    validation.expect(
+        m.getid,
+        UnsetIdMappingError
+    )

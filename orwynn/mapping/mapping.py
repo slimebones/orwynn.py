@@ -2,7 +2,7 @@ import typing
 from typing import Any
 
 from orwynn.base.model.model import Model
-from orwynn.mapping.errors import MappingNotLinkedError
+from orwynn.mapping.errors import MappingNotLinkedError, UnsetIdMappingError
 from orwynn.utils.types import DecoratedCallable
 
 
@@ -29,6 +29,15 @@ class Mapping(Model):
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
+
+    def getid(self) -> str:
+        if self.id is None:
+            raise UnsetIdMappingError(
+                explanation="cannot get an id",
+                mapping=self
+            )
+        else:
+            return self.id
 
     def is_linked(self) -> bool:
         """Whether this mapping is linked to actual object in database.

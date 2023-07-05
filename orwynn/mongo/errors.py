@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any
 from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
 
 if TYPE_CHECKING:
-    from orwynn.mongo.document import Document
+    pass
 
 
 class DuplicateKeyError(Exception):
@@ -19,21 +19,6 @@ class DuplicateKeyError(Exception):
 
 class DocumentUpdateError(Exception):
     pass
-
-
-class UnsetIdDocumentError(Exception):
-    """
-    Id for document has not been set yet.
-    """
-    def __init__(
-        self,
-        *,
-        explanation: str,
-        document: "Document"
-    ) -> None:
-        message: str = \
-            f"{explanation}: id for document <{document}> has not been set yet"
-        super().__init__(message)
 
 
 class UnsupportedQueryTypeError(Exception):
