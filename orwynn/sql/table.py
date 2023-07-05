@@ -6,7 +6,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from orwynn.utils.fmt import snakefy
-from orwynn.utils.rnd import gen_id
+from orwynn.utils.rnd import makeid
 
 
 class Table(DeclarativeBase):
@@ -23,7 +23,7 @@ class Table(DeclarativeBase):
     # For each table special string id is generated, but it is not a primary
     # key for the performance sake, for details see:
     #   https://stackoverflow.com/a/517591/14748231
-    _id: Mapped[str] = mapped_column(default=gen_id, unique=True)
+    _id: Mapped[str] = mapped_column(default=makeid, unique=True)
 
     @hybrid_property
     def sid(self) -> int:

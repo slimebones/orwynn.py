@@ -1,7 +1,7 @@
 from orwynn.context import ContextStorage
 from orwynn.context.errors import RequestIdAlreadySavedError
 from orwynn.utils import validation
-from orwynn.utils.rnd import gen_id
+from orwynn.utils.rnd import makeid
 
 
 class HttpRequestContextId:
@@ -23,7 +23,7 @@ class HttpRequestContextId:
             RequestIdAlreadySavedError:
                 If the request id has been set previously.
         """
-        request_id: str = gen_id()
+        request_id: str = makeid()
         try:
             self.__storage.get("request_id")
         except KeyError:
