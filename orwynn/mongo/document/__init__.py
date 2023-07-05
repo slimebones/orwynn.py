@@ -7,6 +7,7 @@ from pymongo.cursor import Cursor
 from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
 
 from orwynn.di.di import Di
+from orwynn.helpers.errors import UnsupportedError
 from orwynn.mapping.errors import CustomUseOfMappingReservedFieldError
 from orwynn.mapping.mapping import Mapping, if_linked
 from orwynn.mongo.document.helpers import convert_to_object_id
@@ -171,12 +172,19 @@ class Document(Mapping):
     @staticmethod
     def _adjust_id_to_mongo(data: dict) -> dict:
         if "id" in data:
-            input_id: Any = data["id"]
-            if input_id is not None:
-                if isinstance(input_id, str):
-                    data["_id"] = ObjectId(input_id)
-                elif isinstance(input_id, dict):
-                    data["_id"] = convert_to_object_id(input_id)
+            input_id_value: Any = data["id"]
+            if input_id_value is not None:
+                if (
+                    isinstance(input_id_value, str)
+                    or isinstance(input_id_value, dict)
+                    or isinstance(input_id_value, list)
+                ):
+                    data["_id"] = convert_to_object_id(input_id_value)
+                else:
+                    raise UnsupportedError(
+                        title="field \"id\" with value",
+                        value=input_id_value
+                    )
             del data["id"]
         return data
 
