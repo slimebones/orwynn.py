@@ -167,6 +167,16 @@ class Document(Mapping):
             )
         )
 
+    def refresh(
+        self
+    ) -> Self:
+        """
+        Refreshes the document with a new data from the database.
+        """
+        return self.find_one({
+            "id": self.getid()
+        })
+
     @classmethod
     def _get_collection(cls) -> str:
         return snakefy(cls.__name__)
