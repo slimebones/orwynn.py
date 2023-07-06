@@ -50,11 +50,35 @@ class Document(Mapping):
         return cls._get_mongo().start_session(**kwargs)
 
     @classmethod
+    def get(
+        cls,
+        query: dict | None = None,
+        **kwargs
+    ) -> Iterable[Self]:
+        """
+        Fetches all instances matching the query for this document.
+
+        Args:
+            query(optional):
+                MongoDB-compliant dictionary to search. By default all
+                instances of the document is fetched.
+            **kwargs(optional):
+                Additional arguments to Mongo's find method.
+
+        Returns:
+            Iterable with the results of the search.
+        """
+        return cls.find_all(query, **kwargs)
+
+    @classmethod
     def find_all(
         cls,
         query: dict | None = None,
         **kwargs
     ) -> Iterable[Self]:
+        """
+        @deprecated use Document.get instead
+        """
         _query: dict = cls._parse_query(query)
         validation.validate(_query, dict)
 
@@ -72,6 +96,10 @@ class Document(Mapping):
         query: dict | None = None,
         **kwargs
     ) -> Self:
+        """
+        @deprecated use Document.get instead and select as many instances as
+        you might need
+        """
         _query: dict = cls._parse_query(query)
         validation.validate(_query, dict)
 
