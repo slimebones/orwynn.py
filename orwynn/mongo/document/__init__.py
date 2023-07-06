@@ -12,6 +12,7 @@ from orwynn.helpers.errors import UnsupportedError
 from orwynn.mapping.errors import CustomUseOfMappingReservedFieldError
 from orwynn.mapping.mapping import Mapping, if_linked
 from orwynn.mongo.clientsession import ClientSession
+from orwynn.mongo.document.errors import InvalidOperatorError
 from orwynn.mongo.document.helpers import convert_to_object_id
 from orwynn.mongo.entity import MongoEntity
 from orwynn.mongo.errors import DocumentUpdateError, DuplicateKeyError
@@ -116,6 +117,7 @@ class Document(Mapping):
         *,
         set: dict | None = None,
         inc: dict | None = None,
+        operators: dict | None = None,
         **kwargs
     ) -> Self:
         """Updates document with given data.
@@ -125,6 +127,8 @@ class Document(Mapping):
                 Which fields to set.
             inc (optional):
                 Which fields to increment.
+            operators(optional):
+                Additional operators besides `$set` and `$inc` to add.
         """
         # Optimization tip: Consider adapting $inc in future for appropriate
         #   cases
@@ -140,6 +144,19 @@ class Document(Mapping):
         if inc is not None:
             self._validate_update_dict(inc)
             operation["$inc"] = inc
+        if operators is not None:
+            if "$set" in operators:
+                raise InvalidOperatorError(
+                    operator="$set",
+                    explanation="pass it via keyword argument `set=`"
+                )
+            elif "$inc" in operators:
+                raise InvalidOperatorError(
+                    operator="$inc",
+                    explanation="pass it via keyword argument `inc=`"
+                )
+            else:
+                operation.update(operators)
 
         return self._parse_document(
             self._get_mongo().update_one(
