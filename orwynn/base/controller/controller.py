@@ -10,7 +10,9 @@ from orwynn.utils.url import match_routes
 
 
 class Controller:
-    """Entrypoint to some operational service."""
+    """
+    Entrypoint to some operational service.
+    """
     ROUTE: ClassVar[str | None] = None
     VERSION: ClassVar[int | set[int] | Literal["*"] | None] = None
 

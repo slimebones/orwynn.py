@@ -14,7 +14,7 @@ RecoverType = TypeVar("RecoverType", bound="Model")
 class Model(pydantic.BaseModel):
     """Basic way to represent a data in the app.
 
-    Class-Attributes:
+    Attributes:
         INDICATION_TYPE (optional):
             Type to be displayed in final response body. Defaults to OK.
     """

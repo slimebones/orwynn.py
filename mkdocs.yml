@@ -1,0 +1,21 @@
+site_name: Orwynn
+
+theme:
+    name: "material"
+
+plugins:
+    - search
+    - autorefs
+    - mkdocstrings:
+        handlers:
+            python:
+                options:
+                    show_source: false
+                    show_root_toc_entry: false
+
+nav:
+    - Home: index.md
+    - Tutorials: tutorials.md
+    - How-To Guides: howto.md
+    - Reference: reference.md
+    - Explanation: explanation.md

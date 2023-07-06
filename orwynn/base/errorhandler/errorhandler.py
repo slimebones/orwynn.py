@@ -10,10 +10,11 @@ from orwynn.utils.protocol import Protocol
 
 
 class ErrorHandler:
-    """Handles outcoming errors from the application.
+    """
+    Handles outcoming errors from the application.
     Method handle(...) should be redefined in subclass in order to work.
 
-    Class-Attributes:
+    Attributes:
         E:
             Exception or a list of handled Exceptions.
         PROTOCOL:

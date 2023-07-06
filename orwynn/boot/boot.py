@@ -78,12 +78,12 @@ class Boot(Worker):
             time.
 
     Environs:
-        ORWYNN_MODE:
+        - ORWYNN_MODE:
             Boot mode for application. Defaults to DEV. Alternatively you can
             pass arg "mode".
-        ORWYNN_ROOT_DIR:
+        - ORWYNN_ROOT_DIR:
             Root directory for application. Defaults to os.getcwd()
-        ORWYNN_APPRC_PATH:
+        - ORWYNN_APPRC_PATH:
             Path where app configuration file located. Defaults to
             "./apprc.yml". Alternatively you can pass a dictionary directly in
             "apprc" attribute.

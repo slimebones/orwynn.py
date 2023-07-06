@@ -1,2 +1,4 @@
-# Injectable entity.
 Provider = object
+"""
+Injectable entity.
+"""

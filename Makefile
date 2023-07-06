@@ -21,3 +21,9 @@ changelog:
 # Conventional Commits is used since we use exclamation marks to sign breaking
 # commits.
 	poetry run git-changelog -c conventional -o CHANGELOG.md .
+
+docs.serve:
+	poetry run mkdocs serve -a localhost:9000 -w orwynn
+
+docs.build:
+	poetry run mkdocs build
