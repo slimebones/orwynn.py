@@ -102,7 +102,7 @@ class Document(Mapping):
     def remove(
         self, **kwargs
     ) -> Self:
-        id: str = validation.apply(self.id, str)
+        id: str = self.getid()
         return self._parse_document(
             self._get_mongo().remove_one(
                 self._get_collection(), {"_id": ObjectId(id)},
@@ -131,7 +131,7 @@ class Document(Mapping):
         validation.validate(set, [dict, NoneType])
         validation.validate(inc, [dict, NoneType])
 
-        id: str = validation.apply(self.id, str)
+        id: str = self.getid()
 
         operation: dict = {}
         if set is not None:
@@ -193,13 +193,17 @@ class Document(Mapping):
         return data
 
     def _validate_update_dict(self, dct: dict) -> None:
-        # WARNING: Don't use any removable checks like "assert" or "validation"
-        #   since checks here should be performed in any case to avoid
-        #   passing of dangerous updates to db.
         fields: dict[str, ModelField] = self.__fields__
 
         for k, v in dct.items():
-            if k in fields:
+            if "." in k:
+                nesting: list[str] = k.split(".")
+
+                # check only outermost key, inner keys can be easily inserted
+                # and updated without additional default checks. In case of
+                # nesting, the value to check should always be dictionary.
+                self._validate_update_dict({nesting[0]: {}})
+            elif k in fields:
                 # Only strict checking should be performed
                 if type(v) != fields[k].type_:
                     raise DocumentUpdateError(
