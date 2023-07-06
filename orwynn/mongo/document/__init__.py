@@ -167,10 +167,8 @@ class Document(Mapping):
 
         operation: dict = {}
         if set is not None:
-            self._validate_update_dict(set)
             operation["$set"] = set
         if inc is not None:
-            self._validate_update_dict(inc)
             operation["$inc"] = inc
         if operators is not None:
             if "$set" in operators:
@@ -246,26 +244,3 @@ class Document(Mapping):
                 data["id"] = str(data["_id"])
             del data["_id"]
         return data
-
-    def _validate_update_dict(self, dct: dict) -> None:
-        fields: dict[str, ModelField] = self.__fields__
-
-        for k, v in dct.items():
-            if "." in k:
-                nesting: list[str] = k.split(".")
-
-                # check only outermost key, inner keys can be easily inserted
-                # and updated without additional default checks. In case of
-                # nesting, the value to check should always be dictionary.
-                self._validate_update_dict({nesting[0]: {}})
-            elif k in fields:
-                # Only strict checking should be performed
-                if type(v) != fields[k].type_:
-                    raise DocumentUpdateError(
-                        f"unmatched given type {type(v)} to document type"
-                        f" {fields[k].type_}"
-                    )
-            else:
-                raise DocumentUpdateError(
-                    f"key {k} is not present in document fields"
-                )
