@@ -6,6 +6,7 @@ from types import NoneType
 from typing import Self
 
 import dotenv
+from starlette.types import Receive, Scope, Send
 
 from orwynn.apiversion import ApiVersion
 from orwynn.app import App, AppMode
@@ -48,19 +49,6 @@ class Boot(Worker):
             Path where app configuration file located. Defaults to
             "./apprc.yml". Alternatively you can pass a dictionary directly in
             "apprc" attribute.
-
-    Usage:
-    ```py
-    # main.py
-    from orwynn import Boot, App
-
-    # Import root module from your location
-    from .myproject.root_module import root_module
-
-    app: App = Boot.create(
-        root_module=root_module
-    ).app
-    ```
     """
     def __init__(
         self,
@@ -167,6 +155,14 @@ class Boot(Worker):
             validation.apply(self.__di.find("LogConfig"), LogConfig),
             app_mode_prod=AppMode.PROD
         )
+
+    async def __call__(
+        self, scope: Scope, receive: Receive, send: Send
+    ) -> None:
+        """
+        Propagates a call to the created application.
+        """
+        await self.app(scope, receive, send)
 
     @classmethod
     async def create(

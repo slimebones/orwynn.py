@@ -1,4 +1,6 @@
+import asyncio
 from fastapi import Query
+import uvicorn
 
 from orwynn.apiversion import ApiVersion
 from orwynn.app import App
@@ -74,5 +76,14 @@ async def create_boot() -> Boot:
     )
 
 
-async def create_app() -> App:
-    return (await create_boot()).app
+async def main():
+    config = uvicorn.Config(
+        await create_boot(),
+        port=8000,
+    )
+    server = uvicorn.Server(config)
+    await server.serve()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
