@@ -13,8 +13,12 @@ class SomeService(Service):
         self.some_var: int = 0
 
 
-def some_bootscript(some_service: SomeService) -> None:
+def fn(some_service: SomeService) -> None:
     some_service.some_var = 1
+
+
+async def async_fn(some_service: SomeService) -> None:
+    some_service.some_var = 5
 
 
 def test_basic():
@@ -22,7 +26,26 @@ def test_basic():
         Module(Providers=[SomeService]),
         bootscripts=[
             Bootscript(
-                fn=some_bootscript,
+                fn=fn,
+                call_time=CallTime.AFTER_ALL
+            )
+        ]
+    )
+
+    some_service: SomeService = validation.apply(
+        Di.ie().find("SomeService"),
+        SomeService
+    )
+
+    assert some_service.some_var == 1
+
+
+def test_async():
+    Boot(
+        Module(Providers=[SomeService]),
+        bootscripts=[
+            Bootscript(
+                fn=fn,
                 call_time=CallTime.AFTER_ALL
             )
         ]

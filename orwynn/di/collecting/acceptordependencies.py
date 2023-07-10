@@ -1,5 +1,5 @@
 import inspect
-from typing import Callable
+from typing import Callable, Coroutine
 
 from orwynn.base.middleware import Middleware
 from orwynn.base.module import Module
@@ -10,7 +10,7 @@ from orwynn.di.provider import Provider
 
 
 def collect_dependencies_for_acceptor(
-    acceptor_callable: Callable,
+    acceptor_callable: Callable | Coroutine,
     container: DiContainer,
     acceptor_module: Module | None
 ) -> dict[str, Provider]:

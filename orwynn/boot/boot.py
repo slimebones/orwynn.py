@@ -3,6 +3,7 @@ import os
 from copy import deepcopy
 from pathlib import Path
 from types import NoneType
+from typing import Self
 
 import dotenv
 
@@ -18,6 +19,7 @@ from orwynn.bootscript import Bootscript, BootscriptWorker, CallTime
 from orwynn.bootscript.errors import NoScriptsForCallTimeError
 from orwynn.di.di import Di
 from orwynn.di.errors import MissingDiObjectError
+from orwynn.helpers.errors import DeprecatedFeatureError
 from orwynn.http import EndpointContainer
 from orwynn.indication import Indication, default_api_indication
 from orwynn.log import LogConfig, configure_log
@@ -35,47 +37,6 @@ class Boot(Worker):
 
     General usage is to construct this class in the main.py with required
     parameters and then access Boot.app for your needs.
-
-    Attributes:
-        root_module:
-            Root module of the app.
-        dotenv_path (optional):
-            Path to .env file. Defaults to ".env".
-        api_indication (optional):
-            Indication object used as a convention for outcoming API
-            structures. Defaults to predefined by framework's indication
-            convention.
-        ErrorHandlers (optional):
-            List of exception handlers to add. By default framework adds
-            the builtin Exception and orwynn.Error handlers.
-        apprc (optional):
-            Application configuration. By default environ ORWYNN_APPRC_PATH is
-            checked if this arg is not given.
-        mode (optional):
-            Application mode. By default environ ORWYNN_MODE is
-            checked if this arg is not given.
-        global_http_route (optional):
-            Global route to be prepended to every controller's route. Defaults
-            to no route. Can accept formatting "{version}" for an API version
-            to be injected into route.
-        global_websocket_route (optional):
-            Global route to be prepended to every controller's route. Defaults
-            to no route. Can accept formatting "{version}" for an API version
-            to be injected into route.
-        global_imports (optional):
-            Modules available across all other modules imported into the
-            application. Note that no other instance can import a globally
-            available module.
-        global_middleware (optional):
-            Map of middleware and its covered routes to apply globally. Note
-            that every initialized Provider can be accessed from such
-            middleware.
-        api_version (optional):
-            Object describes API versioning rules for the project. By default
-            only v1 is supported.
-        bootscripts (optional):
-            List of bootscripts to be launched at different points of boot
-            time.
 
     Environs:
         - ORWYNN_MODE:
@@ -96,7 +57,7 @@ class Boot(Worker):
     # Import root module from your location
     from .myproject.root_module import root_module
 
-    app: App = Boot(
+    app: App = Boot.create(
         root_module=root_module
     ).app
     ```
@@ -115,9 +76,15 @@ class Boot(Worker):
         global_modules: list[Module] | None = None,
         global_middleware: GlobalMiddlewareSetup | None = None,
         api_version: ApiVersion | None = None,
-        bootscripts: list[Bootscript] | None = None
+        bootscripts: list[Bootscript] | None = None,
+        _fw_init_lock: bool = True
     ) -> None:
-        super().__init__()
+        if _fw_init_lock:
+            raise DeprecatedFeatureError(
+                deprecated_feature="initializing Boot via __init__",
+                use_instead="Boot.create(...)"
+            )
+
         if dotenv_path is None:
             dotenv_path = Path(".env")
         validate(dotenv_path, Path)
@@ -178,7 +145,7 @@ class Boot(Worker):
         self.__api_version: ApiVersion = api_version
 
         # Initialize bootscript
-        bootscript_worker: BootscriptWorker = BootscriptWorker(
+        self._bootscript_worker: BootscriptWorker = BootscriptWorker(
             bootscripts=bootscripts
         )
 
@@ -201,9 +168,99 @@ class Boot(Worker):
             app_mode_prod=AppMode.PROD
         )
 
+    @classmethod
+    async def create(
+        cls,
+        root_module: Module,
+        *,
+        dotenv_path: Path | None = None,
+        api_indication: Indication | None = None,
+        ErrorHandlers: set[type[ErrorHandler]] | None = None,
+        apprc: AppRc | None = None,
+        mode: AppMode | None = None,
+        global_http_route: str | None = None,
+        global_websocket_route: str | None = None,
+        global_modules: list[Module] | None = None,
+        global_middleware: GlobalMiddlewareSetup | None = None,
+        api_version: ApiVersion | None = None,
+        bootscripts: list[Bootscript] | None = None
+    ) -> Self:
+        """
+        Creates a Boot instance.
+
+        This should be the only way to initialize a new Boot.
+
+        Idea of using this create() method instead of traditional __init__ is
+        to await important asynchronous coroutines every time a fresh boot
+        is created.
+
+        Args:
+            root_module:
+                Root module of the app.
+            dotenv_path (optional):
+                Path to .env file. Defaults to ".env".
+            api_indication (optional):
+                Indication object used as a convention for outcoming API
+                structures. Defaults to predefined by framework's indication
+                convention.
+            ErrorHandlers (optional):
+                List of exception handlers to add. By default framework adds
+                the builtin Exception and orwynn.Error handlers.
+            apprc (optional):
+                Application configuration. By default environ ORWYNN_APPRC_PATH is
+                checked if this arg is not given.
+            mode (optional):
+                Application mode. By default environ ORWYNN_MODE is
+                checked if this arg is not given.
+            global_http_route (optional):
+                Global route to be prepended to every controller's route. Defaults
+                to no route. Can accept formatting "{version}" for an API version
+                to be injected into route.
+            global_websocket_route (optional):
+                Global route to be prepended to every controller's route. Defaults
+                to no route. Can accept formatting "{version}" for an API version
+                to be injected into route.
+            global_imports (optional):
+                Modules available across all other modules imported into the
+                application. Note that no other instance can import a globally
+                available module.
+            global_middleware (optional):
+                Map of middleware and its covered routes to apply globally. Note
+                that every initialized Provider can be accessed from such
+                middleware.
+            api_version (optional):
+                Object describes API versioning rules for the project. By default
+                only v1 is supported.
+            bootscripts (optional):
+                List of bootscripts to be launched at different points of boot
+                time.
+        """
+        boot: Boot = Boot(
+            root_module,
+            dotenv_path=dotenv_path,
+            api_indication=api_indication,
+            ErrorHandlers=ErrorHandlers,
+            apprc=apprc,
+            mode=mode,
+            global_http_route=global_http_route,
+            global_websocket_route=global_websocket_route,
+            global_modules=global_modules,
+            global_middleware=global_middleware,
+            api_version=api_version,
+            bootscripts=bootscripts
+        )
+
+        await boot._call_bootscripts()
+
+        return boot
+
+    async def _call_bootscripts(self) -> None:
+        """
+        Calls bootscripts for all time frames.
+        """
         # AFTER_ALL bootscript call time
         with contextlib.suppress(NoScriptsForCallTimeError):
-            bootscript_worker.call_by_time(
+            await self._bootscript_worker.call_by_time(
                 CallTime.AFTER_ALL,
                 self.__di._fw_container
             )

@@ -1,3 +1,3 @@
-from typing import Callable
+from typing import Any, Callable, Coroutine
 
-BootscriptCallable = Callable[..., None]
+BootscriptCallable = Callable[..., None] | Coroutine[None, Any, Any]

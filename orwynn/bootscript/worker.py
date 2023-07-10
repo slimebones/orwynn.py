@@ -1,3 +1,4 @@
+import inspect
 from orwynn.base.worker import Worker
 from orwynn.bootscript.bootscript import Bootscript
 from orwynn.bootscript.calltime import CallTime
@@ -9,6 +10,7 @@ from orwynn.di.collecting.acceptordependencies import (
     collect_dependencies_for_acceptor,
 )
 from orwynn.di.container import DiContainer
+from orwynn.di.provider import Provider
 
 _IsCallPerformed = bool
 # Represents bootscripts sorted by their call time and followed by
@@ -37,7 +39,7 @@ class BootscriptWorker(Worker):
 
         return state
 
-    def call_by_time(
+    async def call_by_time(
         self,
         call_time: CallTime,
         di_container: DiContainer
@@ -56,18 +58,21 @@ class BootscriptWorker(Worker):
                 )
             else:
                 for script in scripts_state[0]:
-                    self.__call_script(script, di_container)
+                    await self.__call_script(script, di_container)
                 scripts_state = (scripts_state[0], True)
 
-    def __call_script(
+    async def __call_script(
         self,
         script: Bootscript,
         di_container: DiContainer
     ) -> None:
-        script.fn(
-            **collect_dependencies_for_acceptor(
-                acceptor_callable=script.fn,
-                container=di_container,
-                acceptor_module=None
-            )
+        dependencies: dict[str, Provider] = collect_dependencies_for_acceptor(
+            acceptor_callable=script.fn,
+            container=di_container,
+            acceptor_module=None
         )
+
+        if inspect.iscoroutinefunction(script.fn):
+            await script.fn(**dependencies)
+        else:
+            script.fn(dependencies)  # type: ignore
