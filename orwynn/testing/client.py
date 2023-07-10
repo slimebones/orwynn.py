@@ -8,7 +8,7 @@ from orwynn.proxy.boot import BootProxy
 from orwynn.testing.embeddedclient import EmbeddedTestClient
 from orwynn.utils import validation
 from orwynn.utils.validation import validate
-from orwynn.utils.protocol import Protocol
+from orwynn.utils.scheme import Scheme
 from orwynn.utils.url import join_routes
 
 if TYPE_CHECKING:
@@ -254,7 +254,7 @@ class Client:
         finalized: _FinalizedRequestData = self._process_request_data(
             route=route,
             request_kwargs=request_kwargs,
-            protocol=Protocol.HTTP
+            protocol=Scheme.HTTP
         )
 
         # Make a request
@@ -277,7 +277,7 @@ class Client:
         *,
         route: str,
         request_kwargs: dict,
-        protocol: Protocol
+        protocol: Scheme
     ) -> _FinalizedRequestData:
         """
         Processes a given route and request kwargs and returns finalized
@@ -323,7 +323,7 @@ class Client:
         *,
         is_global_route_used: bool,
         api_version: int | None,
-        protocol: Protocol
+        protocol: Scheme
     ) -> str:
         if not is_global_route_used and api_version is not None:
             raise ValueError(
@@ -369,7 +369,7 @@ class Client:
         finalized: _FinalizedRequestData = self._process_request_data(
             route=route,
             request_kwargs=request_kwargs,
-            protocol=Protocol.WEBSOCKET
+            protocol=Scheme.WEBSOCKET
         )
 
         return self._embedded_client.websocket_connect(

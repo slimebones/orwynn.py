@@ -1,9 +1,11 @@
 from enum import Enum
 
 
-class Protocol(Enum):
+class Scheme(Enum):
     """
-    Supported protocols.
+    Supported URI schemes.
     """
     HTTP = "http"
+    HTTPS = "https"
     WEBSOCKET = "websocket"
+    RTSP = "rtsp"

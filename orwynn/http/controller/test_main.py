@@ -18,7 +18,7 @@ from orwynn.http.errors import HttpException, UnsupportedHttpMethodError
 from orwynn.proxy.boot import BootProxy
 from orwynn.testing import Client
 from orwynn.utils import validation
-from orwynn.utils.protocol import Protocol
+from orwynn.utils.scheme import Scheme
 from orwynn.utils.validation import validate_re
 from orwynn.utils.validation.errors import (
     RequestValidationException,
@@ -29,7 +29,7 @@ from tests.std.text import DEFAULT_ID, Text
 
 
 def test_http_methods():
-    for method in REQUEST_METHOD_BY_PROTOCOL[Protocol.HTTP]:
+    for method in REQUEST_METHOD_BY_PROTOCOL[Scheme.HTTP]:
         assert hasattr(HttpController, method.value)
 
 

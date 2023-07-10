@@ -23,7 +23,7 @@ from orwynn.router.errors import (
     UnmatchedEndpointEntityError,
 )
 from orwynn.utils import validation
-from orwynn.utils.protocol import Protocol
+from orwynn.utils.scheme import Scheme
 from orwynn.utils.url import join_routes
 from orwynn.websocket import (
     WebsocketController,
@@ -155,7 +155,7 @@ class ControllerRegister:
             # Don't register unused methods
             if (
                 http_method in controller.methods
-                and http_method in REQUEST_METHOD_BY_PROTOCOL[Protocol.HTTP]
+                and http_method in REQUEST_METHOD_BY_PROTOCOL[Scheme.HTTP]
             ):
                 is_method_found = True
 

@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from orwynn.base.worker import Worker
-from orwynn.utils.protocol import Protocol
+from orwynn.utils.scheme import Scheme
 
 if TYPE_CHECKING:
     from orwynn.apiversion import ApiVersion
@@ -87,11 +87,11 @@ class BootProxy(Worker):
 
     def get_global_route_for_protocol(
         self,
-        protocol: Protocol
+        protocol: Scheme
     ) -> str:
-        if protocol is Protocol.HTTP:
+        if protocol is Scheme.HTTP:
             return self.__global_http_route
-        elif protocol is Protocol.WEBSOCKET:
+        elif protocol is Scheme.WEBSOCKET:
             return self.__global_websocket_route
         else:
             raise TypeError(

@@ -4,7 +4,7 @@ from orwynn.helpers.web import REQUEST_METHOD_BY_PROTOCOL, RequestMethod
 
 from .endpoint.endpoint import Endpoint
 from orwynn.base.controller.controller import Controller
-from orwynn.utils.protocol import Protocol
+from orwynn.utils.scheme import Scheme
 from orwynn.http.errors import UnsupportedHttpMethodError
 from .errors import \
     DefinedTwiceControllerMethodError
@@ -63,7 +63,7 @@ class HttpController(Controller):
 
                 http_methods: list[RequestMethod] = [
                     method.value
-                    for method in REQUEST_METHOD_BY_PROTOCOL[Protocol.HTTP]
+                    for method in REQUEST_METHOD_BY_PROTOCOL[Scheme.HTTP]
                 ]
                 if str_method not in http_methods:
                     raise UnsupportedHttpMethodError(
@@ -80,7 +80,7 @@ class HttpController(Controller):
 
                 if (
                     http_method
-                    not in REQUEST_METHOD_BY_PROTOCOL[Protocol.HTTP]
+                    not in REQUEST_METHOD_BY_PROTOCOL[Scheme.HTTP]
                 ):
                     raise ValueError(f"cannot accept method {http_method}")
 

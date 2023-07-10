@@ -2,7 +2,7 @@
 from enum import Enum
 from typing import TYPE_CHECKING, Union
 
-from orwynn.utils.protocol import Protocol
+from orwynn.utils.scheme import Scheme
 
 if TYPE_CHECKING:
     from orwynn.http import HttpRequest, HttpResponse
@@ -35,8 +35,8 @@ class RequestMethod(Enum):
     WEBSOCKET = "websocket"
 
 
-REQUEST_METHOD_BY_PROTOCOL: dict[Protocol, list[RequestMethod]] = {
-    Protocol.HTTP: [
+REQUEST_METHOD_BY_PROTOCOL: dict[Scheme, list[RequestMethod]] = {
+    Scheme.HTTP: [
         RequestMethod.GET,
         RequestMethod.POST,
         RequestMethod.PUT,
@@ -44,7 +44,7 @@ REQUEST_METHOD_BY_PROTOCOL: dict[Protocol, list[RequestMethod]] = {
         RequestMethod.PATCH,
         RequestMethod.OPTIONS,
     ],
-    Protocol.WEBSOCKET: [
+    Scheme.WEBSOCKET: [
         RequestMethod.WEBSOCKET
     ]
 }

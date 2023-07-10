@@ -28,5 +28,3 @@ def join_routes(*routes: str) -> str:
         result = "/"
 
     return result
-
-

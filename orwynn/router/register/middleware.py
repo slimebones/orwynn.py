@@ -19,7 +19,7 @@ from orwynn.http import (
 from orwynn.http.errors import HttpException
 from orwynn.router.errorhandlermanager import ErrorHandlerManager
 from orwynn.utils import validation
-from orwynn.utils.protocol import Protocol
+from orwynn.utils.scheme import Scheme
 from orwynn.websocket import (
     BUILTIN_WEBSOCKET_MIDDLEWARE,
     BuiltinWebsocketMiddleware,
@@ -60,7 +60,7 @@ class MiddlewareRegister:
         Registers all middleware to the system.
         """
         populated_handlers_py_protocol: dict[
-            Protocol, set[ErrorHandler]
+            Scheme, set[ErrorHandler]
         ] = ErrorHandlerManager().get_populated_handlers_by_protocol(
             self.__exception_handlers
         )
@@ -73,12 +73,12 @@ class MiddlewareRegister:
         http_builtin_middleware: Sequence[
             BuiltinHttpMiddleware
         ] = self.__collect_http_builtin_middleware(
-            populated_handlers_py_protocol[Protocol.HTTP]
+            populated_handlers_py_protocol[Scheme.HTTP]
         )
         websocket_builtin_middleware: Sequence[
             BuiltinWebsocketMiddleware
         ] = self.__collect_websocket_builtin_middleware(
-            populated_handlers_py_protocol[Protocol.WEBSOCKET]
+            populated_handlers_py_protocol[Scheme.WEBSOCKET]
         )
 
         self.__register_middleware_arr(

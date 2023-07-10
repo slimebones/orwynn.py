@@ -5,7 +5,7 @@ from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.proxy.boot import BootProxy
 from orwynn.utils import validation
-from orwynn.utils.protocol import Protocol
+from orwynn.utils.scheme import Scheme
 from orwynn.websocket import Websocket, WebsocketController
 
 
@@ -22,7 +22,7 @@ class Wc(WebsocketController):
 
 class Eh(ErrorHandler):
     E = SomeWebsocketError
-    PROTOCOL = Protocol.WEBSOCKET
+    PROTOCOL = Scheme.WEBSOCKET
 
     async def handle(
         self, request: Websocket, error: SomeWebsocketError

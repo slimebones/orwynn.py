@@ -6,7 +6,7 @@ from orwynn.helpers.web import GenericRequest, GenericResponse
 from orwynn.log.helpers import catch_error
 from orwynn.proxy.boot import BootProxy
 from orwynn.utils import validation
-from orwynn.utils.protocol import Protocol
+from orwynn.utils.scheme import Scheme
 
 
 class ErrorHandler:
@@ -24,7 +24,7 @@ class ErrorHandler:
             Log.catch. Defaults to True.
     """
     E: ClassVar[type[Exception] | None] = None
-    PROTOCOL: Protocol = Protocol.HTTP
+    PROTOCOL: Scheme = Scheme.HTTP
     IS_ERROR_CATCH_LOGGED: bool = True
 
     def __init__(self) -> None:
@@ -35,7 +35,7 @@ class ErrorHandler:
         else:
             validation.validate(self.E, Exception)
 
-        validation.validate(self.PROTOCOL, Protocol)
+        validation.validate(self.PROTOCOL, Scheme)
 
     @classmethod
     def get_handled_exception_class(cls) -> type[Exception]:
