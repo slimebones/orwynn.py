@@ -1,12 +1,3 @@
-import pytest
-from orwynn.base.module.module import Module
-from orwynn.boot.boot import Boot
-from orwynn.di.collecting.providerdependencies.map import (
-    ProviderDependenciesMap,
-)
-from orwynn.di.container import DiContainer
-from orwynn.di.init.providers import init_providers
-from tests.std.assertion import Assertion
 
 
 # TODO(ryzhovalex): this test strangely initializes the boot and for the

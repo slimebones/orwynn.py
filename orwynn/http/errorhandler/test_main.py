@@ -1,4 +1,5 @@
 import pytest
+
 from orwynn.base.error.errors import ExceptionAlreadyHandledError
 from orwynn.base.errorhandler import ErrorHandler
 from orwynn.base.module import Module

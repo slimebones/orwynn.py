@@ -1,4 +1,5 @@
 import pytest
+
 from orwynn.base.module import Module
 from orwynn.base.service import Service
 from orwynn.boot import Boot
@@ -15,7 +16,6 @@ class SomeService(Service):
 
 
 def fn(some_service: SomeService) -> None:
-    print(some_service)
     some_service.some_var = 1
 
 

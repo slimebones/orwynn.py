@@ -1,5 +1,5 @@
-from pytest import fixture
 import pytest
+from pytest import fixture
 
 from orwynn.app.app import App
 from orwynn.base.module import Module

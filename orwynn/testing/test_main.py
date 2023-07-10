@@ -1,5 +1,5 @@
-from fastapi import Header
 import pytest
+from fastapi import Header
 
 from orwynn.base.module.module import Module
 from orwynn.boot import Boot

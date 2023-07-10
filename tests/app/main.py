@@ -1,9 +1,9 @@
 import asyncio
-from fastapi import Query
+
 import uvicorn
+from fastapi import Query
 
 from orwynn.apiversion import ApiVersion
-from orwynn.app import App
 from orwynn.base import Module
 from orwynn.boot import Boot
 from orwynn.http import (

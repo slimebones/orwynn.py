@@ -1,6 +1,5 @@
 import inspect
 
-from pytest import fixture
 import pytest
 
 from orwynn.base.config import Config

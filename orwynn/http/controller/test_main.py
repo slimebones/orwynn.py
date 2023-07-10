@@ -1,6 +1,6 @@
 
-from fastapi import Query, Request
 import pytest
+from fastapi import Query, Request
 
 from orwynn.apiversion import ApiVersion
 from orwynn.base.controller.errors import (
@@ -19,7 +19,7 @@ from orwynn.proxy.boot import BootProxy
 from orwynn.testing import Client
 from orwynn.utils import validation
 from orwynn.utils.protocol import Protocol
-from orwynn.utils.validation import expect, validate_re
+from orwynn.utils.validation import validate_re
 from orwynn.utils.validation.errors import (
     RequestValidationException,
     ReValidationError,

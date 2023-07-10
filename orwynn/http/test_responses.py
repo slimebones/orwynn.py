@@ -1,4 +1,5 @@
 import pytest
+
 from orwynn.base import Module
 from orwynn.boot import Boot
 from orwynn.http import Endpoint, HttpController

@@ -24,7 +24,10 @@ def log_apprc_sink_to_writer(writer: Writer) -> dict:
 
 
 @pytest.mark.asyncio
-async def test_logged_request_id(writer: Writer, log_apprc_sink_to_writer: dict):
+async def test_logged_request_id(
+    writer: Writer,
+    log_apprc_sink_to_writer: dict
+):
     class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [

@@ -1,4 +1,5 @@
 import pytest
+
 from orwynn.base.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.di.di import Di

@@ -67,11 +67,7 @@ class Boot(Worker):
         bootscripts: list[Bootscript] | None = None,
         _fw_init_lock: bool = True
     ) -> None:
-        if _fw_init_lock:
-            raise DeprecatedFeatureError(
-                deprecated_feature="initializing Boot via __init__",
-                use_instead="Boot.create(...)"
-            )
+        self._check_init_lock(_fw_init_lock)
 
         if dotenv_path is None:
             dotenv_path = Path(".env")
@@ -203,30 +199,30 @@ class Boot(Worker):
                 List of exception handlers to add. By default framework adds
                 the builtin Exception and orwynn.Error handlers.
             apprc (optional):
-                Application configuration. By default environ ORWYNN_APPRC_PATH is
-                checked if this arg is not given.
+                Application configuration. By default environ ORWYNN_APPRC_PATH
+                is checked if this arg is not given.
             mode (optional):
                 Application mode. By default environ ORWYNN_MODE is
                 checked if this arg is not given.
             global_http_route (optional):
-                Global route to be prepended to every controller's route. Defaults
-                to no route. Can accept formatting "{version}" for an API version
-                to be injected into route.
+                Global route to be prepended to every controller's route.
+                Defaults to no route. Can accept formatting "{version}" for an
+                API version to be injected into route.
             global_websocket_route (optional):
-                Global route to be prepended to every controller's route. Defaults
-                to no route. Can accept formatting "{version}" for an API version
-                to be injected into route.
+                Global route to be prepended to every controller's route.
+                Defaults to no route. Can accept formatting "{version}" for an
+                API version to be injected into route.
             global_imports (optional):
                 Modules available across all other modules imported into the
                 application. Note that no other instance can import a globally
                 available module.
             global_middleware (optional):
-                Map of middleware and its covered routes to apply globally. Note
-                that every initialized Provider can be accessed from such
+                Map of middleware and its covered routes to apply globally.
+                Note that every initialized Provider can be accessed from such
                 middleware.
             api_version (optional):
-                Object describes API versioning rules for the project. By default
-                only v1 is supported.
+                Object describes API versioning rules for the project. By
+                default only v1 is supported.
             bootscripts (optional):
                 List of bootscripts to be launched at different points of boot
                 time.
@@ -363,3 +359,10 @@ class Boot(Worker):
             )
 
         return root_dir
+
+    def _check_init_lock(self, lock: bool) -> None:
+        if lock:
+            raise DeprecatedFeatureError(
+                deprecated_feature="initializing Boot via __init__",
+                use_instead="Boot.create(...)"
+            )
