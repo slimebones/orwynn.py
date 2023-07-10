@@ -1,3 +1,4 @@
+import pytest
 from orwynn.mongo.document.testing import SimpleDocument
 
 

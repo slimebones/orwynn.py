@@ -1,3 +1,4 @@
+import pytest
 from orwynn.base.error.errors import ExceptionAlreadyHandledError
 from orwynn.base.errorhandler import ErrorHandler
 from orwynn.base.module import Module
@@ -42,7 +43,8 @@ class RaiseErrorController(HttpController):
         raise ValueError("hello")
 
 
-def test_custom_handler():
+@pytest.mark.asyncio
+async def test_custom_handler():
     class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
@@ -50,7 +52,7 @@ def test_custom_handler():
         def get(self):
             raise ValueError("whoops!")
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module(route="/", Controllers=[C1]),
         ErrorHandlers={GeneralEh}
     )
@@ -66,7 +68,8 @@ def test_custom_handler():
     assert recovered_error.args[0] == "whoops!"
 
 
-def test_default_exception():
+@pytest.mark.asyncio
+async def test_default_exception():
     class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
@@ -74,7 +77,7 @@ def test_default_exception():
         def get(self):
             raise TypeError("whoops!")
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module(route="/", Controllers=[C1])
     )
     http: Client = boot.app.client
@@ -89,7 +92,8 @@ def test_default_exception():
     assert recovered_exception.args[0] == "whoops!"
 
 
-def test_as_acceptor():
+@pytest.mark.asyncio
+async def test_as_acceptor():
     """
     Tests if an error handler can truly accept Providers.
     """
@@ -123,7 +127,7 @@ def test_as_acceptor():
             data["__test_meta_info"] = self.__cool_service.do_something()
             return JsonHttpResponse(data, 400)
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module(route="/", Providers=[CoolService], Controllers=[C1]),
         ErrorHandlers={Eh1}
     )
@@ -134,7 +138,8 @@ def test_as_acceptor():
     assert data["__test_meta_info"] == ASSERTED_TEXT
 
 
-def test_default_in_middleware():
+@pytest.mark.asyncio
+async def test_default_in_middleware():
     """
     Should handle exceptions occured in middleware.
     """
@@ -153,7 +158,7 @@ def test_default_in_middleware():
         ) -> HttpResponse:
             raise ValueError("whoops!")
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module(route="/", Controllers=[C1], Middleware=[M1])
     )
 
@@ -167,7 +172,8 @@ def test_default_in_middleware():
     assert recovered_exception.args[0] == "whoops!"
 
 
-def test_custom_in_middleware():
+@pytest.mark.asyncio
+async def test_custom_in_middleware():
     """
     Should handle exceptions occured in middleware.
     """
@@ -186,7 +192,7 @@ def test_custom_in_middleware():
         ) -> HttpResponse:
             raise ValueError("whoops!")
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module(route="/", Controllers=[C1], Middleware=[M1]),
         ErrorHandlers={GeneralEh}
     )
@@ -201,22 +207,25 @@ def test_custom_in_middleware():
     assert recovered.args[0] == "whoops!"
 
 
-def test_exception_handled_twice():
+@pytest.mark.asyncio
+async def test_exception_handled_twice():
     """
     Should raise an error for twice-handled exceptions.
     """
     class Eh1(ErrorHandler):
         E = Exception
 
-    validation.expect(
-        Boot,
-        ExceptionAlreadyHandledError,
-        Module("/", Controllers=[RaiseErrorController]),
-        ErrorHandlers={GeneralEh, Eh1}
+    await validation.expect_async(
+        Boot.create(
+            Module("/", Controllers=[RaiseErrorController]),
+            ErrorHandlers={GeneralEh, Eh1}
+        ),
+        ExceptionAlreadyHandledError
     )
 
 
-def test_pydantic_validation_error_is_catched():
+@pytest.mark.asyncio
+async def test_pydantic_validation_error_is_catched():
     """
     Should catch pydantic.ValidationError too, despite it's internal multiple
     inheritance.
@@ -232,7 +241,7 @@ def test_pydantic_validation_error_is_catched():
             Item(name="item", price="whocares")  # type: ignore
             return {}
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module("/", Controllers=[_Ctrl])
     )
 

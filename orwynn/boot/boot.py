@@ -235,6 +235,7 @@ class Boot(Worker):
                 List of bootscripts to be launched at different points of boot
                 time.
         """
+
         boot: Boot = Boot(
             root_module,
             dotenv_path=dotenv_path,
@@ -247,7 +248,8 @@ class Boot(Worker):
             global_modules=global_modules,
             global_middleware=global_middleware,
             api_version=api_version,
-            bootscripts=bootscripts
+            bootscripts=bootscripts,
+            _fw_init_lock=False
         )
 
         await boot._call_bootscripts()

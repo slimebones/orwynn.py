@@ -9,6 +9,7 @@ from typing import Any, Callable, Optional, Sized, TypeVar
 
 from pydantic import ValidationError as _PydanticValidationError
 from pydantic import validator as _pydantic_validator
+from orwynn.utils.types import AnyCoro
 
 from orwynn.utils.validation.validator import Validator
 from orwynn.utils.validation.errors import (ExpectationError,
@@ -242,7 +243,8 @@ def expect(
     *args,
     **kwargs
 ) -> None:
-    """Expects given function to raise given error if function is called with
+    """
+    Expects given function to raise given error if function is called with
     given args and kwargs.
 
     Args:
@@ -266,6 +268,23 @@ def expect(
     else:
         raise ExpectationError(
             f"error {ErrorToExpect} expected on call of function {fn}"
+        )
+
+
+async def expect_async(
+    coro: AnyCoro,
+    ErrorToExpect: type[Exception]
+) -> None:
+    """
+    Works same as validation.expect, but with async coroutine being tested.
+    """
+    try:
+        await coro
+    except ErrorToExpect:
+        pass
+    else:
+        raise ExpectationError(
+            f"error {ErrorToExpect} expected on call of coro {coro}"
         )
 
 

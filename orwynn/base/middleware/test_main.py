@@ -1,3 +1,4 @@
+import pytest
 from orwynn.base.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.di.di import Di
@@ -6,7 +7,8 @@ from orwynn.utils import validation
 from orwynn.websocket import WebsocketMiddleware
 
 
-def test_http():
+@pytest.mark.asyncio
+async def test_http():
     """
     Should be able to add custom middleware globally.
     """
@@ -15,7 +17,7 @@ def test_http():
             self.covered_routes_ = covered_routes
             super().__init__(covered_routes)
 
-    Boot(
+    await Boot.create(
         Module(),
         global_middleware={
             Mw: ["/hello"]
@@ -26,7 +28,8 @@ def test_http():
     assert mw.covered_routes_ == ["/hello"]
 
 
-def test_websocket():
+@pytest.mark.asyncio
+async def test_websocket():
     """
     Should be able to add custom middleware globally.
     """
@@ -35,7 +38,7 @@ def test_websocket():
             self.covered_routes_ = covered_routes
             super().__init__(covered_routes)
 
-    Boot(
+    await Boot.create(
         Module(),
         global_middleware={
             Mw: ["/hello"]

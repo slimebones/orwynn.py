@@ -1,3 +1,4 @@
+import pytest
 import starlette.websockets
 
 from orwynn.apiversion import ApiVersion
@@ -16,11 +17,12 @@ class WsCtrl(WebsocketController):
         await ws.send_json({"message": "hello"})
 
 
-def test_default():
+@pytest.mark.asyncio
+async def test_default():
     """
     By default a client should use the global route.
     """
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         root_module=Module("/", Controllers=[WsCtrl]),
         global_websocket_route="/donuts"
     )
@@ -30,7 +32,8 @@ def test_default():
         assert data["message"] == "hello"
 
 
-def test_default_version():
+@pytest.mark.asyncio
+async def test_default_version():
     """
     By default a client should use the latest api version available.
     """
@@ -40,7 +43,7 @@ def test_default_version():
         async def main(self, ws: Websocket) -> None:
             return await super().main(ws)
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         root_module=Module("/", Controllers=[_C]),
         global_websocket_route="/ws/v{version}",
         api_version=ApiVersion(
@@ -53,11 +56,12 @@ def test_default_version():
         assert data["message"] == "hello"
 
 
-def test_not_used():
+@pytest.mark.asyncio
+async def test_not_used():
     """
     The global route can be disabled.
     """
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         root_module=Module("/", Controllers=[WsCtrl]),
         global_websocket_route="/donuts"
     )
@@ -70,7 +74,8 @@ def test_not_used():
         assert data["message"] == "hello"
 
 
-def test_pass_version():
+@pytest.mark.asyncio
+async def test_pass_version():
     """
     A client is able to not specify global route, but pass own api version.
     """
@@ -80,7 +85,7 @@ def test_pass_version():
         async def main(self, ws: Websocket) -> None:
             return await super().main(ws)
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         root_module=Module("/", Controllers=[_C]),
         global_websocket_route="/ws/v{version}",
         api_version=ApiVersion(

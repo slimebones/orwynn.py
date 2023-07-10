@@ -1,6 +1,7 @@
 import inspect
 
 from pytest import fixture
+import pytest
 
 from orwynn.base.config import Config
 from orwynn.base.module import Module
@@ -17,7 +18,7 @@ from orwynn.log import LogConfig
 from tests.std.assertion import Assertion
 
 
-@fixture
+@pytest.fixture
 def std_provider_dependencies_map(
     std_modules: list[Module]
 ) -> ProviderDependenciesMap:

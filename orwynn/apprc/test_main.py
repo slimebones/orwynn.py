@@ -56,8 +56,9 @@ def raw_apprc() -> AppRc:
     }
 
 
-def test_prod(raw_apprc: AppRc):
-    Boot(
+@pytest.mark.asyncio
+async def test_prod(raw_apprc: AppRc):
+    await Boot.create(
         root_module=Module("/", Providers=[BurgerShotConfig]),
         apprc=raw_apprc,
         mode=AppMode.PROD
@@ -69,8 +70,9 @@ def test_prod(raw_apprc: AppRc):
     ).dict() == mp_find("prod.BurgerShot", raw_apprc)
 
 
-def test_dev(raw_apprc: AppRc):
-    Boot(
+@pytest.mark.asyncio
+async def test_dev(raw_apprc: AppRc):
+    await Boot.create(
         root_module=Module("/", Providers=[BurgerShotConfig]),
         apprc=raw_apprc,
         mode=AppMode.DEV
@@ -91,8 +93,9 @@ def test_dev(raw_apprc: AppRc):
     }
 
 
-def test_test(raw_apprc: AppRc):
-    Boot(
+@pytest.mark.asyncio
+async def test_test(raw_apprc: AppRc):
+    await Boot.create(
         root_module=Module("/", Providers=[BurgerShotConfig]),
         apprc=raw_apprc,
         mode=AppMode.TEST

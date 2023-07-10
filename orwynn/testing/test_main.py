@@ -1,4 +1,5 @@
 from fastapi import Header
+import pytest
 
 from orwynn.base.module.module import Module
 from orwynn.boot import Boot
@@ -36,8 +37,9 @@ class _Ctrl2(HttpController):
         }
 
 
-def test_bind_headers():
-    boot: Boot = Boot(
+@pytest.mark.asyncio
+async def test_bind_headers():
+    boot: Boot = await Boot.create(
         Module("/", Controllers=[_Ctrl1])
     )
 
@@ -49,8 +51,9 @@ def test_bind_headers():
     assert data["x-testing"] == "hello"
 
 
-def test_bind_headers_accumulate():
-    boot: Boot = Boot(
+@pytest.mark.asyncio
+async def test_bind_headers_accumulate():
+    boot: Boot = await Boot.create(
         Module("/", Controllers=[_Ctrl2])
     )
 
@@ -64,12 +67,13 @@ def test_bind_headers_accumulate():
     assert data["x-testing"] == "hello"
     assert data["x-tmp"] == "world"
 
-def test_multiple_bind_headers():
+@pytest.mark.asyncio
+async def test_multiple_bind_headers():
     """
     Shouldn't stack bind headers in the original client for subsequent
     bind_headers() calls.
     """
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module("/", Controllers=[HeadersGetController])
     )
 

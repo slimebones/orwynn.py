@@ -35,3 +35,4 @@ class DeprecatedFeatureError(Exception):
         message: str = \
             f"feature <{deprecated_feature}> is deprecated," \
             f" use {use_instead} instead"
+        super().__init__(message)

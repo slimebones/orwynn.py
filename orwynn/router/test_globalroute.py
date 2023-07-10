@@ -1,10 +1,12 @@
+import pytest
 from orwynn.apiversion import ApiVersion
 from orwynn.base.module import Module
 from orwynn.boot import Boot
 from orwynn.http import Endpoint, HttpController
 
 
-def test_default():
+@pytest.mark.asyncio
+async def test_default():
     """
     By default a client should use the global route.
     """
@@ -15,7 +17,7 @@ def test_default():
         def get(self) -> dict:
             return {"message": "hello"}
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         root_module=Module("/user", Controllers=[C]),
         global_http_route="/donuts"
     )
@@ -23,7 +25,8 @@ def test_default():
     boot.app.client.get_jsonify("/user/message", 200)
 
 
-def test_default_version():
+@pytest.mark.asyncio
+async def test_default_version():
     """
     By default a client should use the latest api version available.
     """
@@ -35,7 +38,7 @@ def test_default_version():
         def get(self) -> dict:
             return {"message": "hello"}
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         root_module=Module("/user", Controllers=[C]),
         global_http_route="/api/v{version}",
         api_version=ApiVersion(
@@ -46,7 +49,8 @@ def test_default_version():
     boot.app.client.get_jsonify("/user/message", 200)
 
 
-def test_not_used():
+@pytest.mark.asyncio
+async def test_not_used():
     """
     The global route can be disabled.
     """
@@ -57,7 +61,7 @@ def test_not_used():
         def get(self) -> dict:
             return {"message": "hello"}
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         root_module=Module("/user", Controllers=[C]),
         global_http_route="/donuts"
     )
@@ -69,7 +73,8 @@ def test_not_used():
     )
 
 
-def test_pass_version():
+@pytest.mark.asyncio
+async def test_pass_version():
     """
     A client is able to not specify global route, but pass own api version.
     """
@@ -81,7 +86,7 @@ def test_pass_version():
         def get(self) -> dict:
             return {"message": "hello"}
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         root_module=Module("/user", Controllers=[C]),
         global_http_route="/api/v{version}",
         api_version=ApiVersion(

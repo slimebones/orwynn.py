@@ -1,4 +1,5 @@
 from pytest import fixture
+import pytest
 
 from orwynn.app.app import App
 from orwynn.base.module import Module
@@ -11,7 +12,8 @@ def std_app(std_boot: Boot) -> App:
     return std_boot.app
 
 
-def test_openapi(run_endpoint):
+@pytest.mark.asyncio
+async def test_openapi(run_endpoint):
     data: dict = Boot.ie().app.client.get_jsonify("/openapi.json", 200)
 
     path: dict = data["paths"]["/"]["get"]
@@ -23,7 +25,8 @@ def test_openapi(run_endpoint):
         path["responses"]["201"]["description"] == "Best response description"
 
 
-def test_get_dependant_patch_against_websocket():
+@pytest.mark.asyncio
+async def test_get_dependant_patch_against_websocket():
     """
     Should correctly operate for websocket controllers and builtin middleware.
     """
@@ -40,7 +43,7 @@ def test_get_dependant_patch_against_websocket():
         async def main(self, websocket: Websocket) -> None:
             await websocket.send_json({"message": "hello"})
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module("/", Controllers=[WsCtrl])
     )
 
@@ -48,8 +51,9 @@ def test_get_dependant_patch_against_websocket():
         ws.receive_json()
 
 
-def test_custom_docs_route():
-    boot: Boot = Boot(
+@pytest.mark.asyncio
+async def test_custom_docs_route():
+    boot: Boot = await Boot.create(
         Module("/"),
         apprc={
             "prod": {
@@ -65,8 +69,9 @@ def test_custom_docs_route():
     boot.app.client.get("/mydocs", 200)
 
 
-def test_custom_redoc_route():
-    boot: Boot = Boot(
+@pytest.mark.asyncio
+async def test_custom_redoc_route():
+    boot: Boot = await Boot.create(
         Module("/"),
         apprc={
             "prod": {

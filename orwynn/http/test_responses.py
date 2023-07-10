@@ -1,3 +1,4 @@
+import pytest
 from orwynn.base import Module
 from orwynn.boot import Boot
 from orwynn.http import Endpoint, HttpController
@@ -5,7 +6,8 @@ from orwynn.http.log.middleware import LogMiddleware
 from orwynn.http.responses import RedirectHttpResponse, TestHttpResponse
 
 
-def test_redirect():
+@pytest.mark.asyncio
+async def test_redirect():
     class LocalController(HttpController):
         ROUTE = "/"
         ENDPOINTS = [
@@ -18,7 +20,7 @@ def test_redirect():
             return RedirectHttpResponse("https://google.com")
 
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module("/", Controllers=[LocalController]),
         global_middleware={
             LogMiddleware: ["*"]

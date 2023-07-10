@@ -6,3 +6,6 @@ from orwynn.bootscript.calltime import CallTime
 class Bootscript(Model):
     fn: BootscriptCallable
     call_time: CallTime
+
+    class Config:
+        arbitrary_types_allowed = True

@@ -1,3 +1,4 @@
+import pytest
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.context.errors import UndefinedStorageError
@@ -12,7 +13,8 @@ from orwynn.websocket.log.middleware import LogWebsocketMiddleware
 from orwynn.websocket.websocket import Websocket
 
 
-def test_basic():
+@pytest.mark.asyncio
+async def test_basic():
     """Request id should be fetchable from context within request-response
     cycle and unfetchable outside this cycle.
     """
@@ -24,7 +26,7 @@ def test_basic():
                 {"request_id": WebsocketRequestContextId().get()}
             )
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module(
             "/",
             Controllers=[C1],

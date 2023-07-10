@@ -23,7 +23,8 @@ def log_apprc_sink_to_writer(writer: Writer) -> dict:
     return get_log_apprc(__check)
 
 
-def test_logged_request_id(writer: Writer, log_apprc_sink_to_writer: dict):
+@pytest.mark.asyncio
+async def test_logged_request_id(writer: Writer, log_apprc_sink_to_writer: dict):
     class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [
@@ -34,7 +35,7 @@ def test_logged_request_id(writer: Writer, log_apprc_sink_to_writer: dict):
             Log.info("hello")
             return {}
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module("/", Controllers=[C1]),
         apprc=log_apprc_sink_to_writer
     )
@@ -46,7 +47,8 @@ def test_logged_request_id(writer: Writer, log_apprc_sink_to_writer: dict):
     assert isinstance(extra["http.request_id"], str)
 
 
-def test_logged_websocket_request_id(
+@pytest.mark.asyncio
+async def test_logged_websocket_request_id(
     writer: Writer,
     log_apprc_sink_to_writer: dict
 ):
@@ -56,7 +58,7 @@ def test_logged_websocket_request_id(
         async def main(self, websocket: Websocket) -> None:
             Log.info("hello")
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module("/", Controllers=[C1]),
         apprc=log_apprc_sink_to_writer
     )  # type: ignore #worker

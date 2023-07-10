@@ -1,3 +1,4 @@
+import pytest
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.http import Endpoint, HttpController
@@ -8,7 +9,8 @@ from .errors import UnsupportedVersionError
 
 # NOTE: By default there is no global route for backwards compatiblity.
 
-def test_versioned_global_route():
+@pytest.mark.asyncio
+async def test_versioned_global_route():
     class C(HttpController):
         ROUTE = "/message"
         ENDPOINTS = [Endpoint(method="get")]
@@ -16,7 +18,7 @@ def test_versioned_global_route():
         def get(self) -> dict:
             return {"message": "hello"}
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         root_module=Module("/user", Controllers=[C]),
         global_http_route="/donuts/v{version}",
     )
@@ -28,7 +30,8 @@ def test_versioned_global_route():
     )
 
 
-def test_controller_version():
+@pytest.mark.asyncio
+async def test_controller_version():
     """
     HttpController can define older version of API than available.
     """
@@ -49,7 +52,7 @@ def test_controller_version():
         def get(self) -> dict:
             return {"message": "hello v2"}
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         root_module=Module("/user", Controllers=[C1, C2]),
         global_http_route="/api/v{version}",
         api_version=ApiVersion(
@@ -74,7 +77,8 @@ def test_controller_version():
     )
 
 
-def test_controller_all_versions():
+@pytest.mark.asyncio
+async def test_controller_all_versions():
     class C1(HttpController):
         ROUTE = "/message"
         VERSION = "*"
@@ -83,7 +87,7 @@ def test_controller_all_versions():
         def get(self) -> dict:
             return {"message": "hello"}
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         root_module=Module("/user", Controllers=[C1]),
         global_http_route="/api/v{version}",
         api_version=ApiVersion(
@@ -103,7 +107,8 @@ def test_controller_all_versions():
     assert data["message"] == "hello"
 
 
-def test_controller_several_versions():
+@pytest.mark.asyncio
+async def test_controller_several_versions():
     class C1(HttpController):
         ROUTE = "/message"
         VERSION = {2, 3}
@@ -112,7 +117,7 @@ def test_controller_several_versions():
         def get(self) -> dict:
             return {"message": "hello"}
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         root_module=Module("/user", Controllers=[C1]),
         global_http_route="/api/v{version}",
         api_version=ApiVersion(
@@ -131,7 +136,8 @@ def test_controller_several_versions():
     assert data["message"] == "hello"
 
 
-def test_controller_unsupported_version():
+@pytest.mark.asyncio
+async def test_controller_unsupported_version():
     class C1(HttpController):
         ROUTE = "/message"
         VERSION = 3
@@ -140,18 +146,20 @@ def test_controller_unsupported_version():
         def get(self) -> dict:
             return {"message": "hello"}
 
-    validation.expect(
-        Boot,
-        UnsupportedVersionError,
-        root_module=Module("/user", Controllers=[C1]),
-        global_http_route="/api/v{version}",
-        api_version=ApiVersion(
-            supported={1, 2}
-        )
+    await validation.expect_async(
+        Boot.create(
+            root_module=Module("/user", Controllers=[C1]),
+            global_http_route="/api/v{version}",
+            api_version=ApiVersion(
+                supported={1, 2}
+            )
+        ),
+        UnsupportedVersionError
     )
 
 
-def test_controller_unsupported_version_of_many():
+@pytest.mark.asyncio
+async def test_controller_unsupported_version_of_many():
     class C1(HttpController):
         ROUTE = "/message"
         # Some are supported, some are not
@@ -161,12 +169,13 @@ def test_controller_unsupported_version_of_many():
         def get(self) -> dict:
             return {"message": "hello"}
 
-    validation.expect(
-        Boot,
-        UnsupportedVersionError,
-        root_module=Module("/user", Controllers=[C1]),
-        global_http_route="/api/v{version}",
-        api_version=ApiVersion(
-            supported={1, 2}
-        )
+    await validation.expect_async(
+        Boot.create(
+            root_module=Module("/user", Controllers=[C1]),
+            global_http_route="/api/v{version}",
+            api_version=ApiVersion(
+                supported={1, 2}
+            )
+        ),
+        UnsupportedVersionError
     )

@@ -1,5 +1,7 @@
 from typing import Callable
 
+import pytest
+
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.http import (
@@ -22,7 +24,8 @@ class Mw1(HttpMiddleware):
         return response
 
 
-def test_basic():
+@pytest.mark.asyncio
+async def test_basic():
     """
     Should work in general cases.
     """
@@ -33,7 +36,7 @@ def test_basic():
         def get(self):
             return {"message": "hello"}
 
-    boot: Boot = Boot(Module(
+    boot: Boot = await Boot.create(Module(
         route="/hello/world",
         Controllers=[C1],
         Middleware=[Mw1]
@@ -44,7 +47,8 @@ def test_basic():
     assert response.headers["x-test"] == "hello"
 
 
-def test_variable_route():
+@pytest.mark.asyncio
+async def test_variable_route():
     """Should work with variable routes.
     """
     class C1(HttpController):
@@ -54,7 +58,7 @@ def test_variable_route():
         def get(self, id: str):
             return {"value": id}
 
-    boot: Boot = Boot(Module(
+    boot: Boot = await Boot.create(Module(
         route="/",
         Controllers=[C1],
         Middleware=[Mw1]
@@ -66,7 +70,8 @@ def test_variable_route():
     assert response.headers["x-test"] == "hello"
 
 
-def test_file_path_route():
+@pytest.mark.asyncio
+async def test_file_path_route():
     """Should be OK with file paths.
     """
     class C1(HttpController):
@@ -76,7 +81,7 @@ def test_file_path_route():
         def get(self, file_path: str):
             return {"value": file_path}
 
-    boot: Boot = Boot(Module(
+    boot: Boot = await Boot.create(Module(
         route="/",
         Controllers=[C1],
         Middleware=[Mw1]

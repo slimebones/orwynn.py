@@ -1,3 +1,4 @@
+import pytest
 from orwynn.base.module import Module
 from orwynn.base.service import Service
 from orwynn.boot.boot import Boot
@@ -9,7 +10,8 @@ from orwynn.utils import validation
 from tests.std.assertion import Assertion
 
 
-def test_std(
+@pytest.mark.asyncio
+async def test_std(
     std_di_container: DiContainer,
     std_modules: list[Module]
 ):
@@ -19,7 +21,8 @@ def test_std(
         isinstance(std_di_container.find(A.__name__), A)
 
 
-def test_controller_dependency_unavailability():
+@pytest.mark.asyncio
+async def test_controller_dependency_unavailability():
     """
     Controller shouldn't be allowed to request unavailable modules.
     """
@@ -41,14 +44,16 @@ def test_controller_dependency_unavailability():
     key_module: Module = Module("/key", Controllers=[Ctrl1])
     unavailable_module: Module = Module(Providers=[UnavailableService])
 
-    validation.expect(
-        Boot,
-        ProviderAvailabilityError,
-        root_module=Module("/", imports=[key_module, unavailable_module])
+    await validation.expect_async(
+        Boot.create(
+            root_module=Module("/", imports=[key_module, unavailable_module])
+        ),
+        ProviderAvailabilityError
     )
 
 
-def test_middleware_dependency_unavailability():
+@pytest.mark.asyncio
+async def test_middleware_dependency_unavailability():
     """
     Middleware shouldn't be allowed to request unavailable modules.
     """
@@ -64,14 +69,16 @@ def test_middleware_dependency_unavailability():
     key_module: Module = Module("/key", Middleware=[Mw1])
     unavailable_module: Module = Module(Providers=[UnavailableService])
 
-    validation.expect(
-        Boot,
-        ProviderAvailabilityError,
-        root_module=Module("/", imports=[key_module, unavailable_module])
+    await validation.expect_async(
+        Boot.create(
+            root_module=Module("/", imports=[key_module, unavailable_module])
+        ),
+        ProviderAvailabilityError
     )
 
 
-def test_unavailability_imported_but_not_exported():
+@pytest.mark.asyncio
+async def test_unavailability_imported_but_not_exported():
     """
     Check that a provider is not available if it's not exported from an
     imported module
@@ -96,8 +103,9 @@ def test_unavailability_imported_but_not_exported():
         "/key", Controllers=[Ctrl1], imports=[unavailable_module]
     )
 
-    validation.expect(
-        Boot,
-        ProviderAvailabilityError,
-        root_module=Module("/", imports=[key_module, unavailable_module])
+    await validation.expect_async(
+        Boot.create(
+            root_module=Module("/", imports=[key_module, unavailable_module])
+        ),
+        ProviderAvailabilityError
     )

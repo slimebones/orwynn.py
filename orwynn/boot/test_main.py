@@ -1,7 +1,7 @@
 import os
 
 import pytest
-from pytest import fixture
+import pytest_asyncio
 
 from orwynn.app import AppMode
 from orwynn.apprc.apprc import AppRc
@@ -22,41 +22,41 @@ class _GService(Service):
         return sum(args)
 
 
-@fixture
-def std_boot(std_struct: Module) -> Boot:
-    return Boot(
+@pytest_asyncio.fixture
+async def std_boot(std_struct: Module) -> Boot:
+    return await Boot.create(
         root_module=std_struct
     )
 
 
-@fixture
-def run_std(std_struct: Module):
-    Boot(std_struct)
+@pytest_asyncio.fixture
+async def run_std(std_struct: Module):
+    await Boot.create(std_struct)
 
 
-@fixture
-def std_mongo_boot(std_struct: Module) -> Boot:
-    return Boot(
+@pytest_asyncio.fixture
+async def std_mongo_boot(std_struct: Module) -> Boot:
+    return await Boot.create(
         root_module=std_struct
     )
 
 
-@fixture
+@pytest.fixture
 def set_prod_mode():
     os.environ["ORWYNN_MODE"] = "prod"
 
 
-@fixture
+@pytest.fixture
 def set_dev_mode():
     os.environ["ORWYNN_MODE"] = "dev"
 
 
-@fixture
+@pytest.fixture
 def set_test_mode():
     os.environ["ORWYNN_MODE"] = "test"
 
 
-@fixture
+@pytest.fixture
 def set_std_apprc_path_env() -> None:
     os.environ["ORWYNN_APPRC_PATH"] = os.path.join(
         os.getcwd(),
@@ -64,57 +64,67 @@ def set_std_apprc_path_env() -> None:
     )
 
 
-def test_init_mode_default(std_struct: Module):
+@pytest.mark.asyncio
+async def test_init_mode_default(std_struct: Module):
     os.environ["ORWYNN_MODE"] = ""
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         root_module=std_struct
     )
     assert boot.mode == AppMode.DEV
 
 
-def test_init_mode_test(std_struct: Module):
+@pytest.mark.asyncio
+async def test_init_mode_test(std_struct: Module):
     os.environ["ORWYNN_MODE"] = "test"
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         root_module=std_struct
     )
     assert boot.mode == AppMode.TEST
 
 
-def test_init_mode_dev(std_struct: Module):
+@pytest.mark.asyncio
+async def test_init_mode_dev(std_struct: Module):
     os.environ["ORWYNN_MODE"] = "dev"
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         root_module=std_struct
     )
     assert boot.mode == AppMode.DEV
 
 
-def test_init_mode_prod(std_struct: Module):
+@pytest.mark.asyncio
+async def test_init_mode_prod(std_struct: Module):
     os.environ["ORWYNN_MODE"] = "prod"
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         root_module=std_struct
     )
     assert boot.mode == AppMode.PROD
 
 
-def test_init_incorrect_mode(std_struct: Module):
+@pytest.mark.asyncio
+async def test_init_incorrect_mode(std_struct: Module):
     os.environ["ORWYNN_MODE"] = "helloworld"
-    validation.expect(Boot, ValueError, root_module=std_struct)
+    await validation.expect_async(
+        Boot.create(root_module=std_struct),
+        ValueError
+    )
 
 
-def test_init_enable_mongo(std_struct: Module, set_std_apprc_path_env):
-    Boot(
+@pytest.mark.asyncio
+async def test_init_enable_mongo(std_struct: Module, set_std_apprc_path_env):
+    await Boot.create(
         root_module=std_struct
     )
 
     validation.validate(Di.ie().find("Mongo"), Mongo)
 
 
-def test_nested_configs_prod(
+@pytest.mark.asyncio
+async def test_nested_configs_prod(
     std_struct: Module,
     set_std_apprc_path_env,
     set_prod_mode
 ):
-    Boot(
+    await Boot.create(
         root_module=std_struct
     )
     app_rc: AppRc = BootProxy.ie().apprc
@@ -123,12 +133,13 @@ def test_nested_configs_prod(
     assert app_rc["Text"]["words_amount"] == text_config.words_amount == 1
 
 
-def test_nested_configs_dev(
+@pytest.mark.asyncio
+async def test_nested_configs_dev(
     std_struct: Module,
     set_std_apprc_path_env,
     set_dev_mode
 ):
-    Boot(
+    await Boot.create(
         root_module=std_struct
     )
     app_rc: AppRc = BootProxy.ie().apprc
@@ -137,12 +148,13 @@ def test_nested_configs_dev(
     assert app_rc["Text"]["words_amount"] == text_config.words_amount == 2
 
 
-def test_nested_configs_test(
+@pytest.mark.asyncio
+async def test_nested_configs_test(
     std_struct: Module,
     set_std_apprc_path_env,
     set_test_mode
 ):
-    Boot(
+    await Boot.create(
         root_module=std_struct
     )
     app_rc: AppRc = BootProxy.ie().apprc
@@ -159,7 +171,8 @@ def __gmodule() -> Module:
         exports=[_GService]
     )
 
-def test_global_modules(
+@pytest.mark.asyncio
+async def test_global_modules(
     __gmodule: Module
 ):
     class C1(HttpController):
@@ -173,7 +186,7 @@ def test_global_modules(
         def get(self) -> dict:
             return {"value": self.__gservice.calculate(1, 2, 3)}
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         root_module=Module("/", Controllers=[C1]),
         global_modules=[__gmodule]
     )
@@ -183,7 +196,8 @@ def test_global_modules(
     assert data["value"] == 6
 
 
-def test_global_modules_reimported(
+@pytest.mark.asyncio
+async def test_global_modules_reimported(
     __gmodule: Module
 ):
     """No module can import globally-defined modules."""
@@ -198,10 +212,11 @@ def test_global_modules_reimported(
         def get(self) -> dict:
             return {"value": self.__gservice.calculate(1, 2, 3)}
 
-    validation.expect(
-        Boot,
-        CircularDependencyError,
-        # Root module reimports globally defined module
-        root_module=Module("/", Controllers=[C1], imports=[__gmodule]),
-        global_modules=[__gmodule]
+    await validation.expect_async(
+        Boot.create(
+            # Root module reimports globally defined module
+            root_module=Module("/", Controllers=[C1], imports=[__gmodule]),
+            global_modules=[__gmodule]
+        ),
+        CircularDependencyError
     )

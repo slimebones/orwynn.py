@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.log.log import Log
@@ -9,7 +11,8 @@ from orwynn.websocket import Websocket, WebsocketController
 from orwynn.websocket.log.middleware import LogWebsocketMiddleware
 
 
-def test_get(
+@pytest.mark.asyncio
+async def test_get(
     writer: Writer,
     log_apprc_sink_to_writer: dict
 ):
@@ -19,7 +22,7 @@ def test_get(
         async def main(self, websocket: Websocket) -> None:
             await websocket.close()
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module(
             route="/", Controllers=[C1], Middleware=[LogWebsocketMiddleware]
         ),

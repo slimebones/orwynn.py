@@ -62,8 +62,8 @@ def create_root_module() -> Module:
     )
 
 
-def create_boot() -> Boot:
-    return Boot(
+async def create_boot() -> Boot:
+    return await Boot.create(
         create_root_module(),
         global_http_route="/api/v{version}",
         global_websocket_route="/ws/v{version}",
@@ -71,8 +71,8 @@ def create_boot() -> Boot:
         global_middleware={
             LogMiddleware: ["*"]
         }
-    )  # type: ignore #worker
+    )
 
 
-def create_app() -> App:
-    return create_boot().app
+async def create_app() -> App:
+    return (await create_boot()).app

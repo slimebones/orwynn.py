@@ -1,3 +1,4 @@
+import pytest
 from orwynn.base.errorhandler.errorhandler import ErrorHandler
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
@@ -30,8 +31,9 @@ class Eh(ErrorHandler):
         await request.send_json(data)
 
 
-def test_default():
-    boot: Boot = Boot(
+@pytest.mark.asyncio
+async def test_default():
+    boot: Boot = await Boot.create(
         Module("/", Controllers=[Wc])
     )
 
@@ -48,8 +50,9 @@ def test_default():
         assert err.args[0] == "hello"
 
 
-def test_one_handler():
-    boot: Boot = Boot(
+@pytest.mark.asyncio
+async def test_one_handler():
+    boot: Boot = await Boot.create(
         Module("/", Controllers=[Wc]),
         ErrorHandlers={Eh}
     )

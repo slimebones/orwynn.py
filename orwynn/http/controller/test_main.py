@@ -1,5 +1,6 @@
 
 from fastapi import Query, Request
+import pytest
 
 from orwynn.apiversion import ApiVersion
 from orwynn.base.controller.errors import (
@@ -32,59 +33,84 @@ def test_http_methods():
         assert hasattr(HttpController, method.value)
 
 
-def test_undefined_route():
+@pytest.mark.asyncio
+async def test_undefined_route():
     class C1(HttpController):
         ENDPOINTS = [Endpoint(method="get")]
 
     m1 = Module(route="/", Controllers=[C1])
-    expect(Boot, MissingControllerClassAttributeError, m1)
+    await validation.expect_async(
+        Boot.create(m1),
+        MissingControllerClassAttributeError
+    )
 
 
-def test_invalid_route():
+@pytest.mark.asyncio
+async def test_invalid_route():
     class C1(HttpController):
         ROUTE = "i don't like rules"
         ENDPOINTS = [Endpoint(method="get")]
 
     m1 = Module(route="/", Controllers=[C1])
-    expect(Boot, ReValidationError, m1)
+    await validation.expect_async(
+        Boot.create(m1),
+        ReValidationError
+    )
 
 
-def test_undefined_endpoints():
+@pytest.mark.asyncio
+async def test_undefined_endpoints():
     class C1(HttpController):
         ROUTE = "/c1"
 
     m1 = Module(route="/", Controllers=[C1])
-    expect(Boot, MissingControllerClassAttributeError, m1)
+    await validation.expect_async(
+        Boot.create(m1),
+        MissingControllerClassAttributeError
+    )
 
 
-def test_empty_endpoints():
+@pytest.mark.asyncio
+async def test_empty_endpoints():
     class C1(HttpController):
         ROUTE = "/c1"
         ENDPOINTS = []
 
     m1 = Module(route="/", Controllers=[C1])
-    expect(Boot, ValidationError, m1)
+    await validation.expect_async(
+        Boot.create(m1),
+        ValidationError
+    )
 
 
-def test_unsupported_method():
+@pytest.mark.asyncio
+async def test_unsupported_method():
     class C1(HttpController):
         ROUTE = "/c1"
         ENDPOINTS = [Endpoint(method="donuts")]
 
     m1 = Module(route="/", Controllers=[C1])
-    expect(Boot, UnsupportedHttpMethodError, m1)
+    await validation.expect_async(
+        Boot.create(m1),
+        UnsupportedHttpMethodError
+    )
 
 
-def test_defined_twice_method():
+@pytest.mark.asyncio
+async def test_defined_twice_method():
     class C1(HttpController):
         ROUTE = "/c1"
         ENDPOINTS = [Endpoint(method="get"), Endpoint(method="get")]
 
     m1 = Module(route="/", Controllers=[C1])
-    expect(Boot, DefinedTwiceControllerMethodError, m1)
+    await validation.expect_async(
+        Boot.create(m1),
+        DefinedTwiceControllerMethodError
+    )
 
 
-def test_uppercase_methods():
+@pytest.mark.asyncio
+async def test_uppercase_methods():
     class C1(HttpController):
         ROUTE = "/c1"
         ENDPOINTS = [
@@ -93,10 +119,11 @@ def test_uppercase_methods():
         ]
 
     m1 = Module(route="/", Controllers=[C1])
-    Boot(m1)
+    await Boot.create(m1)
 
 
-def test_already_registered():
+@pytest.mark.asyncio
+async def test_already_registered():
     class C1(HttpController):
         ROUTE = "/hello"
         ENDPOINTS = [Endpoint(method="get")]
@@ -106,7 +133,10 @@ def test_already_registered():
         ENDPOINTS = [Endpoint(method="get")]
 
     m1 = Module(route="/", Controllers=[C1, C2])
-    expect(Boot, AlreadyRegisteredMethodError, m1)
+    await validation.expect_async(
+        Boot.create(m1),
+        AlreadyRegisteredMethodError
+    )
 
 
 def test_std_routes(std_boot: Boot, std_http: Client):
@@ -115,12 +145,13 @@ def test_std_routes(std_boot: Boot, std_http: Client):
     validate_re(text.text, DEFAULT_ID + r"\: .+")
 
 
-def test_default_404():
+@pytest.mark.asyncio
+async def test_default_404():
     class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module(route="/", Controllers=[C1])
     )
 
@@ -141,7 +172,8 @@ def test_default_404():
     assert recovered_exception.detail == "Not Found"
 
 
-def test_default_request_validation_error():
+@pytest.mark.asyncio
+async def test_default_request_validation_error():
     class Item(Model):
         name: str
         price: float
@@ -153,9 +185,9 @@ def test_default_request_validation_error():
         def post(self, item: Item) -> dict:
             return {}
 
-    data: dict = Boot(
+    data: dict = (await Boot.create(
         Module(route="/", Controllers=[C1])
-    ).app.client.post_jsonify(
+    )).app.client.post_jsonify(
         "/",
         422,
         json={
@@ -175,7 +207,8 @@ def test_default_request_validation_error():
     )
 
 
-def test_default_method_not_allowed():
+@pytest.mark.asyncio
+async def test_default_method_not_allowed():
     class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
@@ -183,9 +216,9 @@ def test_default_method_not_allowed():
         def get(self) -> dict:
             return {}
 
-    data: dict = Boot(
+    data: dict = (await Boot.create(
         Module(route="/", Controllers=[C1])
-    ).app.client.post_jsonify(
+    )).app.client.post_jsonify(
         "/",
         405
     )
@@ -202,14 +235,15 @@ def test_default_method_not_allowed():
     assert recovered_exception.detail == "Method Not Allowed"
 
 
-def test_final_routes():
+@pytest.mark.asyncio
+async def test_final_routes():
     class _Ctrl(HttpController):
         ROUTE = "/{id}/tasty"
         ENDPOINTS = [
             Endpoint(method="get")
         ]
 
-    Boot(
+    await Boot.create(
         Module("/donuts", Controllers=[_Ctrl]),
         global_http_route="/api/v{version}"
     )
@@ -222,7 +256,8 @@ def test_final_routes():
     assert "/api/v1/donuts/{id}/tasty" in ctrl.final_routes
 
 
-def test_is_matching_route():
+@pytest.mark.asyncio
+async def test_is_matching_route():
     class _Ctrl(HttpController):
         ROUTE = "/{id}/tasty"
         ENDPOINTS = [
@@ -230,7 +265,7 @@ def test_is_matching_route():
         ]
         VERSION = 2
 
-    Boot(
+    await Boot.create(
         Module("/donuts", Controllers=[_Ctrl]),
         global_http_route="/api/v{version}",
         api_version=ApiVersion(supported={1, 2, 3})
@@ -255,7 +290,8 @@ def test_is_matching_route():
     assert ctrl.is_matching_route("/donuts/eb00v/tasty") is False
 
 
-def test_multiple_query_params():
+@pytest.mark.asyncio
+async def test_multiple_query_params():
     """
     Should correctly parse list of query params.
     """
@@ -274,7 +310,7 @@ def test_multiple_query_params():
                 "q": q
             }
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module("/", Controllers=[_Ctrl])
     )
 

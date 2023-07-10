@@ -227,8 +227,9 @@ def test_enum_field(_sqlite: Sql):
         assert validation.check(s.get(Item, 3)).color == Color.GREEN
 
 
-def test_config_poolclass():
-    Boot(
+@pytest.mark.asyncio
+async def test_config_poolclass():
+    await Boot.create(
         Module(imports=[sql.module]),
         apprc={
             "prod": {

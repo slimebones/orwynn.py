@@ -1,3 +1,4 @@
+import pytest
 from orwynn.apiversion import ApiVersion
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
@@ -34,7 +35,8 @@ class ArgumentedCtrl(WebsocketController):
         })
 
 
-def test_main_route():
+@pytest.mark.asyncio
+async def test_main_route():
     class WS1(WebsocketController):
         ROUTE = "/hello"
 
@@ -42,10 +44,10 @@ def test_main_route():
             await ws.send_json({"message": "Hello!"})
             await ws.close()
 
-    client = Boot(Module(
+    client = (await Boot.create(Module(
         route="/",
         Controllers=[WS1]
-    )).app.client
+    ))).app.client
 
     with client.websocket("/hello") as ws:
         data = ws.receive_json()
@@ -53,7 +55,8 @@ def test_main_route():
     assert data == {"message": "Hello!"}
 
 
-def test_custom_route():
+@pytest.mark.asyncio
+async def test_custom_route():
     class WS1(WebsocketController):
         ROUTE = "/hello"
 
@@ -61,10 +64,10 @@ def test_custom_route():
             await ws.send_json({"message": "Hello!"})
             await ws.close()
 
-    client = Boot(Module(
+    client = (await Boot.create(Module(
         route="/",
         Controllers=[WS1]
-    )).app.client
+    ))).app.client
 
     with client.websocket("/hello/message") as ws:
         data = ws.receive_json()
@@ -72,7 +75,8 @@ def test_custom_route():
     assert data == {"message": "Hello!"}
 
 
-def test_several_routes():
+@pytest.mark.asyncio
+async def test_several_routes():
     class WS1(WebsocketController):
         ROUTE = "/hello"
 
@@ -88,10 +92,10 @@ def test_several_routes():
             await ws.send_json({"message": "hello"})
             await ws.close()
 
-    client = Boot(Module(
+    client = (await Boot.create(Module(
         route="/",
         Controllers=[WS1]
-    )).app.client
+    ))).app.client
 
     with client.websocket("/hello") as ws:
         data = ws.receive_json()
@@ -106,8 +110,9 @@ def test_several_routes():
         assert data == {"message": "hello"}
 
 
-def test_arguments():
-    boot: Boot = Boot(
+@pytest.mark.asyncio
+async def test_arguments():
+    boot: Boot = await Boot.create(
         Module("/", Controllers=[ArgumentedCtrl])
     )
 
@@ -119,8 +124,9 @@ def test_arguments():
         assert data["order"] == 2
 
 
-def test_default_query():
-    boot: Boot = Boot(
+@pytest.mark.asyncio
+async def test_default_query():
+    boot: Boot = await Boot.create(
         Module("/", Controllers=[ArgumentedCtrl])
     )
 
@@ -133,8 +139,9 @@ def test_default_query():
 
 
 
-def test_final_routes():
-    Boot(
+@pytest.mark.asyncio
+async def test_final_routes():
+    await Boot.create(
         Module(
             "/",
             Controllers=[WsCtrl]

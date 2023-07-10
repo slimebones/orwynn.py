@@ -1,4 +1,5 @@
-from pytest import fixture
+import pytest
+import pytest_asyncio
 
 from orwynn import mongo
 from orwynn.base.model.model import Model
@@ -11,8 +12,8 @@ from orwynn.router.errors import (
 from orwynn.utils import validation
 
 
-@fixture
-def run_endpoint():
+@pytest_asyncio.fixture
+async def run_endpoint():
     class Item(Model):
         name: str
         price: int
@@ -47,7 +48,7 @@ def run_endpoint():
         def get(self) -> Item:
             return Item(name="hello", price=1)
 
-    Boot(
+    await Boot.create(
         Module(
             route="/",
             Controllers=[C1],
@@ -63,7 +64,8 @@ def run_endpoint():
     )
 
 
-def test_not_matched_spec_to_return_type():
+@pytest.mark.asyncio
+async def test_not_matched_spec_to_return_type():
     class WrongItem(Model):
         name: str
         doubt: int
@@ -84,11 +86,12 @@ def test_not_matched_spec_to_return_type():
         def get(self) -> Item:
             return Item(name="hello", price=1.2)
 
-    validation.expect(
-        Boot,
-        UnmatchedEndpointEntityError,
-        Module(
-            route="/",
-            Controllers=[C1]
-        )
+    await validation.expect_async(
+        Boot.create(
+            Module(
+                route="/",
+                Controllers=[C1]
+            )
+        ),
+        UnmatchedEndpointEntityError
     )

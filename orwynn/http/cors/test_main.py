@@ -1,3 +1,4 @@
+import pytest
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.http.controller.controller import HttpController
@@ -5,7 +6,8 @@ from orwynn.http.controller.endpoint.endpoint import Endpoint
 from orwynn.testing.client import Client
 
 
-def test_basic():
+@pytest.mark.asyncio
+async def test_basic():
     class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
@@ -13,7 +15,7 @@ def test_basic():
         def get(self):
             return {}
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module(route="/", Controllers=[C1]),
         apprc={
             "prod": {
@@ -39,7 +41,8 @@ def test_basic():
     assert r.headers.get("access-control-allow-origin") == "*"
 
 
-def test_correct_origin():
+@pytest.mark.asyncio
+async def test_correct_origin():
     class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
@@ -47,7 +50,7 @@ def test_correct_origin():
         def get(self) -> dict:
             return {}
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module(route="/", Controllers=[C1]),
         apprc={
             "prod": {
@@ -74,12 +77,13 @@ def test_correct_origin():
     assert r.headers.get("access-control-allow-origin") == "hello"
 
 
-def test_wrong_origin():
+@pytest.mark.asyncio
+async def test_wrong_origin():
     class C1(HttpController):
         ROUTE = "/"
         ENDPOINTS = [Endpoint(method="get")]
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module(route="/", Controllers=[C1]),
         apprc={
             "prod": {
@@ -105,7 +109,8 @@ def test_wrong_origin():
     assert r.headers.get("access-control-allow-origin") is None
 
 
-def test_unsuccessful():
+@pytest.mark.asyncio
+async def test_unsuccessful():
     """
     Unsuccessful responses should also contain according CORS headers.
     """
@@ -116,7 +121,7 @@ def test_unsuccessful():
         def get(self):
             raise ValueError("cors test")
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module(route="/", Controllers=[C1]),
         apprc={
             "prod": {

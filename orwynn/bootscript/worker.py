@@ -75,4 +75,4 @@ class BootscriptWorker(Worker):
         if inspect.iscoroutinefunction(script.fn):
             await script.fn(**dependencies)
         else:
-            script.fn(dependencies)  # type: ignore
+            script.fn(**dependencies)  # type: ignore

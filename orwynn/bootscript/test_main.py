@@ -1,3 +1,4 @@
+import pytest
 from orwynn.base.module import Module
 from orwynn.base.service import Service
 from orwynn.boot import Boot
@@ -14,6 +15,7 @@ class SomeService(Service):
 
 
 def fn(some_service: SomeService) -> None:
+    print(some_service)
     some_service.some_var = 1
 
 
@@ -21,8 +23,9 @@ async def async_fn(some_service: SomeService) -> None:
     some_service.some_var = 5
 
 
-def test_basic():
-    Boot(
+@pytest.mark.asyncio
+async def test_basic():
+    await Boot.create(
         Module(Providers=[SomeService]),
         bootscripts=[
             Bootscript(
@@ -40,8 +43,9 @@ def test_basic():
     assert some_service.some_var == 1
 
 
-def test_async():
-    Boot(
+@pytest.mark.asyncio
+async def test_async():
+    await Boot.create(
         Module(Providers=[SomeService]),
         bootscripts=[
             Bootscript(

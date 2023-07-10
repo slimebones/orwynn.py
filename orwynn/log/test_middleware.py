@@ -2,6 +2,8 @@ import json
 from types import NoneType
 from typing import Literal
 
+import pytest
+
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.http import Endpoint, HttpController, LogMiddleware
@@ -50,7 +52,8 @@ def __check_log_message(message: str) -> list[dict]:
     return parsed_items
 
 
-def test_get(
+@pytest.mark.asyncio
+async def test_get(
     writer: Writer,
     log_apprc_sink_to_writer: dict
 ):
@@ -63,7 +66,7 @@ def test_get(
         def get(self) -> dict:
             return RETURNED_DATA
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module(
             route="/", Controllers=[C1], Middleware=[LogMiddleware]
         ),
@@ -86,7 +89,8 @@ def test_get(
     Log.remove()
 
 
-def test_get__error(
+@pytest.mark.asyncio
+async def test_get__error(
     writer: Writer,
     log_apprc_sink_to_writer: dict
 ):
@@ -97,7 +101,7 @@ def test_get__error(
         def get(self) -> dict:
             raise ValueError("hello")
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module(
             route="/", Controllers=[C1], Middleware=[LogMiddleware]
         ),

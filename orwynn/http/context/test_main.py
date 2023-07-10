@@ -1,3 +1,4 @@
+import pytest
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.context.errors import UndefinedStorageError
@@ -10,7 +11,8 @@ from orwynn.http import (
 from orwynn.utils import validation
 
 
-def test_basic():
+@pytest.mark.asyncio
+async def test_basic():
     """Request id should be fetchable from context within request-response
     cycle and unfetchable outside this cycle.
     """
@@ -21,7 +23,7 @@ def test_basic():
         def get(self) -> dict:
             return {"request_id": HttpRequestContextId().get()}
 
-    boot: Boot = Boot(
+    boot: Boot = await Boot.create(
         Module(
             "/",
             Controllers=[C1],

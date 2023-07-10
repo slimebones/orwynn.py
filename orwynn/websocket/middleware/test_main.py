@@ -1,3 +1,4 @@
+import pytest
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.testing.client import Client
@@ -25,8 +26,9 @@ class Ws1(WebsocketController):
         await websocket.close()
 
 
-def test_basic():
-    boot: Boot = Boot(Module(
+@pytest.mark.asyncio
+async def test_basic():
+    boot: Boot = await Boot.create(Module(
         route="/hello",
         Controllers=[Ws1],
         Middleware=[Mw1]
