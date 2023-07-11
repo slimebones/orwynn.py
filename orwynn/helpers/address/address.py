@@ -1,4 +1,5 @@
-from typing import Any, Self
+from typing import Self
+
 from orwynn.base.model.model import Model
 from orwynn.utils.scheme import Scheme
 
@@ -63,3 +64,4 @@ class Address(Model):
             InvalidAddressError:
                 The given raw address does not match address's regex.
         """
+        raise NotImplementedError()

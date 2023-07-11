@@ -31,21 +31,24 @@ class ErrorHandlerManager:
         handlers_by_protocol: dict[Scheme, set[ErrorHandler]] = {}
 
         # Populate and register handlers separately for each protocol
-        for protocol in Scheme:
+        for scheme in Scheme:
+            if scheme is not Scheme.HTTP and scheme is not Scheme.WEBSOCKET:
+                continue
+
             populated_handlers: set[ErrorHandler] = \
                 self.__populate_handlers(
                     self.__get_handlers_for_protocol(
-                        protocol,
+                        scheme,
                         exception_handlers
                     ),
-                    protocol
+                    scheme
                 )
 
-            if protocol in handlers_by_protocol:
+            if scheme in handlers_by_protocol:
                 raise ValueError(
-                    f"protocol {protocol} handled twice"
+                    f"protocol {scheme} handled twice"
                 )
-            handlers_by_protocol[protocol] = populated_handlers
+            handlers_by_protocol[scheme] = populated_handlers
 
         return handlers_by_protocol
 
