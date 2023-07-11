@@ -1,6 +1,5 @@
 import asyncio
 
-import uvicorn
 from fastapi import Query
 
 from orwynn.apiversion import ApiVersion
@@ -12,6 +11,8 @@ from orwynn.http import (
     LogMiddleware,
     RedirectHttpResponse,
 )
+from orwynn.server.engine import ServerEngine
+from orwynn.server.server import Server
 
 
 class DonutsController(HttpController):
@@ -77,12 +78,13 @@ async def create_boot() -> Boot:
 
 
 async def main():
-    config = uvicorn.Config(
-        await create_boot(),
-        port=8000,
+    await Server(
+        engine=ServerEngine.Uvicorn,
+        boot=await create_boot()
+    ).serve(
+        host="localhost",
+        port=8000
     )
-    server = uvicorn.Server(config)
-    await server.serve()
 
 
 if __name__ == "__main__":
