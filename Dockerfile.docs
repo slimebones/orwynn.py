@@ -1,0 +1,8 @@
+FROM python:3.11
+
+WORKDIR /app
+
+COPY site ./site
+COPY Makefile .
+
+CMD ["make", "docs.serve_native"]

@@ -1,6 +1,6 @@
 export PYTEST_SHOW=all
 
-testapp.dev:
+testapp.serve:
 	cd tests/app && $(MAKE) dev
 
 test:
@@ -17,13 +17,20 @@ coverage:
 coverage.html:
 	poetry run coverage html --show-contexts && python -m http.server -d htmlcov 8000
 
-changelog:
-# Conventional Commits is used since we use exclamation marks to sign breaking
-# commits.
-	poetry run git-changelog -c conventional -o CHANGELOG.md .
-
 docs.serve:
-	poetry run mkdocs serve -a localhost:9000 -w orwynn
+	poetry run mkdocs serve -a localhost:3100 -w orwynn
 
 docs.build:
 	poetry run mkdocs build
+
+docs.serve_native:
+	python3 -m http.server -d site 3100
+
+docs.docker.build: docs.build
+	docker-compose -f docker-compose.docs.yml up -d --build --remove-orphans
+
+docs.docker.up:
+	docker-compose -f docker-compose.docs.yml up -d
+
+docs.docker.down:
+	docker-compose -f docker-compose.docs.yml down
