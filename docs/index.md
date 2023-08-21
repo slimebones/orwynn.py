@@ -1,41 +1,18 @@
-Documentation for Orwynn Web Framework.
+# Introduction
 
-## Table Of Contents
+Orwynn is a framework for building Python server-side applications. With main goal
+of allowing developers building clean [Modular Programs](https://en.wikipedia.org/wiki/Modular_programming), it inherits many ideas from other frameworks, such as [Angular](https://angular.io/) and [NestJS](https://docs.nestjs.com/).
 
-1. [Tutorials](tutorials.md)
-2. [How-To Guides](howto.md)
-3. [Reference](reference.md)
-4. [Explanation](explanation.md)
+Orwynn is built on top of [FastAPI](https://fastapi.tiangolo.com/), which means that all the advantages of FastAPI are available here, although, they appear in
+different forms. You will see the usage differences in details in later sections.
 
-## Key Features
+So, keeping in mind ability to ease building architectural solutions faster, Orwynn also strives to create a solid infrastructure, much like it does Angular, with one entrypoint and approach to test, scale and maintain your applications.
 
-### Modular
+## Installation
 
-Orwynn uses [modules][orwynn.base.module.module.Module] as the main building blocks.
-
-Each module contains a set of [services][orwynn.base.service.service.Service], [configs][orwynn.base.config.config.Config], [controllers][orwynn.base.controller.controller.Controller] and other objects are injectable (see [Dependency Injection](di.md)) to each other only within the same module or via the [import system][import-system].
-
-### Dependency Injection
-
-Each [module][orwynn.base.module.module.Module] has a set of [Providers][orwynn.di.provider.Provider] and [Acceptors][orwynn.di.acceptor.Acceptor].
-
-Providers can be requested by Acceptors or other Providers as dependencies in the requestor's `__init__` method:
-```py
-class MyProvider(Service):
-    ...
-
-class MyAcceptor(Controller):
-    def __init__(
-        self,
-        myprovider: MyProvider
-    ):
-        ...
+The only thing you probably need to install Orwynn:
+```bash
+pip install orwynn
 ```
 
-The name of the argument doesn't matter, the type does.
-
-See more about [DI system](di.md).
-
-### FastAPI as an underlying engine
-
-Orwynn utilizes and supports many features available in [FastAPI](https://fastapi.tiangolo.com/), including OpenAPI auto-documentation, modern Python support, WebSockets out of the box, CORS and many more.
+After that, for many cases it's recommended to create your new project using [Generate CLI](GenerateCLI.md), which will be covered in details in [Getting Started](GettingStarted.md).

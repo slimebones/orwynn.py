@@ -1,4 +1,8 @@
 site_name: Orwynn
+site_url: https://orwynn.ryzhovalex.com
+repo_url: https://github.com/ryzhovalex/orwynn
+site_author: Alexander Ryzhov
+copyright: Alexander Ryzhov @2023
 
 theme:
     name: "material"
@@ -14,8 +18,7 @@ plugins:
                     show_root_toc_entry: false
 
 nav:
-    - Home: index.md
-    - Tutorials: tutorials.md
-    - How-To Guides: howto.md
-    - Reference: reference.md
-    - Explanation: explanation.md
+    - Introduction: index.md
+    - Overview:
+        - Getting Started: GettingStarted.md
+    - API Reference: APIReference.md
