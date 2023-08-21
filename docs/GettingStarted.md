@@ -44,38 +44,3 @@ make serve mode=dev
 ```
 
 This will serve the created application at `http://localhost:3000` in DEV [App Mode](AppMode.md).
-
-
-
-//
-
-## Key Features
-
-### Modular
-
-Orwynn uses [Modules][orwynn.base.module.module.Module] as the main building blocks.
-
-Each module contains a set of [Services][orwynn.base.service.service.Service], [Configs][orwynn.base.config.config.Config], [Controllers][orwynn.base.controller.controller.Controller] and other objects which can be injected (see [Dependency Injection](DI.md)) to each other within the same module scope or via the [import system][import-system].
-
-### [Dependency Injection](DI.md)
-
-Each [Module][orwynn.base.module.module.Module] has a set of [Providers][orwynn.di.provider.Provider] and [Acceptors][orwynn.di.acceptor.Acceptor].
-
-Providers can be requested by Acceptors or other Providers as dependencies in the requestor's `__init__` method:
-```py
-class MyProvider(Service):
-    ...
-
-class MyAcceptor(Controller):
-    def __init__(
-        self,
-        myprovider: MyProvider
-    ):
-        ...
-```
-
-The name of an argument doesn't matter, the type does.
-
-### FastAPI as an underlying engine
-
-Orwynn utilizes and supports many features available in [FastAPI](https://fastapi.tiangolo.com/), including OpenAPI auto-documentation, modern Python support, WebSockets out of the box, CORS and many more.
