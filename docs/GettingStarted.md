@@ -35,7 +35,7 @@ Brief overview of files and directories generated:
 | `conftest.py` | Configuration for [Pytest](https://docs.pytest.org/en/7.4.x/) testing. |
 | `Makefile` | [GNU Makefile](https://www.gnu.org/software/make/manual/html_node/Simple-Makefile.html) for hosting the project's commands. |
 | `poetry.lock` | [Poetry](https://python-poetry.org/) locked dependencies. |
-| `pyproject.toml` | [Modern Python package informational file](https://pip.pypa.io/en/stable/reference/build-system/pyproject-toml/). |
+| `pyproject.toml` | [Modern Python package file](https://pip.pypa.io/en/stable/reference/build-system/pyproject-toml/). |
 
 After the generation, the application can be started using a command:
 ```bash
