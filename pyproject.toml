@@ -1,7 +1,13 @@
 [tool.poetry]
 name = "orwynn"
-version = "1.0.0"
+version = "1.0.1"
 description = "Scalable web-framework with out-of-the-box architecture"
+homepage = "https://orwynn.ryzhovalex.com"
+documentation = "https://orwynn.ryzhovalex.com"
+keywords = [
+    "framework", "architecture", "backend", "web-framework", "out of the box"
+]
+repository = "https://github.com/ryzhovalex/orwynn"
 authors = ["ryzhovalex <thed4rkof@gmail.com>"]
 readme = "README.md"
 
