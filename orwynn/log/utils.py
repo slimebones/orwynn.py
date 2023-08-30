@@ -1,10 +1,11 @@
+import contextlib
 from orwynn.utils.klass import Static
 import sys
 from typing import TYPE_CHECKING, Any
 import typing_extensions
-from orwynn.log.log import Log
-from orwynn.log.config import LogConfig
-from orwynn.log.handler import LogHandler
+from orwynn.log import Log
+from orwynn.log.configs import LogConfig
+from orwynn.log.handlers import LogHandler
 from orwynn.proxy.boot import BootProxy
 
 if TYPE_CHECKING:
@@ -12,6 +13,25 @@ if TYPE_CHECKING:
 
 
 class LogUtils(Static):
+    catchr = Log.catch(reraise=True)
+    """
+    Shortcut for Log.catch(reraise=True).
+
+    Does not accept additional arguments.
+    """
+
+    @staticmethod
+    def catch_error(error: Exception):
+        """Reraise error and catch it by logger."""
+        # TODO(ryzhovalex):
+        #   Find way to remove this last function from exception stack to not
+        #   be displayed
+
+        # try-except block for correct linting even if error isn't actually
+        # passed up the stack
+        with contextlib.suppress(Exception), Log.catch(reraise=False):
+            raise error
+
     @staticmethod
     def configure_log(config: LogConfig, *, app_mode_prod: "AppMode") -> None:
         if config.handlers:
@@ -72,6 +92,7 @@ class LogUtils(Static):
             sink,
             **kwargs
         )
+
 
 @typing_extensions.deprecated("use LogUtils")
 def configure_log(config: LogConfig, *, app_mode_prod: "AppMode") -> None:

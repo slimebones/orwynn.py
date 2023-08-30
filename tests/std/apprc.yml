@@ -1,6 +1,7 @@
 prod:
   Mongo:
-    database_name: orwynn-test
+    url: mongodb://localhost:9006
+    database_name: orwynn_test
   Text:
     words_amount: 1
 

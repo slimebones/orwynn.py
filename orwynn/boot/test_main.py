@@ -66,9 +66,20 @@ def set_std_apprc_path_env() -> None:
 
 @pytest.mark.asyncio
 async def test_init_mode_default(std_struct: Module):
+    """
+    Default mode should be DEV.
+    """
     os.environ["ORWYNN_MODE"] = ""
     boot: Boot = await Boot.create(
-        root_module=std_struct
+        root_module=std_struct,
+        apprc={
+            "dev": {
+                "Mongo": {
+                    "url": "mongodb://localhost:9006",
+                    "database_name": "orwynn_test"
+                }
+            }
+        }
     )
     assert boot.mode == AppMode.DEV
 
@@ -77,7 +88,15 @@ async def test_init_mode_default(std_struct: Module):
 async def test_init_mode_test(std_struct: Module):
     os.environ["ORWYNN_MODE"] = "test"
     boot: Boot = await Boot.create(
-        root_module=std_struct
+        root_module=std_struct,
+        apprc={
+            "test": {
+                "Mongo": {
+                    "url": "mongodb://localhost:9006",
+                    "database_name": "orwynn_test"
+                }
+            }
+        }
     )
     assert boot.mode == AppMode.TEST
 
@@ -86,7 +105,15 @@ async def test_init_mode_test(std_struct: Module):
 async def test_init_mode_dev(std_struct: Module):
     os.environ["ORWYNN_MODE"] = "dev"
     boot: Boot = await Boot.create(
-        root_module=std_struct
+        root_module=std_struct,
+        apprc={
+            "dev": {
+                "Mongo": {
+                    "url": "mongodb://localhost:9006",
+                    "database_name": "orwynn_test"
+                }
+            }
+        }
     )
     assert boot.mode == AppMode.DEV
 
@@ -95,7 +122,15 @@ async def test_init_mode_dev(std_struct: Module):
 async def test_init_mode_prod(std_struct: Module):
     os.environ["ORWYNN_MODE"] = "prod"
     boot: Boot = await Boot.create(
-        root_module=std_struct
+        root_module=std_struct,
+        apprc={
+            "prod": {
+                "Mongo": {
+                    "url": "mongodb://localhost:9006",
+                    "database_name": "orwynn_test"
+                }
+            }
+        }
     )
     assert boot.mode == AppMode.PROD
 

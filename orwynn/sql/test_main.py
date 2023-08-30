@@ -182,11 +182,11 @@ def test_sqlite_init_absolute_path():
 def test_postgresql_init():
     sql = Sql(SqlConfig(
         database_kind="postgresql",
-        database_name="orwynn-test",
+        database_name="orwynn_test",
         database_user="postgres",
         database_password="postgres",  # noqa: S106
         database_host="localhost",
-        database_port=5432
+        database_port=9005
     ))
     sql.create_tables()
     sql.drop_tables()

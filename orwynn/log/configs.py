@@ -1,5 +1,5 @@
 from orwynn.base.config import Config
-from orwynn.log.handler import LogHandler
+from orwynn.log.handlers import LogHandler
 
 
 class LogConfig(Config):

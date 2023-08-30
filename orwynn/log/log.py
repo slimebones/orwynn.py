@@ -1,3 +1,3 @@
-import loguru
+from loguru import logger as _logger
 
-Log = loguru.logger
+Log = _logger

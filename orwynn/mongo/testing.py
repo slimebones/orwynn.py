@@ -12,6 +12,7 @@ async def mongo_boot() -> Boot:
         apprc={
             "prod": {
                 "Mongo": {
+                    "url": "mongodb://localhost:9006",
                     "database_name": "orwynn-test"
                 }
             }

@@ -57,7 +57,8 @@ async def run_endpoint():
         apprc={
             "test": {
                 "Mongo": {
-                    "database_name": "orwynn-test"
+                    "url": "mongodb://localhost:9006",
+                    "database_name": "orwynn_test"
                 }
             }
         }

@@ -4,7 +4,7 @@ import pytest
 
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
-from orwynn.log.log import Log
+from orwynn.log import Log
 from orwynn.testing import Writer
 from orwynn.testing.client import Client
 from orwynn.websocket import Websocket, WebsocketController

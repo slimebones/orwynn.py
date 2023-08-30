@@ -3,7 +3,7 @@ from typing import ClassVar
 
 from orwynn.base.error.errors import MalfunctionError
 from orwynn.helpers.web import GenericRequest, GenericResponse
-from orwynn.log.helpers import catch_error
+from orwynn.log import LogUtils
 from orwynn.proxy.boot import BootProxy
 from orwynn.utils import validation
 from orwynn.utils.scheme import Scheme
@@ -68,7 +68,7 @@ class ErrorHandler:
                 False
             )
         ):
-            catch_error(error)
+            LogUtils.catch_error(error)
         return self.handle(request, error)
 
     def handle(

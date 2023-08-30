@@ -15,7 +15,7 @@ from orwynn.utils import validation
 class Mongo(Database):
     """Manages actions related to MongoDB."""
     def __init__(self, config: MongoConfig) -> None:
-        self.__client: MongoClient = MongoClient(config.uri)
+        self.__client: MongoClient = MongoClient(config.url)
         self.__database: PymongoDatabase = self.__client[config.database_name]
         self.start_session: Callable[[], ClientSession] = \
             self.__client.start_session
