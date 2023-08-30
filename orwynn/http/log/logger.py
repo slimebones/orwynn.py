@@ -48,12 +48,14 @@ class HttpLogger:
             json_ = None
 
         extra: dict = {
-            "http.request": {
-                "id": request_id,
-                # Get full URL
-                "url": request.url._url,
-                "headers": dict(request.headers),
-                "json": json_
+            "http": {
+                "request": {
+                    "id": request_id,
+                    # Get full URL
+                    "url": request.url._url,
+                    "headers": dict(request.headers),
+                    "json": json_
+                }
             }
         }
 
@@ -113,12 +115,14 @@ class HttpLogger:
             json_ = None
 
         extra: dict = {
-            "http.response": {
-                "status_code": response.status_code,
-                "request_id": request_id,
-                "media_type": response.media_type,
-                "headers": dict(response.headers),
-                "json": json_
+            "http": {
+                "response": {
+                    "status_code": response.status_code,
+                    "request_id": request_id,
+                    "media_type": response.media_type,
+                    "headers": dict(response.headers),
+                    "json": json_
+                }
             }
         }
 

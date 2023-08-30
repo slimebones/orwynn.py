@@ -1,10 +1,12 @@
 export PYTEST_SHOW=all
+export args
+export t=.
 
 testapp.serve:
 	cd tests/app && $(MAKE) dev
 
 test:
-	poetry run coverage run -m pytest -x --ignore=tests/app -p no:warnings --show-capture=$(PYTEST_SHOW) --failed-first orwynn tests
+	poetry run coverage run -m pytest -x --ignore=tests/app -p no:warnings --show-capture=$(PYTEST_SHOW) --failed-first $(args) $(t)
 
 lint:
 	poetry run ruff .

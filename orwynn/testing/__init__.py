@@ -14,6 +14,10 @@ def get_log_apprc(check_fn: Callable) -> dict:
                         "serialize": True
                     }
                 ]
+            },
+            "LogHttpMiddleware": {
+                "is_request_logged": True,
+                "is_reposne_logged": True
             }
         }
     }

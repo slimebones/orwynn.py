@@ -12,6 +12,7 @@ from orwynn.di.container import DiContainer
 from orwynn.di.init.acceptors import init_other_acceptors
 from orwynn.di.init.providers import init_providers
 from orwynn.di.object import DiObject
+from orwynn.http.log.configs import LogHttpMiddlewareConfig
 from orwynn.log import LogConfig
 from orwynn.utils import validation
 
@@ -72,9 +73,10 @@ class Di(Worker):
 
         # Add framework services
         root_module._fw_add_provider_or_skip(App)
-        # Log config is always added to configure logging, it can be built from
-        # an empty apprc too.
+        # Log configs is always added to configure logging, they all should
+        # be able to be built from an empty apprc (all values set to default).
         root_module._fw_add_provider_or_skip(LogConfig)
+        root_module._fw_add_provider_or_skip(LogHttpMiddlewareConfig)
         ##
 
         # So here we have generally a two stages of DI:

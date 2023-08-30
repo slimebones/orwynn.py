@@ -13,6 +13,7 @@ from orwynn.di.collecting.providerdependencies.map import (
 )
 from orwynn.di.isprovider import is_provider
 from orwynn.di.provider import Provider
+from orwynn.http.log.configs import LogHttpMiddlewareConfig
 from orwynn.log import LogConfig
 from tests.std.assertion import Assertion
 
@@ -25,8 +26,11 @@ def std_provider_dependencies_map(
 
 
 def test_std(std_struct: Module):
-    # Add log config by default
+    # TODO(ryzhovalex):
+    #   Here we out of DI adding core providers, which is a duplicate
+    #   operation. Need to consider better solutions.
     std_struct._fw_add_provider_or_skip(LogConfig)
+    std_struct._fw_add_provider_or_skip(LogHttpMiddlewareConfig)
 
     metamap: ProviderDependenciesMap = collect_provider_dependencies(
         ModuleCollector(std_struct).collected_modules

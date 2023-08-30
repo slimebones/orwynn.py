@@ -14,6 +14,7 @@ from .errorhandler.default import (
 from .errorhandler.middleware import (
     ErrorHandlerHttpMiddleware,
 )
+from .log.configs import LogHttpMiddlewareConfig
 from .log.middleware import LogMiddleware
 from .middleware.builtinmiddleware import BuiltinHttpMiddleware
 from .middleware.middleware import HttpMiddleware

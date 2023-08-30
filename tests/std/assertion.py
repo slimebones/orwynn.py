@@ -4,6 +4,7 @@ from orwynn.base.module import Module
 from orwynn.boot import BootConfig
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.provider import Provider
+from orwynn.http.log.configs import LogHttpMiddlewareConfig
 from orwynn.log import LogConfig
 from orwynn.mongo import Mongo, MongoConfig
 from tests.std.float import FloatController, FloatService, float_module
@@ -28,6 +29,7 @@ class Assertion:
         App,
         AppConfig,
         LogConfig,
+        LogHttpMiddlewareConfig,
         Mongo,
         MongoConfig,
         TextService,

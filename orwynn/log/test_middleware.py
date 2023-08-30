@@ -13,7 +13,7 @@ from orwynn.testing import Writer
 from orwynn.testing.client import Client
 
 
-def __check_log_message(message: str) -> list[dict]:
+def _check_log_message(message: str) -> list[dict]:
     assert message != ""
     items: list[str] = message.split("\n")
     parsed_items: list[dict] = []
@@ -24,26 +24,31 @@ def __check_log_message(message: str) -> list[dict]:
         data: dict = json.loads(str(item))
         extra: dict = data["record"]["extra"]
 
-        request_or_response: Literal["http.request", "http.response"]
-        if "http.request" in extra and "http.response" not in extra:
-            request_or_response = "http.request"
-            request_data: dict = extra["http.request"]
+        try:
+            http_extra: dict = extra["http"]
+        except KeyError as error:
+            raise AssertionError from error
+
+        request_or_response: Literal["request", "response"]
+        if "request" in http_extra and "response" not in http_extra:
+            request_or_response = "request"
+            request_data: dict = http_extra["request"]
             assert type(request_data["id"]) is str
             assert type(request_data["url"]) is str
-        elif "http.response" in extra and "http.request" not in extra:
-            request_or_response = "http.response"
-            response_data: dict = extra["http.response"]
+        elif "response" in http_extra and "request" not in http_extra:
+            request_or_response = "response"
+            response_data: dict = http_extra["response"]
             assert type(response_data["request_id"]) is str
             assert type(response_data["status_code"]) is int
             assert type(response_data["media_type"]) in [str, NoneType]
         else:
-            raise AssertionError()
+            raise AssertionError
 
-        assert type(extra[request_or_response]["headers"]) is dict
-        assert extra[request_or_response]["json"] is None or (
+        assert type(http_extra[request_or_response]["headers"]) is dict
+        assert http_extra[request_or_response]["json"] is None or (
             # Empty json dict is not allowed in log extra - it should be
             # replaced with None.
-            type(extra[request_or_response]["json"]) is dict
+            type(http_extra[request_or_response]["json"]) is dict
             and extra[request_or_response]["json"] != {}
         )
 
@@ -78,7 +83,7 @@ async def test_get(
         200
     )
 
-    items: list[dict] = __check_log_message(writer.read())
+    items: list[dict] = _check_log_message(writer.read())
     for item in items:
         extra: dict = item["record"]["extra"]
         if "request" in extra:
@@ -113,7 +118,7 @@ async def test_get__error(
         400
     )
 
-    items: list[dict] = __check_log_message(writer.read())
+    items: list[dict] = _check_log_message(writer.read())
     for item in items:
         extra: dict = item["record"]["extra"]
         if "request" in extra:
