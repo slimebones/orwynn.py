@@ -6,6 +6,11 @@ from orwynn.utils.types import Class
 from .errors import ClassNotFoundError
 
 
+class Static:
+    def __init__(self) -> None:
+        raise NotImplementedError
+
+
 def find_subclass_by_name(name: str, BaseClass: Class) -> Class:
     """Searches given base class for subclass with given name.
 

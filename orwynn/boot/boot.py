@@ -23,7 +23,7 @@ from orwynn.di.errors import MissingDiObjectError
 from orwynn.helpers.errors import DeprecatedFeatureError
 from orwynn.http import EndpointContainer
 from orwynn.indication import Indication, default_api_indication
-from orwynn.log import LogConfig, configure_log
+from orwynn.log import LogConfig, LogUtils
 from orwynn.proxy.boot import BootProxy
 from orwynn.proxy.indicationonly import ApiIndicationOnlyProxy
 from orwynn.router import Router
@@ -147,7 +147,7 @@ class Boot(Worker):
         self.__init_router()
 
         # Configure logging
-        configure_log(
+        LogUtils.configure_log(
             validation.apply(self.__di.find("LogConfig"), LogConfig),
             app_mode_prod=AppMode.PROD
         )
