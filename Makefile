@@ -9,7 +9,7 @@ test:
 	poetry run coverage run -m pytest -x --ignore=tests/app -p no:warnings --show-capture=$(PYTEST_SHOW) --failed-first $(args) $(t)
 
 lint:
-	poetry run ruff .
+	poetry run ruff $(args) $(t)
 
 check: lint test
 
@@ -20,7 +20,7 @@ coverage.html:
 	poetry run coverage html --show-contexts && python -m http.server -d htmlcov 8000
 
 docs.serve:
-	poetry run mkdocs serve -a localhost:3100 -w orwynn
+	poetry run mkdocs serve -a localhost:3100 -w $(t)
 
 docs.build:
 	poetry run mkdocs build
