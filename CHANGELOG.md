@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.0.4
+
+- perf(mongo): Better optimized document creation.
+
 ## 1.0.3
 
 - (http.log): Conditional request/response logging (set to False by default).
