@@ -58,14 +58,17 @@ class Mongo(Database):
         validation.validate(collection, str)
         validation.validate(document, dict)
 
-        return self.find_one(
-            collection,
-            {
-                "_id": self.__database[collection].insert_one(
-                    document, **kwargs
-                ).inserted_id
-            }
-        )
+        # NOTE(ryzhovalex):
+        #   instead of searching for created document, just replace it's id
+        #   with mongo's generated one, which is better for performance
+
+        inserted_id: str = self.__database[collection].insert_one(
+            document, **kwargs
+        ).inserted_id
+        copied: MongoEntity = document.copy()
+        copied["_id"] = inserted_id
+
+        return copied
 
     def remove_one(
         self, collection: str, query: dict, **kwargs
