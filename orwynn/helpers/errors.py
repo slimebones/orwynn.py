@@ -1,6 +1,8 @@
-from typing import Any
-from antievil import UnsupportedError as UnsupportedError
+from antievil import UnsupportedError
 
+__all__ = [
+    "UnsupportedError"
+]
 
 class DeprecatedFeatureError(Exception):
     """
