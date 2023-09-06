@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 1.0.5
+
+- fix: AnyIO breaking changes by version restriction
+- feat: Antievil exception library support
+
 ## 1.0.4
 
 - perf(mongo): Better optimized document creation.
