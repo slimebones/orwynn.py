@@ -30,6 +30,9 @@ sqlalchemy = "^2.0.3"
 psycopg2 = "^2.9.5"
 typing-extensions = "^4.7.1"
 antievil = "^0.1.5"
+# TODO(ryzhovalex):
+#   remove this pin after upgrading Starlette 0.31.1 (see FastAPI dependencies)
+anyio = ">=3.7.1,<4.0.0"
 
 [tool.poetry.group.dev.dependencies]
 lorem = "^0.1.1"
