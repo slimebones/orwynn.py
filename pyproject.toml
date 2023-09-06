@@ -29,6 +29,7 @@ python-benedict = "^0.28.1"
 sqlalchemy = "^2.0.3"
 psycopg2 = "^2.9.5"
 typing-extensions = "^4.7.1"
+antievil = "^0.1.5"
 
 [tool.poetry.group.dev.dependencies]
 lorem = "^0.1.1"
