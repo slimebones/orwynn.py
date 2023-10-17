@@ -5,18 +5,18 @@ from orwynn.base.database.database import Database
 
 from .table import Table
 
-from .databasekind import SQLDatabaseKind
+from .enums import SQLDatabaseKind
 
-from orwynn.sql.config import SqlConfig
+from orwynn.sql.config import SQLConfig
 from sqlalchemy import create_engine, Engine
 from sqlalchemy import Table as SQLAlchemyTable
 from sqlalchemy.orm import Session
 
 
-class Sql(Database):
+class SQL(Database):
     def __init__(
         self,
-        config: SqlConfig
+        config: SQLConfig
     ) -> None:
         super().__init__()
         self.__config = config
@@ -74,14 +74,14 @@ class Sql(Database):
         final_kwargs: dict = {}
 
         match self.__config.database_kind:
-            case SQLDatabaseKind.POSTGRESQL:
+            case SQLDatabaseKind.PostgreSQL:
                 url = \
                     f"postgresql://{self.__config.database_user}" \
                     + f":{self.__config.database_password}" \
                     + f"@{self.__config.database_host}" \
                     + f":{self.__config.database_port}" \
                     + f"/{self.__config.database_name}"
-            case SQLDatabaseKind.SQLITE:
+            case SQLDatabaseKind.SQLite:
                 database_path: str = validation.apply(
                     self.__config.database_path,
                     str

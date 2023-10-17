@@ -1,9 +1,31 @@
-from typing import TYPE_CHECKING, Any
-
+from typing import Any
 from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
+from antievil import TypeConversionError
 
-if TYPE_CHECKING:
-    pass
+
+class UnsetIdMongoError(Exception):
+    """
+    Id of created Mongo document should be set.
+    """
+    def __init__(self) -> None:
+        super().__init__(
+            "id of a created Mongo document should be set",
+        )
+
+
+class MongoTypeConversionError(TypeConversionError):
+    """
+    Cannot convert an input type to a mongo-compatible type.
+    """
+    def __init__(
+        self,
+        *,
+        t: type,
+    ):
+        super().__init__(
+            t1=t,
+            reason="cannot convert to a mongo-compatible type",
+        )
 
 
 class DuplicateKeyError(Exception):

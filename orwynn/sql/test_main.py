@@ -13,9 +13,9 @@ from orwynn.boot import Boot
 from orwynn.utils import validation
 from orwynn.utils.crypto import hash_password
 
-from .config import SqlConfig
-from .databasekind import SQLDatabaseKind
-from .sql import Sql
+from .config import SQLConfig
+from .enums import SQLDatabaseKind
+from .sql import SQL
 from .table import Table
 
 
@@ -46,8 +46,8 @@ class Like(Table):
 
 @pytest.fixture
 def _sqlite() -> Generator:
-    service = Sql(SqlConfig(
-        database_kind=SQLDatabaseKind.SQLITE,
+    service = SQL(SQLConfig(
+        database_kind=SQLDatabaseKind.SQLite,
         database_path=":memory:"
     ))
 
@@ -88,28 +88,28 @@ def _like1() -> Like:
 
 
 @pytest.fixture
-def _add_user1(_sqlite: Sql, _user1: User) -> None:
+def _add_user1(_sqlite: SQL, _user1: User) -> None:
     with _sqlite.session as session:
         session.add(_user1)
         session.commit()
 
 
 @pytest.fixture
-def _add_user2(_sqlite: Sql, _user2: User) -> None:
+def _add_user2(_sqlite: SQL, _user2: User) -> None:
     with _sqlite.session as session:
         session.add(_user2)
         session.commit()
 
 
 @pytest.fixture
-def _add_tweet1(_sqlite: Sql, _tweet1: Tweet) -> None:
+def _add_tweet1(_sqlite: SQL, _tweet1: Tweet) -> None:
     with _sqlite.session as session:
         session.add(_tweet1)
         session.commit()
 
 
 @pytest.fixture
-def _add_like1(_sqlite: Sql, _like1: Like) -> None:
+def _add_like1(_sqlite: SQL, _like1: Like) -> None:
     with _sqlite.session as session:
         session.add(_like1)
         session.commit()
@@ -117,7 +117,7 @@ def _add_like1(_sqlite: Sql, _like1: Like) -> None:
 
 @pytest.fixture
 def _connect_user1a2_tweet1_like1(
-    _sqlite: Sql,
+    _sqlite: SQL,
     _add_user1,
     _add_user2,
     _add_tweet1,
@@ -135,7 +135,7 @@ def _connect_user1a2_tweet1_like1(
 
 
 def test_sqlite_init_memory():
-    sql = Sql(SqlConfig(
+    sql = SQL(SQLConfig(
         database_kind="sqlite",
         database_path=":memory:"
     ))
@@ -155,7 +155,7 @@ def test_sqlite_init_relative_path():
                 os.getcwd(), "var/tmp/test.db"
             ))
 
-    sql = Sql(SqlConfig(
+    sql = SQL(SQLConfig(
         database_kind="sqlite",
         database_path="var/tmp/test.db"
     ))
@@ -171,7 +171,7 @@ def test_sqlite_init_absolute_path():
         except OSError: # Directory not empty
             os.remove("/tmp/orwynn/test.db")  # noqa: S108
 
-    sql = Sql(SqlConfig(
+    sql = SQL(SQLConfig(
         database_kind="sqlite",
         database_path="/tmp/orwynn/test.db"  # noqa: S108
     ))
@@ -180,7 +180,7 @@ def test_sqlite_init_absolute_path():
 
 
 def test_postgresql_init():
-    sql = Sql(SqlConfig(
+    sql = SQL(SQLConfig(
         database_kind="postgresql",
         database_name="orwynn_test",
         database_user="postgres",
@@ -193,7 +193,7 @@ def test_postgresql_init():
 
 
 def test_create(
-    _sqlite: Sql,
+    _sqlite: SQL,
     _connect_user1a2_tweet1_like1
 ):
     with _sqlite.session as s:
@@ -206,7 +206,7 @@ def test_create(
         assert user2.likes == [like1]
 
 
-def test_enum_field(_sqlite: Sql):
+def test_enum_field(_sqlite: SQL):
     class Color(Enum):
         RED = 1
         BLUE = 2

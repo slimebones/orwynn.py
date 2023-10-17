@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 1.1.0 - UTILS IN DA CITY
+
+### Features
+
+- Big utils update: many utility objects are added, most notable SHD - aka
+  session handler
+
+### Refactor
+
+- Many SQL types are renamed
+- Sql and SqlConfig are now SQL and SQLConfig
+
 ## 1.0.5
 
 - fix: AnyIO breaking changes by version restriction

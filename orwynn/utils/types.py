@@ -2,6 +2,8 @@
 """
 from typing import Any, Callable, Coroutine, TypeVar
 
+T = TypeVar("T")
+
 CommonType = TypeVar("CommonType")
 Class = TypeVar("Class", bound=type)
 DecoratedCallable = TypeVar("DecoratedCallable", bound=Callable[..., Any])

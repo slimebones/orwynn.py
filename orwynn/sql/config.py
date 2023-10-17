@@ -5,10 +5,10 @@ from orwynn.base.error import MalfunctionError
 from sqlalchemy.pool import StaticPool, Pool
 
 from orwynn.sql.poolclass import PoolclassStr
-from .databasekind import SQLDatabaseKind
+from .enums import SQLDatabaseKind
 
 
-class SqlConfig(Config):
+class SQLConfig(Config):
     database_kind: SQLDatabaseKind
     database_name: str | None = None
     database_user: str | None = None
@@ -28,7 +28,7 @@ class SqlConfig(Config):
             ) from err
 
         # Check right associations
-        if db_kind is SQLDatabaseKind.POSTGRESQL:
+        if db_kind is SQLDatabaseKind.PostgreSQL:
             for key in [
                 "database_name",
                 "database_user",
@@ -40,7 +40,7 @@ class SqlConfig(Config):
                     raise ValueError(
                         f"for PostgreSQL you should define {key} in SQL config"
                     )
-        elif db_kind is SQLDatabaseKind.SQLITE:
+        elif db_kind is SQLDatabaseKind.SQLite:
             if not data.get("database_path", None):
                 raise ValueError(
                     "for SQLite you should define database_path in SQL config"
