@@ -1,19 +1,19 @@
 from typing import overload
 
 import pytest
+from antievil import NotFoundError
+
 from orwynn import sql
 from orwynn.base import Module, Service
 from orwynn.boot import Boot
 from orwynn.bootscript import Bootscript
 from orwynn.di.di import Di
 from orwynn.sql import SQL
+from orwynn.sql.errors import EmptyExecutionQueueError
 from orwynn.sql.shd import SHD
 from orwynn.sql.testing import S1Item
 from orwynn.sql.utils import SQLUtils
 from orwynn.utils import validation
-
-from antievil import NotFoundError
-from orwynn.sql.errors import EmptyExecutionQueueError
 
 
 class ItemRepo(Service):
@@ -109,11 +109,19 @@ async def test_execution_normal(
         bootscripts=[
             create_tables_bootscript,
         ],
+        apprc={
+            "prod": {
+                "SQL": {
+                    "database_kind": "sqlite",
+                    "database_path": ":memory:"
+                }
+            }
+        }
     )
 
     item_repo: ItemRepo = Di.ie().find("ItemRepo")
 
-    with SHD.new(Di.ie().find("Sql")) as shd:
+    with SHD.new(Di.ie().find("SQL")) as shd:
         created_item_id: str = item_repo.create_one(name="donut", price=1.2)
         created_item: S1Item = item_repo.get_one(created_item_id, shd)
 
@@ -150,11 +158,19 @@ async def test_execution_upstream(
             imports=[sql.module],
         ),
         bootscripts=[create_tables_bootscript],
+        apprc={
+            "prod": {
+                "SQL": {
+                    "database_kind": "sqlite",
+                    "database_path": ":memory:"
+                }
+            }
+        }
     )
 
     item_repo: ItemRepo = Di.ie().find("ItemRepo")
 
-    with SHD.new(Di.ie().find("Sql")) as shd:
+    with SHD.new(Di.ie().find("SQL")) as shd:
         created_item: S1Item = item_repo.create_one(
             shd, name="donut", price=1.2,
         )

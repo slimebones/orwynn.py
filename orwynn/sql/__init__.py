@@ -1,12 +1,13 @@
 from orwynn.base.module.module import Module
+from orwynn.sql.search import TableSearch
 from orwynn.sql.shd import SHD
 from orwynn.sql.stateflag import StateFlag
 from orwynn.sql.types import ConvertedModel, ListedConvertedModel, TTable
+from orwynn.sql.utils import SHDUtils, SQLUtils
 
 from .config import SQLConfig
 from .sql import SQL
 from .table import Table
-from orwynn.sql.utils import SHDUtils, SQLUtils
 
 __all__ = [
     "Table",
@@ -19,6 +20,7 @@ __all__ = [
     "ConvertedModel",
     "ListedConvertedModel",
     "SHD",
+    "TableSearch"
 ]
 
 module = Module(

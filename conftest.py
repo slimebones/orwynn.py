@@ -3,8 +3,10 @@
 import contextlib
 import os
 
+import pytest_asyncio
 from pytest import fixture
 
+from orwynn import sql
 from orwynn.app import AppMode
 from orwynn.app.app import App
 from orwynn.app.test_main import std_app
@@ -17,6 +19,7 @@ from orwynn.boot.test_main import (
     std_boot,
     std_mongo_boot,
 )
+from orwynn.bootscript.bootscript import Bootscript
 from orwynn.di.collecting.providerdependencies.test_main import (
     std_provider_dependencies_map,
 )
@@ -35,6 +38,7 @@ from orwynn.mongo.document.testing import (
 )
 from orwynn.mongo.mongo import Mongo
 from orwynn.mongo.testing import mongo_boot
+from orwynn.sql.testing import create_tables_bootscript, s1_table_search
 from orwynn.testing.client import Client
 from orwynn.testing.embeddedclient import EmbeddedTestClient
 from orwynn.utils import validation
@@ -72,3 +76,18 @@ def _delete_environs():
     for environ in ENVIRONS:
         with contextlib.suppress(KeyError):
             del os.environ[environ]
+
+@pytest_asyncio.fixture
+async def bare_boot(create_tables_bootscript: Bootscript) -> Boot:
+    return await Boot.create(Module(
+        imports=[sql.module]),
+        bootscripts=[create_tables_bootscript],
+        apprc={
+            "prod": {
+                "SQL": {
+                    "database_kind": "sqlite",
+                    "database_path": ":memory:"
+                }
+            }
+        }
+    )

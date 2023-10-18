@@ -1,19 +1,20 @@
 import os
-from collections.abc import Callable, Sequence
+from collections.abc import Callable
 from typing import TYPE_CHECKING
-from antievil import NotFoundError
 
+from antievil import NotFoundError
 from sqlalchemy import Select, text
+
 from orwynn.base.model import Model
 from orwynn.di.di import Di
 from orwynn.log import Log
-from orwynn.sql import SQL, Table
 from orwynn.sql.search import TableSearch
 from orwynn.sql.shd import SHD
+from orwynn.sql.sql import SQL
 from orwynn.sql.stateflag import StateFlag
+from orwynn.sql.table import Table
 from orwynn.sql.types import ConvertedModel, ListedConvertedModel, TTable
 from orwynn.utils import validation
-
 from orwynn.utils.klass import Static
 
 if TYPE_CHECKING:
@@ -69,8 +70,8 @@ class SQLUtils(Static):
             # and BootProxy.ie().mode != AppMode.PROD
         ):
             Log.info("drop sql database")
-            # use raw sql since i haven't found a quick way to drop cascade using
-            # python objects
+            # use raw sql since i haven't found a quick way to drop cascade
+            # using python objects
             with sql.session as s:
                 s.execute(text("""
                 DROP SCHEMA public CASCADE;
@@ -236,8 +237,9 @@ class SQLUtils(Static):
         listed_converted_model_units_key: str,
         shd: SHD,
     ) -> ListedConvertedModel:
-        """Finds all rows for table and converts them into listed model (model that
-        contains many converted models).
+        """
+        Finds all rows for table and converts them into listed model (model
+        that contains many converted models).
 
         Args:
             Table_:
@@ -247,8 +249,8 @@ class SQLUtils(Static):
             ListedConvertedModel_:
                 Model to be used as a container for all converted models.
             listed_converted_model_units_key:
-                Key of the ListedConvertedModel_ where collected units should be
-                passed. For example "products".
+                Key of the ListedConvertedModel_ where collected units should
+                be passed. For example "products".
             session:
                 SqlA shd.
 
@@ -322,7 +324,7 @@ class SQLUtils(Static):
 
     @staticmethod
     def get_sql_from_di(di: Di) -> SQL:
-        return validation.apply(di.find("Sql"), SQL)
+        return validation.apply(di.find("SQL"), SQL)
 
     @staticmethod
     def create_tables(sql: SQL):

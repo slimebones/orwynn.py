@@ -1,9 +1,8 @@
 from enum import Enum
 
+from orwynn.mongo import MongoUtils
+from orwynn.mongo.errors import MongoTypeConversionError
 from orwynn.utils import validation
-
-from orwynn.utils.umongo import MongoUtils
-from orwynn.utils.umongo.errors import MongoTypeConversionError
 
 
 class StringEnum(Enum):

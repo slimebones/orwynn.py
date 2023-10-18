@@ -233,7 +233,7 @@ async def test_config_poolclass():
         Module(imports=[sql.module]),
         apprc={
             "prod": {
-                "Sql": {
+                "SQL": {
                     "database_kind": "sqlite",
                     "database_path": ":memory:",
                     "poolclass": "StaticPool"

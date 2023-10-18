@@ -1,19 +1,19 @@
+import typing
 from enum import Enum
-from typing import TYPE_CHECKING, Any, get_args
+from typing import TYPE_CHECKING, Any
 
-import typing_extensions
-from antievil import NotFoundError
-from orwynn.mongo import Document
-
+from orwynn.mongo.errors import (
+    MongoTypeConversionError,
+    UnsetIdMongoError,
+)
+from orwynn.mongo.types import MongoCompatibleType, TDocument
 from orwynn.utils.klass import Static
-from orwynn.utils.types import TDocument
-from orwynn.utils.umongo.errors import MongoTypeConversionError, UnsetIdMongoError
-from orwynn.utils.umongo.types import DocumentType, MongoCompatibleType
 
 if TYPE_CHECKING:
-    from orwynn.utils.dbsearch import DocumentSearch
+    from orwynn.mongo import Document
+    from orwynn.mongo.search import DocumentSearch
 
-MONGO_COMPATIBLE_TYPES: tuple[type] = get_args(MongoCompatibleType)
+MongoCompatibleTypes: tuple[Any, ...] = typing.get_args(MongoCompatibleType)
 
 
 class MongoUtils(Static):
@@ -133,7 +133,7 @@ class MongoUtils(Static):
 
 
     @staticmethod
-    def get_id(document: Document) -> str:
+    def get_id(document: "Document") -> str:
         doc_id: str | None = document.id
 
         if doc_id is None:
@@ -177,7 +177,7 @@ class MongoUtils(Static):
             result = []
             for item in obj:
                 result.append(MongoUtils.convert_compatible(item))
-        elif type(obj) in MONGO_COMPATIBLE_TYPES:
+        elif type(obj) in MongoCompatibleTypes:
             result = obj
         elif hasattr(obj, "mongovalue"):
             result = MongoUtils.convert_compatible(obj.mongovalue)
@@ -189,77 +189,8 @@ class MongoUtils(Static):
         return result
 
     @staticmethod
-    def refresh(document: DocumentType) -> DocumentType:
+    def refresh(document: TDocument) -> TDocument:
         """
         Refreshes document with fresh data from database.
         """
         return document.find_one({"id": document.getid()})
-
-
-# Deprecated #
-
-@typing_extensions.deprecated("use MongoUtils.get_id instead")
-def get_id(document: Document) -> str:
-    doc_id: str | None = document.id
-
-    if doc_id is None:
-        raise UnsetIdMongoError
-
-    return doc_id
-
-
-@typing_extensions.deprecated("use MongoUtils.convert_compatible instead")
-def convert_compatible(obj: Any) -> MongoCompatibleType:
-    """
-    Converts object to mongo compatible type.
-
-    Convertation rules:
-    - object with type listed in already compatible mongo types is returned
-    as it is
-    - elements of list, as well as dictionary's keys and values are converted
-    recursively using this function
-    - in case of Enum, the Enum's value is obtained and converted through this
-    function
-    - objects with defined attribute `mongovalue` (either by variable or
-    property) is called like `obj.mongovalue` and the result is converted again
-    through this function
-    - for all other types the MongoTypeConversionError is raised
-
-    Args:
-        obj:
-            Object to convert.
-
-    Raises:
-        MongoTypeConversionError:
-            Cannot convert object to mongo-compatible.
-    """
-    result: MongoCompatibleType
-
-    if type(obj) is dict:
-        result = {}
-        for k, v in obj.items():
-            result[convert_compatible(k)] = convert_compatible(v)
-    elif type(obj) is list:
-        result = []
-        for item in obj:
-            result.append(convert_compatible(item))
-    elif type(obj) in MONGO_COMPATIBLE_TYPES:
-        result = obj
-    elif hasattr(obj, "mongovalue"):
-        result = convert_compatible(obj.mongovalue)
-    elif isinstance(obj, Enum):
-        result = convert_compatible(obj.value)
-    else:
-        raise MongoTypeConversionError(t=type(obj))
-
-    return result
-
-
-@typing_extensions.deprecated("use MongoUtils.refresh instead")
-def refresh(document: DocumentType) -> DocumentType:
-    """
-    Refreshes document with fresh data from database.
-    """
-    return document.find_one({"id": document.getid()})
-
-##

@@ -1,6 +1,7 @@
 from typing import Generic, Literal, Self
 
 from antievil import NameExpectError, UnsupportedError
+
 from orwynn.sql.shd import SHD
 from orwynn.sql.table import Table
 from orwynn.sql.types import TTable

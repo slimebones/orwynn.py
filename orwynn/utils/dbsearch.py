@@ -1,11 +1,8 @@
-from typing import Generic, Literal, Self
+from typing import Generic
 
 from antievil import (
-    NameExpectError,
     NotFoundError,
-    UnsupportedError,
 )
-from orwynn.sql import Table
 from pydantic.generics import GenericModel
 
 from orwynn.utils.expectation import Expectation

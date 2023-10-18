@@ -1,9 +1,9 @@
-from orwynn.utils import validation
+from antievil import WrongGenericTypeError
 
+from orwynn.utils import validation
 from orwynn.utils.condition import ComparisonCondition
 from orwynn.utils.condition._mark import ComparisonMark
 from orwynn.utils.condition.errors import UnsupportedComparisonError
-from orwynn.utils.errors import WrongGenericTypeError
 
 
 def test_int_equal():

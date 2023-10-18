@@ -1,18 +1,18 @@
 from queue import Empty, Queue
 from typing import Self
 
-from orwynn.sql import SQL
+from antievil import LogicError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from antievil import LogicError
-from orwynn.utils.func import FuncSpec
 from orwynn.sql.errors import (
     EmptyExecutionQueueError,
     ManageableSHDError,
     NonManageableSHDError,
     SqlToUpstreamUnmatchError,
 )
+from orwynn.sql.sql import SQL
+from orwynn.utils.func import FuncSpec
 
 
 class SHD:
@@ -250,10 +250,10 @@ class SHD:
         if self.__is_manageable:
             self._execution_queue.put_nowait(fn_spec)
         elif self.__upstream_shd is None:
-            raise LogicError(  # noqa: TRY003
+            raise LogicError(
                 f"shd={self} is not manageable, but an upstream shd is None",
             )
         else:
-            self.__upstream_shd._add_to_execution_queue(  # noqa: SLF001
+            self.__upstream_shd._add_to_execution_queue(
                 fn_spec,
             )

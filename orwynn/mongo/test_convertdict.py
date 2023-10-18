@@ -1,6 +1,6 @@
 from typing import Any
 
-from orwynn.utils.umongo import MongoUtils
+from orwynn.mongo import MongoUtils
 
 
 def test_s1():

@@ -1,9 +1,9 @@
 from typing import Any, ClassVar, Generic
 
+from antievil import AbstractUsageError
 from pydantic.generics import GenericModel
 
 from orwynn.utils.condition import ComparisonCondition as _ComparisonCondition
-from antievil import AbstractUsageError
 from orwynn.utils.expectation.errors import (
     ExpectationError,
     UnsupportedExpectationTypeError,

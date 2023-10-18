@@ -1,5 +1,4 @@
 from orwynn.utils import validation
-
 from orwynn.utils.condition import ComparisonCondition, ComparisonMark
 from orwynn.utils.expectation import ListExpectation
 from orwynn.utils.expectation.errors import (

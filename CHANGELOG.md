@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 1.1.0 - UTILS IN DA CITY
+## 1.1.0
 
 ### Features
 

@@ -1,5 +1,6 @@
-from orwynn.sql import Table
 from sqlalchemy.orm import Mapped, mapped_column
+
+from orwynn.sql.table import Table
 
 
 class StateFlag(Table):
