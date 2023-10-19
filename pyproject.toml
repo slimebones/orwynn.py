@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "orwynn"
-version = "1.1.0"
+version = "1.2.0"
 description = "Scalable web-framework with out-of-the-box architecture"
 homepage = "https://orwynn.ryzhovalex.com"
 documentation = "https://orwynn.ryzhovalex.com"
