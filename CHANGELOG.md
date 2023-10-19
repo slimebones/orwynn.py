@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.2.0
+
+### Features
+
+- DTO models and utils
+- Class utils
+
 ## 1.1.0
 
 ### Features

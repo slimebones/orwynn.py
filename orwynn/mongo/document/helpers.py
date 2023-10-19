@@ -3,10 +3,10 @@ from bson import ObjectId
 from bson.errors import InvalidId
 
 from orwynn.mongo.document.errors import InvalidIdError
-from orwynn.utils.types import CommonType
+from orwynn.utils.types import T
 
 
-def convert_to_object_id(obj: CommonType) -> CommonType | ObjectId:
+def convert_to_object_id(obj: T) -> T | ObjectId:
     """
     Converts an object to ObjectId compliant.
 
@@ -19,7 +19,7 @@ def convert_to_object_id(obj: CommonType) -> CommonType | ObjectId:
     Returns:
         ObjectId-compliant representation of the given object.
     """
-    result: CommonType | ObjectId
+    result: T | ObjectId
 
     if type(obj) is str:
         try:

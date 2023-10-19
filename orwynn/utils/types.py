@@ -4,9 +4,8 @@ from typing import Any, Callable, Coroutine, TypeVar
 
 T = TypeVar("T")
 
-CommonType = TypeVar("CommonType")
-Class = TypeVar("Class", bound=type)
-DecoratedCallable = TypeVar("DecoratedCallable", bound=Callable[..., Any])
+TClass = TypeVar("TClass", bound=type)
+TDecoratedCallable = TypeVar("TDecoratedCallable", bound=Callable[..., Any])
 
 Timestamp = float
 Delta = float

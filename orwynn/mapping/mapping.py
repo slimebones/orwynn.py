@@ -3,19 +3,19 @@ from typing import Any
 
 from orwynn.base.model.model import Model
 from orwynn.mapping.errors import MappingNotLinkedError, UnsetIdMappingError
-from orwynn.utils.types import DecoratedCallable
+from orwynn.utils.types import TDecoratedCallable
 
 
 def if_linked(
-    fn: DecoratedCallable
-) -> DecoratedCallable:
+    fn: TDecoratedCallable
+) -> TDecoratedCallable:
     def inner(self: Mapping, *args, **kwargs):
         if not self.is_linked:
             raise MappingNotLinkedError(
                 f"{self} is not linked to database yet"
             )
         return fn(self, *args, **kwargs)
-    return typing.cast(DecoratedCallable, inner)
+    return typing.cast(TDecoratedCallable, inner)
 
 
 class Mapping(Model):
