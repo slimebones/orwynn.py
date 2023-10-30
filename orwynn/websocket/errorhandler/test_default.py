@@ -14,7 +14,7 @@ class SomeWebsocketError(Exception):
 
 
 class Wc(WebsocketController):
-    ROUTE = "/"
+    Route = "/"
 
     async def main(self, ws: Websocket) -> None:
         raise SomeWebsocketError("hello")

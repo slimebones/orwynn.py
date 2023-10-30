@@ -26,39 +26,39 @@ class HttpController(Controller):
     initialized and registered.
 
     Class-Attributes:
-        ROUTE:
+        Route:
             A subroute of Module's route (where controller attached) which
             controller will answer to. This attribute is required to be
             defined in subclasses explicitly or an error will be raised.
             It is allowed to be "/" to handle Module's root route requests.
-        ENDPOINTS:
+        Endpoints:
             List of endpoints enabled in this controller.
-        VERSION (optional):
+        Version (optional):
             An API version the controller supports. Defaults to the latest one.
     """
-    ROUTE: ClassVar[str | None] = None
-    ENDPOINTS: ClassVar[list[Endpoint] | None] = None
-    VERSION: ClassVar[int | set[int] | Literal["*"] | None] = None
+    Route: ClassVar[str | None] = None
+    Endpoints: ClassVar[list[Endpoint] | None] = None
+    Version: ClassVar[int | set[int] | Literal["*"] | None] = None
 
     def __init__(self) -> None:
         super().__init__()
 
         self._methods: list[RequestMethod] = []
 
-        if self.ENDPOINTS is None:
+        if self.Endpoints is None:
             raise MissingControllerClassAttributeError(
-                "you should set class attribute ENDPOINTS for"
+                "you should set class attribute Endpoints for"
                 f" controller {self.__class__}"
             )
         else:
             validation.validate_each(
-                self.ENDPOINTS,
+                self.Endpoints,
                 Endpoint,
                 expected_sequence_type=list,
                 should_check_if_empty=True
             )
             collected_str_methods: list[str] = []
-            for endpoint in self.ENDPOINTS:
+            for endpoint in self.Endpoints:
                 str_method = endpoint.method.lower()
 
                 http_methods: list[RequestMethod] = [

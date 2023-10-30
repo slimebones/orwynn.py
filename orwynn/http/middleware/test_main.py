@@ -30,8 +30,8 @@ async def test_basic():
     Should work in general cases.
     """
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self):
             return {"message": "hello"}
@@ -52,8 +52,8 @@ async def test_variable_route():
     """Should work with variable routes.
     """
     class C1(HttpController):
-        ROUTE = "/{id}"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/{id}"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self, id: str):
             return {"value": id}
@@ -75,8 +75,8 @@ async def test_file_path_route():
     """Should be OK with file paths.
     """
     class C1(HttpController):
-        ROUTE = "/{file_path:path}"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/{file_path:path}"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self, file_path: str):
             return {"value": file_path}

@@ -54,8 +54,8 @@ class TextService(Service):
 
 
 class TextController(HttpController):
-    ROUTE = "/"
-    ENDPOINTS = [Endpoint(method="get")]
+    Route = "/"
+    Endpoints = [Endpoint(method="get")]
 
     def __init__(self, service: TextService) -> None:
         super().__init__()

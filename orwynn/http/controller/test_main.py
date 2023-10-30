@@ -36,7 +36,7 @@ def test_http_methods():
 @pytest.mark.asyncio
 async def test_undefined_route():
     class C1(HttpController):
-        ENDPOINTS = [Endpoint(method="get")]
+        Endpoints = [Endpoint(method="get")]
 
     m1 = Module(route="/", Controllers=[C1])
     await validation.expect_async(
@@ -48,8 +48,8 @@ async def test_undefined_route():
 @pytest.mark.asyncio
 async def test_invalid_route():
     class C1(HttpController):
-        ROUTE = "i don't like rules"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "i don't like rules"
+        Endpoints = [Endpoint(method="get")]
 
     m1 = Module(route="/", Controllers=[C1])
     await validation.expect_async(
@@ -61,7 +61,7 @@ async def test_invalid_route():
 @pytest.mark.asyncio
 async def test_undefined_endpoints():
     class C1(HttpController):
-        ROUTE = "/c1"
+        Route = "/c1"
 
     m1 = Module(route="/", Controllers=[C1])
     await validation.expect_async(
@@ -73,8 +73,8 @@ async def test_undefined_endpoints():
 @pytest.mark.asyncio
 async def test_empty_endpoints():
     class C1(HttpController):
-        ROUTE = "/c1"
-        ENDPOINTS = []
+        Route = "/c1"
+        Endpoints = []
 
     m1 = Module(route="/", Controllers=[C1])
     await validation.expect_async(
@@ -86,8 +86,8 @@ async def test_empty_endpoints():
 @pytest.mark.asyncio
 async def test_unsupported_method():
     class C1(HttpController):
-        ROUTE = "/c1"
-        ENDPOINTS = [Endpoint(method="donuts")]
+        Route = "/c1"
+        Endpoints = [Endpoint(method="donuts")]
 
     m1 = Module(route="/", Controllers=[C1])
     await validation.expect_async(
@@ -99,8 +99,8 @@ async def test_unsupported_method():
 @pytest.mark.asyncio
 async def test_defined_twice_method():
     class C1(HttpController):
-        ROUTE = "/c1"
-        ENDPOINTS = [Endpoint(method="get"), Endpoint(method="get")]
+        Route = "/c1"
+        Endpoints = [Endpoint(method="get"), Endpoint(method="get")]
 
     m1 = Module(route="/", Controllers=[C1])
     await validation.expect_async(
@@ -112,8 +112,8 @@ async def test_defined_twice_method():
 @pytest.mark.asyncio
 async def test_uppercase_methods():
     class C1(HttpController):
-        ROUTE = "/c1"
-        ENDPOINTS = [
+        Route = "/c1"
+        Endpoints = [
             Endpoint(method="GET"),
             Endpoint(method="POST")
         ]
@@ -125,12 +125,12 @@ async def test_uppercase_methods():
 @pytest.mark.asyncio
 async def test_already_registered():
     class C1(HttpController):
-        ROUTE = "/hello"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/hello"
+        Endpoints = [Endpoint(method="get")]
 
     class C2(HttpController):
-        ROUTE = "/hello"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/hello"
+        Endpoints = [Endpoint(method="get")]
 
     m1 = Module(route="/", Controllers=[C1, C2])
     await validation.expect_async(
@@ -148,8 +148,8 @@ def test_std_routes(std_boot: Boot, std_http: Client):
 @pytest.mark.asyncio
 async def test_default_404():
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/"
+        Endpoints = [Endpoint(method="get")]
 
     boot: Boot = await Boot.create(
         Module(route="/", Controllers=[C1])
@@ -179,8 +179,8 @@ async def test_default_request_validation_error():
         price: float
 
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="post")]
+        Route = "/"
+        Endpoints = [Endpoint(method="post")]
 
         def post(self, item: Item) -> dict:
             return {}
@@ -210,8 +210,8 @@ async def test_default_request_validation_error():
 @pytest.mark.asyncio
 async def test_default_method_not_allowed():
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self) -> dict:
             return {}
@@ -238,8 +238,8 @@ async def test_default_method_not_allowed():
 @pytest.mark.asyncio
 async def test_final_routes():
     class _Ctrl(HttpController):
-        ROUTE = "/{id}/tasty"
-        ENDPOINTS = [
+        Route = "/{id}/tasty"
+        Endpoints = [
             Endpoint(method="get")
         ]
 
@@ -259,11 +259,11 @@ async def test_final_routes():
 @pytest.mark.asyncio
 async def test_is_matching_route():
     class _Ctrl(HttpController):
-        ROUTE = "/{id}/tasty"
-        ENDPOINTS = [
+        Route = "/{id}/tasty"
+        Endpoints = [
             Endpoint(method="get")
         ]
-        VERSION = 2
+        Version = 2
 
     await Boot.create(
         Module("/donuts", Controllers=[_Ctrl]),
@@ -296,8 +296,8 @@ async def test_multiple_query_params():
     Should correctly parse list of query params.
     """
     class _Ctrl(HttpController):
-        ROUTE = "/items"
-        ENDPOINTS = [
+        Route = "/items"
+        Endpoints = [
             Endpoint(method="get")
         ]
 

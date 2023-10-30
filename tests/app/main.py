@@ -16,8 +16,8 @@ from orwynn.server.server import Server
 
 
 class DonutsController(HttpController):
-    ROUTE = "/donuts"
-    ENDPOINTS = [
+    Route = "/donuts"
+    Endpoints = [
         Endpoint(
             method="get",
             summary="Donuts!",
@@ -39,8 +39,8 @@ class DonutsController(HttpController):
 
 
 class GoawayRedirectController(HttpController):
-    ROUTE = "/goaway"
-    ENDPOINTS = [
+    Route = "/goaway"
+    Endpoints = [
         Endpoint(
             method="get"
         )

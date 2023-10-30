@@ -9,8 +9,8 @@ from orwynn.websocket import Websocket, WebsocketController
 
 
 class WsCtrl(WebsocketController):
-    ROUTE = "/"
-    VERSION = {2, 3}
+    Route = "/"
+    Version = {2, 3}
 
     async def main(self, ws: Websocket) -> None:
         await ws.send_json({"message": "hello"})
@@ -20,7 +20,7 @@ class WsCtrl(WebsocketController):
 
 
 class ArgumentedCtrl(WebsocketController):
-    ROUTE = "/user/{user_id}"
+    Route = "/user/{user_id}"
 
     async def main(
         self,
@@ -39,7 +39,7 @@ class ArgumentedCtrl(WebsocketController):
 @pytest.mark.asyncio
 async def test_main_route():
     class WS1(WebsocketController):
-        ROUTE = "/hello"
+        Route = "/hello"
 
         async def main(self, ws: Websocket) -> None:
             await ws.send_json({"message": "Hello!"})
@@ -59,7 +59,7 @@ async def test_main_route():
 @pytest.mark.asyncio
 async def test_custom_route():
     class WS1(WebsocketController):
-        ROUTE = "/hello"
+        Route = "/hello"
 
         async def on_message(self, ws: Websocket) -> None:
             await ws.send_json({"message": "Hello!"})
@@ -79,7 +79,7 @@ async def test_custom_route():
 @pytest.mark.asyncio
 async def test_several_routes():
     class WS1(WebsocketController):
-        ROUTE = "/hello"
+        Route = "/hello"
 
         async def main(self, ws: Websocket) -> None:
             await ws.send_json({"message": "main"})

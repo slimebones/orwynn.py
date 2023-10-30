@@ -20,7 +20,7 @@ class Mw1(WebsocketMiddleware):
 
 
 class Ws1(WebsocketController):
-    ROUTE = "/"
+    Route = "/"
 
     async def on_message(self, websocket: Websocket) -> None:
         await websocket.send_json({"value": "hello"})

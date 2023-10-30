@@ -37,8 +37,8 @@ class GeneralEh(ErrorHandler):
 
 
 class RaiseErrorController(HttpController):
-    ROUTE = "/"
-    ENDPOINTS = [Endpoint(method="get")]
+    Route = "/"
+    Endpoints = [Endpoint(method="get")]
 
     def get(self):
         raise ValueError("hello")
@@ -47,8 +47,8 @@ class RaiseErrorController(HttpController):
 @pytest.mark.asyncio
 async def test_custom_handler():
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self):
             raise ValueError("whoops!")
@@ -72,8 +72,8 @@ async def test_custom_handler():
 @pytest.mark.asyncio
 async def test_default_exception():
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self):
             raise TypeError("whoops!")
@@ -107,8 +107,8 @@ async def test_as_acceptor():
             return ASSERTED_TEXT
 
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self):
             raise TypeError("whoops!")
@@ -145,8 +145,8 @@ async def test_default_in_middleware():
     Should handle exceptions occured in middleware.
     """
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self):
             return {}
@@ -179,8 +179,8 @@ async def test_custom_in_middleware():
     Should handle exceptions occured in middleware.
     """
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self):
             return {}
@@ -232,8 +232,8 @@ async def test_pydantic_validation_error_is_catched():
     inheritance.
     """
     class _Ctrl(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [
+        Route = "/"
+        Endpoints = [
             Endpoint(method="get")
         ]
 

@@ -13,27 +13,27 @@ class Controller:
     """
     Entrypoint to some operational service.
     """
-    ROUTE: ClassVar[str | None] = None
-    VERSION: ClassVar[int | set[int] | Literal["*"] | None] = None
+    Route: ClassVar[str | None] = None
+    Version: ClassVar[int | set[int] | Literal["*"] | None] = None
 
     def __init__(self) -> None:
         # Actual route for the controller assigned at boottime
         self._final_routes: set[str] = set()
 
-        if self.ROUTE is None:
+        if self.Route is None:
             raise MissingControllerClassAttributeError(
-                "you should set class attribute ROUTE for"
+                "you should set class attribute Route for"
                 f" controller {self.__class__}"
             )
         else:
-            validation.validate(self.ROUTE, str)
-            validation.validate_route(self.ROUTE)
-            self._route: str = self.ROUTE
+            validation.validate(self.Route, str)
+            validation.validate_route(self.Route)
+            self._route: str = self.Route
 
-        validation.validate(self.VERSION, [int, set, str, NoneType])
-        if isinstance(self.VERSION, str) and self.VERSION != "*":
+        validation.validate(self.Version, [int, set, str, NoneType])
+        if isinstance(self.Version, str) and self.Version != "*":
             raise TypeError(
-                f"unrecognized VERSION {self.VERSION}"
+                f"unrecognized Version {self.Version}"
             )
 
     @property

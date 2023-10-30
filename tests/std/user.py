@@ -23,8 +23,8 @@ class UserService(Service):
 
 
 class UsersController(HttpController):
-    ROUTE = "/"
-    ENDPOINTS = [Endpoint(method="post")]
+    Route = "/"
+    Endpoints = [Endpoint(method="post")]
 
     def __init__(self, sv: UserService) -> None:
         super().__init__()
@@ -35,8 +35,8 @@ class UsersController(HttpController):
 
 
 class UsersIdController(HttpController):
-    ROUTE = "/{id}"
-    ENDPOINTS = [Endpoint(method="get")]
+    Route = "/{id}"
+    Endpoints = [Endpoint(method="get")]
 
     def __init__(self, sv: UserService) -> None:
         super().__init__()

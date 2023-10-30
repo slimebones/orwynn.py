@@ -17,7 +17,7 @@ async def test_get(
     log_apprc_sink_to_writer: dict
 ):
     class C1(WebsocketController):
-        ROUTE = "/"
+        Route = "/"
 
         async def main(self, websocket: Websocket) -> None:
             await websocket.close()

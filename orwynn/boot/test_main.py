@@ -211,8 +211,8 @@ async def test_global_modules(
     __gmodule: Module
 ):
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/"
+        Endpoints = [Endpoint(method="get")]
 
         def __init__(self, gservice: _GService) -> None:
             super().__init__()
@@ -237,8 +237,8 @@ async def test_global_modules_reimported(
 ):
     """No module can import globally-defined modules."""
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/"
+        Endpoints = [Endpoint(method="get")]
 
         def __init__(self, gservice: _GService) -> None:
             super().__init__()

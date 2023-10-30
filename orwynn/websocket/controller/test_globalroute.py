@@ -11,7 +11,7 @@ from orwynn.websocket.websocket import Websocket
 
 
 class WsCtrl(WebsocketController):
-    ROUTE = "/message"
+    Route = "/message"
 
     async def main(self, ws: Websocket) -> None:
         await ws.send_json({"message": "hello"})
@@ -38,7 +38,7 @@ async def test_default_version():
     By default a client should use the latest api version available.
     """
     class _C(WsCtrl):
-        VERSION = 3
+        Version = 3
 
         async def main(self, ws: Websocket) -> None:
             return await super().main(ws)
@@ -80,7 +80,7 @@ async def test_pass_version():
     A client is able to not specify global route, but pass own api version.
     """
     class _C(WsCtrl):
-        VERSION = 2
+        Version = 2
 
         async def main(self, ws: Websocket) -> None:
             return await super().main(ws)

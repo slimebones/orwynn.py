@@ -31,8 +31,8 @@ async def test_controller_dependency_unavailability():
         pass
 
     class Ctrl1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [
+        Route = "/"
+        Endpoints = [
             Endpoint(method="get")
         ]
 
@@ -88,8 +88,8 @@ async def test_unavailability_imported_but_not_exported():
         pass
 
     class Ctrl1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [
+        Route = "/"
+        Endpoints = [
             Endpoint(method="get")
         ]
 

@@ -10,8 +10,8 @@ from orwynn.http.responses import RedirectHttpResponse, TestHttpResponse
 @pytest.mark.asyncio
 async def test_redirect():
     class LocalController(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [
+        Route = "/"
+        Endpoints = [
             Endpoint(
                 method="get"
             )

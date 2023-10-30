@@ -9,8 +9,8 @@ from orwynn.testingtools import HeadersGetController
 
 
 class _Ctrl1(HttpController):
-    ROUTE = "/"
-    ENDPOINTS = [
+    Route = "/"
+    Endpoints = [
         Endpoint(method="get")
     ]
 
@@ -21,8 +21,8 @@ class _Ctrl1(HttpController):
 
 
 class _Ctrl2(HttpController):
-    ROUTE = "/"
-    ENDPOINTS = [
+    Route = "/"
+    Endpoints = [
         Endpoint(method="get")
     ]
 

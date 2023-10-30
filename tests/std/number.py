@@ -21,8 +21,8 @@ class NumberService(Service):
 
 
 class NumberController(HttpController):
-    ROUTE = "/"
-    ENDPOINTS = [Endpoint(method="get")]
+    Route = "/"
+    Endpoints = [Endpoint(method="get")]
 
     def __init__(self, service: NumberService) -> None:
         super().__init__()

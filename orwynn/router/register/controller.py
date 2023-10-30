@@ -119,7 +119,7 @@ class ControllerRegister:
                 Module to register for.
         """
         # Methods started from "on_" or equal to "main" should be registered.
-        # "main" is assigned to MODULE_ROUTE + CONTROLLER_ROUTE directly.
+        # "main" is assigned to MODULE_Route + CONTROLLER_Route directly.
         for event_handler in controller.event_handlers:
             method_route: str = \
                 "/" if event_handler.name == "main" else event_handler.name
@@ -199,7 +199,7 @@ class ControllerRegister:
 
         routes: set[str] = set()
         final_versions: set[int] = set()
-        version: int | set[int] | None | Literal["*"] = controller.VERSION
+        version: int | set[int] | None | Literal["*"] = controller.Version
 
         # Get the latest version if none is specified for controller
         if version is None:

@@ -13,8 +13,8 @@ from .errors import UnsupportedVersionError
 @pytest.mark.asyncio
 async def test_versioned_global_route():
     class C(HttpController):
-        ROUTE = "/message"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/message"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self) -> dict:
             return {"message": "hello"}
@@ -37,18 +37,18 @@ async def test_controller_version():
     HttpController can define older version of API than available.
     """
     class C1(HttpController):
-        ROUTE = "/message"
-        VERSION = 1
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/message"
+        Version = 1
+        Endpoints = [Endpoint(method="get")]
 
         def get(self) -> dict:
             return {"message": "hello v1"}
 
     class C2(HttpController):
-        # Here we don't need to define a VERSION, since the v2 should be
+        # Here we don't need to define a Version, since the v2 should be
         # latest.
-        ROUTE = "/message"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/message"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self) -> dict:
             return {"message": "hello v2"}
@@ -81,9 +81,9 @@ async def test_controller_version():
 @pytest.mark.asyncio
 async def test_controller_all_versions():
     class C1(HttpController):
-        ROUTE = "/message"
-        VERSION = "*"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/message"
+        Version = "*"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self) -> dict:
             return {"message": "hello"}
@@ -111,9 +111,9 @@ async def test_controller_all_versions():
 @pytest.mark.asyncio
 async def test_controller_several_versions():
     class C1(HttpController):
-        ROUTE = "/message"
-        VERSION = {2, 3}
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/message"
+        Version = {2, 3}
+        Endpoints = [Endpoint(method="get")]
 
         def get(self) -> dict:
             return {"message": "hello"}
@@ -140,9 +140,9 @@ async def test_controller_several_versions():
 @pytest.mark.asyncio
 async def test_controller_unsupported_version():
     class C1(HttpController):
-        ROUTE = "/message"
-        VERSION = 3
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/message"
+        Version = 3
+        Endpoints = [Endpoint(method="get")]
 
         def get(self) -> dict:
             return {"message": "hello"}
@@ -162,10 +162,10 @@ async def test_controller_unsupported_version():
 @pytest.mark.asyncio
 async def test_controller_unsupported_version_of_many():
     class C1(HttpController):
-        ROUTE = "/message"
+        Route = "/message"
         # Some are supported, some are not
-        VERSION = {2, 3}
-        ENDPOINTS = [Endpoint(method="get")]
+        Version = {2, 3}
+        Endpoints = [Endpoint(method="get")]
 
         def get(self) -> dict:
             return {"message": "hello"}

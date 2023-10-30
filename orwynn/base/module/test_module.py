@@ -12,8 +12,8 @@ from orwynn.utils import validation
 
 def test_controller_added_to_no_route():
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [
+        Route = "/"
+        Endpoints = [
             Endpoint(
                 method="get"
             )

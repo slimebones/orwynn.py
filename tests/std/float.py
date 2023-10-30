@@ -19,8 +19,8 @@ class FloatService(Service):
 
 
 class FloatController(HttpController):
-    ROUTE = "/"
-    ENDPOINTS = [Endpoint(method="get")]
+    Route = "/"
+    Endpoints = [Endpoint(method="get")]
 
     def __init__(self, service: FloatService) -> None:
         super().__init__()

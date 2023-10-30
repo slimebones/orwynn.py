@@ -10,7 +10,7 @@ from orwynn.websocket.controller.eventhandlermethod import (
 class WebsocketController(Controller):
     """Operates on websocket protocol.
 
-    Subclasses should define class attribute ROUTE signifies route under
+    Subclasses should define class attribute Route signifies route under
     which all operations is made.
 
     To define subroute operation, define method started with "on_", rest part
@@ -21,15 +21,15 @@ class WebsocketController(Controller):
     controller's namespace itself (see Example for details).
 
     Note that final route for each websocket controller method consists of
-    three things: MODULE_ROUTE + CONTROLLER_ROUTE + METHOD_ROUTE.
+    three things: MODULE_Route + CONTROLLER_Route + METHOD_Route.
 
     Class-Attributes:
-        ROUTE:
+        Route:
             A subroute of Module's route (where controller attached) which
             controller will answer to. This attribute is required to be
             defined in subclasses explicitly or an error will be raised.
             It is allowed to be "/" to handle Module's root route requests.
-        VERSION (optional):
+        Version (optional):
             An API version the controller supports. Defaults to the latest one.
 
     Example:
@@ -37,7 +37,7 @@ class WebsocketController(Controller):
     from orwynn import WebsocketController
 
     class MyWSController(WebsocketController):
-        ROUTE = "/chat"
+        Route = "/chat"
 
         def main(...):  # -> "/chat"
             ...
@@ -49,8 +49,8 @@ class WebsocketController(Controller):
             ...
     ```
     """
-    ROUTE: ClassVar[str | None] = None
-    VERSION: ClassVar[int | set[int] | Literal["*"] | None] = None
+    Route: ClassVar[str | None] = None
+    Version: ClassVar[int | set[int] | Literal["*"] | None] = None
 
     @classmethod
     def get_handler_subroutes(cls) -> list[str]:

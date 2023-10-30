@@ -65,8 +65,8 @@ async def test_get(
     RETURNED_DATA: dict = {"hello": 1}
 
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self) -> dict:
             return RETURNED_DATA
@@ -100,8 +100,8 @@ async def test_get__error(
     log_apprc_sink_to_writer: dict
 ):
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self) -> dict:
             raise ValueError("hello")

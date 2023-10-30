@@ -29,8 +29,8 @@ async def test_logged_request_id(
     log_apprc_sink_to_writer: dict
 ):
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [
+        Route = "/"
+        Endpoints = [
             Endpoint(method="get")
         ]
 
@@ -56,7 +56,7 @@ async def test_logged_websocket_request_id(
     log_apprc_sink_to_writer: dict
 ):
     class C1(WebsocketController):
-        ROUTE = "/"
+        Route = "/"
 
         async def main(self, websocket: Websocket) -> None:
             Log.info("hello")

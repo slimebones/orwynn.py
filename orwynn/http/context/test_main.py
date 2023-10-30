@@ -18,8 +18,8 @@ async def test_basic():
     cycle and unfetchable outside this cycle.
     """
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self) -> dict:
             return {"request_id": HttpRequestContextId().get()}

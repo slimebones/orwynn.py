@@ -23,8 +23,8 @@ async def run_endpoint():
         power: float
 
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [
+        Route = "/"
+        Endpoints = [
             Endpoint(
                 method="get",
                 default_status_code=201,
@@ -76,8 +76,8 @@ async def test_not_matched_spec_to_return_type():
         price: float
 
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [
+        Route = "/"
+        Endpoints = [
             Endpoint(
                 method="get",
                 responses=[EndpointResponse(status_code=200, Entity=WrongItem)]

@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## UNRELEASED
+
+### Features
+
+### Refactor
+
+- ROUTE, ENDPOINTS and VERSION of controller classes now are PascalCase.
+
 ## 1.2.0
 
 ### Features

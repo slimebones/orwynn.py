@@ -10,8 +10,8 @@ from orwynn.testing.client import Client
 @pytest.mark.asyncio
 async def test_basic():
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self):
             return {}
@@ -45,8 +45,8 @@ async def test_basic():
 @pytest.mark.asyncio
 async def test_correct_origin():
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self) -> dict:
             return {}
@@ -81,8 +81,8 @@ async def test_correct_origin():
 @pytest.mark.asyncio
 async def test_wrong_origin():
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/"
+        Endpoints = [Endpoint(method="get")]
 
     boot: Boot = await Boot.create(
         Module(route="/", Controllers=[C1]),
@@ -116,8 +116,8 @@ async def test_unsuccessful():
     Unsuccessful responses should also contain according CORS headers.
     """
     class C1(HttpController):
-        ROUTE = "/"
-        ENDPOINTS = [Endpoint(method="get")]
+        Route = "/"
+        Endpoints = [Endpoint(method="get")]
 
         def get(self):
             raise ValueError("cors test")

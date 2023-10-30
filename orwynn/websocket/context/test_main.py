@@ -20,7 +20,7 @@ async def test_basic():
     cycle and unfetchable outside this cycle.
     """
     class C1(WebsocketController):
-        ROUTE = "/"
+        Route = "/"
 
         async def main(self, websocket: Websocket) -> None:
             await websocket.send_json(

@@ -38,7 +38,7 @@ async def test_get_dependant_patch_against_websocket():
     #   related arguments.
 
     class WsCtrl(WebsocketController):
-        ROUTE = "/"
+        Route = "/"
 
         async def main(self, websocket: Websocket) -> None:
             await websocket.send_json({"message": "hello"})

@@ -10,8 +10,8 @@ GET_DATA: dict = {"message": "hello"}
 
 
 class GetController(HttpController):
-    ROUTE = "/"
-    ENDPOINTS = [
+    Route = "/"
+    Endpoints = [
         Endpoint(method="get")
     ]
 
@@ -20,8 +20,8 @@ class GetController(HttpController):
 
 
 class IdGetController(HttpController):
-    ROUTE = "/{id}"
-    ENDPOINTS = [
+    Route = "/{id}"
+    Endpoints = [
         Endpoint(method="get")
     ]
 
@@ -33,8 +33,8 @@ class HeadersGetController(HttpController):
     """
     Returns all accepted headers.
     """
-    ROUTE = "/"
-    ENDPOINTS = [
+    Route = "/"
+    Endpoints = [
         Endpoint(method="get")
     ]
 
@@ -43,8 +43,8 @@ class HeadersGetController(HttpController):
 
 
 class RedirectController(HttpController):
-    ROUTE = "/"
-    ENDPOINTS = [
+    Route = "/"
+    Endpoints = [
         Endpoint(
             method="get"
         )
