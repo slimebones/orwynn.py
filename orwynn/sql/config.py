@@ -22,10 +22,10 @@ class SQLConfig(Config):
     def __init__(self, **data: Any) -> None:
         try:
             db_kind: SQLDatabaseKind = SQLDatabaseKind(data["database_kind"])
-        except KeyError as err:
-            raise KeyError(
-                "define key \"database_kind\" in your apprc config"
-            ) from err
+        except KeyError:
+            # memory sqlite is used by default
+            db_kind = SQLDatabaseKind.SQLite
+            data["database_path"] = ":memory:"
 
         # Check right associations
         if db_kind is SQLDatabaseKind.PostgreSQL:

@@ -4,7 +4,12 @@
 
 ### Features
 
-- `orwynn.yml` is the only configuration filename supported for now.
+- `orwynn.yml` is the only configuration filename supported for now. To
+  override this, define environ `ORWYNN_RC_PATH`.
+
+### Fixed
+
+- Memory sqlite database is now used by default, instead of raising an error.
 
 ### Refactor
 

@@ -58,14 +58,13 @@ class Mongo(Database):
         validation.validate(collection, str)
         validation.validate(document, dict)
 
-        # NOTE(ryzhovalex):
-        #   instead of searching for created document, just replace it's id
-        #   with mongo's generated one, which is better for performance
-
         inserted_id: str = self.__database[collection].insert_one(
             document, **kwargs
         ).inserted_id
         copied: MongoEntity = document.copy()
+
+        # instead of searching for created document, just replace it's id
+        # with mongo's generated one, which is better for performance
         copied["_id"] = inserted_id
 
         return copied
