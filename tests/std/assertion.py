@@ -6,7 +6,7 @@ from orwynn.di.acceptor import Acceptor
 from orwynn.di.provider import Provider
 from orwynn.http.log.configs import LogHttpMiddlewareConfig
 from orwynn.log import LogConfig
-from orwynn.mongo import Mongo, MongoConfig
+from orwynn.mongo import Mongo, MongoConfig, MongoStateFlagService
 from tests.std.float import FloatController, FloatService, float_module
 from tests.std.number import NumberController, NumberService, number_module
 from tests.std.rootmodule import root_module
@@ -15,7 +15,7 @@ from tests.std.user import UserService, UsersIdController, user_module
 
 
 class Assertion:
-    COLLECTED_MODULES: list[Module] = [
+    CollectedModules: list[Module] = [
         root_module,
         text_module,
         number_module,
@@ -25,13 +25,14 @@ class Assertion:
     ]
     # Order of these providers doesn't matter here since set() should be
     # performed on comparison tests
-    COLLECTED_PROVIDERS: list[type[Provider]] = [
+    CollectedProviders: list[type[Provider]] = [
         App,
         AppConfig,
         LogConfig,
         LogHttpMiddlewareConfig,
         Mongo,
         MongoConfig,
+        MongoStateFlagService,
         TextService,
         TextConfig,
         NumberService,
@@ -39,7 +40,7 @@ class Assertion:
         BootConfig,
         UserService
     ]
-    COLLECTED_OTHER_ACCEPTORS: list[type[Acceptor]] = [
+    CollectedOtherAcceptors: list[type[Acceptor]] = [
         TextController,
         NumberController,
         FloatController,

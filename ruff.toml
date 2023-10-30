@@ -10,6 +10,9 @@ exclude = [
 ]
 
 ignore = [
+    # False-Positive
+    "PD011",
+
     # Doesn't recognize new "match" syntax
     "E999",
 

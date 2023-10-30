@@ -6,6 +6,7 @@
 
 - `orwynn.yml` is the only configuration filename supported for now. To
   override this, define environ `ORWYNN_RC_PATH`.
+- MongoStateFlag
 
 ### Fixed
 

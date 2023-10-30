@@ -18,7 +18,7 @@ async def test_std(
 ):
     init_other_acceptors(std_di_container, std_modules)
 
-    for A in Assertion.COLLECTED_OTHER_ACCEPTORS:
+    for A in Assertion.CollectedOtherAcceptors:
         isinstance(std_di_container.find(A.__name__), A)
 
 

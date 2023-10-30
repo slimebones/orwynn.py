@@ -15,7 +15,7 @@ def std_modules(std_struct: Module) -> list[Module]:
 def test_std(std_struct: Module):
     collected_modules = ModuleCollector(std_struct).collected_modules
 
-    assert collected_modules == Assertion.COLLECTED_MODULES
+    assert collected_modules == Assertion.CollectedModules
 
 
 def test_imports_self(self_importing_module_struct: Module):

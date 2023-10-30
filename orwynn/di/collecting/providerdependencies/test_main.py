@@ -37,7 +37,7 @@ def test_std(std_struct: Module):
     )
 
     # Order doesn't matter
-    assert set(metamap.Providers) == set(Assertion.COLLECTED_PROVIDERS)
+    assert set(metamap.Providers) == set(Assertion.CollectedProviders)
 
     for P, dependencies in metamap.mapped_items:
         assertion_dependencies: list[type[Provider]] = []

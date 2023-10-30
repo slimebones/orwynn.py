@@ -1,5 +1,7 @@
 from orwynn.base.module import Module
-from orwynn.mongo.search import DocumentSearch
+from orwynn.mongo.search import DocumentSearch, MongoStateFlagSearch
+from orwynn.mongo.services import MongoStateFlagService
+from orwynn.mongo.stateflag import MongoStateFlag
 from orwynn.mongo.utils import MongoUtils
 
 from .config import MongoConfig
@@ -11,10 +13,13 @@ __all__ = [
     "MongoConfig",
     "Mongo",
     "MongoUtils",
-    "DocumentSearch"
+    "DocumentSearch",
+    "MongoStateFlag",
+    "MongoStateFlagSearch",
+    "MongoStateFlagService"
 ]
 
 module = Module(
-    Providers=[Mongo, MongoConfig],
-    exports=[Mongo, MongoConfig]
+    Providers=[Mongo, MongoConfig, MongoStateFlagService],
+    exports=[Mongo, MongoConfig, MongoStateFlagService]
 )

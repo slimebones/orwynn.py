@@ -9,3 +9,8 @@ class DocumentSearch(DatabaseSearch[Document], Generic[TDocument]):
     """
     Search Mongo Documents.
     """
+
+
+class MongoStateFlagSearch(DocumentSearch):
+    keys: list[str] | None = None
+    values: list[bool] | None = None
