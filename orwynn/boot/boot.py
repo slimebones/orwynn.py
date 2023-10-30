@@ -10,7 +10,7 @@ from starlette.types import Receive, Scope, Send
 
 from orwynn.apiversion import ApiVersion
 from orwynn.app import App, AppMode
-from orwynn.apprc import AppRc, parse_apprc
+from orwynn.apprc import AppRc, AppRCUtils
 from orwynn.base.controller import Controller
 from orwynn.base.errorhandler import ErrorHandler
 from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
@@ -45,7 +45,7 @@ class Boot(Worker):
             pass arg "mode".
         - ORWYNN_ROOT_DIR:
             Root directory for application. Defaults to os.getcwd()
-        - ORWYNN_APPRC_PATH:
+        - ORWYNN_RC_PATH:
             Path where app configuration file located. Defaults to
             "./apprc.yml". Alternatively you can pass a dictionary directly in
             "apprc" attribute.
@@ -119,7 +119,7 @@ class Boot(Worker):
         self.__mode: AppMode = self.__initialize_mode(mode)
         self.__root_dir: Path = self.__parse_root_dir()
         self.__api_indication: Indication = api_indication
-        self.__apprc: AppRc = parse_apprc(
+        self.__apprc: AppRc = AppRCUtils.parse(
             self.__root_dir,
             self.__mode,
             deepcopy(apprc)
@@ -199,7 +199,7 @@ class Boot(Worker):
                 List of exception handlers to add. By default framework adds
                 the builtin Exception and orwynn.Error handlers.
             apprc (optional):
-                Application configuration. By default environ ORWYNN_APPRC_PATH
+                Application configuration. By default environ ORWYNN_RC_PATH
                 is checked if this arg is not given.
             mode (optional):
                 Application mode. By default environ ORWYNN_MODE is

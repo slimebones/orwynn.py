@@ -4,9 +4,12 @@
 
 ### Features
 
+- `orwynn.yml` is the only configuration filename supported for now.
+
 ### Refactor
 
 - ROUTE, ENDPOINTS and VERSION of controller classes now are PascalCase.
+- ORWYNN_APPRC_PATH -> ORWYNN_RC_PATH.
 
 ## 1.2.0
 

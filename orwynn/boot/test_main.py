@@ -58,9 +58,9 @@ def set_test_mode():
 
 @pytest.fixture
 def set_std_apprc_path_env() -> None:
-    os.environ["ORWYNN_APPRC_PATH"] = os.path.join(
+    os.environ["ORWYNN_RC_PATH"] = os.path.join(
         os.getcwd(),
-        "tests/std/apprc.yml"
+        "tests/std/orwynn.yml"
     )
 
 
