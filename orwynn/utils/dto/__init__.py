@@ -245,7 +245,7 @@ class DTOUtils(Static):
         for subclass in base_subclasses:
             if (
                 subclass.Code is not None
-                and subclass.Code is type_code
+                and subclass.Code == type_code
             ):
                 return subclass
 
