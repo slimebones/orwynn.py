@@ -29,14 +29,14 @@ class UnitDTO(DTO):
     Represents some business unit wrapped in DTO to be returned outside.
 
     Note that model's field "code" is set internally only according to
-    class attribute "CODE" (see below).
+    class attribute "Code" (see below).
 
     So on given "code" field explicitly on model's creation, the
-    ValueError will be raised, if the given code is not matched class's CODE.
+    ValueError will be raised, if the given code is not matched class's Code.
     In any other case, this argument will be just ignored.
 
     Class-attributes:
-        CODE:
+        Code:
             Type of the dto which will be set at serialization time to field
             "type". Useful to represent different types in interfaces which
             act polymorphically and may return different types of the same

@@ -8,14 +8,14 @@ from orwynn.utils import validation
 
 def test_int():
     class MyError(Exception):
-        CODE = 1
+        Code = 1
 
     assert get_error_code(MyError()) == 1
 
 
 def test_str():
     class MyError(Exception):
-        CODE = "hello"
+        Code = "hello"
 
     assert get_error_code(MyError()) == "hello"
 
@@ -25,14 +25,14 @@ def test_enum():
         RED = "RED"
 
     class MyError(Exception):
-        CODE = ErrorCode.RED
+        Code = ErrorCode.RED
 
     assert get_error_code(MyError()) == ErrorCode.RED
 
 
 def test_wrong_type():
     class MyError(Exception):
-        CODE = 5.55
+        Code = 5.55
 
     validation.expect(
         get_error_code,

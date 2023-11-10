@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.3.2
+
+### Fixed
+
+- Error code handling
+
 ## 1.3.1
 
 ### Fixed

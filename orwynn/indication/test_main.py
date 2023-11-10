@@ -98,16 +98,16 @@ def test_digest_error(default_indication: Indication):
         ADVANCED_CASE = "ADVANCED_CASE"
 
     class SimpleError(Exception):
-        CODE = ErrorCode.SIMPLE_CASE
+        Code = ErrorCode.SIMPLE_CASE
 
     class AdvancedError(Exception):
-        CODE = ErrorCode.ADVANCED_CASE
+        Code = ErrorCode.ADVANCED_CASE
 
     class IntError(Exception):
-        CODE = 5
+        Code = 5
 
     class StrError(Exception):
-        CODE = "hello"
+        Code = "hello"
 
     data: dict
 

@@ -11,7 +11,7 @@ def get_error_code(err: Exception) -> ErrorCode:
     """
     Returns an error code if it exists.
 
-    Note that error code should be in class-attribute CODE of the given
+    Note that error code should be in class-attribute Code of the given
     exception and be type of int, str or Enum.
 
     Args:
@@ -22,10 +22,10 @@ def get_error_code(err: Exception) -> ErrorCode:
         Error code.
     """
     try:
-        error_code: ErrorCode = err.CODE  # type: ignore
+        error_code: ErrorCode = err.Code  # type: ignore
     except AttributeError as stack_err:
         raise AttributeError(
-            f"no specified CODE for error {err}"
+            f"no specified Code for error {err}"
         ) from stack_err
 
     try:

@@ -6,7 +6,7 @@ class DtoError(Exception):
 
 class HasCodeButNoAttributeDtoError(DtoError):
     """
-    When a dto does not have `CODE` attribute set, but got `code` field.
+    When a dto does not have `Code` attribute set, but got `code` field.
     """
     def __init__(
         self,
@@ -14,14 +14,14 @@ class HasCodeButNoAttributeDtoError(DtoError):
         code_field: str,
     ):
         message: str = \
-            "dto does not have CODE attribute but does have `code` field=" \
+            "dto does not have Code attribute but does have `code` field=" \
             f"{code_field}"
         super().__init__(message)
 
 
 class UnmatchedCodeFieldDtoError(DtoError):
     """
-    When dto's `code` field does not match CODE class attribute.
+    When dto's `code` field does not match Code class attribute.
     """
     def __init__(
         self,
