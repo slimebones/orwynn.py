@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.3.1
+
+### Fixed
+
+- Updated antievil to conform with new error codes
+- Small yet critical fixes
+
 ## 1.3.0
 
 ### Features
