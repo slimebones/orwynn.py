@@ -1,5 +1,0 @@
-
-
-
-class NotDirError(Exception):
-    pass

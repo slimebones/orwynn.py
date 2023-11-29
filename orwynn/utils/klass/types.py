@@ -1,1 +1,0 @@
-BaseSubclassable = type

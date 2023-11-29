@@ -1,11 +1,9 @@
-from orwynn.utils.url.helpers import get_vars
-from orwynn.utils.url.url import Url
-from orwynn.utils.url.vars import UrlVars
+from orwynn.url import URLUtils, URLVars, URL
 
 
 def test_path():
-    vars: UrlVars = get_vars(
-        url=Url("/user/eg1"),
+    vars: URLVars = URLUtils.URLUtils.get_vars(
+        url=URL("/user/eg1"),
         abstract_route="/user/{user_id}"
     )
     assert vars.path_vars["user_id"] == "eg1"
@@ -13,8 +11,8 @@ def test_path():
 
 
 def test_path_2():
-    vars: UrlVars = get_vars(
-        url=Url("/user/eg1/hello"),
+    vars: URLVars = URLUtils.URLUtils.get_vars(
+        url=URL("/user/eg1/hello"),
         abstract_route="/user/{user_id}/{user_sign}"
     )
     assert vars.path_vars["user_id"] == "eg1"
@@ -23,8 +21,8 @@ def test_path_2():
 
 
 def test_query():
-    vars: UrlVars = get_vars(
-        url=Url("/user?token=woo"),
+    vars: URLVars = URLUtils.get_vars(
+        url=URL("/user?token=woo"),
         abstract_route="/user"
     )
     assert vars.path_vars == {}
@@ -32,8 +30,8 @@ def test_query():
 
 
 def test_query_2():
-    vars: UrlVars = get_vars(
-        url=Url("/user?token=woo&order=5"),
+    vars: URLVars = URLUtils.get_vars(
+        url=URL("/user?token=woo&order=5"),
         abstract_route="/user"
     )
     assert vars.path_vars == {}
@@ -42,8 +40,8 @@ def test_query_2():
 
 
 def test_mixed():
-    vars: UrlVars = get_vars(
-        url=Url("/user/eg1/hello?token=woo&order=5"),
+    vars: URLVars = URLUtils.get_vars(
+        url=URL("/user/eg1/hello?token=woo&order=5"),
         abstract_route="/user/{user_id}/{user_sign}"
     )
     assert vars.path_vars["user_id"] == "eg1"
