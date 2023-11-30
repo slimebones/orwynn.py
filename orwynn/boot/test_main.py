@@ -2,6 +2,7 @@ import os
 
 import pytest
 import pytest_asyncio
+from sbpykit import validation
 
 from orwynn.app import AppMode
 from orwynn.apprc.apprc import AppRc
@@ -13,7 +14,6 @@ from orwynn.di.di import Di
 from orwynn.http import Endpoint, HttpController
 from orwynn.mongo.mongo import Mongo
 from orwynn.proxy.boot import BootProxy
-from orwynn.utils import validation
 from tests.std.text import TextConfig
 
 

@@ -1,9 +1,9 @@
 import pytest
+from sbpykit import validation
 
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.context.errors import UndefinedStorageError
-from orwynn.utils import validation
 from orwynn.websocket.context.id import (
     WebsocketRequestContextId,
 )

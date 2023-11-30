@@ -1,9 +1,9 @@
 
 from bson import ObjectId
 from bson.errors import InvalidId
+from sbpykit.types import T
 
 from orwynn.mongo.document.errors import InvalidIdError
-from orwynn.utils.types import T
 
 
 def convert_to_object_id(obj: T) -> T | ObjectId:

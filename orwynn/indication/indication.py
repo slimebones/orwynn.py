@@ -12,18 +12,17 @@ from orwynn.http.schema.validationvalue import \
 from orwynn.http.errors import HttpException
 from orwynn.indication.type import IndicationType
 from orwynn.indication.errors import UnsupportedIndicatorError
-from orwynn.utils import validation
-from orwynn.utils.mp.location import (FieldLocation, find_field_by_location,
-                                     find_location_by_field)
-from orwynn.utils.validation import (validate,
+from sbpykit import validation
+from sbpykit.mp import MapUtils
+from sbpykit.validation import (validate,
                                     validate_dict)
-from orwynn.utils.validation.errors import RequestValidationException
-from orwynn.utils.validation.validator import Validator
+from fastapi.exceptions import RequestValidationError
+from sbpykit.validation.validator import Validator
 
 from .indicatable import Indicatable, IndicatableTypeVar
 from .indicator import Indicator
 
-_Locations = dict[Indicator, FieldLocation]
+_Locations = dict[Indicator, str]
 
 
 class Indication:
@@ -101,8 +100,12 @@ class Indication:
 
     def __find_locations(self) -> _Locations:
         return {
-            Indicator.TYPE: find_location_by_field(Indicator.TYPE, self.__mp),
-            Indicator.VALUE: find_location_by_field(Indicator.VALUE, self.__mp)
+            Indicator.TYPE: MapUtils.find_location_by_field(
+                Indicator.TYPE, self.__mp
+            ),
+            Indicator.VALUE: MapUtils.find_location_by_field(
+                Indicator.VALUE, self.__mp
+            )
         }
 
     @property
@@ -137,7 +140,7 @@ class Indication:
                             "status_code": obj.status_code,
                             "message": obj.detail
                         }
-                    elif isinstance(obj, RequestValidationException):
+                    elif isinstance(obj, RequestValidationError):
                         message: str = ""
                         locations: list[list[str]] = []
                         validation_errors = obj.errors()
@@ -234,7 +237,7 @@ class Indication:
                 detail=value["message"]
             )
         elif (
-            issubclass(Object, RequestValidationException)
+            issubclass(Object, RequestValidationError)
         ):
             # Temporarily RequestValidationException data is not recovered
             return Object(
@@ -252,9 +255,9 @@ class Indication:
             )
 
     def __find_value_in_mp(self, mp: dict) -> dict:
-        indication_value_field_location: FieldLocation = \
+        indication_value_field_location: str = \
             self.__locations[Indicator.VALUE]
-        mp_value: dict = find_field_by_location(
+        mp_value: dict = MapUtils.find_field_by_location(
             indication_value_field_location, mp
         )
 
@@ -265,7 +268,7 @@ class Indication:
         self,
         obj: Indicatable
     ) -> IndicationType:
-        indication_type: IndicationType = IndicationType.OK
+        indication_type: IndicationType = IndicationType.Ok
 
         # For models default type is OK, unless is defined
         # otherwise in INDICATION_TYPE
@@ -276,7 +279,7 @@ class Indication:
             )
         # For Exception indication type is always ERROR
         elif isinstance(obj, Exception):
-            indication_type = IndicationType.ERROR
+            indication_type = IndicationType.Error
 
         return indication_type
 

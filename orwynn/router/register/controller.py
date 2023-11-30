@@ -3,6 +3,9 @@ from inspect import isclass
 from typing import Any, Callable, Literal
 
 import pydantic
+from sbpykit import validation
+from sbpykit.scheme import Scheme
+from sbpykit.url import join_routes
 
 from orwynn.apiversion import ApiVersion
 from orwynn.app import App
@@ -11,7 +14,7 @@ from orwynn.base.controller.errors import AlreadyRegisteredMethodError
 from orwynn.base.error import MalfunctionError
 from orwynn.base.model import Model
 from orwynn.base.module import Module
-from orwynn.helpers.web import REQUEST_METHOD_BY_PROTOCOL, RequestMethod
+from orwynn.helpers.web import REQUEST_METHOD_BY_PROTOCOL
 from orwynn.http import Endpoint, EndpointContainer, HttpController
 from orwynn.http.errors import (
     EndpointNotFoundError,
@@ -22,9 +25,7 @@ from orwynn.proxy.boot import BootProxy
 from orwynn.router.errors import (
     UnmatchedEndpointEntityError,
 )
-from orwynn.utils import validation
-from orwynn.utils.scheme import Scheme
-from orwynn.utils.url import join_routes
+from orwynn.url import URLMethod
 from orwynn.websocket import (
     WebsocketController,
     WebsocketStack,
@@ -51,7 +52,7 @@ class ControllerRegister:
 
         self.__modules: list[Module] = modules
         self.__controllers: list[Controller] = controllers
-        self.__methods_by_route: dict[str, set[RequestMethod]] = {}
+        self.__methods_by_route: dict[str, set[URLMethod]] = {}
 
         self.__global_http_route: str = global_http_route
         self.__global_websocket_route: str = global_websocket_route
@@ -151,7 +152,7 @@ class ControllerRegister:
 
         # At least one method found
         is_method_found: bool = False
-        for http_method in RequestMethod:
+        for http_method in URLMethod:
             # Don't register unused methods
             if (
                 http_method in controller.methods
@@ -361,7 +362,7 @@ class ControllerRegister:
         return False
 
     def __register_http_route(
-        self, *, route: str, fn: Callable, method: RequestMethod
+        self, *, route: str, fn: Callable, method: URLMethod
     ) -> None:
         """Registers a fn for a route.
 
@@ -375,7 +376,7 @@ class ControllerRegister:
         """
         validation.validate(route, str)
         validation.validate(fn, Callable)
-        validation.validate(method, RequestMethod)
+        validation.validate(method, URLMethod)
 
         app_fn: Callable | None = \
             self.__app.HTTP_METHODS_TO_REGISTERING_FUNCTIONS.get(

@@ -1,11 +1,11 @@
 import pytest
+from sbpykit import validation
+from sbpykit.scheme import Scheme
 
 from orwynn.base.errorhandler.errorhandler import ErrorHandler
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.proxy.boot import BootProxy
-from orwynn.utils import validation
-from orwynn.utils.scheme import Scheme
 from orwynn.websocket import Websocket, WebsocketController
 
 

@@ -1,10 +1,11 @@
+from sbpykit import validation
+
 from orwynn.http import TestHttpResponse
 from orwynn.mapping.errors import CustomUseOfMappingReservedFieldError
 from orwynn.mongo.document import Document
 from orwynn.mongo.errors import DuplicateKeyError
 from orwynn.proxy.boot import BootProxy
 from orwynn.testing.client import Client
-from orwynn.utils import validation
 from tests.std.user import User
 
 

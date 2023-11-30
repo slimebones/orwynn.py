@@ -1,8 +1,9 @@
 from typing import Callable, ItemsView
 
+from sbpykit import validation
+
 from orwynn.base.worker import Worker
 from orwynn.http.errors import EndpointNotFoundError
-from orwynn.utils import validation
 
 from .endpoint import Endpoint
 

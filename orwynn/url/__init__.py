@@ -1,9 +1,10 @@
 """
 Works with url formatting.
 """
+import re
 from enum import Enum
 from itertools import zip_longest
-import re
+
 from sbpykit import validation
 from sbpykit.klass import Static
 from starlette.datastructures import URL as _StarletteURL
@@ -19,7 +20,7 @@ class URLScheme(Enum):
     """
     HTTP = "http"
     HTTPS = "https"
-    WEBSOCKET = "websocket"
+    Websocket = "websocket"
     RTSP = "rtsp"
 
 
@@ -145,3 +146,16 @@ class URLUtils(Static):
                 continue
             name, value = el.split("=")
             url_vars.query_vars[name] = value
+
+
+class URLMethod(Enum):
+    """
+    All possible request methods.
+    """
+    Get = "get"
+    Post = "post"
+    Put = "put"
+    Delete = "delete"
+    Patch = "patch"
+    Options = "options"
+    Websocket = "websocket"

@@ -1,9 +1,10 @@
 import typing
 from typing import Any
 
+from sbpykit.types import TDecoratedCallable
+
 from orwynn.base.model.model import Model
 from orwynn.mapping.errors import MappingNotLinkedError, UnsetIdMappingError
-from orwynn.utils.types import TDecoratedCallable
 
 
 def if_linked(

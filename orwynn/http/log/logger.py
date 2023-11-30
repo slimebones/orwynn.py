@@ -1,6 +1,7 @@
 import contextlib
 import json
 
+from sbpykit import validation
 from starlette.concurrency import iterate_in_threadpool
 from starlette.responses import StreamingResponse
 
@@ -8,7 +9,6 @@ from orwynn.base.error import MalfunctionError
 from orwynn.http.requests import HttpRequest
 from orwynn.http.responses import HttpResponse
 from orwynn.log import Log
-from orwynn.utils import validation
 
 
 class HttpLogger:

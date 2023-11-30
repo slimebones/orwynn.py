@@ -6,6 +6,8 @@ from bson import ObjectId
 from pydantic.fields import ModelField
 from pymongo.cursor import Cursor
 from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
+from sbpykit import validation
+from sbpykit.fmt import snakefy
 
 from orwynn.di.di import Di
 from orwynn.helpers.errors import UnsupportedError
@@ -17,8 +19,6 @@ from orwynn.mongo.document.helpers import convert_to_object_id
 from orwynn.mongo.entity import MongoEntity
 from orwynn.mongo.errors import DocumentUpdateError, DuplicateKeyError
 from orwynn.mongo.mongo import Mongo
-from orwynn.utils import validation
-from orwynn.utils.fmt import snakefy
 
 
 class Document(Mapping):

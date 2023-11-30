@@ -1,8 +1,8 @@
 from bson import ObjectId
+from sbpykit import validation
 
 from orwynn.mongo.document.errors import InvalidIdError
 from orwynn.mongo.document.helpers import convert_to_object_id
-from orwynn.utils import validation
 
 
 def test_str():

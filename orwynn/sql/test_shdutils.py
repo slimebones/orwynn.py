@@ -1,12 +1,12 @@
 import pytest
-from antievil import NotFoundError
+from sbpykit import validation
+from sbpykit.errors import NotFoundError
 
 from orwynn.di.di import Di
 from orwynn.sql.search import TableSearch
 from orwynn.sql.shd import SHD
 from orwynn.sql.testing import S1Item
 from orwynn.sql.utils import SHDUtils
-from orwynn.utils import validation
 
 
 @pytest.mark.asyncio

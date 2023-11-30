@@ -1,4 +1,5 @@
 import lorem
+from sbpykit.validation import model_validator
 
 from orwynn.app.app import App
 from orwynn.base.config import Config
@@ -7,7 +8,6 @@ from orwynn.base.module.module import Module
 from orwynn.base.service.service import Service
 from orwynn.boot.config import BootConfig
 from orwynn.http import Endpoint, HttpController
-from orwynn.utils.validation import model_validator
 from tests.std.float import FloatService, float_module
 from tests.std.number import NumberService, number_module
 from tests.std.user import user_module

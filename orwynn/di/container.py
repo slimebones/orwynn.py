@@ -1,6 +1,8 @@
 import re
 from typing import TypeVar
 
+from sbpykit.validation import validate
+
 from orwynn.base.config import Config
 from orwynn.base.controller.controller import Controller
 from orwynn.base.error.errors import MalfunctionError
@@ -15,7 +17,6 @@ from orwynn.di.errors import (
 from orwynn.di.isprovider import is_provider
 from orwynn.di.object import DiObject
 from orwynn.helpers.constants import SUBCLASSABLES
-from orwynn.utils.validation import validate
 
 _InnerObj = TypeVar("_InnerObj")
 

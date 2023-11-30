@@ -1,12 +1,12 @@
 from typing import Any
 
-from antievil import NotFoundError
+from sbpykit.errors import NotFoundError
+from sbpykit.func import FuncSpec
 
 from orwynn.base import Service
 from orwynn.mongo.search import MongoStateFlagSearch
 from orwynn.mongo.stateflag import MongoStateFlag
 from orwynn.mongo.utils import MongoUtils
-from orwynn.utils.func import FuncSpec
 
 
 class MongoStateFlagService(Service):

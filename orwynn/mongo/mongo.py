@@ -4,12 +4,12 @@ from pymongo import MongoClient, ReturnDocument
 from pymongo.client_session import ClientSession
 from pymongo.cursor import Cursor
 from pymongo.database import Database as PymongoDatabase
+from sbpykit import validation
 
 from orwynn.base.database import Database
 from orwynn.base.database.errors import DatabaseEntityNotFoundError
 from orwynn.mongo.config import MongoConfig
 from orwynn.mongo.entity import MongoEntity
-from orwynn.utils import validation
 
 
 class Mongo(Database):

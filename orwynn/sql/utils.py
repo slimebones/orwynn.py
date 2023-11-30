@@ -2,7 +2,9 @@ import os
 from collections.abc import Callable
 from typing import TYPE_CHECKING
 
-from antievil import NotFoundError
+from sbpykit import validation
+from sbpykit.errors import NotFoundError
+from sbpykit.klass import Static
 from sqlalchemy import Select, text
 
 from orwynn.base.model import Model
@@ -14,8 +16,6 @@ from orwynn.sql.sql import SQL
 from orwynn.sql.stateflag import StateFlag
 from orwynn.sql.table import Table
 from orwynn.sql.types import ConvertedModel, ListedConvertedModel, TTable
-from orwynn.utils import validation
-from orwynn.utils.klass import Static
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

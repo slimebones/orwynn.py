@@ -1,5 +1,6 @@
 import pytest
 import pytest_asyncio
+from sbpykit import validation
 
 from orwynn import mongo
 from orwynn.base.model.model import Model
@@ -9,7 +10,6 @@ from orwynn.http import Endpoint, EndpointResponse, HttpController
 from orwynn.router.errors import (
     UnmatchedEndpointEntityError,
 )
-from orwynn.utils import validation
 
 
 @pytest_asyncio.fixture

@@ -1,3 +1,5 @@
+from sbpykit import validation
+
 from orwynn.app.app import App
 from orwynn.base.controller.controller import Controller
 from orwynn.base.errorhandler.errorhandler import ErrorHandler
@@ -14,7 +16,6 @@ from orwynn.di.init.providers import init_providers
 from orwynn.di.object import DiObject
 from orwynn.http.log.configs import LogHttpMiddlewareConfig
 from orwynn.log import LogConfig
-from orwynn.utils import validation
 
 
 class Di(Worker):

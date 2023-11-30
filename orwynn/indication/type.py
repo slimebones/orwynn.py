@@ -12,7 +12,8 @@ class IndicationType(Enum):
             issue. Here goes also all errors connected with business-logic
             itself.
     """
-    OK = "ok"
-    # FIXME: In future, consider moving all non-BL related problems
-    # to another type, e.g. "http-error".
-    ERROR = "error"
+    Ok = "ok"
+    # TODO(ryzhovalex):
+    #   In future, consider moving all non-BL related problems
+    #   to another type, e.g. "http-error".
+    Error = "error"

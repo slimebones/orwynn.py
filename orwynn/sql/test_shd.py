@@ -1,7 +1,8 @@
 from typing import overload
 
 import pytest
-from antievil import NotFoundError
+from sbpykit import validation
+from sbpykit.errors import NotFoundError
 
 from orwynn import sql
 from orwynn.base import Module, Service
@@ -13,7 +14,6 @@ from orwynn.sql.errors import EmptyExecutionQueueError
 from orwynn.sql.shd import SHD
 from orwynn.sql.testing import S1Item
 from orwynn.sql.utils import SQLUtils
-from orwynn.utils import validation
 
 
 class ItemRepo(Service):

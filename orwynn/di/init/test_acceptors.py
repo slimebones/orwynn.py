@@ -1,4 +1,5 @@
 import pytest
+from sbpykit import validation
 
 from orwynn.base.module import Module
 from orwynn.base.service import Service
@@ -7,7 +8,6 @@ from orwynn.di.container import DiContainer
 from orwynn.di.errors import ProviderAvailabilityError
 from orwynn.di.init.acceptors import init_other_acceptors
 from orwynn.http import Endpoint, HttpController, HttpMiddleware
-from orwynn.utils import validation
 from tests.std.assertion import Assertion
 
 

@@ -1,8 +1,9 @@
 import functools
 from typing import Callable
 
+from orwynn.url import URLUtils, URLVars
+
 from orwynn.base.error.errors import MalfunctionError
-from orwynn.utils import url
 from orwynn.websocket.websocket import Websocket
 
 from .handlers import DispatchWebsocketHandler, WebsocketHandler
@@ -140,7 +141,7 @@ class WebsocketStack:
         first_handler: WebsocketHandler = _fw_handlers[0]
 
         # Collect request kwargs from url
-        url_vars: url.UrlVars = url.get_vars(
+        url_vars: URLVars = URLUtils.get_vars(
             websocket.url,
             abstract_route=_fw_original_route
         )

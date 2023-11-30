@@ -1,18 +1,19 @@
+from fastapi.exceptions import RequestValidationError
+
 from orwynn.base.errorhandler import ErrorHandler
 from orwynn.http.errors import HttpException
 from orwynn.http.requests import HttpRequest
 from orwynn.http.responses import HttpResponse, JsonHttpResponse
 from orwynn.proxy.boot import BootProxy
-from orwynn.utils.validation.errors import RequestValidationException
 
 
 class DefaultRequestValidationErrorHandler(ErrorHandler):
-    E = RequestValidationException
+    E = RequestValidationError
 
     def handle(
         self,
         request: HttpRequest,
-        error: RequestValidationException
+        error: RequestValidationError
     ) -> HttpResponse:
         return JsonHttpResponse(
             BootProxy.ie().api_indication.digest(error),

@@ -1,4 +1,5 @@
 import pytest
+from sbpykit import validation
 
 from orwynn.base.error.errors import ExceptionAlreadyHandledError
 from orwynn.base.errorhandler import ErrorHandler
@@ -21,7 +22,6 @@ from orwynn.http.responses import (
 from orwynn.proxy.boot import BootProxy
 from orwynn.testing import Client
 from orwynn.testingtools import Item
-from orwynn.utils import validation
 
 
 class GeneralEh(ErrorHandler):

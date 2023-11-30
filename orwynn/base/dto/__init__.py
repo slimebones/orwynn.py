@@ -1,16 +1,16 @@
 from collections.abc import Callable, Sequence
 from typing import Any, ClassVar, Self, TypeVar
 
-from antievil import NotFoundError, RequiredClassAttributeError
-
-from orwynn.base.model import Model
-from orwynn.utils import validation
-from orwynn.utils.dto.errors import (
+from sbpykit import validation
+from orwynn.base.dto.errors import (
     AbstractDtoClassAsBaseDtoError,
     HasCodeButNoAttributeDtoError,
     UnmatchedCodeFieldDtoError,
 )
-from orwynn.utils.klass import ClassUtils, Static
+from sbpykit.errors import NotFoundError, RequiredClassAttributeError
+from sbpykit.klass import ClassUtils, Static
+
+from orwynn.base.model import Model
 from orwynn.websocket import Websocket
 
 _TTable = TypeVar("_TTable")

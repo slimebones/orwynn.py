@@ -1,12 +1,13 @@
 import inspect
 from types import NoneType
 
+from sbpykit import validation
+
 from orwynn.base.error.errors import MalfunctionError
 from orwynn.base.error.utils import (
     find_detailed_class_for_exception,
 )
 from orwynn.base.errorhandler.errorhandler import ErrorHandler
-from orwynn.utils import validation
 from orwynn.websocket.context.id import (
     WebsocketRequestContextId,
 )

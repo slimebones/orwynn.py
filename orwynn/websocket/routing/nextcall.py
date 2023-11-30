@@ -1,6 +1,7 @@
 import contextlib
 
-from orwynn.utils.url import UrlVars
+from orwynn.url import URLVars
+
 from orwynn.websocket.websocket import Websocket
 
 from .handlers import DispatchWebsocketHandler, WebsocketHandler
@@ -14,12 +15,12 @@ class NextCallHandler:
     def __init__(
         self,
         handlers: list[WebsocketHandler],
-        url_vars: UrlVars
+        url_vars: URLVars
     ) -> None:
         # Index of function being executed
         self.__current_index: int = 0
         self.__handlers: list[WebsocketHandler] = handlers
-        self.__url_vars: UrlVars = url_vars
+        self.__url_vars: URLVars = url_vars
 
     async def __call__(self, websocket: Websocket) -> None:
         """

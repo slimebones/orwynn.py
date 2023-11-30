@@ -1,5 +1,5 @@
 import contextlib
-from orwynn.utils.klass import Static
+from sbpykit.klass import Static
 import sys
 from typing import TYPE_CHECKING, Any
 import typing_extensions

@@ -7,7 +7,7 @@ from orwynn.app.config import AppConfig
 from orwynn.app.core import CoreApp
 from orwynn.app.types import CoreCors
 from orwynn.base.service.framework import FrameworkService
-from orwynn.helpers.web import RequestMethod
+from orwynn.url import URLMethod
 from orwynn.testing import Client, EmbeddedTestClient
 
 
@@ -43,13 +43,13 @@ class App(FrameworkService):
         self._fw_websocket_handler = self._core_app.websocket
 
         self.HTTP_METHODS_TO_REGISTERING_FUNCTIONS: \
-            dict[RequestMethod, Callable] = {
-                RequestMethod.GET: self._core_app.get,
-                RequestMethod.POST: self._core_app.post,
-                RequestMethod.PUT: self._core_app.put,
-                RequestMethod.DELETE: self._core_app.delete,
-                RequestMethod.PATCH: self._core_app.patch,
-                RequestMethod.OPTIONS: self._core_app.options
+            dict[URLMethod, Callable] = {
+                URLMethod.Get: self._core_app.get,
+                URLMethod.Post: self._core_app.post,
+                URLMethod.Put: self._core_app.put,
+                URLMethod.Delete: self._core_app.delete,
+                URLMethod.Patch: self._core_app.patch,
+                URLMethod.Options: self._core_app.options
             }
 
         self._client: Client = Client(

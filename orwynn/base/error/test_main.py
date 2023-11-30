@@ -1,9 +1,10 @@
 from enum import Enum
 
+from sbpykit import validation
+
 from orwynn.base.error.code import get_error_code
 from orwynn.indication.indication import Indication
 from orwynn.indication.indicator import Indicator
-from orwynn.utils import validation
 
 
 def test_int():

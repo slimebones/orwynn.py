@@ -1,7 +1,8 @@
+from sbpykit import validation
+from sbpykit.rnd import RandomUtils
+
 from orwynn.context import ContextStorage
 from orwynn.context.errors import RequestIdAlreadySavedError
-from orwynn.utils import validation
-from orwynn.utils.rnd import makeid
 
 
 class WebsocketRequestContextId:
@@ -26,7 +27,7 @@ class WebsocketRequestContextId:
             RequestIdAlreadySavedError:
                 If the request id has been set previously.
         """
-        request_id: str = makeid()
+        request_id: str = RandomUtils.makeid()
         try:
             self.__storage.get("websocket_request_id")
         except KeyError:

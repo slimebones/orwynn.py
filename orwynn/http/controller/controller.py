@@ -1,17 +1,18 @@
 from typing import Callable, ClassVar, Literal
 
-from orwynn.helpers.web import REQUEST_METHOD_BY_PROTOCOL, RequestMethod
+from orwynn.helpers.web import REQUEST_METHOD_BY_PROTOCOL
+from orwynn.url import URLMethod
 
 from .endpoint.endpoint import Endpoint
 from orwynn.base.controller.controller import Controller
-from orwynn.utils.scheme import Scheme
+from orwynn.url import URLScheme
 from orwynn.http.errors import UnsupportedHttpMethodError
 from .errors import \
     DefinedTwiceControllerMethodError
 from orwynn.base.controller.errors import \
     MissingControllerClassAttributeError
 from .endpoint.container import EndpointContainer
-from orwynn.utils import validation
+from sbpykit import validation
 
 
 class HttpController(Controller):
@@ -43,7 +44,7 @@ class HttpController(Controller):
     def __init__(self) -> None:
         super().__init__()
 
-        self._methods: list[RequestMethod] = []
+        self._methods: list[URLMethod] = []
 
         if self.Endpoints is None:
             raise MissingControllerClassAttributeError(
@@ -61,9 +62,9 @@ class HttpController(Controller):
             for endpoint in self.Endpoints:
                 str_method = endpoint.method.lower()
 
-                http_methods: list[RequestMethod] = [
+                http_methods: list[str] = [
                     method.value
-                    for method in REQUEST_METHOD_BY_PROTOCOL[Scheme.HTTP]
+                    for method in REQUEST_METHOD_BY_PROTOCOL[URLScheme.HTTP]
                 ]
                 if str_method not in http_methods:
                     raise UnsupportedHttpMethodError(
@@ -76,11 +77,11 @@ class HttpController(Controller):
                     )
 
                 collected_str_methods.append(str_method)
-                http_method: RequestMethod = RequestMethod(str_method)
+                http_method: URLMethod = URLMethod(str_method)
 
                 if (
                     http_method
-                    not in REQUEST_METHOD_BY_PROTOCOL[Scheme.HTTP]
+                    not in REQUEST_METHOD_BY_PROTOCOL[URLScheme.HTTP]
                 ):
                     raise ValueError(f"cannot accept method {http_method}")
 
@@ -96,24 +97,24 @@ class HttpController(Controller):
         return self._route
 
     @property
-    def methods(self) -> list[RequestMethod]:
+    def methods(self) -> list[URLMethod]:
         return self._methods
 
-    def get_fn_by_http_method(self, method: RequestMethod) -> Callable:
+    def get_fn_by_http_method(self, method: URLMethod) -> Callable:
         fn: Callable
 
         match method:
-            case RequestMethod.GET:
+            case URLMethod.Get:
                 fn = self.get
-            case RequestMethod.POST:
+            case URLMethod.Post:
                 fn = self.post
-            case RequestMethod.PUT:
+            case URLMethod.Put:
                 fn = self.put
-            case RequestMethod.DELETE:
+            case URLMethod.Delete:
                 fn = self.delete
-            case RequestMethod.PATCH:
+            case URLMethod.Patch:
                 fn = self.patch
-            case RequestMethod.OPTIONS:
+            case URLMethod.Options:
                 fn = self.options
             case _:
                 raise

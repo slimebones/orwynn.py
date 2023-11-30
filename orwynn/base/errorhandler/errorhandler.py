@@ -1,12 +1,13 @@
 import os
 from typing import ClassVar
 
+from sbpykit import validation
+from orwynn.url import URLScheme
+
 from orwynn.base.error.errors import MalfunctionError
 from orwynn.helpers.web import GenericRequest, GenericResponse
 from orwynn.log import LogUtils
 from orwynn.proxy.boot import BootProxy
-from orwynn.utils import validation
-from orwynn.utils.scheme import Scheme
 
 
 class ErrorHandler:
@@ -24,7 +25,7 @@ class ErrorHandler:
             Log.catch. Defaults to True.
     """
     E: ClassVar[type[Exception] | None] = None
-    PROTOCOL: Scheme = Scheme.HTTP
+    PROTOCOL: URLScheme = URLScheme.HTTP
     IS_ERROR_CATCH_LOGGED: bool = True
 
     def __init__(self) -> None:
@@ -35,7 +36,7 @@ class ErrorHandler:
         else:
             validation.validate(self.E, Exception)
 
-        validation.validate(self.PROTOCOL, Scheme)
+        validation.validate(self.PROTOCOL, URLScheme)
 
     @classmethod
     def get_handled_exception_class(cls) -> type[Exception]:

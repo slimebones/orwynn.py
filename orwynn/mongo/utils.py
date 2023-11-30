@@ -2,12 +2,13 @@ import typing
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 
+from sbpykit.klass import Static
+
 from orwynn.mongo.errors import (
     MongoTypeConversionError,
     UnsetIdMongoError,
 )
 from orwynn.mongo.types import MongoCompatibleType, TDocument
-from orwynn.utils.klass import Static
 
 if TYPE_CHECKING:
     from orwynn.mongo import Document

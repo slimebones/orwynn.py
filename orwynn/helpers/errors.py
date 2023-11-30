@@ -1,4 +1,4 @@
-from antievil import UnsupportedError
+from sbpykit.errors import UnsupportedError
 
 __all__ = [
     "UnsupportedError"

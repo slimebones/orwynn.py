@@ -1,11 +1,11 @@
 from typing import Generic, Literal, Self
 
-from antievil import NameExpectError, UnsupportedError
+from sbpykit.search import DatabaseSearch
+from sbpykit.errors import NameExpectError, UnsupportedError
 
 from orwynn.sql.shd import SHD
 from orwynn.sql.table import Table
 from orwynn.sql.types import TTable
-from orwynn.utils.dbsearch import DatabaseSearch
 
 
 class TableSearch(DatabaseSearch[Table], Generic[TTable]):

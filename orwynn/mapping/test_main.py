@@ -1,5 +1,6 @@
+from sbpykit import validation
+
 from orwynn.mapping.errors import UnsetIdMappingError
-from orwynn.utils import validation
 
 from .mapping import Mapping
 

@@ -1,7 +1,8 @@
+from sbpykit import validation
+from sbpykit.fmt import format_chain
+
 from orwynn.base.module import Module
 from orwynn.base.module.errors import CircularDependencyError
-from orwynn.utils import validation
-from orwynn.utils.fmt import format_chain
 
 
 class ModuleCollector:

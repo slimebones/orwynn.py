@@ -1,9 +1,10 @@
 from datetime import time, timedelta
 from typing import Callable
 
+from sbpykit.types import CashOperator
+
 from orwynn.base.model.model import Model
 from orwynn.log.types import LogMessage
-from orwynn.utils.types import CashOperator
 
 
 class LogHandler(Model):

@@ -5,6 +5,7 @@ import os
 
 import pytest_asyncio
 from pytest import fixture
+from sbpykit import validation
 
 from orwynn import sql
 from orwynn.app import AppMode
@@ -41,7 +42,6 @@ from orwynn.mongo.testing import mongo_boot
 from orwynn.sql.testing import create_tables_bootscript, s1_table_search
 from orwynn.testing.client import Client
 from orwynn.testing.embeddedclient import EmbeddedTestClient
-from orwynn.utils import validation
 from tests.structs import (
     circular_module_struct,
     long_circular_module_struct,

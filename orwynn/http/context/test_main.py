@@ -1,4 +1,5 @@
 import pytest
+from sbpykit import validation
 
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
@@ -9,7 +10,6 @@ from orwynn.http import (
     HttpRequestContextId,
     LogMiddleware,
 )
-from orwynn.utils import validation
 
 
 @pytest.mark.asyncio

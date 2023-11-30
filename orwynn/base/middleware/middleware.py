@@ -1,7 +1,7 @@
 import re
 from typing import Any, Callable
 
-from orwynn.utils import validation
+from sbpykit import validation
 
 
 class Middleware:

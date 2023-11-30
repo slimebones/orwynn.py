@@ -1,8 +1,9 @@
 from contextlib import contextmanager
 from contextvars import Token
 
+from sbpykit import validation
+
 from orwynn.context.storage import ContextStorage
-from orwynn.utils import validation
 
 
 @contextmanager

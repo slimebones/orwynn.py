@@ -1,8 +1,9 @@
 from contextvars import ContextVar, Token
 from typing import Any
 
+from sbpykit import validation
+
 from orwynn.base.worker.worker import Worker
-from orwynn.utils import validation
 
 from .errors import AlreadyInitializedStorageError, UndefinedStorageError
 

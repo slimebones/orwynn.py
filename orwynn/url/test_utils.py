@@ -1,8 +1,8 @@
-from orwynn.url import URLUtils, URLVars, URL
+from orwynn.url import URL, URLUtils, URLVars
 
 
 def test_path():
-    vars: URLVars = URLUtils.URLUtils.get_vars(
+    vars: URLVars = URLUtils.get_vars(
         url=URL("/user/eg1"),
         abstract_route="/user/{user_id}"
     )
@@ -11,7 +11,7 @@ def test_path():
 
 
 def test_path_2():
-    vars: URLVars = URLUtils.URLUtils.get_vars(
+    vars: URLVars = URLUtils.get_vars(
         url=URL("/user/eg1/hello"),
         abstract_route="/user/{user_id}/{user_sign}"
     )

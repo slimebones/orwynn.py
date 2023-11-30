@@ -1,3 +1,5 @@
+from sbpykit import validation
+
 from orwynn.base.module.module import Module
 from orwynn.http import (
     Endpoint,
@@ -7,7 +9,6 @@ from orwynn.http import (
     HttpRequest,
     HttpResponse,
 )
-from orwynn.utils import validation
 
 
 def test_controller_added_to_no_route():

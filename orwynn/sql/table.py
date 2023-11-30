@@ -1,12 +1,11 @@
 from typing import Any, Self
 
+from sbpykit.fmt import FormatUtils
+from sbpykit.rnd import RandomUtils
 from sqlalchemy import ForeignKey
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-
-from orwynn.utils.fmt import snakefy
-from orwynn.utils.rnd import makeid
 
 
 class Table(DeclarativeBase):
@@ -23,7 +22,7 @@ class Table(DeclarativeBase):
     # For each table special string id is generated, but it is not a primary
     # key for the performance sake, for details see:
     #   https://stackoverflow.com/a/517591/14748231
-    _id: Mapped[str] = mapped_column(default=makeid, unique=True)
+    _id: Mapped[str] = mapped_column(default=RandomUtils.makeid, unique=True)
 
     @hybrid_property
     def sid(self) -> int:
@@ -36,7 +35,7 @@ class Table(DeclarativeBase):
             return mapped_column(primary_key=True)
         else:
             return mapped_column(
-                ForeignKey(snakefy(parent.__name__) + "._sid"),
+                ForeignKey(FormatUtils.snakefy(parent.__name__) + "._sid"),
                 primary_key=True
             )
 
@@ -49,7 +48,7 @@ class Table(DeclarativeBase):
 
     @classmethod
     def _get_parent_class(cls) -> type[Self]:
-        bases: tuple[type] = cls.__bases__
+        bases: tuple[type, ...] = cls.__bases__
 
         if len(bases) == 1:
             return bases[0]
@@ -71,11 +70,11 @@ class Table(DeclarativeBase):
     @declared_attr.directive
     def __tablename__(cls) -> str:
         cls_name: str = cls.__name__
-        return snakefy(cls_name)
+        return FormatUtils.snakefy(cls_name)
 
     @declared_attr.directive
     def __identity__(cls) -> str:
-        return snakefy(cls.__name__)
+        return FormatUtils.snakefy(cls.__name__)
 
     @declared_attr.directive
     def __mapper_args__(cls) -> dict[str, Any]:

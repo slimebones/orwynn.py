@@ -6,6 +6,9 @@ from types import NoneType
 from typing import Self
 
 import dotenv
+from sbpykit import validation
+from sbpykit.validation import validate, validate_dict, validate_each
+from sbpykit.yml.errors import NotDirError
 from starlette.types import Receive, Scope, Send
 
 from orwynn.apiversion import ApiVersion
@@ -28,9 +31,6 @@ from orwynn.proxy.boot import BootProxy
 from orwynn.proxy.indicationonly import ApiIndicationOnlyProxy
 from orwynn.router import Router
 from orwynn.testing import Client
-from orwynn.utils import validation
-from orwynn.utils.validation import validate, validate_dict, validate_each
-from orwynn.utils.yml.errors import NotDirError
 
 
 class Boot(Worker):

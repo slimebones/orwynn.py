@@ -1,8 +1,9 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from orwynn.url import URLScheme
+
 from orwynn.base.worker import Worker
-from orwynn.utils.scheme import Scheme
 
 if TYPE_CHECKING:
     from orwynn.apiversion import ApiVersion
@@ -87,13 +88,13 @@ class BootProxy(Worker):
 
     def get_global_route_for_protocol(
         self,
-        protocol: Scheme
+        scheme: URLScheme
     ) -> str:
-        if protocol is Scheme.HTTP:
+        if scheme is URLScheme.HTTP:
             return self.__global_http_route
-        elif protocol is Scheme.WEBSOCKET:
+        elif scheme is URLScheme.Websocket:
             return self.__global_websocket_route
         else:
             raise TypeError(
-                f"unrecognized protocol {protocol}"
+                f"unrecognized protocol {scheme}"
             )

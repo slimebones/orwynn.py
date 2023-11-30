@@ -1,6 +1,14 @@
 
 import pytest
 from fastapi import Query, Request
+from sbpykit import validation
+from sbpykit.scheme import Scheme
+from sbpykit.validation import validate_re
+from sbpykit.validation.errors import (
+    RequestValidationException,
+    ReValidationError,
+    ValidationError,
+)
 
 from orwynn.apiversion import ApiVersion
 from orwynn.base.controller.errors import (
@@ -17,14 +25,6 @@ from orwynn.http.controller.errors import DefinedTwiceControllerMethodError
 from orwynn.http.errors import HttpException, UnsupportedHttpMethodError
 from orwynn.proxy.boot import BootProxy
 from orwynn.testing import Client
-from orwynn.utils import validation
-from orwynn.utils.scheme import Scheme
-from orwynn.utils.validation import validate_re
-from orwynn.utils.validation.errors import (
-    RequestValidationException,
-    ReValidationError,
-    ValidationError,
-)
 from tests.std.text import DEFAULT_ID, Text
 
 

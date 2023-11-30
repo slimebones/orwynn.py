@@ -2,11 +2,12 @@ import re
 from types import NoneType
 from typing import ClassVar, Literal
 
+from sbpykit import validation
+from orwynn.url import URLUtils
+
 from orwynn.base.controller.errors import (
     MissingControllerClassAttributeError,
 )
-from orwynn.utils import validation
-from orwynn.utils.url import match_routes
 
 
 class Controller:
@@ -61,7 +62,7 @@ class Controller:
             Boolean flag.
         """
         for abstract_route in self.final_routes:
-            match_result: re.Match | None = match_routes(
+            match_result: re.Match | None = URLUtils.match_routes(
                 abstract_route=abstract_route,
                 real_route=real_route
             )

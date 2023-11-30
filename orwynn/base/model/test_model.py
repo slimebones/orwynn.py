@@ -19,7 +19,7 @@ def test_default_indication_type():
 
 def test_custom_indication_type():
     class Item(Model):
-        INDICATION_TYPE = IndicationType.ERROR
+        INDICATION_TYPE = IndicationType.Error
         name: str
         price: float
 

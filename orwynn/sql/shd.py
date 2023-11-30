@@ -1,7 +1,8 @@
 from queue import Empty, Queue
 from typing import Self
 
-from antievil import LogicError
+from sbpykit.errors import LogicError
+from sbpykit.func import FuncSpec
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -12,7 +13,6 @@ from orwynn.sql.errors import (
     SqlToUpstreamUnmatchError,
 )
 from orwynn.sql.sql import SQL
-from orwynn.utils.func import FuncSpec
 
 
 class SHD:

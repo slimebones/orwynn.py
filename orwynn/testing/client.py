@@ -6,10 +6,10 @@ from orwynn.base.model.model import Model
 from orwynn.proxy.boot import BootProxy
 
 from orwynn.testing.embeddedclient import EmbeddedTestClient
-from orwynn.utils import validation
-from orwynn.utils.validation import validate
-from orwynn.utils.scheme import Scheme
-from orwynn.utils.url import join_routes
+from sbpykit import validation
+from sbpykit.validation import validate
+from sbpykit.scheme import Scheme
+from sbpykit.url import join_routes
 
 if TYPE_CHECKING:
     from orwynn.http import TestHttpResponse

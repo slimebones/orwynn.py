@@ -1,9 +1,9 @@
 from typing import TYPE_CHECKING, Any, ClassVar, Self, TypeVar, Union
 
 import pydantic
+from sbpykit import validation
 
 from orwynn.proxy.indicationonly import ApiIndicationOnlyProxy
-from orwynn.utils import validation
 
 if TYPE_CHECKING:
     from orwynn.indication import IndicationType

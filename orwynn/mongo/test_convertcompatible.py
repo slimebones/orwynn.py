@@ -1,8 +1,9 @@
 from enum import Enum
 
+from sbpykit import validation
+
 from orwynn.mongo import MongoUtils
 from orwynn.mongo.errors import MongoTypeConversionError
-from orwynn.utils import validation
 
 
 class StringEnum(Enum):

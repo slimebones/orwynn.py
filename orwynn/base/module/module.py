@@ -2,6 +2,9 @@ import copy
 from types import NoneType
 from typing import Self
 
+from sbpykit import validation
+from sbpykit.validation import validate, validate_route
+
 from orwynn.base.controller import Controller
 from orwynn.base.middleware import Middleware as MiddlewareClass
 from orwynn.base.module.errors import (
@@ -10,8 +13,6 @@ from orwynn.base.module.errors import (
     FrameworkServiceModuleReferenceError,
 )
 from orwynn.base.service.framework import FrameworkService
-from orwynn.utils import validation
-from orwynn.utils.validation import validate, validate_route
 
 
 class Module:

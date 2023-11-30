@@ -1,5 +1,7 @@
 import inspect
 
+from sbpykit.fmt import format_chain
+
 from orwynn.base.config import Config
 from orwynn.base.module.errors import CircularDependencyError
 from orwynn.di.collecting.errors import (
@@ -12,7 +14,6 @@ from orwynn.di.container import DiContainer
 from orwynn.di.errors import MissingDiObjectError
 from orwynn.di.isprovider import is_provider
 from orwynn.di.provider import Provider
-from orwynn.utils.fmt import format_chain
 
 
 def init_providers(

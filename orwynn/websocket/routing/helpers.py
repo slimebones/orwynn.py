@@ -2,14 +2,17 @@ import inspect
 import typing
 from types import NoneType, UnionType
 
-from orwynn.utils.url import UrlVars
+from orwynn.url import URLVars
+
 from orwynn.websocket.websocket import Websocket
 
 from .handlers import WebsocketHandler
 
 # Types allowed to be set at handler's function argument annotations
 _AllowedTypesUnion = str | int | float
-_AllowedTypes: tuple[type] = typing.get_args(_AllowedTypesUnion)
+_AllowedTypes: tuple[type] = typing.get_args(
+    _AllowedTypesUnion
+)  # type: ignore
 _Annotation = typing.TypeVar("_Annotation")
 
 # Allowed for handler kwargs
@@ -18,7 +21,7 @@ HandlerKwargs = dict[str, _AllowedTypesUnion]
 
 def get_handler_kwargs(
     handler: WebsocketHandler,
-    url_vars: UrlVars
+    url_vars: URLVars
 ) -> HandlerKwargs:
     """
     Inspects the given handler and the given url vars to select and convert
@@ -79,7 +82,7 @@ def _set_regular_param(
     *,
     kwargs: HandlerKwargs,
     param: inspect.Parameter,
-    url_vars: UrlVars
+    url_vars: URLVars
 ) -> None:
     try:
         path_var_value: str = url_vars.path_vars[param.name]
@@ -101,7 +104,7 @@ def _set_union_param(
     kwargs: HandlerKwargs,
     param: inspect.Parameter,
     handler: WebsocketHandler,
-    url_vars: UrlVars
+    url_vars: URLVars
 ) -> None:
     union_args: tuple = param.annotation.__args__
     _check_union_args(

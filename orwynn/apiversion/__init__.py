@@ -1,6 +1,6 @@
 from copy import copy
 
-from orwynn.utils import validation
+from sbpykit import validation
 
 from .errors import UnsupportedVersionError
 

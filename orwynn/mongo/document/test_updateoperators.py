@@ -1,6 +1,7 @@
+from sbpykit import validation
+
 from orwynn.mongo.document.errors import InvalidOperatorError
 from orwynn.mongo.document.testing import SimpleDocument
-from orwynn.utils import validation
 
 
 def test_min(document_1: SimpleDocument):
