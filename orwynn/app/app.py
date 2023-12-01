@@ -7,8 +7,8 @@ from orwynn.app.config import AppConfig
 from orwynn.app.core import CoreApp
 from orwynn.app.types import CoreCors
 from orwynn.base.service.framework import FrameworkService
-from orwynn.url import URLMethod
 from orwynn.testing import Client, EmbeddedTestClient
+from orwynn.url import URLMethod
 
 
 class App(FrameworkService):

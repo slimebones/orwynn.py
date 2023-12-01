@@ -1,9 +1,8 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from orwynn.url import URLScheme
-
 from orwynn.base.worker import Worker
+from orwynn.url import URLScheme
 
 if TYPE_CHECKING:
     from orwynn.apiversion import ApiVersion

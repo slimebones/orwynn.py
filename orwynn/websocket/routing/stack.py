@@ -1,9 +1,8 @@
 import functools
 from typing import Callable
 
-from orwynn.url import URLUtils, URLVars
-
 from orwynn.base.error.errors import MalfunctionError
+from orwynn.url import URLUtils, URLVars
 from orwynn.websocket.websocket import Websocket
 
 from .handlers import DispatchWebsocketHandler, WebsocketHandler

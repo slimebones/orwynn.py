@@ -1,5 +1,5 @@
 from sbpykit import validation
-from sbpykit.fmt import format_chain
+from sbpykit.fmt import FormatUtils
 
 from orwynn.base.module import Module
 from orwynn.base.module.errors import CircularDependencyError
@@ -59,7 +59,7 @@ class ModuleCollector:
                 # Failed module is added second time to the chain for
                 # error descriptiveness
                 f"{init_module} occured twice in dependency chain"
-                f" {format_chain(self.__chain + [init_module])}"
+                f" {FormatUtils.format_chain(self.__chain + [init_module])}"
             )
         self.__chain.append(init_module)
 

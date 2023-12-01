@@ -1,7 +1,6 @@
 import contextlib
 
 from orwynn.url import URLVars
-
 from orwynn.websocket.websocket import Websocket
 
 from .handlers import DispatchWebsocketHandler, WebsocketHandler

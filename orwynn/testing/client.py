@@ -8,8 +8,7 @@ from orwynn.proxy.boot import BootProxy
 from orwynn.testing.embeddedclient import EmbeddedTestClient
 from sbpykit import validation
 from sbpykit.validation import validate
-from sbpykit.scheme import Scheme
-from sbpykit.url import join_routes
+from orwynn.url import URLScheme, URLUtils
 
 if TYPE_CHECKING:
     from orwynn.http import TestHttpResponse
@@ -254,7 +253,7 @@ class Client:
         finalized: _FinalizedRequestData = self._process_request_data(
             route=route,
             request_kwargs=request_kwargs,
-            protocol=Scheme.HTTP
+            protocol=URLScheme.HTTP
         )
 
         # Make a request
@@ -277,7 +276,7 @@ class Client:
         *,
         route: str,
         request_kwargs: dict,
-        protocol: Scheme
+        protocol: URLScheme
     ) -> _FinalizedRequestData:
         """
         Processes a given route and request kwargs and returns finalized
@@ -323,7 +322,7 @@ class Client:
         *,
         is_global_route_used: bool,
         api_version: int | None,
-        protocol: Scheme
+        protocol: URLScheme
     ) -> str:
         if not is_global_route_used and api_version is not None:
             raise ValueError(
@@ -356,7 +355,7 @@ class Client:
             # No {version} format block
             final_global_route = global_route
 
-        return join_routes(
+        return URLUtils.join_routes(
             final_global_route,
             route
         )
@@ -369,7 +368,7 @@ class Client:
         finalized: _FinalizedRequestData = self._process_request_data(
             route=route,
             request_kwargs=request_kwargs,
-            protocol=Scheme.WEBSOCKET
+            protocol=URLScheme.Websocket
         )
 
         return self._embedded_client.websocket_connect(

@@ -3,11 +3,11 @@ from types import NoneType
 from typing import ClassVar, Literal
 
 from sbpykit import validation
-from orwynn.url import URLUtils
 
 from orwynn.base.controller.errors import (
     MissingControllerClassAttributeError,
 )
+from orwynn.url import URLUtils
 
 
 class Controller:

@@ -3,7 +3,6 @@ import typing
 from types import NoneType, UnionType
 
 from orwynn.url import URLVars
-
 from orwynn.websocket.websocket import Websocket
 
 from .handlers import WebsocketHandler

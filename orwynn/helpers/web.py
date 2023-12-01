@@ -1,8 +1,7 @@
 # A request of any supported protocol
 from typing import TYPE_CHECKING, Union
 
-from orwynn.url import URLScheme
-from orwynn.url import URLMethod
+from orwynn.url import URLMethod, URLScheme
 
 if TYPE_CHECKING:
     from orwynn.http import HttpRequest, HttpResponse

@@ -1,4 +1,4 @@
-from sbpykit.fmt import format_chain
+from sbpykit.fmt import FormatUtils
 
 from orwynn.base.config import Config
 from orwynn.base.module import Module
@@ -57,7 +57,7 @@ def _traverse(
             # Failed provider is added second time to the chain for
             # error descriptiveness
             f"provider {P} occured twice in dependency chain"
-            f" {format_chain(chain + [P])}"
+            f" {FormatUtils.format_chain(chain + [P])}"
         )
     chain.append(P)
 
