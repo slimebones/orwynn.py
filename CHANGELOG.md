@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 1.3.3
+
+### Features
+
+- FastAPI 0.104 support.
+
+### Refactor
+
+- Moved Utils to PyKit.
+
 ## 1.3.2
 
 ### Fixed
