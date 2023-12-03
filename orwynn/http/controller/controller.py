@@ -12,7 +12,7 @@ from .errors import \
 from orwynn.base.controller.errors import \
     MissingControllerClassAttributeError
 from .endpoint.container import EndpointContainer
-from sbpykit import validation
+from pykit import validation
 
 
 class HttpController(Controller):

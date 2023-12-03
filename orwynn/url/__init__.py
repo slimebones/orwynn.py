@@ -5,8 +5,8 @@ import re
 from enum import Enum
 from itertools import zip_longest
 
-from sbpykit import validation
-from sbpykit.klass import Static
+from pykit import validation
+from pykit.klass import Static
 from starlette.datastructures import URL as _StarletteURL
 
 from orwynn.base.model.model import Model

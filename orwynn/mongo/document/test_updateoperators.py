@@ -1,4 +1,4 @@
-from sbpykit import validation
+from pykit import validation
 
 from orwynn.mongo.document.errors import InvalidOperatorError
 from orwynn.mongo.document.testing import SimpleDocument

@@ -1,5 +1,5 @@
-from sbpykit import validation
-from sbpykit.rnd import RandomUtils
+from pykit import validation
+from pykit.rnd import RandomUtils
 
 from orwynn.context import ContextStorage
 from orwynn.context.errors import RequestIdAlreadySavedError

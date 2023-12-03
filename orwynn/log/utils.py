@@ -1,5 +1,5 @@
 import contextlib
-from sbpykit.klass import Static
+from pykit.klass import Static
 import sys
 from typing import TYPE_CHECKING, Any
 import typing_extensions

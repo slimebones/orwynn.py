@@ -2,9 +2,9 @@ import os
 from collections.abc import Callable
 from typing import TYPE_CHECKING
 
-from sbpykit import validation
-from sbpykit.errors import NotFoundError
-from sbpykit.klass import Static
+from pykit import validation
+from pykit.errors import NotFoundError
+from pykit.klass import Static
 from sqlalchemy import Select, text
 
 from orwynn.base.model import Model

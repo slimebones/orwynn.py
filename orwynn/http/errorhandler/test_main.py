@@ -1,5 +1,5 @@
 import pytest
-from sbpykit import validation
+from pykit import validation
 
 from orwynn.base.error.errors import ExceptionAlreadyHandledError
 from orwynn.base.errorhandler import ErrorHandler

@@ -1,7 +1,7 @@
 from typing import Callable, Sequence
 
-from sbpykit import validation
-from sbpykit.scheme import Scheme
+from pykit import validation
+from pykit.scheme import Scheme
 from starlette.middleware.base import (
     BaseHTTPMiddleware as StarletteBaseHTTPMiddleware,
 )

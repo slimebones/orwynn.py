@@ -1,6 +1,6 @@
 from copy import copy
 
-from sbpykit import validation
+from pykit import validation
 
 from .errors import UnsupportedVersionError
 

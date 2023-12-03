@@ -1,5 +1,5 @@
-from sbpykit import validation
-from sbpykit.fmt import FormatUtils
+from pykit import validation
+from pykit.fmt import FormatUtils
 
 from orwynn.base.module import Module
 from orwynn.base.module.errors import CircularDependencyError

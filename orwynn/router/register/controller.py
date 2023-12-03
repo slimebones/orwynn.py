@@ -3,9 +3,9 @@ from inspect import isclass
 from typing import Any, Callable, Literal
 
 import pydantic
-from sbpykit import validation
-from sbpykit.scheme import Scheme
-from sbpykit.url import join_routes
+from pykit import validation
+from pykit.scheme import Scheme
+from pykit.url import join_routes
 
 from orwynn.apiversion import ApiVersion
 from orwynn.app import App

@@ -1,7 +1,7 @@
 from typing import Any, Self
 
-from sbpykit.fmt import FormatUtils
-from sbpykit.rnd import RandomUtils
+from pykit.fmt import FormatUtils
+from pykit.rnd import RandomUtils
 from sqlalchemy import ForeignKey
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property

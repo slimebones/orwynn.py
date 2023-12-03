@@ -1,6 +1,6 @@
 from enum import Enum
 
-from sbpykit import validation
+from pykit import validation
 
 from orwynn.mongo import MongoUtils
 from orwynn.mongo.errors import MongoTypeConversionError

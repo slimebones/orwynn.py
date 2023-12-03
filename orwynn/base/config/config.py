@@ -1,7 +1,7 @@
 import re
 from typing import TYPE_CHECKING, Any, Self
 
-from sbpykit import validation
+from pykit import validation
 
 from orwynn.base.model.model import Model
 from orwynn.proxy.boot import BootProxy

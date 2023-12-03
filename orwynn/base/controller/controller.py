@@ -2,7 +2,7 @@ import re
 from types import NoneType
 from typing import ClassVar, Literal
 
-from sbpykit import validation
+from pykit import validation
 
 from orwynn.base.controller.errors import (
     MissingControllerClassAttributeError,

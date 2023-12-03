@@ -1,7 +1,7 @@
 from contextvars import ContextVar, Token
 from typing import Any
 
-from sbpykit import validation
+from pykit import validation
 
 from orwynn.base.worker.worker import Worker
 

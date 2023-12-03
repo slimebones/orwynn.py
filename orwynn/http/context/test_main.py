@@ -1,5 +1,5 @@
 import pytest
-from sbpykit import validation
+from pykit import validation
 
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot

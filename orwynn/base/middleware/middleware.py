@@ -1,7 +1,7 @@
 import re
 from typing import Any, Callable
 
-from sbpykit import validation
+from pykit import validation
 
 
 class Middleware:

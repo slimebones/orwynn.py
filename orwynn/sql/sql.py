@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import Optional, Sequence
-from sbpykit import validation
+from pykit import validation
 from orwynn.base.database.database import Database
 
 from .table import Table

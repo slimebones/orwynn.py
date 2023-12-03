@@ -1,6 +1,6 @@
 from typing import Self
 
-from sbpykit.scheme import Scheme
+from pykit.scheme import Scheme
 
 from orwynn.base.model.model import Model
 

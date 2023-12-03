@@ -2,7 +2,7 @@ import typing
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 
-from sbpykit.klass import Static
+from pykit.klass import Static
 
 from orwynn.mongo.errors import (
     MongoTypeConversionError,

@@ -1,7 +1,7 @@
 import os
 from typing import ClassVar
 
-from sbpykit import validation
+from pykit import validation
 
 from orwynn.base.error.errors import MalfunctionError
 from orwynn.helpers.web import GenericRequest, GenericResponse

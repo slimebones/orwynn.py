@@ -5,7 +5,7 @@ import os
 
 import pytest_asyncio
 from pytest import fixture
-from sbpykit import validation
+from pykit import validation
 
 from orwynn import sql
 from orwynn.app import AppMode

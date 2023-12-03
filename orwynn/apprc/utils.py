@@ -3,11 +3,11 @@ import os
 from pathlib import Path
 from types import NoneType
 
-from sbpykit import validation
-from sbpykit.errors import NotFoundError
-from sbpykit.klass import Static
-from sbpykit.mp import patch as mp_patch
-from sbpykit.yml import load_yml
+from pykit import validation
+from pykit.errors import NotFoundError
+from pykit.klass import Static
+from pykit.mp import patch as mp_patch
+from pykit.yml import load_yml
 
 from orwynn.app import AppMode
 from orwynn.apprc.apprc import AppRc

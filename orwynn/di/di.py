@@ -1,4 +1,4 @@
-from sbpykit import validation
+from pykit import validation
 
 from orwynn.app.app import App
 from orwynn.base.controller.controller import Controller

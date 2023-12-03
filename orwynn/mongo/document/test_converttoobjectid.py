@@ -1,5 +1,5 @@
 from bson import ObjectId
-from sbpykit import validation
+from pykit import validation
 
 from orwynn.mongo.document.errors import InvalidIdError
 from orwynn.mongo.document.helpers import convert_to_object_id

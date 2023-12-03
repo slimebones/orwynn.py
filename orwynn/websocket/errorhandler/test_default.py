@@ -1,6 +1,6 @@
 import pytest
-from sbpykit import validation
-from sbpykit.scheme import Scheme
+from pykit import validation
+from pykit.scheme import Scheme
 
 from orwynn.base.errorhandler.errorhandler import ErrorHandler
 from orwynn.base.module.module import Module

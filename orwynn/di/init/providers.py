@@ -1,6 +1,6 @@
 import inspect
 
-from sbpykit.fmt import format_chain
+from pykit.fmt import format_chain
 
 from orwynn.base.config import Config
 from orwynn.base.module.errors import CircularDependencyError

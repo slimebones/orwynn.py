@@ -1,4 +1,4 @@
-from sbpykit.errors import UnsupportedError
+from pykit.errors import UnsupportedError
 
 __all__ = [
     "UnsupportedError"

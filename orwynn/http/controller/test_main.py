@@ -1,10 +1,10 @@
 
 import pytest
 from fastapi import Query, Request
-from sbpykit import validation
-from sbpykit.scheme import Scheme
-from sbpykit.validation import validate_re
-from sbpykit.validation.errors import (
+from pykit import validation
+from pykit.scheme import Scheme
+from pykit.validation import validate_re
+from pykit.validation.errors import (
     RequestValidationException,
     ReValidationError,
     ValidationError,

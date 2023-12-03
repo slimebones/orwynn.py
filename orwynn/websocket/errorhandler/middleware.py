@@ -1,7 +1,7 @@
 import inspect
 from types import NoneType
 
-from sbpykit import validation
+from pykit import validation
 
 from orwynn.base.error.errors import MalfunctionError
 from orwynn.base.error.utils import (

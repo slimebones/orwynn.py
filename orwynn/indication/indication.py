@@ -12,12 +12,12 @@ from orwynn.http.schema.validationvalue import \
 from orwynn.http.errors import HttpException
 from orwynn.indication.type import IndicationType
 from orwynn.indication.errors import UnsupportedIndicatorError
-from sbpykit import validation
-from sbpykit.mp import MapUtils
-from sbpykit.validation import (validate,
+from pykit import validation
+from pykit.mp import MapUtils
+from pykit.validation import (validate,
                                     validate_dict)
 from fastapi.exceptions import RequestValidationError
-from sbpykit.validation.validator import Validator
+from pykit.validation.validator import Validator
 
 from .indicatable import Indicatable, IndicatableTypeVar
 from .indicator import Indicator

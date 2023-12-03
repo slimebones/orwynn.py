@@ -1,7 +1,7 @@
 import contextlib
 import json
 
-from sbpykit import validation
+from pykit import validation
 from starlette.concurrency import iterate_in_threadpool
 from starlette.responses import StreamingResponse
 

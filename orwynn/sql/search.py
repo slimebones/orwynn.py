@@ -1,7 +1,7 @@
 from typing import Generic, Literal, Self
 
-from sbpykit.errors import NameExpectError, UnsupportedError
-from sbpykit.search import DatabaseSearch
+from pykit.errors import NameExpectError, UnsupportedError
+from pykit.search import DatabaseSearch
 
 from orwynn.sql.shd import SHD
 from orwynn.sql.table import Table

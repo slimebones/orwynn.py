@@ -2,7 +2,7 @@ import os
 
 import pytest
 import pytest_asyncio
-from sbpykit import validation
+from pykit import validation
 
 from orwynn.app import AppMode
 from orwynn.apprc.apprc import AppRc

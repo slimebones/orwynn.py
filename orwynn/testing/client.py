@@ -6,8 +6,8 @@ from orwynn.base.model.model import Model
 from orwynn.proxy.boot import BootProxy
 
 from orwynn.testing.embeddedclient import EmbeddedTestClient
-from sbpykit import validation
-from sbpykit.validation import validate
+from pykit import validation
+from pykit.validation import validate
 from orwynn.url import URLScheme, URLUtils
 
 if TYPE_CHECKING:

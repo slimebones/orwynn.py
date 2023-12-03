@@ -1,7 +1,7 @@
 import re
 from typing import TypeVar
 
-from sbpykit.validation import validate
+from pykit.validation import validate
 
 from orwynn.base.config import Config
 from orwynn.base.controller.controller import Controller

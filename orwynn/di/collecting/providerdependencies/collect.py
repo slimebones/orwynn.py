@@ -1,4 +1,4 @@
-from sbpykit.fmt import FormatUtils
+from pykit.fmt import FormatUtils
 
 from orwynn.base.config import Config
 from orwynn.base.module import Module

@@ -6,9 +6,9 @@ from types import NoneType
 from typing import Self
 
 import dotenv
-from sbpykit import validation
-from sbpykit.validation import validate, validate_dict, validate_each
-from sbpykit.yml.errors import NotDirError
+from pykit import validation
+from pykit.validation import validate, validate_dict, validate_each
+from pykit.yml.errors import NotDirError
 from starlette.types import Receive, Scope, Send
 
 from orwynn.apiversion import ApiVersion

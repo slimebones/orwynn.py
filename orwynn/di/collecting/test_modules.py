@@ -1,5 +1,5 @@
 from pytest import fixture
-from sbpykit.validation import expect
+from pykit.validation import expect
 
 from orwynn.base.module.errors import CircularDependencyError
 from orwynn.base.module.module import Module

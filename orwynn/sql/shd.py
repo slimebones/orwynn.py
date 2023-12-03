@@ -1,8 +1,8 @@
 from queue import Empty, Queue
 from typing import Self
 
-from sbpykit.errors import LogicError
-from sbpykit.func import FuncSpec
+from pykit.errors import LogicError
+from pykit.func import FuncSpec
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 

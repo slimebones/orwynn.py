@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Any, ClassVar, Self, TypeVar, Union
 
 import pydantic
-from sbpykit import validation
+from pykit import validation
 
 from orwynn.proxy.indicationonly import ApiIndicationOnlyProxy
 

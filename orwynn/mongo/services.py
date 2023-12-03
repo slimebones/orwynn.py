@@ -1,7 +1,7 @@
 from typing import Any
 
-from sbpykit.errors import NotFoundError
-from sbpykit.func import FuncSpec
+from pykit.errors import NotFoundError
+from pykit.func import FuncSpec
 
 from orwynn.base import Service
 from orwynn.mongo.search import MongoStateFlagSearch

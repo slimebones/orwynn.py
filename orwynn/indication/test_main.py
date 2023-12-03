@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Any
 
 from pytest import fixture
-from sbpykit import validation
+from pykit import validation
 
 from orwynn.base.model.model import Model
 from orwynn.indication.indication import Indication

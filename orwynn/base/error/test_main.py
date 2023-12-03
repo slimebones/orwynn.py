@@ -1,6 +1,6 @@
 from enum import Enum
 
-from sbpykit import validation
+from pykit import validation
 
 from orwynn.base.error.code import get_error_code
 from orwynn.indication.indication import Indication

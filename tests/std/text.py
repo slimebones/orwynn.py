@@ -1,5 +1,5 @@
 import lorem
-from sbpykit.validation import model_validator
+from pykit.validation import model_validator
 
 from orwynn.app.app import App
 from orwynn.base.config import Config

@@ -1,7 +1,7 @@
 
 from bson import ObjectId
 from bson.errors import InvalidId
-from sbpykit.types import T
+from pykit.types import T
 
 from orwynn.mongo.document.errors import InvalidIdError
 

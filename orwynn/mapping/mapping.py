@@ -1,7 +1,7 @@
 import typing
 from typing import Any
 
-from sbpykit.types import TDecoratedCallable
+from pykit.types import TDecoratedCallable
 
 from orwynn.base.model.model import Model
 from orwynn.mapping.errors import MappingNotLinkedError, UnsetIdMappingError

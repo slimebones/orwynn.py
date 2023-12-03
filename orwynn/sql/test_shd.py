@@ -1,8 +1,8 @@
 from typing import overload
 
 import pytest
-from sbpykit import validation
-from sbpykit.errors import NotFoundError
+from pykit import validation
+from pykit.errors import NotFoundError
 
 from orwynn import sql
 from orwynn.base import Module, Service

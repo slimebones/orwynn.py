@@ -1,4 +1,4 @@
-from sbpykit import validation
+from pykit import validation
 
 from orwynn.http import TestHttpResponse
 from orwynn.mapping.errors import CustomUseOfMappingReservedFieldError

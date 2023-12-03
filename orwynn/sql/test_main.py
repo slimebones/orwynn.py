@@ -4,8 +4,8 @@ from enum import Enum
 from typing import Generator
 
 import pytest
-from sbpykit import validation
-from sbpykit.crypto import hash_password
+from pykit import validation
+from pykit.crypto import hash_password
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 

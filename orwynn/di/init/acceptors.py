@@ -1,7 +1,7 @@
 
-from sbpykit import validation
-from sbpykit.url import join_routes
-from sbpykit.validation import validate
+from pykit import validation
+from pykit.url import join_routes
+from pykit.validation import validate
 
 from orwynn.base.controller.controller import Controller
 from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware

@@ -1,4 +1,4 @@
-from sbpykit import validation
+from pykit import validation
 
 from orwynn.log import Log
 from orwynn.websocket.websocket import Websocket

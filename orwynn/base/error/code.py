@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import get_args
 
-from sbpykit import validation
+from pykit import validation
 
 ErrorCode = int | str | Enum
 _ErrorCodeTypes: list[type] = list(get_args(ErrorCode))

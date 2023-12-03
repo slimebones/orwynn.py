@@ -6,8 +6,8 @@ from bson import ObjectId
 from pydantic.fields import ModelField
 from pymongo.cursor import Cursor
 from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
-from sbpykit import validation
-from sbpykit.fmt import snakefy
+from pykit import validation
+from pykit.fmt import snakefy
 
 from orwynn.di.di import Di
 from orwynn.helpers.errors import UnsupportedError

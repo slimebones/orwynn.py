@@ -1,6 +1,6 @@
 from typing import Generic
 
-from sbpykit.search import DatabaseSearch
+from pykit.search import DatabaseSearch
 
 from orwynn.mongo.document import Document
 from orwynn.mongo.types import TDocument

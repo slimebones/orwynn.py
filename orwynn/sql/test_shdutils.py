@@ -1,6 +1,6 @@
 import pytest
-from sbpykit import validation
-from sbpykit.errors import NotFoundError
+from pykit import validation
+from pykit.errors import NotFoundError
 
 from orwynn.di.di import Di
 from orwynn.sql.search import TableSearch

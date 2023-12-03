@@ -1,6 +1,6 @@
 import pytest
 import pytest_asyncio
-from sbpykit import validation
+from pykit import validation
 
 from orwynn import mongo
 from orwynn.base.model.model import Model
