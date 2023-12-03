@@ -66,7 +66,7 @@ class ErrorHandlerManager:
         final_set: set[ErrorHandler] = set()
 
         for eh in error_handlers:
-            if eh.PROTOCOL is protocol:
+            if eh.Protocol is protocol:
                 final_set.add(eh)
 
         return final_set

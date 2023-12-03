@@ -6,7 +6,7 @@ from types import NoneType
 from pykit import validation
 from pykit.cls import Static
 from pykit.errors import NotFoundError
-from pykit.mp import MapUtils
+from pykit.map import MapUtils
 from pykit.yml import YMLUtils
 
 from orwynn.app import AppMode

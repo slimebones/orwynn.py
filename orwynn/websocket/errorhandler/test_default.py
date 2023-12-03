@@ -1,11 +1,11 @@
 import pytest
 from pykit import validation
-from pykit.scheme import Scheme
 
 from orwynn.base.errorhandler.errorhandler import ErrorHandler
 from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.proxy.boot import BootProxy
+from orwynn.url import URLScheme
 from orwynn.websocket import Websocket, WebsocketController
 
 
@@ -22,7 +22,7 @@ class Wc(WebsocketController):
 
 class Eh(ErrorHandler):
     E = SomeWebsocketError
-    PROTOCOL = Scheme.WEBSOCKET
+    Protocol = URLScheme.Websocket
 
     async def handle(
         self, request: Websocket, error: SomeWebsocketError

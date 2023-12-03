@@ -1,18 +1,18 @@
 import pytest
+from pydantic import RootModel
 from pykit import validation
-from pykit.mp import MapUtils
+from pykit.map import MapUtils
 
 from orwynn.app import AppMode
 from orwynn.apprc.apprc import AppRc
 from orwynn.base.config import Config
-from orwynn.base.model.model import Model
 from orwynn.base.module.module import Module
 from orwynn.boot import Boot
 from orwynn.di.di import Di
 
 
-class Menu(Model):
-    __root__: dict[str, float]
+class Menu(RootModel):
+    root: dict[str, float]
 
 
 class BurgerShotConfig(Config):
@@ -67,7 +67,7 @@ async def test_prod(raw_apprc: AppRc):
     assert validation.apply(
         Di.ie().find("BurgerShotConfig"),
         BurgerShotConfig
-    ).dict() == mp_find("prod.BurgerShot", raw_apprc)
+    ).model_dump() == MapUtils.find("prod.BurgerShot", raw_apprc)
 
 
 @pytest.mark.asyncio
@@ -81,7 +81,7 @@ async def test_dev(raw_apprc: AppRc):
     assert validation.apply(
         Di.ie().find("BurgerShotConfig"),
         BurgerShotConfig
-    ).dict() == {
+    ).model_dump() == {
         "location": "Vinewood",
         "employees": 25,
         "menu": {

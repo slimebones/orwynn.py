@@ -18,15 +18,15 @@ class ErrorHandler:
     Attributes:
         E:
             Exception or a list of handled Exceptions.
-        PROTOCOL:
+        Protocol:
             Protocol the handler works with.
-        IS_ERROR_CATCH_LOGGED:
+        IsErrorCatchLogged:
             Whether the handled errors should be automatically logged by
             Log.catch. Defaults to True.
     """
     E: ClassVar[type[Exception] | None] = None
-    PROTOCOL: URLScheme = URLScheme.HTTP
-    IS_ERROR_CATCH_LOGGED: bool = True
+    Protocol: URLScheme = URLScheme.HTTP
+    IsErrorCatchLogged: bool = True
 
     def __init__(self) -> None:
         if self.E is None:
@@ -36,7 +36,7 @@ class ErrorHandler:
         else:
             validation.validate(self.E, Exception)
 
-        validation.validate(self.PROTOCOL, URLScheme)
+        validation.validate(self.Protocol, URLScheme)
 
     @classmethod
     def get_handled_exception_class(cls) -> type[Exception]:
@@ -61,7 +61,7 @@ class ErrorHandler:
         Inside it should always propagate the control to self.handle.
         """
         if (
-            self.IS_ERROR_CATCH_LOGGED
+            self.IsErrorCatchLogged
             # check without an AppMode importing due to circular issues
             and BootProxy.ie().mode.value != "test"
             and not os.getenv(

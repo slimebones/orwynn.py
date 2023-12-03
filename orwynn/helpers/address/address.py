@@ -1,8 +1,7 @@
 from typing import Self
 
-from pykit.scheme import Scheme
-
 from orwynn.base.model.model import Model
+from orwynn.url import URLScheme
 
 
 class Address(Model):
@@ -41,7 +40,7 @@ class Address(Model):
     top_domain: str | None = None
     second_domain: str | None = None
     subdomain: str | None = None
-    scheme: Scheme | None = None
+    scheme: URLScheme | None = None
     port: int | None = None
     path: str | None = None
     query: dict[str, str | list[str]] | None = None

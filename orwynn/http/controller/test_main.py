@@ -1,11 +1,10 @@
 
 import pytest
 from fastapi import Query, Request
+from fastapi.exceptions import RequestValidationError
 from pykit import validation
-from pykit.scheme import Scheme
 from pykit.validation import validate_re
 from pykit.validation.errors import (
-    RequestValidationException,
     ReValidationError,
     ValidationError,
 )
@@ -25,11 +24,12 @@ from orwynn.http.controller.errors import DefinedTwiceControllerMethodError
 from orwynn.http.errors import HttpException, UnsupportedHttpMethodError
 from orwynn.proxy.boot import BootProxy
 from orwynn.testing import Client
+from orwynn.url import URLScheme
 from tests.std.text import DEFAULT_ID, Text
 
 
 def test_http_methods():
-    for method in REQUEST_METHOD_BY_PROTOCOL[Scheme.HTTP]:
+    for method in REQUEST_METHOD_BY_PROTOCOL[URLScheme.HTTP]:
         assert hasattr(HttpController, method.value)
 
 
@@ -200,10 +200,10 @@ async def test_default_request_validation_error():
     # filled back to the indication
     validation.apply(
         BootProxy.ie().api_indication.recover(
-            RequestValidationException,
+            RequestValidationError,
             data
         ),
-        RequestValidationException
+        RequestValidationError
     )
 
 

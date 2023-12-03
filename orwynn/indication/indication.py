@@ -13,7 +13,7 @@ from orwynn.http.errors import HttpException
 from orwynn.indication.type import IndicationType
 from orwynn.indication.errors import UnsupportedIndicatorError
 from pykit import validation
-from pykit.mp import MapUtils
+from pykit.map import MapUtils
 from pykit.validation import (validate,
                                     validate_dict)
 from fastapi.exceptions import RequestValidationError
