@@ -4,10 +4,10 @@ from pathlib import Path
 from types import NoneType
 
 from pykit import validation
+from pykit.cls import Static
 from pykit.errors import NotFoundError
-from pykit.klass import Static
-from pykit.mp import patch as mp_patch
-from pykit.yml import load_yml
+from pykit.mp import MapUtils
+from pykit.yml import YMLUtils
 
 from orwynn.app import AppMode
 from orwynn.apprc.apprc import AppRc
@@ -61,7 +61,7 @@ class AppRCUtils(Static):
             for p in rc_paths:
                 if p.exists():
                     # Here goes all data contained in yaml config
-                    apprc: AppRc = load_yml(p)
+                    apprc: AppRc = YMLUtils.load_yml(p)
                     AppRCUtils._parse_into(
                         final_apprc, apprc, False, mode
                     )
@@ -98,7 +98,7 @@ class AppRCUtils(Static):
         for nesting_mode in APP_RC_MODE_NESTING[:mode_nesting_index + 1]:
             # Supress: We don't mind if any top-level key is missing here
             with contextlib.suppress(KeyError):
-                mp_patch(
+                MapUtils.patch(
                     receiver,
                     source[nesting_mode.value],
                     should_deepcopy=False

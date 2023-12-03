@@ -7,8 +7,8 @@ from typing import Self
 
 import dotenv
 from pykit import validation
+from pykit.errors import DirectoryExpectError
 from pykit.validation import validate, validate_dict, validate_each
-from pykit.yml.errors import NotDirError
 from starlette.types import Receive, Scope, Send
 
 from orwynn.apiversion import ApiVersion
@@ -354,8 +354,8 @@ class Boot(Worker):
             Path(os.getcwd()) if not root_dir_env else Path(root_dir_env)
 
         if not root_dir.is_dir():
-            raise NotDirError(
-                f"{root_dir} is not a directory"
+            raise DirectoryExpectError(
+                path=root_dir
             )
 
         return root_dir

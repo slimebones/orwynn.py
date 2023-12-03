@@ -1,7 +1,6 @@
 from typing import Callable, Sequence
 
 from pykit import validation
-from pykit.scheme import Scheme
 from starlette.middleware.base import (
     BaseHTTPMiddleware as StarletteBaseHTTPMiddleware,
 )
@@ -20,6 +19,7 @@ from orwynn.http import (
 )
 from orwynn.http.errors import HttpException
 from orwynn.router.errorhandlermanager import ErrorHandlerManager
+from orwynn.url import URLScheme
 from orwynn.websocket import (
     BUILTIN_WEBSOCKET_MIDDLEWARE,
     BuiltinWebsocketMiddleware,
@@ -60,7 +60,7 @@ class MiddlewareRegister:
         Registers all middleware to the system.
         """
         populated_handlers_py_protocol: dict[
-            Scheme, set[ErrorHandler]
+            URLScheme, set[ErrorHandler]
         ] = ErrorHandlerManager().get_populated_handlers_by_protocol(
             self.__exception_handlers
         )
@@ -73,12 +73,12 @@ class MiddlewareRegister:
         http_builtin_middleware: Sequence[
             BuiltinHttpMiddleware
         ] = self.__collect_http_builtin_middleware(
-            populated_handlers_py_protocol[Scheme.HTTP]
+            populated_handlers_py_protocol[URLScheme.HTTP]
         )
         websocket_builtin_middleware: Sequence[
             BuiltinWebsocketMiddleware
         ] = self.__collect_websocket_builtin_middleware(
-            populated_handlers_py_protocol[Scheme.WEBSOCKET]
+            populated_handlers_py_protocol[URLScheme.Websocket]
         )
 
         self.__register_middleware_arr(

@@ -1,8 +1,8 @@
 from enum import Enum
 from typing import Any
 
-from pytest import fixture
 from pykit import validation
+from pytest import fixture
 
 from orwynn.base.model.model import Model
 from orwynn.indication.indication import Indication

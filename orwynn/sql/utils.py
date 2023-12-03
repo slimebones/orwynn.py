@@ -3,8 +3,8 @@ from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from pykit import validation
+from pykit.cls import Static
 from pykit.errors import NotFoundError
-from pykit.klass import Static
 from sqlalchemy import Select, text
 
 from orwynn.base.model import Model

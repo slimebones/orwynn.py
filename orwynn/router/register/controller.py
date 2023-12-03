@@ -4,8 +4,6 @@ from typing import Any, Callable, Literal
 
 import pydantic
 from pykit import validation
-from pykit.scheme import Scheme
-from pykit.url import join_routes
 
 from orwynn.apiversion import ApiVersion
 from orwynn.app import App
@@ -25,7 +23,7 @@ from orwynn.proxy.boot import BootProxy
 from orwynn.router.errors import (
     UnmatchedEndpointEntityError,
 )
-from orwynn.url import URLMethod
+from orwynn.url import URLMethod, URLScheme, URLUtils
 from orwynn.websocket import (
     WebsocketController,
     WebsocketStack,
@@ -156,7 +154,7 @@ class ControllerRegister:
             # Don't register unused methods
             if (
                 http_method in controller.methods
-                and http_method in REQUEST_METHOD_BY_PROTOCOL[Scheme.HTTP]
+                and http_method in REQUEST_METHOD_BY_PROTOCOL[URLScheme.HTTP]
             ):
                 is_method_found = True
 
@@ -234,14 +232,14 @@ class ControllerRegister:
                 # We can concatenate routes such way since routes
                 # are validated to not contain following slash
                 # -> But join_routes() handles this situation, doesn't it?
-                concatenated_route = join_routes(
+                concatenated_route = URLUtils.join_routes(
                     final_global_route,
                     module.route,
                     controller.route,
                     additional_route
                 )
             elif isinstance(controller, WebsocketController):
-                concatenated_route = join_routes(
+                concatenated_route = URLUtils.join_routes(
                     final_global_route,
                     module.route,
                     controller.route,

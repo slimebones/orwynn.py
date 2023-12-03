@@ -1,6 +1,5 @@
 
 from pykit import validation
-from pykit.url import join_routes
 from pykit.validation import validate
 
 from orwynn.base.controller.controller import Controller
@@ -13,6 +12,7 @@ from orwynn.di.collecting.acceptordependencies import (
 from orwynn.di.container import DiContainer
 from orwynn.http import HttpController, HttpMiddleware
 from orwynn.proxy.boot import BootProxy
+from orwynn.url import URLUtils
 from orwynn.websocket import WebsocketController, WebsocketMiddleware
 
 
@@ -101,7 +101,7 @@ def __init_controllers(
                 module
             )
         )
-        final_route: str = join_routes(
+        final_route: str = URLUtils.join_routes(
             module.route, controller.route
         )
 
@@ -117,7 +117,7 @@ def __init_controllers(
             # subroute system
             for subroute in C.get_handler_subroutes():
                 websocket_covered_routes.append(
-                    join_routes(final_route, subroute)
+                    URLUtils.join_routes(final_route, subroute)
                 )
         elif type(C) is Controller:
             raise TypeError(

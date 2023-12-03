@@ -4,8 +4,8 @@ import contextlib
 import os
 
 import pytest_asyncio
-from pytest import fixture
 from pykit import validation
+from pytest import fixture
 
 from orwynn import sql
 from orwynn.app import AppMode

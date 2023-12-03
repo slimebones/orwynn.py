@@ -1,6 +1,6 @@
 import pytest
 from pykit import validation
-from pykit.mp import find as mp_find
+from pykit.mp import MapUtils
 
 from orwynn.app import AppMode
 from orwynn.apprc.apprc import AppRc

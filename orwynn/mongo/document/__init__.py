@@ -3,11 +3,10 @@ from types import NoneType
 from typing import Any, Iterable, Self
 
 from bson import ObjectId
-from pydantic.fields import ModelField
+from pykit import validation
+from pykit.fmt import FormatUtils
 from pymongo.cursor import Cursor
 from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
-from pykit import validation
-from pykit.fmt import snakefy
 
 from orwynn.di.di import Di
 from orwynn.helpers.errors import UnsupportedError
@@ -205,7 +204,7 @@ class Document(Mapping):
 
     @classmethod
     def _get_collection(cls) -> str:
-        return snakefy(cls.__name__)
+        return FormatUtils.snakefy(cls.__name__)
 
     @classmethod
     def _get_mongo(cls) -> Mongo:

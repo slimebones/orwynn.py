@@ -2,7 +2,7 @@ from orwynn.base.error.errors import (ExceptionAlreadyHandledError,
                                       MalfunctionError)
 from orwynn.base.errorhandler import ErrorHandler
 from orwynn.http import DEFAULT_HTTP_ERROR_HANDLERS
-from pykit.scheme import Scheme
+from orwynn.url import URLScheme
 from orwynn.websocket import DEFAULT_WEBSOCKET_EXCEPTION_HANDLERS
 
 
@@ -17,7 +17,7 @@ class ErrorHandlerManager:
     def get_populated_handlers_by_protocol(
         self,
         exception_handlers: set[ErrorHandler]
-    ) -> dict[Scheme, set[ErrorHandler]]:
+    ) -> dict[URLScheme, set[ErrorHandler]]:
         """
         Forms a set of handlers populated with default ones if required.
 
@@ -28,11 +28,14 @@ class ErrorHandlerManager:
         Returns:
             Populated set of exception handlers by their protocol.
         """
-        handlers_by_protocol: dict[Scheme, set[ErrorHandler]] = {}
+        handlers_by_protocol: dict[URLScheme, set[ErrorHandler]] = {}
 
         # Populate and register handlers separately for each protocol
-        for scheme in Scheme:
-            if scheme is not Scheme.HTTP and scheme is not Scheme.WEBSOCKET:
+        for scheme in URLScheme:
+            if (
+                scheme is not URLScheme.HTTP
+                and scheme is not URLScheme.Websocket
+            ):
                 continue
 
             populated_handlers: set[ErrorHandler] = \
@@ -54,7 +57,7 @@ class ErrorHandlerManager:
 
     def __get_handlers_for_protocol(
         self,
-        protocol: Scheme,
+        protocol: URLScheme,
         error_handlers: set[ErrorHandler]
     ) -> set[ErrorHandler]:
         """
@@ -71,7 +74,7 @@ class ErrorHandlerManager:
     def __populate_handlers(
         self,
         error_handlers: set[ErrorHandler],
-        protocol: Scheme
+        protocol: URLScheme
     ) -> set[ErrorHandler]:
         """
         Traverses handlers to find handled Python-builtin exceptions.
@@ -105,9 +108,9 @@ class ErrorHandlerManager:
         # not added
         DEFAULT_HANDLERS: set[type[ErrorHandler]]
         match protocol:
-            case Scheme.HTTP:
+            case URLScheme.HTTP:
                 DEFAULT_HANDLERS = DEFAULT_HTTP_ERROR_HANDLERS
-            case Scheme.WEBSOCKET:
+            case URLScheme.Websocket:
                 DEFAULT_HANDLERS = DEFAULT_WEBSOCKET_EXCEPTION_HANDLERS
             case _:
                 raise TypeError(

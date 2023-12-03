@@ -2,8 +2,8 @@ from collections.abc import Callable, Sequence
 from typing import Any, ClassVar, Self, TypeVar
 
 from pykit import validation
+from pykit.cls import ClassUtils, Static
 from pykit.errors import NotFoundError, RequiredClassAttributeError
-from pykit.klass import ClassUtils, Static
 
 from orwynn.base.dto.errors import (
     AbstractDtoClassAsBaseDtoError,

@@ -1,7 +1,7 @@
 from typing import Any
 
-from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
 from pykit.errors import TypeConversionError
+from pymongo.errors import DuplicateKeyError as PymongoDuplicateKeyError
 
 
 class UnsetIdMongoError(Exception):

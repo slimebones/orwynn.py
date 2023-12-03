@@ -1,6 +1,6 @@
 import inspect
 
-from pykit.fmt import format_chain
+from pykit.fmt import FormatUtils
 
 from orwynn.base.config import Config
 from orwynn.base.module.errors import CircularDependencyError
@@ -63,7 +63,7 @@ def _traverse(
             # Failed provider is added second time to the chain for
             # error descriptiveness
             f"provider {StarterProvider} occured twice in dependency chain"
-            f" {format_chain(chain + [StarterProvider])}"
+            f" {FormatUtils.format_chain(chain + [StarterProvider])}"
         )
 
     try:
