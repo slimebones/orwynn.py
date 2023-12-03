@@ -1525,13 +1525,13 @@ files = [
 
 [[package]]
 name = "sbpykit"
-version = "0.4.5"
+version = "0.4.6"
 description = "Python toolkit."
 optional = false
 python-versions = ">=3.11,<4.0"
 files = [
-    {file = "sbpykit-0.4.5-py3-none-any.whl", hash = "sha256:32abaefa72e4ba9191dcf151e368bd7f7a997d12558ea9669d08b59936355d61"},
-    {file = "sbpykit-0.4.5.tar.gz", hash = "sha256:25741592fc770167d3af82dbfe58b83dcad5062ac86daf192024d4256f4b9733"},
+    {file = "sbpykit-0.4.6-py3-none-any.whl", hash = "sha256:8b820aeeb61a03f5be81633748d364b1c29f71f74492f8d8ad8dafabee4e1857"},
+    {file = "sbpykit-0.4.6.tar.gz", hash = "sha256:ec43d5778042a5a607130161d92ac469a65c4bb9eaafe1d35b164928c99136d6"},
 ]
 
 [package.dependencies]
@@ -1944,4 +1944,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "6e172ac8e0dcf125da1dd8eaa329ad89de3e1a1c1bac77d0b6dc46ea3306ccaf"
+content-hash = "5208d1fff017664577ff339ce41da8e17a032794c219ac749840abef0e6f4569"
