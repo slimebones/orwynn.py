@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "orwynn"
-version = "1.3.3"
+version = "1.3.4"
 description = "Scalable web-framework with out-of-the-box architecture"
 homepage = "https://orwynn.ryzhovalex.com"
 documentation = "https://orwynn.ryzhovalex.com"
@@ -29,7 +29,7 @@ typing-extensions = "^4.7.1"
 # TODO(ryzhovalex):
 #   remove this pin after upgrading Starlette 0.31.1 (see FastAPI dependencies)
 anyio = ">=3.7.1,<4.0.0"
-sbpykit = "^0.4.6"
+sbpykit = "^0.4.7"
 
 [tool.poetry.group.dev.dependencies]
 lorem = "^0.1.1"

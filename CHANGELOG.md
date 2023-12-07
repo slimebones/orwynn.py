@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.3.4
+
+- Update PyKit.
+
 ## 1.3.3
 
 ### Features
