@@ -2,6 +2,7 @@
 
 ## 1.4.0 - UNRELEASED
 
+- Removed `base` imports.
 - Fixed indication digesting on polymorph cdto input.
 
 ## 1.3.4
