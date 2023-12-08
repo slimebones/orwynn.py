@@ -4,6 +4,7 @@
 
 - Removed `base` imports.
 - Fixed indication digesting on polymorph cdto input.
+- Added proper module version.
 
 ## 1.3.4
 
