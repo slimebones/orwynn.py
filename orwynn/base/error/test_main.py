@@ -57,8 +57,8 @@ def test_default_indication_type():
         pass
 
     i: Indication = Indication({
-        "type": Indicator.TYPE,
-        "value": Indicator.VALUE
+        "type": Indicator.Type,
+        "value": Indicator.Value
     })
 
     assert i.digest(E("whatever"))["type"] == "error"

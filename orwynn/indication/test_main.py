@@ -13,8 +13,8 @@ from tests.std.text import Text
 @fixture
 def default_indication() -> Indication:
     mp: dict[str, Indicator] = {
-        "type": Indicator.TYPE,
-        "value": Indicator.VALUE
+        "type": Indicator.Type,
+        "value": Indicator.Value
     }
     return Indication(mp)
 
@@ -50,8 +50,8 @@ def test_multiple_schemas():
         price: float
 
     i: Indication = Indication({
-        "type": Indicator.TYPE,
-        "value": Indicator.VALUE
+        "type": Indicator.Type,
+        "value": Indicator.Value
     })
 
     assert i.gen_schema(Item) == i.gen_schema(Item)

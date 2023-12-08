@@ -5,11 +5,11 @@ class Indicator(Enum):
     """List of indicators applicable to Schema's data representation.
 
     Values:
-        TYPE:
+        Type:
             Indicates that field should contain any type representation of an
             object.
-        VALUE:
+        Value:
             Indicates that field should contain a value of an object.
     """
-    TYPE = "type"
-    VALUE = "value"
+    Type = "type"
+    Value = "value"

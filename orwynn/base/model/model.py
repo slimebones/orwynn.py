@@ -6,7 +6,7 @@ from pykit import validation
 from orwynn.proxy.indicationonly import ApiIndicationOnlyProxy
 
 if TYPE_CHECKING:
-    from orwynn.indication import IndicationType
+    from orwynn.indication.type import IndicationType
 
 RecoverType = TypeVar("RecoverType", bound="Model")
 
@@ -15,10 +15,10 @@ class Model(pydantic.BaseModel):
     """Basic way to represent a data in the app.
 
     Attributes:
-        INDICATION_TYPE (optional):
+        _IndicationType (optional):
             Type to be displayed in final response body. Defaults to OK.
     """
-    INDICATION_TYPE: ClassVar[Union["IndicationType", None]] = None
+    _IndicationType: ClassVar[Union["IndicationType", None]] = None
 
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)

@@ -2,7 +2,8 @@ from enum import Enum
 
 
 class IndicationType(Enum):
-    """Possible values of field "type".
+    """
+    Possible values of field "type".
 
     Values:
         OK:

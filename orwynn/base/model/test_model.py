@@ -10,8 +10,8 @@ def test_default_indication_type():
         price: float
 
     i: Indication = Indication({
-        "type": Indicator.TYPE,
-        "value": Indicator.VALUE
+        "type": Indicator.Type,
+        "value": Indicator.Value
     })
 
     assert i.digest(Item(name="pizza", price=2.3))["type"] == "ok"
@@ -19,13 +19,13 @@ def test_default_indication_type():
 
 def test_custom_indication_type():
     class Item(Model):
-        INDICATION_TYPE = IndicationType.Error
+        _IndicationType = IndicationType.Error
         name: str
         price: float
 
     i: Indication = Indication({
-        "type": Indicator.TYPE,
-        "value": Indicator.VALUE
+        "type": Indicator.Type,
+        "value": Indicator.Value
     })
 
     assert i.digest(Item(name="pizza", price=2.3))["type"] == "error"

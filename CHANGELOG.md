@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.4.0 - UNRELEASED
+
+- Fixed indication digesting on polymorph cdto input.
+
 ## 1.3.4
 
 - Update PyKit.

@@ -65,9 +65,9 @@ class Indication:
         for k, v in self.items:
             final_field: str | type
             match v:
-                case Indicator.TYPE:
+                case Indicator.Type:
                     final_field = str
-                case Indicator.VALUE:
+                case Indicator.Value:
                     if issubclass(Entity, HttpException):
                         final_field = HttpExceptionValueSchema
                     elif issubclass(
@@ -100,11 +100,11 @@ class Indication:
 
     def __find_locations(self) -> _Locations:
         return {
-            Indicator.TYPE: MapUtils.find_location_by_field(
-                Indicator.TYPE, self.__mp
+            Indicator.Type: MapUtils.find_location_by_field(
+                Indicator.Type, self.__mp
             ),
-            Indicator.VALUE: MapUtils.find_location_by_field(
-                Indicator.VALUE, self.__mp
+            Indicator.Value: MapUtils.find_location_by_field(
+                Indicator.Value, self.__mp
             )
         }
 
@@ -132,9 +132,9 @@ class Indication:
         for k, v in self.items:
             final_field: str | dict
             match v:
-                case Indicator.TYPE:
+                case Indicator.Type:
                     final_field = self.__get_type_for_object(obj).value
-                case Indicator.VALUE:
+                case Indicator.Value:
                     if isinstance(obj, HttpException):
                         final_field = {
                             "status_code": obj.status_code,
@@ -174,6 +174,10 @@ class Indication:
                                 obj
                             )
                         }
+                    elif getattr(obj, "units", None) is not None:
+                        final_field = {"units": []}
+                        for u in obj.units:  # type: ignore
+                            final_field["units"].append(json.loads(u.json()))
                     elif isinstance(obj, Model):
                         # Since pydantic seems to not having a way to deal
                         # with Enums through dict() call (only via Config),
@@ -198,7 +202,8 @@ class Indication:
         Object: type[IndicatableTypeVar],
         mp: dict
     ) -> IndicatableTypeVar:
-        """Creates object from given map according to indication rules.
+        """
+        Creates object from given map according to indication rules.
 
         Note that your project's indication instance should match an indication
         instance used to digest the object.
@@ -207,6 +212,10 @@ class Indication:
         Model or Error.
 
         Recovering of Python's Exception are also supported.
+
+        If you need to recover Container DTO's polymorph units, you should use
+        ContainerDTO.recover_polymorph method. This recover itself won't
+        consider inheritance tree.
 
         Args:
             Object:
@@ -248,7 +257,7 @@ class Indication:
         ):
             return Object(*value["message"].split(" ; "))
         elif issubclass(Object, Model):
-            return Object.parse_obj(value)
+            return Object.model_validate(value)
         else:
             raise TypeError(
                 f"unrecognized Object {Object}"
@@ -256,7 +265,7 @@ class Indication:
 
     def __find_value_in_mp(self, mp: dict) -> dict:
         indication_value_field_location: str = \
-            self.__locations[Indicator.VALUE]
+            self.__locations[Indicator.Value]
         mp_value: dict = MapUtils.find_field_by_location(
             indication_value_field_location, mp
         )
@@ -271,10 +280,10 @@ class Indication:
         indication_type: IndicationType = IndicationType.Ok
 
         # For models default type is OK, unless is defined
-        # otherwise in INDICATION_TYPE
-        if isinstance(obj, Model) and obj.INDICATION_TYPE is not None:
+        # otherwise in IndicationType
+        if isinstance(obj, Model) and obj._IndicationType is not None:
             indication_type = validation.apply(
-                obj.INDICATION_TYPE,
+                obj._IndicationType,
                 IndicationType
             )
         # For Exception indication type is always ERROR
