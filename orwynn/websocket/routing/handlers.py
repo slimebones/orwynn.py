@@ -1,16 +1,16 @@
 from orwynn.model.model import Model
 
-from .dispatchfn import DispatchWebsocketFn
-from .genericfn import GenericWebsocketFn
+from .dispatchfunc import DispatchWebsocketFn
+from .genericfunc import GenericWebsocketFn
 
 
 class WebsocketHandler(Model):
-    fn: GenericWebsocketFn
+    func: GenericWebsocketFn
     route: str
 
 
 class DispatchWebsocketHandler(WebsocketHandler):
-    fn: DispatchWebsocketFn
+    func: DispatchWebsocketFn
     # Middleware is responding to all routes, but inside own dispatch function
     # decides whether to handle it or not.
     route: str = "*"

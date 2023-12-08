@@ -88,7 +88,7 @@ class HttpController(Controller):
                 self._methods.append(http_method)
 
                 EndpointContainer.ie().add(
-                    self.get_fn_by_http_method(http_method),
+                    self.get_func_by_http_method(http_method),
                     endpoint
                 )
 
@@ -100,26 +100,26 @@ class HttpController(Controller):
     def methods(self) -> list[URLMethod]:
         return self._methods
 
-    def get_fn_by_http_method(self, method: URLMethod) -> Callable:
-        fn: Callable
+    def get_func_by_http_method(self, method: URLMethod) -> Callable:
+        func: Callable
 
         match method:
             case URLMethod.Get:
-                fn = self.get
+                func = self.get
             case URLMethod.Post:
-                fn = self.post
+                func = self.post
             case URLMethod.Put:
-                fn = self.put
+                func = self.put
             case URLMethod.Delete:
-                fn = self.delete
+                func = self.delete
             case URLMethod.Patch:
-                fn = self.patch
+                func = self.patch
             case URLMethod.Options:
-                fn = self.options
+                func = self.options
             case _:
                 raise
 
-        return fn
+        return func
 
     def get(self, *args, **kwargs) -> dict:
         raise NotImplementedError(

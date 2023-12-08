@@ -152,14 +152,14 @@ class SHD:
             self._target_session.add(instance, _warn)
         else:
             self._add_to_execution_queue(FuncSpec(
-                fn=self._target_session.add,
+                func=self._target_session.add,
                 args=(
                     instance,
                     _warn,
                 ),
             ))
 
-    def queue(self, fnspec: FuncSpec) -> None:
+    def queue(self, funcspec: FuncSpec) -> None:
         """
         Adds a function to execution queue.
 
@@ -170,14 +170,14 @@ class SHD:
             raise ManageableSHDError(
                 operation_name="queue",
             )
-        self._add_to_execution_queue(fnspec)
+        self._add_to_execution_queue(funcspec)
 
     def delete(self, instance: object) -> None:
         if self.__is_manageable:
             self._target_session.delete(instance)
         else:
             self._add_to_execution_queue(FuncSpec(
-                fn=self._target_session.delete,
+                func=self._target_session.delete,
                 args=(
                     instance,
                 ),
@@ -227,8 +227,8 @@ class SHD:
         else:
             while True:
                 try:
-                    fn_spec: FuncSpec = self._execution_queue.get_nowait()
-                    fn_spec.call()
+                    func_spec: FuncSpec = self._execution_queue.get_nowait()
+                    func_spec.call()
                 except Empty:
                     return
 
@@ -241,19 +241,19 @@ class SHD:
 
     def _add_to_execution_queue(
         self,
-        fn_spec: FuncSpec,
+        func_spec: FuncSpec,
     ) -> None:
         """
-        Adds a fn spec to execution queue of this SHD, or of upstream one if
+        Adds a func spec to execution queue of this SHD, or of upstream one if
         it exists.
         """
         if self.__is_manageable:
-            self._execution_queue.put_nowait(fn_spec)
+            self._execution_queue.put_nowait(func_spec)
         elif self.__upstream_shd is None:
             raise LogicError(
                 f"shd={self} is not manageable, but an upstream shd is None",
             )
         else:
             self.__upstream_shd._add_to_execution_queue(
-                fn_spec,
+                func_spec,
             )

@@ -100,7 +100,7 @@ class WebsocketController(Controller):
                     # It's important to use "getattr()" here instead of
                     # "v" since last is obtained from class and is not bound to
                     # an instance.
-                    fn=getattr(self, k)
+                    func=getattr(self, k)
                 ))
 
         if events == []:

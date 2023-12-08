@@ -4,7 +4,7 @@ from orwynn.model import Model
 
 
 class Bootscript(Model):
-    fn: BootscriptCallable
+    func: BootscriptCallable
     call_time: CallTime
 
     class Config:

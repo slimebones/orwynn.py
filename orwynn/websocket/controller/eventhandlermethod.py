@@ -5,4 +5,4 @@ from orwynn.model.model import Model
 
 class WebsocketEventHandlerMethod(Model):
     name: str
-    fn: Callable
+    func: Callable

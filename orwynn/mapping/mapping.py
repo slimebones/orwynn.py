@@ -8,14 +8,14 @@ from orwynn.model.model import Model
 
 
 def if_linked(
-    fn: TDecoratedCallable
+    func: TDecoratedCallable
 ) -> TDecoratedCallable:
     def inner(self: Mapping, *args, **kwargs):
         if not self.is_linked:
             raise MappingNotLinkedError(
                 f"{self} is not linked to database yet"
             )
-        return fn(self, *args, **kwargs)
+        return func(self, *args, **kwargs)
     return typing.cast(TDecoratedCallable, inner)
 
 

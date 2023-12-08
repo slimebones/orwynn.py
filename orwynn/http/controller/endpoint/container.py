@@ -12,29 +12,29 @@ class EndpointContainer(Worker):
     """Collects endpoint specs to be used on routes registering."""
     def __init__(self) -> None:
         super().__init__()
-        self.__spec_by_fn: dict[Callable, Endpoint] = {}
+        self.__spec_by_func: dict[Callable, Endpoint] = {}
 
     @property
     def items(self) -> ItemsView[Callable, Endpoint]:
-        return self.__spec_by_fn.items()
+        return self.__spec_by_func.items()
 
-    def add(self, fn: Callable, spec: Endpoint) -> None:
-        validation.validate(fn, Callable)
+    def add(self, func: Callable, spec: Endpoint) -> None:
+        validation.validate(func, Callable)
         validation.validate(spec, Endpoint)
 
-        if fn in self.__spec_by_fn:
+        if func in self.__spec_by_func:
             raise ValueError(
-                f"{fn} already declared for proxy"
+                f"{func} already declared for proxy"
             )
 
-        self.__spec_by_fn[fn] = spec
+        self.__spec_by_func[func] = spec
 
-    def find_spec(self, fn: Callable) -> Endpoint:
-        validation.validate(fn, Callable)
+    def find_spec(self, func: Callable) -> Endpoint:
+        validation.validate(func, Callable)
 
         try:
-            return self.__spec_by_fn[fn]
+            return self.__spec_by_func[func]
         except KeyError as err:
             raise EndpointNotFoundError(
-                f"{fn} not found in proxy"
+                f"{func} not found in proxy"
             ) from err

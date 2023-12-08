@@ -3,6 +3,7 @@
 ## 1.4.0 - UNRELEASED
 
 - Removed `base` imports.
+- Renamed globally `fn` to `func`.
 - Fixed indication digesting on polymorph cdto input.
 - Added proper module version.
 

@@ -133,7 +133,7 @@ class ControllerRegister:
             for route in routes:
                 self.__websocket_stack.add_call(
                     routing_handlers.WebsocketHandler(
-                        fn=event_handler.fn,
+                        func=event_handler.func,
                         route=route
                     )
                 )
@@ -161,7 +161,7 @@ class ControllerRegister:
                 for route in routes:
                     self.__register_http_route(
                         route=route,
-                        fn=controller.get_fn_by_http_method(http_method),
+                        func=controller.get_func_by_http_method(http_method),
                         method=http_method
                     )
 
@@ -280,10 +280,10 @@ class ControllerRegister:
             return global_route
 
     def __parse_endpoint_spec_kwargs(
-        self, spec: Endpoint | None, fn: Callable
+        self, spec: Endpoint | None, func: Callable
     ) -> dict[str, Any]:
         result: dict[str, Any] = {}
-        fn_return_typehint: Any | None = typing.get_type_hints(fn).get(
+        func_return_typehint: Any | None = typing.get_type_hints(func).get(
             "return", None
         )
 
@@ -299,13 +299,13 @@ class ControllerRegister:
                 for response in spec.responses:
                     if (
                         response.status_code == spec.default_status_code
-                        and fn_return_typehint is not dict
-                        and response.Entity is not fn_return_typehint
+                        and func_return_typehint is not dict
+                        and response.Entity is not func_return_typehint
                     ):
                         raise UnmatchedEndpointEntityError(
-                            f"route handler {fn} response endpoint entity"
+                            f"route handler {func} response endpoint entity"
                             f" {response.Entity} is not match returned"
-                            f" typehint {fn_return_typehint}"
+                            f" typehint {func_return_typehint}"
                         )
 
                     final_responses[response.status_code] = {
@@ -316,13 +316,13 @@ class ControllerRegister:
             # Add default status code response AKA response_model
             if spec.default_status_code not in final_responses:
                 if (
-                    fn_return_typehint is not None
-                    and isclass(fn_return_typehint)
-                    and issubclass(fn_return_typehint, Model)
+                    func_return_typehint is not None
+                    and isclass(func_return_typehint)
+                    and issubclass(func_return_typehint, Model)
                 ):
                     final_responses[spec.default_status_code] = {
                         "model": api_indication.gen_schema(
-                            fn_return_typehint
+                            func_return_typehint
                         )
                     }
                 else:
@@ -331,7 +331,7 @@ class ControllerRegister:
             # Add default pydantic validation error
             if (
                 422 not in final_responses
-                and self.__is_pydantic_validation_error_can_occur_in_fn(fn)
+                and self.__is_pydantic_validation_error_can_occur_in_func(func)
             ):
                 final_responses[422] = {
                     "model": api_indication.gen_schema(
@@ -343,13 +343,13 @@ class ControllerRegister:
 
         return result
 
-    def __is_pydantic_validation_error_can_occur_in_fn(
+    def __is_pydantic_validation_error_can_occur_in_func(
         self,
-        fn: Callable
+        func: Callable
     ) -> bool:
         # Wrap return statement in try...except to prevent error from
         # issubclass() about wrong typehint (typehint is not a class)
-        for typehint in typing.get_type_hints(fn).values():
+        for typehint in typing.get_type_hints(func).values():
             try:
                 flag: bool = issubclass(typehint, pydantic.BaseModel)
             except TypeError:
@@ -360,28 +360,28 @@ class ControllerRegister:
         return False
 
     def __register_http_route(
-        self, *, route: str, fn: Callable, method: URLMethod
+        self, *, route: str, func: Callable, method: URLMethod
     ) -> None:
-        """Registers a fn for a route.
+        """Registers a func for a route.
 
         Attributes:
             route:
                 Route to register to.
-            fn:
+            func:
                 Function to register.
             method:
                 HTTP method function is handling.
         """
         validation.validate(route, str)
-        validation.validate(fn, Callable)
+        validation.validate(func, Callable)
         validation.validate(method, URLMethod)
 
-        app_fn: Callable | None = \
+        app_func: Callable | None = \
             self.__app.HTTP_METHODS_TO_REGISTERING_FUNCTIONS.get(
                 method, None
             )
 
-        if not app_fn:
+        if not app_func:
             raise UnsupportedHttpMethodError(
                 f"HTTP method {method} is not supported"
             )
@@ -402,14 +402,14 @@ class ControllerRegister:
 
         spec: Endpoint | None
         try:
-            spec = EndpointContainer.ie().find_spec(fn)
+            spec = EndpointContainer.ie().find_spec(func)
         except EndpointNotFoundError:
             spec = None
 
-        app_fn(
+        app_func(
             route,
             **self.__parse_endpoint_spec_kwargs(
                 spec,
-                fn
+                func
             )
-        )(fn)
+        )(func)

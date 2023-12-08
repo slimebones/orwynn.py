@@ -91,7 +91,7 @@ class ContainerDTO(DTO):
     def convert(
         cls,
         tables: list[_TTable],
-        convertion_fn: Callable[[_TTable], _TUnitDTO],
+        convertion_func: Callable[[_TTable], _TUnitDTO],
         container_kwargs: dict[str, Any] | None = None,
     ) -> Self:
         Base: type[UnitDTO] = cls._get_base_attr()
@@ -99,7 +99,7 @@ class ContainerDTO(DTO):
         result: list[_TUnitDTO] = []
 
         for table in tables:
-            converted: _TUnitDTO = convertion_fn(table)
+            converted: _TUnitDTO = convertion_func(table)
             validation.validate(converted, Base)
             result.append(converted)
 

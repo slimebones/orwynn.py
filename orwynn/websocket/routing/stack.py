@@ -148,7 +148,7 @@ class WebsocketStack:
         # For middleware pass special NextCallHandler with data of all handler
         # functions ahead, except first one which is executed first.
         if isinstance(first_handler, DispatchWebsocketHandler):
-            await first_handler.fn(
+            await first_handler.func(
                 websocket,
                 NextCallHandler(_fw_handlers[1:], url_vars=url_vars)
             )

@@ -38,7 +38,7 @@ class App(FrameworkService):
             self._wrapped_core_app = self._core_app
 
         self._fw_register_middleware = self._core_app.add_middleware
-        self._fw_register_exception_handler_fn = \
+        self._fw_register_exception_handler_func = \
             self._core_app.add_exception_handler
         self._fw_websocket_handler = self._core_app.websocket
 

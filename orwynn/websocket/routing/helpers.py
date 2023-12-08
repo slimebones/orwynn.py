@@ -38,7 +38,7 @@ def get_handler_kwargs(
     kwargs: HandlerKwargs = {}
 
 
-    for param in inspect.signature(handler.fn).parameters.values():
+    for param in inspect.signature(handler.func).parameters.values():
         _check_if_duplicate(
             kwargs=kwargs,
             param=param

@@ -38,7 +38,7 @@ class NextCallHandler:
                         f" {current_handler}"
                     )
 
-                await current_handler.fn(
+                await current_handler.func(
                     websocket,
                     self.__class__(
                         handlers=self.__handlers[self.__current_index+1:],
@@ -46,7 +46,7 @@ class NextCallHandler:
                     )
                 )
             else:
-                await current_handler.fn(
+                await current_handler.func(
                     websocket,
                     **get_handler_kwargs(current_handler, self.__url_vars)
                 )

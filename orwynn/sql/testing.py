@@ -18,7 +18,7 @@ class S1Item(Table):
 @pytest.fixture
 def create_tables_bootscript() -> Bootscript:
     return Bootscript(
-        fn=SQLUtils.create_tables,
+        func=SQLUtils.create_tables,
         call_time=CallTime.AFTER_ALL,
     )
 

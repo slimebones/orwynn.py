@@ -200,7 +200,7 @@ class SQLUtils(Static):
     def get_one_and_convert(
         id: str,
         Table_: type[TTable],
-        convertion_fn: Callable[[TTable], ConvertedModel],
+        convertion_func: Callable[[TTable], ConvertedModel],
         shd: SHD,
     ) -> ConvertedModel:
         """
@@ -211,7 +211,7 @@ class SQLUtils(Static):
                 Id to match.
             Table_:
                 Table where object resides.
-            convertion_fn:
+            convertion_func:
                 Convertion function to be used to convert Table->Model.
             session:
                 SqlA shd.
@@ -220,10 +220,10 @@ class SQLUtils(Static):
             Converted model.
         """
         validation.validate(Table_, Table)
-        validation.validate(convertion_fn, Callable)
+        validation.validate(convertion_func, Callable)
         validation.validate(shd, SHD)
 
-        return convertion_fn(SQLUtils.get_one(
+        return convertion_func(SQLUtils.get_one(
             id,
             Table_,
             shd,
@@ -232,7 +232,7 @@ class SQLUtils(Static):
     @staticmethod
     def get_all_and_convert(
         Table_: type[TTable],
-        convertion_fn: Callable[[TTable], ConvertedModel],
+        convertion_func: Callable[[TTable], ConvertedModel],
         ListedConvertedModel_: type[ListedConvertedModel],
         listed_converted_model_units_key: str,
         shd: SHD,
@@ -244,7 +244,7 @@ class SQLUtils(Static):
         Args:
             Table_:
                 Table where object resides.
-            convertion_fn:
+            convertion_func:
                 Convertion function to be used to convert Table->Model.
             ListedConvertedModel_:
                 Model to be used as a container for all converted models.
@@ -258,7 +258,7 @@ class SQLUtils(Static):
             Listed model with converted models.
         """
         validation.validate(Table_, Table)
-        validation.validate(convertion_fn, Callable)
+        validation.validate(convertion_func, Callable)
         validation.validate(ListedConvertedModel_, Model)
         validation.validate(listed_converted_model_units_key, str)
         validation.validate(shd, SHD)
@@ -269,7 +269,7 @@ class SQLUtils(Static):
         )
         converted_list: list[ConvertedModel] = []
         for row in rows:
-            converted_list.append(convertion_fn(row))
+            converted_list.append(convertion_func(row))
         return ListedConvertedModel_.parse_obj({
             listed_converted_model_units_key: converted_list,
         })

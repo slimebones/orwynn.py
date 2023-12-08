@@ -15,11 +15,11 @@ class SomeService(Service):
         self.some_var: int = 0
 
 
-def fn(some_service: SomeService) -> None:
+def func(some_service: SomeService) -> None:
     some_service.some_var = 1
 
 
-async def async_fn(some_service: SomeService) -> None:
+async def async_func(some_service: SomeService) -> None:
     some_service.some_var = 5
 
 
@@ -29,7 +29,7 @@ async def test_basic():
         Module(Providers=[SomeService]),
         bootscripts=[
             Bootscript(
-                fn=fn,
+                func=func,
                 call_time=CallTime.AFTER_ALL
             )
         ]
@@ -49,7 +49,7 @@ async def test_async():
         Module(Providers=[SomeService]),
         bootscripts=[
             Bootscript(
-                fn=fn,
+                func=func,
                 call_time=CallTime.AFTER_ALL
             )
         ]

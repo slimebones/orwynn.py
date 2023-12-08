@@ -4,13 +4,13 @@ from .client import Client
 from .embeddedclient import EmbeddedTestClient
 
 
-def get_log_apprc(check_fn: Callable) -> dict:
+def get_log_apprc(check_func: Callable) -> dict:
     return {
         "prod": {
             "Log": {
                 "handlers": [
                     {
-                        "sink": check_fn,
+                        "sink": check_func,
                         "serialize": True
                     }
                 ]

@@ -192,13 +192,13 @@ class MiddlewareRegister:
         elif isinstance(middleware, ErrorHandlerHttpMiddleware):
             self.__register_exception_http_middleware(middleware)
         elif isinstance(middleware, HttpMiddleware):
-            self.__register_http_middleware_fn(
+            self.__register_http_middleware_func(
                 middleware.dispatch
             )
         elif isinstance(middleware, WebsocketMiddleware):
             self.__websocket_stack.add_call(
                 routing_handlers.DispatchWebsocketHandler(
-                    fn=middleware.dispatch
+                    func=middleware.dispatch
                 )
             )
         else:
@@ -206,13 +206,13 @@ class MiddlewareRegister:
                 f"unrecognized middleware {middleware}"
             )
 
-    def __register_http_middleware_fn(
+    def __register_http_middleware_func(
         self,
-        fn: Callable
+        func: Callable
     ) -> None:
         self.__app._fw_register_middleware(
             StarletteBaseHTTPMiddleware,
-            dispatch=fn
+            dispatch=func
         )
 
     def __register_exception_http_middleware(
@@ -240,25 +240,25 @@ class MiddlewareRegister:
                 custom_base_exception_handler = handler
                 continue
             else:
-                self.__app._fw_register_exception_handler_fn(
+                self.__app._fw_register_exception_handler_func(
                     handler.HandledException,
                     handler._fw_handle_wrapper
                 )
 
         for Remaining in __RemainingExceptionDirectSubclasses:
-            handle_fn: Callable
+            handle_func: Callable
             if Remaining is HttpException:
-                handle_fn = DefaultHttpErrorHandler().handle
+                handle_func = DefaultHttpErrorHandler().handle
             else:
                 # If custom exception handler is defined, pass it's handler,
                 # for all remaining subclasses, else use default exc handler
                 if custom_base_exception_handler:
-                    handle_fn = \
+                    handle_func = \
                         custom_base_exception_handler._fw_handle_wrapper
                 else:
-                    handle_fn = DefaultErrorHandler()._fw_handle_wrapper
+                    handle_func = DefaultErrorHandler()._fw_handle_wrapper
 
-            self.__app._fw_register_exception_handler_fn(
+            self.__app._fw_register_exception_handler_func(
                 Remaining,
-                handle_fn
+                handle_func
             )

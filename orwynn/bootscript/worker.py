@@ -68,12 +68,12 @@ class BootscriptWorker(Worker):
         di_container: DiContainer
     ) -> None:
         dependencies: dict[str, Provider] = collect_dependencies_for_acceptor(
-            acceptor_callable=script.fn,
+            acceptor_callable=script.func,
             container=di_container,
             acceptor_module=None
         )
 
-        if inspect.iscoroutinefunction(script.fn):
-            await script.fn(**dependencies)
+        if inspect.iscoroutinefunction(script.func):
+            await script.func(**dependencies)
         else:
-            script.fn(**dependencies)  # type: ignore
+            script.func(**dependencies)  # type: ignore
