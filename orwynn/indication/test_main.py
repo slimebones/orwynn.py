@@ -4,6 +4,7 @@ from typing import Any
 from pykit import validation
 from pytest import fixture
 
+from orwynn.base.dto import ContainerDTO, UnitDTO
 from orwynn.base.model.model import Model
 from orwynn.indication.indication import Indication
 from orwynn.indication.indicator import Indicator
@@ -130,3 +131,54 @@ def test_digest_error(default_indication: Indication):
     assert data["type"] == "error"
     assert data["value"]["message"] == "hello world"
     assert data["value"]["code"] == "hello"
+
+
+def test_digest_polymorph(bare_boot):
+    class ItemUDTO(UnitDTO):
+        Code = "slimebones.orwynn.indication-testing.udto.item"
+        price: float
+
+    class SuperItemUDTO(ItemUDTO):
+        Code = "slimebones.orwynn.indication-testing.udto.super-item"
+        coolness: int
+
+    class MiniItemUDTO(ItemUDTO):
+        Code = "slimebones.orwynn.indication-testing.udto.mini-item"
+        size: int
+
+    class TinyItemUDTO(MiniItemUDTO):
+        Code = "slimebones.orwynn.indication-testing.udto.tiny-item"
+        is_really_small: bool
+
+    class ItemCDTO(ContainerDTO):
+        Base = ItemUDTO
+        units: list[ItemUDTO]
+
+    cdto = ItemCDTO(units=[
+        ItemUDTO(id="1", price=10.5),
+        SuperItemUDTO(id="2", price=50.3, coolness=100),
+        MiniItemUDTO(id="3", price=2.1, size=3),
+        TinyItemUDTO(id="4", price=1.5, size=1, is_really_small=True)
+    ])
+
+    api = cdto.api
+
+    u = api["value"]["units"][0]
+    assert u["id"] == "1"
+    assert u["price"] == 10.5
+
+    u = api["value"]["units"][1]
+    assert u["id"] == "2"
+    assert u["price"] == 50.3
+    assert u["coolness"] == 100
+
+    u = api["value"]["units"][2]
+    assert u["id"] == "3"
+    assert u["price"] == 2.1
+    assert u["size"] == 3
+
+    u = api["value"]["units"][3]
+    assert u["id"] == "4"
+    assert u["price"] == 1.5
+    assert u["size"] == 1
+    assert u["is_really_small"] is True
