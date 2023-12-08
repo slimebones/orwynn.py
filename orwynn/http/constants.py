@@ -1,4 +1,4 @@
-from orwynn.base.errorhandler import ErrorHandler
+from orwynn.errorhandler import ErrorHandler
 from orwynn.http.errorhandler.middleware import ErrorHandlerHttpMiddleware
 from orwynn.http.middleware.builtinmiddleware import BuiltinHttpMiddleware
 

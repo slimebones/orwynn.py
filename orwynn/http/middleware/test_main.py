@@ -2,7 +2,6 @@ from typing import Callable
 
 import pytest
 
-from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.http import (
     Endpoint,
@@ -12,6 +11,7 @@ from orwynn.http import (
     HttpResponse,
     TestHttpResponse,
 )
+from orwynn.module.module import Module
 from orwynn.testing.client import Client
 
 

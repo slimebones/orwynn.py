@@ -1,4 +1,4 @@
-from orwynn.base.module.module import Module
+from orwynn.module.module import Module
 from orwynn.sql.search import TableSearch
 from orwynn.sql.shd import SHD
 from orwynn.sql.stateflag import StateFlag

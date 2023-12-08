@@ -1,11 +1,11 @@
 from orwynn import mongo
 from orwynn.app import App, AppConfig
-from orwynn.base.module import Module
 from orwynn.boot import BootConfig
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.provider import Provider
 from orwynn.http.log.configs import LogHttpMiddlewareConfig
 from orwynn.log import LogConfig
+from orwynn.module import Module
 from orwynn.mongo import Mongo, MongoConfig, MongoStateFlagService
 from tests.std.float import FloatController, FloatService, float_module
 from tests.std.number import NumberController, NumberService, number_module

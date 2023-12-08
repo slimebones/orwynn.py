@@ -2,7 +2,7 @@ import inspect
 from types import NoneType
 from typing import TYPE_CHECKING, Any, Callable, Optional, Self, TypeVar
 from orwynn.apiversion import ApiVersion
-from orwynn.base.model.model import Model
+from orwynn.model.model import Model
 from orwynn.proxy.boot import BootProxy
 
 from orwynn.testing.embeddedclient import EmbeddedTestClient

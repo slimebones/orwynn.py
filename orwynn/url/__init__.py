@@ -9,7 +9,7 @@ from pykit import validation
 from pykit.cls import Static
 from starlette.datastructures import URL as _StarletteURL
 
-from orwynn.base.model.model import Model
+from orwynn.model.model import Model
 
 URL = _StarletteURL
 

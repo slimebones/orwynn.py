@@ -1,6 +1,6 @@
 import pytest
 
-from orwynn.base import Module
+from orwynn import Module
 from orwynn.boot import Boot
 from orwynn.http import Endpoint, HttpController
 from orwynn.http.log.middleware import LogMiddleware

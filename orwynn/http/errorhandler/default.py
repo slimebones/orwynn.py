@@ -1,6 +1,6 @@
 from fastapi.exceptions import RequestValidationError
 
-from orwynn.base.errorhandler import ErrorHandler
+from orwynn.errorhandler import ErrorHandler
 from orwynn.http.errors import HttpException
 from orwynn.http.requests import HttpRequest
 from orwynn.http.responses import HttpResponse, JsonHttpResponse

@@ -5,10 +5,10 @@ from pykit.map import MapUtils
 
 from orwynn.app import AppMode
 from orwynn.apprc.apprc import AppRc
-from orwynn.base.config import Config
-from orwynn.base.module.module import Module
 from orwynn.boot import Boot
+from orwynn.config import Config
 from orwynn.di.di import Di
+from orwynn.module.module import Module
 
 
 class Menu(RootModel):

@@ -1,9 +1,9 @@
 from pykit.validation import expect
 from pytest import fixture
 
-from orwynn.base.module.errors import CircularDependencyError
-from orwynn.base.module.module import Module
 from orwynn.di.collecting.modulecollector import ModuleCollector
+from orwynn.module.errors import CircularDependencyError
+from orwynn.module.module import Module
 from tests.std.assertion import Assertion
 
 

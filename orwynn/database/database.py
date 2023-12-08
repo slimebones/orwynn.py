@@ -1,5 +1,5 @@
 
-from orwynn.base.service.service import Service
+from orwynn.service.service import Service
 
 
 class Database(Service):

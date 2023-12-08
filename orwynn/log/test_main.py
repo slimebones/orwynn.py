@@ -2,11 +2,11 @@ import json
 
 import pytest
 
-from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.http import Endpoint, HttpController
 from orwynn.log import Log
 from orwynn.log.types import LogMessage
+from orwynn.module.module import Module
 from orwynn.testing import Writer, get_log_apprc
 from orwynn.websocket import Websocket, WebsocketController
 

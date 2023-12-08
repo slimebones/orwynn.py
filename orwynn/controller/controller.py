@@ -4,7 +4,7 @@ from typing import ClassVar, Literal
 
 from pykit import validation
 
-from orwynn.base.controller.errors import (
+from orwynn.controller.errors import (
     MissingControllerClassAttributeError,
 )
 from orwynn.url import URLUtils

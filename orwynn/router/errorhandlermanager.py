@@ -1,6 +1,6 @@
-from orwynn.base.error.errors import (ExceptionAlreadyHandledError,
+from orwynn.error.errors import (ExceptionAlreadyHandledError,
                                       MalfunctionError)
-from orwynn.base.errorhandler import ErrorHandler
+from orwynn.errorhandler import ErrorHandler
 from orwynn.http import DEFAULT_HTTP_ERROR_HANDLERS
 from orwynn.url import URLScheme
 from orwynn.websocket import DEFAULT_WEBSOCKET_EXCEPTION_HANDLERS

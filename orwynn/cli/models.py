@@ -1,5 +1,5 @@
-from orwynn.base.model.model import Model
 from orwynn.cli.enums import CliCommand
+from orwynn.model.model import Model
 
 
 class CliCommandData(Model):

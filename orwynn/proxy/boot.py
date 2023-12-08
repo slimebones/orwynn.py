@@ -1,14 +1,14 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from orwynn.base.worker import Worker
 from orwynn.url import URLScheme
+from orwynn.worker import Worker
 
 if TYPE_CHECKING:
     from orwynn.apiversion import ApiVersion
     from orwynn.app import AppMode
     from orwynn.apprc import AppRc
-    from orwynn.base.errorhandler.errorhandler import ErrorHandler
+    from orwynn.errorhandler.errorhandler import ErrorHandler
     from orwynn.indication.indication import Indication
 
 

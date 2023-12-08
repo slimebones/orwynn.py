@@ -6,8 +6,8 @@ from pymongo.client_session import ClientSession
 from pymongo.cursor import Cursor
 from pymongo.database import Database as PymongoDatabase
 
-from orwynn.base.database import Database
-from orwynn.base.database.errors import DatabaseEntityNotFoundError
+from orwynn.database import Database
+from orwynn.database.errors import DatabaseEntityNotFoundError
 from orwynn.mongo.config import MongoConfig
 from orwynn.mongo.entity import MongoEntity
 

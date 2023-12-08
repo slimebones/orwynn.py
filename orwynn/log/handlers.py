@@ -3,8 +3,8 @@ from typing import Callable
 
 from pykit.types import CashOperator
 
-from orwynn.base.model.model import Model
 from orwynn.log.types import LogMessage
+from orwynn.model.model import Model
 
 
 class LogHandler(Model):

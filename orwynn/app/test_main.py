@@ -2,8 +2,8 @@ import pytest
 from pytest import fixture
 
 from orwynn.app.app import App
-from orwynn.base.module import Module
 from orwynn.boot import Boot
+from orwynn.module import Module
 from orwynn.websocket import Websocket, WebsocketController
 
 

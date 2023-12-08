@@ -2,8 +2,7 @@ import inspect
 
 import pytest
 
-from orwynn.base.config import Config
-from orwynn.base.module import Module
+from orwynn.config import Config
 from orwynn.di.collecting.modulecollector import ModuleCollector
 from orwynn.di.collecting.providerdependencies.collect import (
     collect_provider_dependencies,
@@ -15,6 +14,7 @@ from orwynn.di.isprovider import is_provider
 from orwynn.di.provider import Provider
 from orwynn.http.log.configs import LogHttpMiddlewareConfig
 from orwynn.log import LogConfig
+from orwynn.module import Module
 from tests.std.assertion import Assertion
 
 

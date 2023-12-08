@@ -1,7 +1,7 @@
 from typing import Any
 
-from orwynn.base.config import Config
-from orwynn.base.error import MalfunctionError
+from orwynn.config import Config
+from orwynn.error import MalfunctionError
 from sqlalchemy.pool import StaticPool, Pool
 
 from orwynn.sql.poolclass import PoolclassStr

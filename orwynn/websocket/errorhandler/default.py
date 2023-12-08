@@ -1,4 +1,4 @@
-from orwynn.base.errorhandler.errorhandler import ErrorHandler
+from orwynn.errorhandler.errorhandler import ErrorHandler
 from orwynn.proxy.boot import BootProxy
 from orwynn.websocket.websocket import Websocket
 

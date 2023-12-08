@@ -1,9 +1,9 @@
 """List of classes an user can subclass from."""
-from orwynn.base.controller.controller import Controller
-from orwynn.base.errorhandler.errorhandler import ErrorHandler
-from orwynn.base.middleware import Middleware
-from orwynn.base.model.model import Model
-from orwynn.base.service.service import Service
+from orwynn.controller.controller import Controller
+from orwynn.errorhandler.errorhandler import ErrorHandler
+from orwynn.middleware import Middleware
+from orwynn.model.model import Model
+from orwynn.service.service import Service
 
 # Note that here listed the most basic classes. E.g. Config is not listed
 # since it is a derivative from the Model and on the stage of DI

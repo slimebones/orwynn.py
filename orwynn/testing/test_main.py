@@ -1,9 +1,9 @@
 import pytest
 from fastapi import Header
 
-from orwynn.base.module.module import Module
 from orwynn.boot import Boot
 from orwynn.http import Endpoint, HttpController
+from orwynn.module.module import Module
 from orwynn.testing.client import Client
 from orwynn.testingtools import HeadersGetController
 

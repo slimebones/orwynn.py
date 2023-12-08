@@ -1,4 +1,4 @@
-from orwynn.base.error.code import ErrorCode, get_error_code
+from orwynn.error.code import ErrorCode, get_error_code
 
 from .errors import MalfunctionError
 from .utils import (

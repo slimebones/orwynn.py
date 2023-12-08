@@ -4,10 +4,10 @@ from typing import Any
 from pykit import validation
 from pytest import fixture
 
-from orwynn.base.dto import ContainerDTO, UnitDTO
-from orwynn.base.model.model import Model
+from orwynn.dto import ContainerDTO, UnitDTO
 from orwynn.indication.indication import Indication
 from orwynn.indication.indicator import Indicator
+from orwynn.model.model import Model
 from tests.std.text import Text
 
 

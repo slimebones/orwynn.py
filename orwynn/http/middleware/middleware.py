@@ -1,7 +1,7 @@
-from orwynn.base.middleware import Middleware
 from orwynn.http.middleware.nextcall import HttpNextCall
 from orwynn.http.requests import HttpRequest
 from orwynn.http.responses import HttpResponse
+from orwynn.middleware import Middleware
 
 
 class HttpMiddleware(Middleware):

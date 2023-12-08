@@ -1,10 +1,10 @@
-from orwynn.base.config import Config
-from orwynn.base.controller.controller import Controller
-from orwynn.base.errorhandler.errorhandler import ErrorHandler
-from orwynn.base.middleware import Middleware
-from orwynn.base.service import FrameworkService, Service
+from orwynn.config import Config
+from orwynn.controller.controller import Controller
 from orwynn.di.acceptor import Acceptor
 from orwynn.di.provider import Provider
+from orwynn.errorhandler.errorhandler import ErrorHandler
+from orwynn.middleware import Middleware
+from orwynn.service import FrameworkService, Service
 
 """
 List of builtin classes in Provider category.

@@ -10,8 +10,8 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from orwynn import sql
-from orwynn.base.module import Module
 from orwynn.boot import Boot
+from orwynn.module import Module
 
 from .config import SQLConfig
 from .enums import SQLDatabaseKind

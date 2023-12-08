@@ -1,5 +1,5 @@
 
-from orwynn.base.error.utils import (
+from orwynn.error.utils import (
     find_detailed_class_for_exception,
 )
 

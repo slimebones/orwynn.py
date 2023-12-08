@@ -1,9 +1,9 @@
 import pytest
 from pykit import validation
 
-from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.http import Endpoint, HttpController
+from orwynn.module.module import Module
 
 from . import ApiVersion
 from .errors import UnsupportedVersionError

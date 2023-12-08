@@ -3,7 +3,7 @@ from typing import ClassVar
 
 from pykit import validation
 
-from orwynn.base.error.errors import MalfunctionError
+from orwynn.error.errors import MalfunctionError
 from orwynn.helpers.web import GenericRequest, GenericResponse
 from orwynn.log import LogUtils
 from orwynn.proxy.boot import BootProxy

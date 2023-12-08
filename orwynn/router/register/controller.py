@@ -7,11 +7,9 @@ from pykit import validation
 
 from orwynn.apiversion import ApiVersion
 from orwynn.app import App
-from orwynn.base.controller.controller import Controller
-from orwynn.base.controller.errors import AlreadyRegisteredMethodError
-from orwynn.base.error import MalfunctionError
-from orwynn.base.model import Model
-from orwynn.base.module import Module
+from orwynn.controller.controller import Controller
+from orwynn.controller.errors import AlreadyRegisteredMethodError
+from orwynn.error import MalfunctionError
 from orwynn.helpers.web import REQUEST_METHOD_BY_PROTOCOL
 from orwynn.http import Endpoint, EndpointContainer, HttpController
 from orwynn.http.errors import (
@@ -19,6 +17,8 @@ from orwynn.http.errors import (
     UnsupportedHttpMethodError,
 )
 from orwynn.indication.indication import Indication
+from orwynn.model import Model
+from orwynn.module import Module
 from orwynn.proxy.boot import BootProxy
 from orwynn.router.errors import (
     UnmatchedEndpointEntityError,

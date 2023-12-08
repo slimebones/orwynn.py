@@ -2,15 +2,15 @@
 from pykit import validation
 from pykit.validation import validate
 
-from orwynn.base.controller.controller import Controller
-from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
-from orwynn.base.model.model import Model
-from orwynn.base.module.module import Module
+from orwynn.controller.controller import Controller
 from orwynn.di.collecting.acceptordependencies import (
     collect_dependencies_for_acceptor,
 )
 from orwynn.di.container import DiContainer
 from orwynn.http import HttpController, HttpMiddleware
+from orwynn.middleware import GlobalMiddlewareSetup, Middleware
+from orwynn.model.model import Model
+from orwynn.module.module import Module
 from orwynn.proxy.boot import BootProxy
 from orwynn.url import URLUtils
 from orwynn.websocket import WebsocketController, WebsocketMiddleware

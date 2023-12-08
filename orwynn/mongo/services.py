@@ -3,7 +3,7 @@ from typing import Any
 from pykit.errors import NotFoundError
 from pykit.func import FuncSpec
 
-from orwynn.base import Service
+from orwynn import Service
 from orwynn.mongo.search import MongoStateFlagSearch
 from orwynn.mongo.stateflag import MongoStateFlag
 from orwynn.mongo.utils import MongoUtils

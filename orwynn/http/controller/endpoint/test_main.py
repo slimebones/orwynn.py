@@ -3,10 +3,10 @@ import pytest_asyncio
 from pykit import validation
 
 from orwynn import mongo
-from orwynn.base.model.model import Model
-from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.http import Endpoint, EndpointResponse, HttpController
+from orwynn.model.model import Model
+from orwynn.module.module import Module
 from orwynn.router.errors import (
     UnmatchedEndpointEntityError,
 )

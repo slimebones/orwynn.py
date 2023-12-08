@@ -3,11 +3,11 @@ from types import NoneType
 
 from pykit import validation
 
-from orwynn.base.error.errors import MalfunctionError
-from orwynn.base.error.utils import (
+from orwynn.error.errors import MalfunctionError
+from orwynn.error.utils import (
     find_detailed_class_for_exception,
 )
-from orwynn.base.errorhandler.errorhandler import ErrorHandler
+from orwynn.errorhandler.errorhandler import ErrorHandler
 from orwynn.websocket.context.id import (
     WebsocketRequestContextId,
 )

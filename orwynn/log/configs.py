@@ -1,4 +1,4 @@
-from orwynn.base.config import Config
+from orwynn.config import Config
 from orwynn.log.handlers import LogHandler
 
 

@@ -10,18 +10,18 @@ from pykit.validation.errors import (
 )
 
 from orwynn.apiversion import ApiVersion
-from orwynn.base.controller.errors import (
+from orwynn.boot import Boot
+from orwynn.controller.errors import (
     AlreadyRegisteredMethodError,
     MissingControllerClassAttributeError,
 )
-from orwynn.base.model import Model
-from orwynn.base.module import Module
-from orwynn.boot import Boot
 from orwynn.di.di import Di
 from orwynn.helpers.web import REQUEST_METHOD_BY_PROTOCOL
 from orwynn.http import Endpoint, HttpController
 from orwynn.http.controller.errors import DefinedTwiceControllerMethodError
 from orwynn.http.errors import HttpException, UnsupportedHttpMethodError
+from orwynn.model import Model
+from orwynn.module import Module
 from orwynn.proxy.boot import BootProxy
 from orwynn.testing import Client
 from orwynn.url import URLScheme

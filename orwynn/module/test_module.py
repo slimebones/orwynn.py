@@ -1,6 +1,5 @@
 from pykit import validation
 
-from orwynn.base.module.module import Module
 from orwynn.http import (
     Endpoint,
     HttpController,
@@ -9,6 +8,7 @@ from orwynn.http import (
     HttpRequest,
     HttpResponse,
 )
+from orwynn.module.module import Module
 
 
 def test_controller_added_to_no_route():

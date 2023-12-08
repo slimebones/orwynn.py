@@ -1,11 +1,11 @@
 from orwynn.apiversion import ApiVersion
 from orwynn.app.app import App
-from orwynn.base.controller.controller import Controller
-from orwynn.base.errorhandler.errorhandler import ErrorHandler
-from orwynn.base.middleware import Middleware
-from orwynn.base.module.module import Module
-from orwynn.base.worker.worker import Worker
+from orwynn.controller.controller import Controller
+from orwynn.errorhandler.errorhandler import ErrorHandler
+from orwynn.middleware import Middleware
+from orwynn.module.module import Module
 from orwynn.websocket import WebsocketStack
+from orwynn.worker.worker import Worker
 
 from .register.controller import ControllerRegister
 from .register.middleware import MiddlewareRegister

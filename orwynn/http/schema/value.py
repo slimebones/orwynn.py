@@ -1,4 +1,4 @@
-from orwynn.base.error import ErrorValueSchema
+from orwynn.error import ErrorValueSchema
 
 
 class HttpExceptionValueSchema(ErrorValueSchema):

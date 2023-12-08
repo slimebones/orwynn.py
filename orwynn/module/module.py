@@ -5,14 +5,14 @@ from typing import Self
 from pykit import validation
 from pykit.validation import validate, validate_route
 
-from orwynn.base.controller import Controller
-from orwynn.base.middleware import Middleware as MiddlewareClass
-from orwynn.base.module.errors import (
+from orwynn.controller import Controller
+from orwynn.middleware import Middleware as MiddlewareClass
+from orwynn.module.errors import (
     CircularDependencyError,
     EmptyRouteError,
     FrameworkServiceModuleReferenceError,
 )
-from orwynn.base.service.framework import FrameworkService
+from orwynn.service.framework import FrameworkService
 
 
 class Module:

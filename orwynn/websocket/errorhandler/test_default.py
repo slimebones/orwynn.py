@@ -1,9 +1,9 @@
 import pytest
 from pykit import validation
 
-from orwynn.base.errorhandler.errorhandler import ErrorHandler
-from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
+from orwynn.errorhandler.errorhandler import ErrorHandler
+from orwynn.module.module import Module
 from orwynn.proxy.boot import BootProxy
 from orwynn.url import URLScheme
 from orwynn.websocket import Websocket, WebsocketController

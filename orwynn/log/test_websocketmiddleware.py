@@ -2,9 +2,9 @@ import json
 
 import pytest
 
-from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.log import Log
+from orwynn.module.module import Module
 from orwynn.testing import Writer
 from orwynn.testing.client import Client
 from orwynn.websocket import Websocket, WebsocketController

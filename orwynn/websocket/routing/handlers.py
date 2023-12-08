@@ -1,4 +1,4 @@
-from orwynn.base.model.model import Model
+from orwynn.model.model import Model
 
 from .dispatchfn import DispatchWebsocketFn
 from .genericfn import GenericWebsocketFn

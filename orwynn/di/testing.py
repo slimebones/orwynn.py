@@ -1,12 +1,12 @@
 import pytest_asyncio
 
-from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.di.collecting.providerdependencies.map import (
     ProviderDependenciesMap,
 )
 from orwynn.di.container import DiContainer
 from orwynn.di.init.providers import init_providers
+from orwynn.module.module import Module
 
 
 @pytest_asyncio.fixture

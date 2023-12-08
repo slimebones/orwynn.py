@@ -1,8 +1,6 @@
 from pykit.fmt import FormatUtils
 
-from orwynn.base.config import Config
-from orwynn.base.module import Module
-from orwynn.base.module.errors import CircularDependencyError
+from orwynn.config import Config
 from orwynn.di.availability import check_availability
 from orwynn.di.collecting.errors import (
     ProviderAlreadyInitializedForMapError,
@@ -16,6 +14,8 @@ from orwynn.di.collecting.providerdependencies.map import (
 from orwynn.di.errors import NotProviderError
 from orwynn.di.isprovider import is_provider
 from orwynn.di.provider import Provider
+from orwynn.module import Module
+from orwynn.module.errors import CircularDependencyError
 
 
 def collect_provider_dependencies(

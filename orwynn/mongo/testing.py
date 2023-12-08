@@ -1,8 +1,8 @@
 import pytest_asyncio
 
 from orwynn import mongo
-from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
+from orwynn.module.module import Module
 
 
 @pytest_asyncio.fixture

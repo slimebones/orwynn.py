@@ -4,10 +4,10 @@ from typing import Literal
 
 import pytest
 
-from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.http import Endpoint, HttpController, LogMiddleware
 from orwynn.log import Log
+from orwynn.module.module import Module
 from orwynn.proxy.boot import BootProxy
 from orwynn.testing import Writer
 from orwynn.testing.client import Client

@@ -4,8 +4,7 @@ import pytest
 from pykit import validation
 from pykit.errors import NotFoundError
 
-from orwynn import sql
-from orwynn.base import Module, Service
+from orwynn import Module, Service, sql
 from orwynn.boot import Boot
 from orwynn.bootscript import Bootscript
 from orwynn.di.di import Di

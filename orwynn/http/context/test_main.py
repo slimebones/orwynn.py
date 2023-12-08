@@ -1,7 +1,6 @@
 import pytest
 from pykit import validation
 
-from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.context.errors import UndefinedStorageError
 from orwynn.http import (
@@ -10,6 +9,7 @@ from orwynn.http import (
     HttpRequestContextId,
     LogMiddleware,
 )
+from orwynn.module.module import Module
 
 
 @pytest.mark.asyncio

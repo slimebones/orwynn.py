@@ -3,7 +3,7 @@ from typing import Any
 
 from pykit import validation
 
-from orwynn.base.worker.worker import Worker
+from orwynn.worker.worker import Worker
 
 from .errors import AlreadyInitializedStorageError, UndefinedStorageError
 

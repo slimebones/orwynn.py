@@ -3,12 +3,8 @@ from typing import TypeVar
 
 from pykit.validation import validate
 
-from orwynn.base.config import Config
-from orwynn.base.controller.controller import Controller
-from orwynn.base.error.errors import MalfunctionError
-from orwynn.base.errorhandler.errorhandler import ErrorHandler
-from orwynn.base.middleware import Middleware
-from orwynn.base.model.model import Model
+from orwynn.config import Config
+from orwynn.controller.controller import Controller
 from orwynn.di.errors import (
     DiObjectAlreadyInitializedInContainerError,
     FinalizedDiContainerError,
@@ -16,7 +12,11 @@ from orwynn.di.errors import (
 )
 from orwynn.di.isprovider import is_provider
 from orwynn.di.object import DiObject
+from orwynn.error.errors import MalfunctionError
+from orwynn.errorhandler.errorhandler import ErrorHandler
 from orwynn.helpers.constants import SUBCLASSABLES
+from orwynn.middleware import Middleware
+from orwynn.model.model import Model
 
 _InnerObj = TypeVar("_InnerObj")
 

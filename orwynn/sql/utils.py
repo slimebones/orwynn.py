@@ -7,9 +7,9 @@ from pykit.cls import Static
 from pykit.errors import NotFoundError
 from sqlalchemy import Select, text
 
-from orwynn.base.model import Model
 from orwynn.di.di import Di
 from orwynn.log import Log
+from orwynn.model import Model
 from orwynn.sql.search import TableSearch
 from orwynn.sql.shd import SHD
 from orwynn.sql.sql import SQL

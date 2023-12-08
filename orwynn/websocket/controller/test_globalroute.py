@@ -2,8 +2,8 @@ import pytest
 import starlette.websockets
 
 from orwynn.apiversion import ApiVersion
-from orwynn.base.module.module import Module
 from orwynn.boot import Boot
+from orwynn.module.module import Module
 from orwynn.websocket.controller.controller import (
     WebsocketController,
 )

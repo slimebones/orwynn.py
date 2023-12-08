@@ -1,4 +1,4 @@
-from orwynn.base.module import Module
+from orwynn.module import Module
 from orwynn.mongo.search import DocumentSearch, MongoStateFlagSearch
 from orwynn.mongo.services import MongoStateFlagService
 from orwynn.mongo.stateflag import MongoStateFlag

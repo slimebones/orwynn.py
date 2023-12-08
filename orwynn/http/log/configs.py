@@ -1,4 +1,4 @@
-from orwynn.base.config.config import Config
+from orwynn.config.config import Config
 
 
 class LogHttpMiddlewareConfig(Config):

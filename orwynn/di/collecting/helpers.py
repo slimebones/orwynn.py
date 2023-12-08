@@ -1,13 +1,13 @@
 import inspect
 
-from orwynn.base.config import Config
-from orwynn.base.model.model import Model
+from orwynn.config import Config
 from orwynn.di.collecting.errors import (
     ProviderKeywordAttributeError,
 )
 from orwynn.di.errors import NoAnnotationError, NotProviderError
 from orwynn.di.isprovider import is_provider
 from orwynn.di.provider import Provider
+from orwynn.model.model import Model
 
 ProviderParameters = list["ProviderParameter"]
 

@@ -6,9 +6,8 @@ from starlette.middleware.base import (
 )
 
 from orwynn.app import App
-from orwynn.base.error.utils import get_exception_direct_subclasses
-from orwynn.base.errorhandler import ErrorHandler
-from orwynn.base.middleware import Middleware
+from orwynn.error.utils import get_exception_direct_subclasses
+from orwynn.errorhandler import ErrorHandler
 from orwynn.http import (
     BUILTIN_HTTP_MIDDLEWARE,
     BuiltinHttpMiddleware,
@@ -18,6 +17,7 @@ from orwynn.http import (
     HttpMiddleware,
 )
 from orwynn.http.errors import HttpException
+from orwynn.middleware import Middleware
 from orwynn.router.errorhandlermanager import ErrorHandlerManager
 from orwynn.url import URLScheme
 from orwynn.websocket import (

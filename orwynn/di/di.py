@@ -1,11 +1,7 @@
 from pykit import validation
 
 from orwynn.app.app import App
-from orwynn.base.controller.controller import Controller
-from orwynn.base.errorhandler.errorhandler import ErrorHandler
-from orwynn.base.middleware import GlobalMiddlewareSetup, Middleware
-from orwynn.base.module.module import Module
-from orwynn.base.worker.worker import Worker
+from orwynn.controller.controller import Controller
 from orwynn.di.collecting.modulecollector import ModuleCollector
 from orwynn.di.collecting.providerdependencies.collect import (
     collect_provider_dependencies,
@@ -14,8 +10,12 @@ from orwynn.di.container import DiContainer
 from orwynn.di.init.acceptors import init_other_acceptors
 from orwynn.di.init.providers import init_providers
 from orwynn.di.object import DiObject
+from orwynn.errorhandler.errorhandler import ErrorHandler
 from orwynn.http.log.configs import LogHttpMiddlewareConfig
 from orwynn.log import LogConfig
+from orwynn.middleware import GlobalMiddlewareSetup, Middleware
+from orwynn.module.module import Module
+from orwynn.worker.worker import Worker
 
 
 class Di(Worker):

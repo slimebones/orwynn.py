@@ -5,7 +5,7 @@ from pykit import validation
 from starlette.concurrency import iterate_in_threadpool
 from starlette.responses import StreamingResponse
 
-from orwynn.base.error import MalfunctionError
+from orwynn.error import MalfunctionError
 from orwynn.http.requests import HttpRequest
 from orwynn.http.responses import HttpResponse
 from orwynn.log import Log

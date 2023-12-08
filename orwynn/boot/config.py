@@ -3,7 +3,7 @@ from typing import Any, Self
 
 from orwynn.app import AppMode
 from orwynn.apprc.apprc import AppRc
-from orwynn.base.config import Config
+from orwynn.config import Config
 from orwynn.indication.indication import Indication
 from orwynn.proxy.boot import BootProxy
 

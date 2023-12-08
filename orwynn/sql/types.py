@@ -1,6 +1,6 @@
 from typing import TypeVar
 
-from orwynn.base.model import Model
+from orwynn.model import Model
 from orwynn.sql.table import Table
 
 TTable = TypeVar("TTable", bound=Table)

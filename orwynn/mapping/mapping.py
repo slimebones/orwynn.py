@@ -3,8 +3,8 @@ from typing import Any
 
 from pykit.types import TDecoratedCallable
 
-from orwynn.base.model.model import Model
 from orwynn.mapping.errors import MappingNotLinkedError, UnsetIdMappingError
+from orwynn.model.model import Model
 
 
 def if_linked(

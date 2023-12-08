@@ -1,4 +1,4 @@
-from orwynn.base.model import Model
+from orwynn.model import Model
 
 
 class ErrorValueSchema(Model):

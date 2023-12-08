@@ -2,8 +2,8 @@ import asyncio
 
 from fastapi import Query
 
+from orwynn import Module
 from orwynn.apiversion import ApiVersion
-from orwynn.base import Module
 from orwynn.boot import Boot
 from orwynn.http import (
     Endpoint,

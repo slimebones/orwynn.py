@@ -1,6 +1,6 @@
-from orwynn.base.model import Model
 from orwynn.bootscript.callable import BootscriptCallable
 from orwynn.bootscript.calltime import CallTime
+from orwynn.model import Model
 
 
 class Bootscript(Model):

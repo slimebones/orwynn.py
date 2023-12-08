@@ -1,11 +1,9 @@
 import pytest
 from pykit import validation
 
-from orwynn.base.error.errors import ExceptionAlreadyHandledError
-from orwynn.base.errorhandler import ErrorHandler
-from orwynn.base.module import Module
-from orwynn.base.service.service import Service
 from orwynn.boot.boot import Boot
+from orwynn.error.errors import ExceptionAlreadyHandledError
+from orwynn.errorhandler import ErrorHandler
 from orwynn.http.context.middleware.contextbuiltin import (
     HttpRequestContextBuiltinMiddleware,
 )
@@ -19,7 +17,9 @@ from orwynn.http.responses import (
     JsonHttpResponse,
     TestHttpResponse,
 )
+from orwynn.module import Module
 from orwynn.proxy.boot import BootProxy
+from orwynn.service.service import Service
 from orwynn.testing import Client
 from orwynn.testingtools import Item
 

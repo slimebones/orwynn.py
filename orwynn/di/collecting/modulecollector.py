@@ -1,8 +1,8 @@
 from pykit import validation
 from pykit.fmt import FormatUtils
 
-from orwynn.base.module import Module
-from orwynn.base.module.errors import CircularDependencyError
+from orwynn.module import Module
+from orwynn.module.errors import CircularDependencyError
 
 
 class ModuleCollector:

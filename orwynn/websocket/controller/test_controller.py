@@ -2,9 +2,9 @@ import pytest
 from pykit import validation
 
 from orwynn.apiversion import ApiVersion
-from orwynn.base.module.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.di.di import Di
+from orwynn.module.module import Module
 from orwynn.websocket import Websocket, WebsocketController
 
 

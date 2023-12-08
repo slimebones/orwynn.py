@@ -1,6 +1,5 @@
 import inspect
 
-from orwynn.base.worker import Worker
 from orwynn.bootscript.bootscript import Bootscript
 from orwynn.bootscript.calltime import CallTime
 from orwynn.bootscript.errors import (
@@ -12,6 +11,7 @@ from orwynn.di.collecting.acceptordependencies import (
 )
 from orwynn.di.container import DiContainer
 from orwynn.di.provider import Provider
+from orwynn.worker import Worker
 
 _IsCallPerformed = bool
 # Represents bootscripts sorted by their call time and followed by

@@ -11,8 +11,6 @@ from orwynn import sql
 from orwynn.app import AppMode
 from orwynn.app.app import App
 from orwynn.app.test_main import std_app
-from orwynn.base.module.module import Module
-from orwynn.base.worker.worker import Worker
 from orwynn.boot.boot import Boot
 from orwynn.boot.test_main import (
     run_std,
@@ -32,6 +30,7 @@ from orwynn.helpers.constants import ENVIRONS
 from orwynn.http.controller.endpoint.test_main import run_endpoint
 from orwynn.http.testing import std_http
 from orwynn.log.test_main import log_apprc_sink_to_writer, writer
+from orwynn.module.module import Module
 from orwynn.mongo.document.testing import (
     document_1,
     document_2,
@@ -42,6 +41,7 @@ from orwynn.mongo.testing import mongo_boot
 from orwynn.sql.testing import create_tables_bootscript, s1_table_search
 from orwynn.testing.client import Client
 from orwynn.testing.embeddedclient import EmbeddedTestClient
+from orwynn.worker.worker import Worker
 from tests.structs import (
     circular_module_struct,
     long_circular_module_struct,

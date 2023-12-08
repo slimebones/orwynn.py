@@ -2,9 +2,9 @@ from enum import Enum
 import json
 from typing import Any, ItemsView
 
-from orwynn.base.error import get_error_code, ErrorCode
-from orwynn.base.error import ErrorValueSchema
-from orwynn.base.model.model import Model
+from orwynn.error import get_error_code, ErrorCode
+from orwynn.error import ErrorValueSchema
+from orwynn.model.model import Model
 from orwynn.http.schema.value import \
     HttpExceptionValueSchema
 from orwynn.http.schema.validationvalue import \

@@ -1,4 +1,4 @@
-from orwynn.base.errorhandler import ErrorHandler
+from orwynn.errorhandler import ErrorHandler
 from orwynn.websocket.middleware.connectionbuiltin import (
     ConnectionBuiltinWebsocketMiddleware,
 )

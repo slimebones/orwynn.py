@@ -1,6 +1,6 @@
 from pykit import validation
 
-from orwynn.base.errorhandler.errorhandler import ErrorHandler
+from orwynn.errorhandler.errorhandler import ErrorHandler
 from orwynn.http.middleware.builtinmiddleware import BuiltinHttpMiddleware
 from orwynn.http.middleware.nextcall import HttpNextCall
 from orwynn.http.requests import HttpRequest

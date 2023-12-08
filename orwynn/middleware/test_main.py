@@ -1,10 +1,10 @@
 import pytest
 from pykit import validation
 
-from orwynn.base.module import Module
 from orwynn.boot.boot import Boot
 from orwynn.di.di import Di
 from orwynn.http import HttpMiddleware
+from orwynn.module import Module
 from orwynn.websocket import WebsocketMiddleware
 
 

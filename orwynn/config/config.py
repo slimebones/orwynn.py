@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any, Self
 
 from pykit import validation
 
-from orwynn.base.model.model import Model
+from orwynn.model.model import Model
 from orwynn.proxy.boot import BootProxy
 
 if TYPE_CHECKING:

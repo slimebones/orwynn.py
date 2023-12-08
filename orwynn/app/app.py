@@ -6,7 +6,7 @@ from starlette.types import Receive, Scope, Send
 from orwynn.app.config import AppConfig
 from orwynn.app.core import CoreApp
 from orwynn.app.types import CoreCors
-from orwynn.base.service.framework import FrameworkService
+from orwynn.service.framework import FrameworkService
 from orwynn.testing import Client, EmbeddedTestClient
 from orwynn.url import URLMethod
 

@@ -1,10 +1,10 @@
-from orwynn.base.config import Config
-from orwynn.base.module.module import Module
-from orwynn.base.service.framework import FrameworkService
+from orwynn.config import Config
 from orwynn.di.errors import NotProviderError, ProviderAvailabilityError
 from orwynn.di.isprovider import is_provider
 from orwynn.di.object import DiObject
 from orwynn.di.provider import Provider
+from orwynn.module.module import Module
+from orwynn.service.framework import FrameworkService
 
 
 def check_availability(

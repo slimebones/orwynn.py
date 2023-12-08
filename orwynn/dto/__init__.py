@@ -5,12 +5,12 @@ from pykit import validation
 from pykit.cls import ClassUtils, Static
 from pykit.errors import NotFoundError, RequiredClassAttributeError
 
-from orwynn.base.dto.errors import (
+from orwynn.dto.errors import (
     AbstractDtoClassAsBaseDtoError,
     HasCodeButNoAttributeDtoError,
     UnmatchedCodeFieldDtoError,
 )
-from orwynn.base.model import Model
+from orwynn.model import Model
 from orwynn.websocket import Websocket
 
 _TTable = TypeVar("_TTable")

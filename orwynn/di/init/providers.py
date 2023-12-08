@@ -2,8 +2,7 @@ import inspect
 
 from pykit.fmt import FormatUtils
 
-from orwynn.base.config import Config
-from orwynn.base.module.errors import CircularDependencyError
+from orwynn.config import Config
 from orwynn.di.collecting.errors import (
     NoDependenciesForGivenProviderError,
 )
@@ -14,6 +13,7 @@ from orwynn.di.container import DiContainer
 from orwynn.di.errors import MissingDiObjectError
 from orwynn.di.isprovider import is_provider
 from orwynn.di.provider import Provider
+from orwynn.module.errors import CircularDependencyError
 
 
 def init_providers(

@@ -1,12 +1,12 @@
 import pytest
 from pykit import validation
 
-from orwynn.base.module import Module
-from orwynn.base.service import Service
 from orwynn.boot import Boot
 from orwynn.bootscript.bootscript import Bootscript
 from orwynn.bootscript.calltime import CallTime
 from orwynn.di.di import Di
+from orwynn.module import Module
+from orwynn.service import Service
 
 
 class SomeService(Service):

@@ -4,12 +4,12 @@ from orwynn.helpers.web import REQUEST_METHOD_BY_PROTOCOL
 from orwynn.url import URLMethod
 
 from .endpoint.endpoint import Endpoint
-from orwynn.base.controller.controller import Controller
+from orwynn.controller.controller import Controller
 from orwynn.url import URLScheme
 from orwynn.http.errors import UnsupportedHttpMethodError
 from .errors import \
     DefinedTwiceControllerMethodError
-from orwynn.base.controller.errors import \
+from orwynn.controller.errors import \
     MissingControllerClassAttributeError
 from .endpoint.container import EndpointContainer
 from pykit import validation

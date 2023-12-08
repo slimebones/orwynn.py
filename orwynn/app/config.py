@@ -1,4 +1,4 @@
-from orwynn.base import Config
+from orwynn import Config
 from orwynn.http.cors.cors import Cors
 
 
