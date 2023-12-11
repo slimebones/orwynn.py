@@ -143,6 +143,15 @@ def test_sqlite_init_memory():
     sql.drop_tables()
 
 
+def test_sqlite_default():
+    """
+    Default config should be sqlite memory db.
+    """
+    sql = SQL(SQLConfig())
+    sql.create_tables()
+    sql.drop_tables()
+
+
 def test_sqlite_init_relative_path():
     # Delete old data to ensure auto directory creating is working.
     with contextlib.suppress(FileNotFoundError):

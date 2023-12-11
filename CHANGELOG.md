@@ -6,6 +6,7 @@
 - Renamed globally `fn` to `func`.
 - Fixed indication digesting on polymorph cdto input.
 - Added proper module version.
+- (SQL) Added sqlite memory default initialization.
 
 ## 1.3.4
 

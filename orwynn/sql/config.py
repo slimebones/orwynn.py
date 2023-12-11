@@ -9,11 +9,11 @@ from .enums import SQLDatabaseKind
 
 
 class SQLConfig(Config):
-    database_kind: SQLDatabaseKind
+    database_kind: SQLDatabaseKind = SQLDatabaseKind.SQLite
     database_name: str | None = None
     database_user: str | None = None
     database_password: str | None = None
-    database_path: str | None = None
+    database_path: str = ":memory:"
     database_host: str | None = None
     database_port: int | None = None
     poolclass: PoolclassStr | None = None

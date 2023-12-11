@@ -19,17 +19,17 @@ class SQL(Database):
         config: SQLConfig
     ) -> None:
         super().__init__()
-        self.__config = config
-        self.__engine: Engine = self._create_engine()
+        self._config = config
+        self._engine: Engine = self._create_engine()
 
     @property
     def engine(self) -> Engine:
-        return self.__engine
+        return self._engine
 
     @property
     def session(self) -> Session:
         """Returns a new session."""
-        return Session(self.__engine)
+        return Session(self._engine)
 
     def create_tables(self, *tables: type[Table]) -> None:
         """Creates tables.
@@ -40,7 +40,7 @@ class SQL(Database):
                 reachable tables are created.
         """
         Table.metadata.create_all(
-            self.__engine,
+            self._engine,
             tables=self._collect_sqla_tables(*tables)
         )
 
@@ -53,7 +53,7 @@ class SQL(Database):
                 reachable tables are dropped.
         """
         Table.metadata.drop_all(
-            self.__engine,
+            self._engine,
             tables=self._collect_sqla_tables(*tables)
         )
 
@@ -73,17 +73,17 @@ class SQL(Database):
         connect_args: dict = {}
         final_kwargs: dict = {}
 
-        match self.__config.database_kind:
+        match self._config.database_kind:
             case SQLDatabaseKind.PostgreSQL:
                 url = \
-                    f"postgresql://{self.__config.database_user}" \
-                    + f":{self.__config.database_password}" \
-                    + f"@{self.__config.database_host}" \
-                    + f":{self.__config.database_port}" \
-                    + f"/{self.__config.database_name}"
+                    f"postgresql://{self._config.database_user}" \
+                    + f":{self._config.database_password}" \
+                    + f"@{self._config.database_host}" \
+                    + f":{self._config.database_port}" \
+                    + f"/{self._config.database_name}"
             case SQLDatabaseKind.SQLite:
                 database_path: str = validation.apply(
-                    self.__config.database_path,
+                    self._config.database_path,
                     str
                 )
 
@@ -103,13 +103,13 @@ class SQL(Database):
                 connect_args.update({"check_same_thread": False})
             case _:
                 raise TypeError(
-                    f"unknown database {self.__config.database_kind}"
+                    f"unknown database {self._config.database_kind}"
                 )
 
         final_kwargs["connect_args"] = connect_args
-        final_kwargs["poolclass"] = self.__config.real_poolclass
-        if self.__config.pool_size:
-            final_kwargs["pool_size"] = self.__config.pool_size
+        final_kwargs["poolclass"] = self._config.real_poolclass
+        if self._config.pool_size:
+            final_kwargs["pool_size"] = self._config.pool_size
 
         return create_engine(
             url,
