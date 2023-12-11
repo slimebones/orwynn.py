@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 1.4.0 - UNRELEASED
+## 1.4.0
 
 - Removed `base` imports.
 - Renamed globally `fn` to `func`.
