@@ -100,6 +100,9 @@ class HttpController(Controller):
     def methods(self) -> list[URLMethod]:
         return self._methods
 
+    def has_method(self, method: URLMethod):
+        return method in self.methods
+
     def get_func_by_http_method(self, method: URLMethod) -> Callable:
         func: Callable
 

@@ -24,13 +24,33 @@ from orwynn.model import Model
 from orwynn.module import Module
 from orwynn.proxy.boot import BootProxy
 from orwynn.testing import Client
-from orwynn.url import URLScheme
+from orwynn.url import URLMethod, URLScheme
 from tests.std.text import DEFAULT_ID, Text
 
 
 def test_http_methods():
     for method in REQUEST_METHOD_BY_PROTOCOL[URLScheme.HTTP]:
         assert hasattr(HttpController, method.value)
+
+
+@pytest.mark.asyncio
+async def test_has_method():
+    class C1(HttpController):
+        Route = "/"
+        Endpoints = [Endpoint(method="get"), Endpoint(method="post")]
+
+        def get(self) -> dict:
+            return {}
+
+        def post(self) -> dict:
+            return {}
+
+    await Boot.create(Module(route="/", Controllers=[C1]))
+    c1: C1 = Di.ie().find("C1")
+    assert c1.has_method(URLMethod.Get)
+    assert c1.has_method(URLMethod.Post)
+    assert not c1.has_method(URLMethod.Delete)
+    assert not c1.has_method(URLMethod.Patch)
 
 
 @pytest.mark.asyncio
