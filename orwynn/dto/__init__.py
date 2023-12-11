@@ -4,6 +4,7 @@ from typing import Any, ClassVar, Self, TypeVar
 from pykit import validation
 from pykit.cls import ClassUtils, Static
 from pykit.errors import NotFoundError, RequiredClassAttributeError
+from pykit.types import T
 
 from orwynn.dto.errors import (
     AbstractDtoClassAsBaseDtoError,
@@ -90,16 +91,16 @@ class ContainerDTO(DTO):
     @classmethod
     def convert(
         cls,
-        tables: list[_TTable],
-        convertion_func: Callable[[_TTable], _TUnitDTO],
+        objs: list[T],
+        convertion_func: Callable[[T], _TUnitDTO],
         container_kwargs: dict[str, Any] | None = None,
     ) -> Self:
         Base: type[UnitDTO] = cls._get_base_attr()
 
         result: list[_TUnitDTO] = []
 
-        for table in tables:
-            converted: _TUnitDTO = convertion_func(table)
+        for obj in objs:
+            converted: _TUnitDTO = convertion_func(obj)
             validation.validate(converted, Base)
             result.append(converted)
 

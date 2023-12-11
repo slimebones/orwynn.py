@@ -9,6 +9,7 @@
 - (SQL) Added sqlite memory default initialization.
 - (SQL) SQLConfig.should_drop_env_spec + SQL.recreate_public_schema_cascade
     for PSQL databases
+- (DTO) CDTO.convert now accepts any objects.
 - (HTTP) HTTPController.has_method.
 
 ## 1.3.4
