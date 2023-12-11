@@ -29,7 +29,7 @@ typing-extensions = "^4.7.1"
 # TODO(ryzhovalex):
 #   remove this pin after upgrading Starlette 0.31.1 (see FastAPI dependencies)
 anyio = ">=3.7.1,<4.0.0"
-sbpykit = "^0.4.8"
+sbpykit = "^0.4.12"
 
 [tool.poetry.group.dev.dependencies]
 lorem = "^0.1.1"

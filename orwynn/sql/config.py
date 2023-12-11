@@ -1,5 +1,7 @@
 from typing import Any
 
+from pykit.env import EnvSpec
+
 from orwynn.config import Config
 from orwynn.error import MalfunctionError
 from sqlalchemy.pool import StaticPool, Pool
@@ -18,6 +20,7 @@ class SQLConfig(Config):
     database_port: int | None = None
     poolclass: PoolclassStr | None = None
     pool_size: int | None = None
+    should_drop_env_spec: EnvSpec | None = None
 
     def __init__(self, **data: Any) -> None:
         try:

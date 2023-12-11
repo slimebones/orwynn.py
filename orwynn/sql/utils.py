@@ -1,15 +1,18 @@
-import os
 from collections.abc import Callable
 from typing import TYPE_CHECKING
 
+import typing_extensions
 from pykit import validation
 from pykit.cls import Static
 from pykit.errors import NotFoundError
 from sqlalchemy import Select, text
 
+from orwynn.app import AppMode
 from orwynn.di.di import Di
 from orwynn.log import Log
 from orwynn.model import Model
+from orwynn.proxy.boot import BootProxy
+from orwynn.sql.constants import PSQLStatementConstants
 from orwynn.sql.search import TableSearch
 from orwynn.sql.shd import SHD
 from orwynn.sql.sql import SQL
@@ -59,24 +62,22 @@ class SHDUtils(Static):
 
 class SQLUtils(Static):
     @staticmethod
+    @typing_extensions.deprecated("use sql.recreate_public_schema_cascade")
     def drop_database(
         sql: SQL,
     ) -> None:
         if (
-            os.environ.get("HQB_SHOULD_DROP_SQL", "0") == "1"
-            # TODO(ryzhovalex): temporarily disabled PROD checking
-            # 0
-            #
-            # and BootProxy.ie().mode != AppMode.PROD
+            sql.should_drop_sql
+            # lock drop in prod mode for error-protection
+            and BootProxy.ie().mode != AppMode.PROD
         ):
             Log.info("drop sql database")
             # use raw sql since i haven't found a quick way to drop cascade
             # using python objects
             with sql.session as s:
-                s.execute(text("""
-                DROP SCHEMA public CASCADE;
-                CREATE SCHEMA public;
-                """))
+                s.execute(text(
+                    PSQLStatementConstants.RecreatePublicSchemaCascade
+                ))
                 s.commit()
 
     @staticmethod

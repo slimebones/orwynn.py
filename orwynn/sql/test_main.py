@@ -7,11 +7,16 @@ import pytest
 from pykit import validation
 from pykit.crypto import hash_password
 from sqlalchemy import ForeignKey
+from sqlalchemy.exc import ProgrammingError
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from orwynn import sql
 from orwynn.boot import Boot
+from orwynn.di.di import Di
 from orwynn.module import Module
+from orwynn.sql import module as sql_module
+from orwynn.sql.shd import SHD
 
 from .config import SQLConfig
 from .enums import SQLDatabaseKind
@@ -141,6 +146,60 @@ def test_sqlite_init_memory():
     ))
     sql.create_tables()
     sql.drop_tables()
+
+
+@pytest.mark.asyncio
+async def test_recreate_cascade_with_environ(
+    setenv_orwynntest_should_drop_sql_to_1
+):
+    class Item(Table):
+        price: Mapped[float]
+
+        @declared_attr.directive
+        def __tablename__(cls) -> str:
+            return "recreate_cascade_with_environ_item"
+
+    await Boot.create(
+        Module(
+            imports=[sql_module]
+        ),
+        apprc={
+            "prod": {
+                "SQL": {
+                    "database_kind": "postgresql",
+                    "database_name": "orwynn_test",
+                    "database_user": "postgres",
+                    "database_password": "postgres",
+                    "database_host": "localhost",
+                    "database_port": 9005,
+                    "should_drop_env_spec": {
+                        "key": "ORWYNNTEST_SHOULD_DROP_SQL"
+                    }
+                }
+            }
+        }
+    )
+    sql: SQL = Di.ie().find("SQL")
+
+    sql.drop_tables()
+    sql.create_tables()
+    try:
+        with SHD.new(sql) as shd:
+            item = Item(price=10.2)
+            shd.add(item)
+            item = Item(price=15.5)
+            shd.add(item)
+            shd.commit()
+            assert len(shd.scalars(shd.select(Item)).all()) == 2
+        assert sql.should_drop_sql
+        sql.recreate_public_schema_cascade()
+        validation.expect(
+            shd.scalars,
+            ProgrammingError,
+            shd.select(Item)
+        )
+    finally:
+        sql.drop_tables()
 
 
 def test_sqlite_default():

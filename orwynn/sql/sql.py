@@ -1,16 +1,25 @@
+import os
 from pathlib import Path
 from typing import Optional, Sequence
-from pykit import validation
-from orwynn.database.database import Database
 
-from .table import Table
+from pykit import validation
+from pykit.errors import UnsupportedError
+from pykit.env import EnvUtils
+from pykit.errors import PleaseDefineError, StrExpectError
+from sqlalchemy import Engine
+from sqlalchemy import Table as SQLAlchemyTable
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import Session
+
+from orwynn.app.mode import AppMode
+from orwynn.database.database import Database
+from orwynn.log.log import Log
+from orwynn.proxy.boot import BootProxy
+from orwynn.sql.config import SQLConfig
+from orwynn.sql.constants import (PSQLStatementConstants)
 
 from .enums import SQLDatabaseKind
-
-from orwynn.sql.config import SQLConfig
-from sqlalchemy import create_engine, Engine
-from sqlalchemy import Table as SQLAlchemyTable
-from sqlalchemy.orm import Session
+from .table import Table
 
 
 class SQL(Database):
@@ -25,6 +34,16 @@ class SQL(Database):
     @property
     def engine(self) -> Engine:
         return self._engine
+
+    @property
+    def should_drop_sql(self) -> bool:
+        if (self._config.should_drop_env_spec is None):
+            raise PleaseDefineError(
+                cannot_do="should drop sql environ retrieval",
+                please_define="SQLConfig.should_drop_sql_env_spec"
+            )
+
+        return EnvUtils.get_bool(self._config.should_drop_env_spec)
 
     @property
     def session(self) -> Session:
@@ -56,6 +75,29 @@ class SQL(Database):
             self._engine,
             tables=self._collect_sqla_tables(*tables)
         )
+
+    def recreate_public_schema_cascade(
+        self
+    ) -> None:
+        if (self._config.database_kind is SQLDatabaseKind.SQLite):
+            raise UnsupportedError(
+                value="sqlite database for cascade recreating"
+            )
+
+        if (
+            # lock drop in prod mode for error-protection
+            BootProxy.ie().mode != AppMode.PROD
+        ):
+            Log.info("recreating sql database (public cascade)")
+            # use raw sql since i haven't found a quick way to drop cascade
+            # using python objects
+            statement: str = (
+                PSQLStatementConstants.RecreatePublicSchemaCascade
+            )
+
+            with self.session as s:
+                s.execute(text(statement))
+                s.commit()
 
     def _collect_sqla_tables(
         self,

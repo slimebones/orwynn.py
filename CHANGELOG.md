@@ -7,6 +7,7 @@
 - Fixed indication digesting on polymorph cdto input.
 - Added proper module version.
 - (SQL) Added sqlite memory default initialization.
+- (SQL) SQLConfig.should_drop_env_spec
 
 ## 1.3.4
 

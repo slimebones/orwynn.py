@@ -79,8 +79,10 @@ def _delete_environs():
 
 @pytest_asyncio.fixture
 async def bare_boot(create_tables_bootscript: Bootscript) -> Boot:
-    return await Boot.create(Module(
-        imports=[sql.module]),
+    return await Boot.create(
+        Module(
+            imports=[sql.module]
+        ),
         bootscripts=[create_tables_bootscript],
         apprc={
             "prod": {
