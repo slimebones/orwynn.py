@@ -1,6 +1,4 @@
-# CHANGELOG
-
-## 1.4.0
+# 1.4.0
 
 - Removed `base` imports.
 - Renamed globally `fn` to `func`.
@@ -12,79 +10,79 @@
 - (DTO) CDTO.convert now accepts any objects.
 - (HTTP) HTTPController.has_method.
 
-## 1.3.4
+# 1.3.4
 
 - Update PyKit.
 
-## 1.3.3
+# 1.3.3
 
-### Features
+## Features
 
 - FastAPI 0.104 support.
 
-### Refactor
+## Refactor
 
 - Moved Utils to PyKit.
 
-## 1.3.2
+# 1.3.2
 
-### Fixed
+## Fixed
 
 - Error code handling
 
-## 1.3.1
+# 1.3.1
 
-### Fixed
+## Fixed
 
 - Updated antievil to conform with new error codes
 - Small yet critical fixes
 
-## 1.3.0
+# 1.3.0
 
-### Features
+## Features
 
 - `orwynn.yml` is the only configuration filename supported for now. To
   override this, define environ `ORWYNN_RC_PATH`.
 - MongoStateFlag
 
-### Fixed
+## Fixed
 
 - Memory sqlite database is now used by default, instead of raising an error.
 
-### Refactor
+## Refactor
 
 - ROUTE, ENDPOINTS and VERSION of controller classes now are PascalCase.
 - ORWYNN_APPRC_PATH -> ORWYNN_RC_PATH.
 
-## 1.2.0
+# 1.2.0
 
-### Features
+## Features
 
 - DTO models and utils
 - Class utils
 
-## 1.1.0
+# 1.1.0
 
-### Features
+## Features
 
 - Big utils update: many utility objects are added, most notable SHD - aka
   session handler
 
-### Refactor
+## Refactor
 
 - Many SQL types are renamed
 - Sql and SqlConfig are now SQL and SQLConfig
 
-## 1.0.5
+# 1.0.5
 
 - fix: AnyIO breaking changes by version restriction
 - feat: Antievil exception library support
 
-## 1.0.4
+# 1.0.4
 
 - perf(mongo): Better optimized document creation.
 
-## 1.0.3
+# 1.0.3
 
 - (http.log): Conditional request/response logging (set to False by default).
 - (mongo): MongoConfig now accepts `url` instead `uri` and this field no more
@@ -92,14 +90,14 @@
 - Structural refactors.
 - Database ports for Orwynn development - see `docs/Development.md`.
 
-## 1.0.2
+# 1.0.2
 
 - Small chore changes.
 
-## 1.0.1
+# 1.0.1
 
 - Small chore changes.
 
-## 1.0.0
+# 1.0.0
 
 - First version of the framework.

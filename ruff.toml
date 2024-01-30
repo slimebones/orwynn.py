@@ -10,8 +10,30 @@ exclude = [
 ]
 
 ignore = [
-    # False-Positive
-    "PD011",
+    # remove ugly trailing commas
+    "COM812",
+
+    # advent of asserts
+    "S101",
+
+    # we love long messages
+    "TRY003",
+
+    # allow free format of TODOs
+    "TD",
+
+    # preffered todo style includes keyword and author's name in parentheses.
+    # Other is on todo author's free account.
+    "TD003",
+    "TD005",
+    "TD007",
+
+    # We understood when to use pseudo-random generators.
+    "S311",
+
+    # we often don't want to care about number of function arguments,
+    # especially if they are inside pytest's fixture
+    "PLR0913",
 
     # Doesn't recognize new "match" syntax
     "E999",

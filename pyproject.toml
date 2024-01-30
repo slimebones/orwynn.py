@@ -9,27 +9,23 @@ keywords = [
 ]
 repository = "https://github.com/ryzhovalex/orwynn"
 authors = ["ryzhovalex <thed4rkof@gmail.com>"]
-readme = "README.md"
+readme = "readme.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.104"
-uvicorn = {extras = ["standard"], version = "^0.20.0"}
-loguru = "^0.6.0"
+uvicorn = { extras = ["standard"], version = "^0.20.0" }
+loguru = "^0.7.2"
 pyjwt = "^2.6.0"
-httpx = "^0.24.1"
-colorama = "^0.4.6"
 pymongo = "^4.3.3"
-python-dotenv = "^0.21.0"
-bcrypt = "^4.0.1"
-websockets = "^10.4"
 sqlalchemy = "^2.0.3"
 psycopg2 = "^2.9.5"
 typing-extensions = "^4.7.1"
-# TODO(ryzhovalex):
-#   remove this pin after upgrading Starlette 0.31.1 (see FastAPI dependencies)
-anyio = ">=3.7.1,<4.0.0"
-sbpykit = "^0.4.12"
+aiohttp = { extras = ["speedups"], version = "^3.9.3" }
+rxcat = { path = "../rxcat/lib/pyrxcat", develop = true }
+fcode = { path = "../fcode/lib/pyfcode", develop = true }
+pykit = { path = "../pykit", develop = true }
+
+pydantic = "^2.6.0"
 
 [tool.poetry.group.dev.dependencies]
 lorem = "^0.1.1"
