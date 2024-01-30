@@ -668,6 +668,9 @@ python-versions = "^3.11"
 files = []
 develop = true
 
+[package.dependencies]
+pykit = {path = "../../../pykit", develop = true}
+
 [package.source]
 type = "directory"
 url = "../fcode/lib/pyfcode"
