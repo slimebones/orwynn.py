@@ -6,6 +6,7 @@ import asyncio
 from io import BufferedIOBase
 import shutil
 from pathlib import Path
+import typing
 
 import aiofiles
 import aiohttp.web
@@ -13,6 +14,7 @@ from pydantic import BaseModel
 from pykit.dt import DTUtils
 from pykit.err import InpErr
 from pykit.log import log
+from orwynn.cfg import Cfg
 from orwynn.sys import Sys
 from orwynn.mongo import Doc
 
@@ -37,7 +39,11 @@ class UploadFile(BaseModel):
         arbitrary_types_allowed = True
 
 
-class PreloadSys(Sys):
+class PreloadCfg(Cfg):
+    must_clean_on_destroy: bool = False
+
+
+class PreloadSys(Sys[PreloadCfg]):
     # All preloaded files are stored in var/preload dir, under corresponding
     # dir with preload_sid name. Every stored file has it's original filename.
 
@@ -129,6 +135,11 @@ class PreloadSys(Sys):
             ignore_errors=True
         )
         return True
+
+    async def destroy(self):
+        if self._cfg.must_clean_on_destroy:
+            raise ValueError("wow")
+            await self.try_del_all()
 
     async def _del_preload_on_expire(self, preload: PreloadDoc):
         await asyncio.sleep(preload.expire_time - preload.created_time)

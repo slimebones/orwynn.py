@@ -1,7 +1,7 @@
 import aiohttp.web
 from orwynn.boot import BootCfg
 from orwynn.mongo import MongoCfg
-from orwynn.preload import handle_preload
+from orwynn.preload import PreloadCfg, handle_preload
 
 default = [
     BootCfg(
@@ -12,5 +12,8 @@ default = [
     MongoCfg(
         url="mongodb://localhost:9006",
         database_name="orwynn-test"
+    ),
+    PreloadCfg(
+        must_clean_on_destroy=True
     )
 ]

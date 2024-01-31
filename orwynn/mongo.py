@@ -194,12 +194,8 @@ class Doc(BaseModel):
 
 TDoc = TypeVar("TDoc", bound=Doc)
 
-class MongoSys(Sys):
-    CfgType = MongoCfg
-
+class MongoSys(Sys[MongoCfg]):
     async def init(self):
-        self._cfg: MongoCfg = self._cfg
-
         self._client: MongoClient = MongoClient(self._cfg.url)
         self._db: MongoDb = self._client[self._cfg.database_name]
         await MongoUtils.init(self._client, self._db)
@@ -529,9 +525,10 @@ class MongoStateFlagSearch(DocSearch):
     keys: list[str] | None = None
     values: list[bool] | None = None
 
-class MongoStateFlagSys(Sys):
+class MongoStateFlagUtils(Utils):
+    @classmethod
     def get(
-        self,
+        cls,
         search: MongoStateFlagSearch
     ) -> list[MongoStateFlagDoc]:
         query: dict[str, Any] = {}
@@ -555,8 +552,9 @@ class MongoStateFlagSys(Sys):
             MongoStateFlagDoc
         )
 
+    @classmethod
     def get_first_or_set_default(
-        self,
+        cls,
         key: str,
         default_value: bool
     ) -> MongoStateFlagDoc:
@@ -565,17 +563,18 @@ class MongoStateFlagSys(Sys):
         with default value.
         """
         try:
-            return self.get(MongoStateFlagSearch(
+            return cls.get(MongoStateFlagSearch(
                 keys=[key]
             ))[0]
         except NotFoundErr:
-            return self.set(
+            return cls.set(
                 key,
                 default_value
             )
 
+    @classmethod
     def set(
-        self,
+        cls,
         key: str,
         value: bool
     ) -> MongoStateFlagDoc:
@@ -587,7 +586,7 @@ class MongoStateFlagSys(Sys):
         flag: MongoStateFlagDoc
 
         try:
-            flag = self.get(MongoStateFlagSearch(
+            flag = cls.get(MongoStateFlagSearch(
                 keys=[key]
             ))[0]
         except NotFoundErr:
@@ -597,8 +596,9 @@ class MongoStateFlagSys(Sys):
 
         return flag
 
+    @classmethod
     def decide(
-        self,
+        cls,
         *,
         key: str,
         on_true: FuncSpec | None = None,
@@ -628,7 +628,7 @@ class MongoStateFlagSys(Sys):
             Chosen function output. None if no function is used.
         """
         result: Any = None
-        flag: MongoStateFlagDoc = self.get_first_or_set_default(
+        flag: MongoStateFlagDoc = cls.get_first_or_set_default(
             key, default_flag_on_not_found
         )
 

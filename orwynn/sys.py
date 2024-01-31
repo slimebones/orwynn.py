@@ -1,31 +1,48 @@
+from contextlib import suppress
 from enum import Enum
+from typing import Any, Generic
+import typing
 from pydantic import BaseModel
+from pykit.log import log
 from pykit.singleton import Singleton
 from rxcat import Bus
+from pydantic.generics import GenericModel
 
-from orwynn.cfg import Cfg
+from orwynn.cfg import Cfg, TCfg
 
-class SysArgs(BaseModel):
+class SysArgs(GenericModel, Generic[TCfg]):
     bus: Bus
-    cfg: Cfg
+    cfg: TCfg
 
     class Config:
         arbitrary_types_allowed = True
 
-class Sys(Singleton):
+class internal_SysErr(Exception):
+    pass
+
+class internal_FailedSysCase(Enum):
+    Init = "init"
+    Enable = "enable"
+    Disable = "disable"
+    Destroy = "destroy"
+
+class internal_FailedSysErr(Exception):
+    def __init__(self, sys_type: type["Sys"], case: internal_FailedSysCase, why: str):
+        msg = f"failed to {case.value} {sys_type}: {why}"
+        super().__init__(msg)
+
+class Sys(Singleton, Generic[TCfg]):
     """
     Heart of the app's logic.
 
     @abs
     """
-    CfgType: type[Cfg] | None = None
-
     def __init__(
         self,
         args: SysArgs
     ):
         self._bus: Bus = args.bus
-        self._cfg: Cfg = args.cfg
+        self._cfg: TCfg = args.cfg
 
         self._internal_is_initd = False
         self._internal_is_enabled = False
@@ -77,15 +94,26 @@ class Sys(Singleton):
         """
         """
 
-class internal_SysErr(Exception):
-    pass
+    @classmethod
+    async def _internal_destroy(cls):
+        try:
+            ie = cls.ie()
+        except AttributeError:
+            # if system hasn't been initialized, we have nothing to do here
+            return
+        if ie.is_initd:
+            try:
+                await ie.destroy()
+            except Exception as err:
+                newerr = internal_FailedSysErr(
+                    cls,
+                    internal_FailedSysCase.Destroy,
+                    f"unhandled err => {err}"
+                )
+                log.err_or_catch(newerr, 2)
+            cls.try_discard()
 
-class internal_FailedSysCase(Enum):
-    Init = "init"
-    Enable = "enable"
-    Disable = "disable"
+    async def destroy(self):
+        """
+        """
 
-class internal_FailedSysErr(Exception):
-    def __init__(self, sys_type: type[Sys], case: internal_FailedSysCase, why: str):
-        msg = f"failed to {case.value} {sys_type}: {why}"
-        super().__init__(msg)

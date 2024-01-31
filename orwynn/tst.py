@@ -10,7 +10,8 @@ class Client:
 
     async def post(self, url: str, asserted_status_code: int = 200, **kwargs) -> ClientResponse:
         res = await self._native.post(url, **kwargs)
-        assert res.status == asserted_status_code
+        res_text = await res.text()
+        assert res.status == asserted_status_code, res_text
         return res
 
     async def post_jsonify(

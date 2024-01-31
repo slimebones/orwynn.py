@@ -15,7 +15,7 @@ class BootCfg(Cfg):
     verbosity: int = 0
     routedef_funcs: list[Callable[[], aiohttp.web.RouteDef]] | None = None
 
-class Boot(Sys):
+class Boot(Sys[BootCfg]):
     @classmethod
     async def init_boot(cls) -> Self:
         # attach empty boot cfg now, later the boot will adjust it for itself
@@ -33,7 +33,7 @@ class Boot(Sys):
 
         app = App()
         routedefs = []
-        routedef_funcs = typing.cast(BootCfg, boot._cfg).routedef_funcs
+        routedef_funcs = boot._cfg.routedef_funcs
         if routedef_funcs:
             routedefs = [func() for func in routedef_funcs]
         app.add_routes([
@@ -52,17 +52,17 @@ class Boot(Sys):
         aiohttp.web.run_app(app)
 
     async def init(self):
-        _cfg_pack = await self._init_cfg_pack()
-        _type_to_cfg: dict[type[Cfg], Cfg] = {}
-        for cfg in _cfg_pack:
+        cfg_pack = await self._init_cfg_pack()
+        type_to_cfg: dict[type[Cfg], Cfg] = {}
+        for cfg in cfg_pack:
             cfg_type = type(cfg)
             if cfg_type is BootCfg:
                 self._cfg = typing.cast(BootCfg, cfg)
                 log.verbosity = self._cfg.verbosity
                 continue
-            _type_to_cfg[cfg_type] = cfg 
+            type_to_cfg[cfg_type] = cfg 
 
-        await self._init_sys(_type_to_cfg)
+        await self._init_sys(type_to_cfg)
         # for now all systems are enabled without an option to change, later
         # we will do something more flexible
         await self._enable_all_sys()
@@ -119,20 +119,31 @@ class Boot(Sys):
                 continue
 
             sys_cfg = Cfg()
-            if sys_type.CfgType is not None:
-                if sys_type.CfgType in type_to_cfg:
-                    sys_cfg = type_to_cfg[sys_type.CfgType]
-                    assert isinstance(sys_cfg, sys_type.CfgType)
+
+            sys_cfg_type = None
+            if len(sys_type.__orig_bases__) > 0:  # type: ignore
+                sys_cfg_type = typing.get_args(
+                    sys_type.__orig_bases__[0]  # type: ignore 
+                )[0]
+
+                if not issubclass(sys_cfg_type, Cfg):
+                    log.err(f"wrong {sys_type} cfg generic: {sys_cfg_type}")
+                    sys_cfg_type = None
+
+            if sys_cfg_type is not None:
+                if sys_cfg_type in type_to_cfg:
+                    sys_cfg = type_to_cfg[sys_cfg_type]
+                    assert isinstance(sys_cfg, sys_cfg_type)
                 else:
                     # try start defined cfg without arguments - if fail, the
                     # system init must fail
                     try:
-                        sys_cfg = sys_type.CfgType()
+                        sys_cfg = sys_cfg_type()  # type: ignore
                     except ValidationError:
                         newerr = internal_FailedSysErr(
                             sys_type,
                             internal_FailedSysCase.Init,
-                            f" define {sys_type.CfgType}"
+                            f" define {sys_cfg_type}"
                         )
                         log.err_or_catch(newerr, 2)
                         continue

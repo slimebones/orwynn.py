@@ -29,6 +29,8 @@ async def test_preload_1(
     assert preload_dir.is_dir()
     assert Path(preload_dir, "sample.jpg").is_file()
 
+    assert 0
+
 @pytest.mark.asyncio
 async def test_preload_2(
     client,
