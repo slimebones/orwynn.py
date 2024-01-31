@@ -26,6 +26,7 @@ fcode = { path = "../fcode/lib/pyfcode", develop = true }
 pykit = { path = "../pykit", develop = true }
 
 pydantic = "^2.6.0"
+aiofiles = "^23.2.1"
 
 [tool.poetry.group.dev.dependencies]
 lorem = "^0.1.1"

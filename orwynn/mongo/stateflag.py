@@ -1,19 +1,19 @@
-from typing import Any
+from orwynn.mongo import Doc, DocSearch, MongoUtils
+from orwynn import Sys
 
-from pykit.errors import NotFoundError
-from pykit.func import FuncSpec
+class MongoStateFlagDoc(Doc):
+    key: str
+    value: bool
 
-from orwynn import Service
-from orwynn.mongo.search import MongoStateFlagSearch
-from orwynn.mongo.stateflag import MongoStateFlag
-from orwynn.mongo.utils import MongoUtils
+class MongoStateFlagSearch(DocSearch):
+    keys: list[str] | None = None
+    values: list[bool] | None = None
 
-
-class MongoStateFlagService(Service):
+class MongoStateFlagSys(Sys):
     def get(
         self,
         search: MongoStateFlagSearch
-    ) -> list[MongoStateFlag]:
+    ) -> list[MongoStateFlagDoc]:
         query: dict[str, Any] = {}
 
         if search.ids:
@@ -32,14 +32,14 @@ class MongoStateFlagService(Service):
         return MongoUtils.process_query(
             query,
             search,
-            MongoStateFlag
+            MongoStateFlagDoc
         )
 
     def get_first_or_set_default(
         self,
         key: str,
         default_value: bool
-    ) -> MongoStateFlag:
+    ) -> MongoStateFlagDoc:
         """
         Returns first flag found for given search or a new flag initialized
         with default value.
@@ -58,20 +58,20 @@ class MongoStateFlagService(Service):
         self,
         key: str,
         value: bool
-    ) -> MongoStateFlag:
+    ) -> MongoStateFlagDoc:
         """
         Sets new value for a key.
 
         If the key does not exist, create a new state flag with given value.
         """
-        flag: MongoStateFlag
+        flag: MongoStateFlagDoc
 
         try:
             flag = self.get(MongoStateFlagSearch(
                 keys=[key]
             ))[0]
         except NotFoundError:
-            flag = MongoStateFlag(key=key, value=value).create()
+            flag = MongoStateFlagDoc(key=key, value=value).create()
         else:
             flag = flag.update(set={"value": value})
 
@@ -108,7 +108,7 @@ class MongoStateFlagService(Service):
             Chosen function output. None if no function is used.
         """
         result: Any = None
-        flag: MongoStateFlag = self.get_first_or_set_default(
+        flag: MongoStateFlagDoc = self.get_first_or_set_default(
             key, default_flag_on_not_found
         )
 

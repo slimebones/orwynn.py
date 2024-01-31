@@ -1,61 +1,19 @@
 import importlib
 from pathlib import Path
+import typing
 
-import loguru
 import aiohttp.web
-from pykit import Singleton
+from aiohttp.web import WebSocketResponse as Websocket
+from pykit.singleton import Singleton
 from pydantic import BaseModel
 from rxcat import Bus
+from pykit.log import log
 
 class Utils:
     """
     Utils base class to handle common static functionality.
     """
     pass
-
-class log(Utils):
-    verbosity: int = 0
-    """
-    Verbosity level.
-
-    Levels:
-        0. silent
-        1. cozy chatter
-        2. rap god
-
-    Methods that produce logging accept variable "v" which defines the
-    minimal level of verbosity required to make the intended log. For example
-    if "info('hello', v=1)", the info message would only be produced on 
-    verbosity level 1 or 2.
-
-    For debug logs verbosity level is unavailable - doesn't make sense.
-    """
-
-    _log = loguru.logger
-
-    @classmethod
-    def debug(cls, *args, sep: str = ", "):
-        cls._log.debug(sep.join(args))
-
-    @classmethod
-    def info(cls, msg: str, v: int = 0):
-        if cls.verbosity >= v:
-            cls._log.info(msg)
-
-    @classmethod
-    def warn(cls, msg: str, v: int = 0):
-        if cls.verbosity >= v:
-            cls._log.warning(msg)
-
-    @classmethod
-    def err(cls, msg: str, v: int = 0):
-        if cls.verbosity >= v:
-            cls._log.error(msg)
-
-    @classmethod
-    def catch(cls, err: Exception, v: int = 0):
-        if cls.verbosity >= v:
-            cls._log.exception(err)
 
 class Cfg(BaseModel):
     """
@@ -106,15 +64,16 @@ class BootCfg(Cfg):
 class Boot(Sys):
     # sorry, Barbara
     def __init__(self):
-        self._bus: Bus = Bus()
-        self._cfg: Cfg = BootCfg()
+        self._bus = Bus()
+        self._cfg = BootCfg()
 
     async def run(self):  # add here server args
         """
         Runs the app using a server.
         """
         app = aiohttp.web.Application()
-        app.add_routes([aiohttp.web.get("/rx", websocket_handler)])
+        app.add_routes([aiohttp.web.get("/rx", self._ws_handler)])
+        aiohttp.web.run_app(app)
 
     async def init(self):
         self._root_dir: Path = Path.cwd()
@@ -124,7 +83,8 @@ class Boot(Sys):
         for cfg in _cfg_pack:
             cfg_type = type(cfg)
             if cfg_type is BootCfg:
-                self._cfg = cfg
+                self._cfg = typing.cast(BootCfg, cfg)
+                log.verbosity = self._cfg.verbosity
                 continue
             _type_to_cfg[cfg_type] = cfg 
 
@@ -133,22 +93,11 @@ class Boot(Sys):
         # we will do something more flexible
         await self._enable_all_sys()
 
-    async def _ws_handler(self, request):
-        ws = aiohttp.web.WebSocketResponse()
-        await ws.prepare(request)
+    async def _ws_handler(self, webreq: aiohttp.web.BaseRequest):
+        ws = Websocket()
+        await ws.prepare(webreq)
 
-        # todo: move this to rxcat bus as wrapped to actions
-        async for msg in ws:
-            if msg.type == aiohttp.WSMsgType.TEXT:
-                if msg.data == 'close':
-                    await ws.close()
-                else:
-                    await ws.send_str(msg.data + '/answer')
-            elif msg.type == aiohttp.WSMsgType.ERROR:
-                print('ws connection closed with exception %s' %
-                      ws.exception())
-
-        print('websocket connection closed')
+        await self._bus.conn(ws)  # type: ignore
 
         return ws
 
