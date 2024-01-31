@@ -99,7 +99,7 @@ class Sys(Singleton, Generic[TCfg]):
     async def _internal_destroy(cls):
         try:
             ie = cls.ie()
-        except AttributeError:
+        except (AttributeError, TypeError):
             # if system hasn't been initialized, we have nothing to do here
             return
         if ie.is_initd:

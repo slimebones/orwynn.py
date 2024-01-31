@@ -14,7 +14,7 @@ class NestedDocument(Doc):
 
 
 @pytest.fixture
-def document_1() -> SimpleDocument:
+def document_1(app) -> SimpleDocument:
     return SimpleDocument(
         name="pizza",
         price=1.2,
@@ -23,7 +23,7 @@ def document_1() -> SimpleDocument:
 
 
 @pytest.fixture
-def document_2() -> SimpleDocument:
+def document_2(app) -> SimpleDocument:
     return SimpleDocument(
         name="donut",
         price=1
@@ -31,7 +31,7 @@ def document_2() -> SimpleDocument:
 
 
 @pytest.fixture
-def nested_document_1() -> NestedDocument:
+def nested_document_1(app) -> NestedDocument:
     return NestedDocument(
         nested={
             "key1": {
