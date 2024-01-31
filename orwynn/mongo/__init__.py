@@ -1,7 +1,9 @@
+from copy import copy
 from enum import Enum
 import typing
 from pydantic import BaseModel
-from pykit.err import NotFoundErr
+from pykit.err import NotFoundErr, UnsupportedErr
+from pymongo.errors import DuplicateKeyError
 from orwynn import Cfg, Sys, Utils
 from typing import Any, Callable, Iterable, Self, TypeVar, Generic
 
@@ -17,6 +19,7 @@ from pykit.search import DatabaseSearch
 from bson import ObjectId
 from bson.errors import InvalidId
 from pykit.types import T
+from pykit.fmt import FormatUtils
 
 MongoCompatibleType = str | int | float | bool | list | dict | None
 MongoCompatibleTypes: tuple[Any, ...] = typing.get_args(MongoCompatibleType)
@@ -35,9 +38,15 @@ class Doc(BaseModel):
     forming the document from MongoDB data.
     """
     sid: str = ""
+    """
+    String representation of mongo objectid. Set to empty string if is not
+    synchronized with db yet.
+    """
+
+    _collection: str = FormatUtils.snakefy(__name__)
 
     @classmethod
-    def get(
+    def get_many(
         cls,
         query: dict | None = None,
         **kwargs
@@ -58,166 +67,110 @@ class Doc(BaseModel):
         _query: dict = cls._parse_query(query)
         validation.validate(_query, dict)
 
-        cursor: Cursor = cls._get_mongo().find_all(
-            cls._get_collection(),
-            cls._adjust_id_to_mongo(_query),
+        cursor: MongoCursor = MongoUtils.get_many(
+            cls._collection,
+            cls._adjust_sid_to_mongo(_query),
             **kwargs
         )
 
-        return map(cls._parse_document, cursor)
+        return map(cls._parse_data_to_doc, cursor)
 
     @classmethod
-    def find_one(
+    def try_get(
         cls,
-        query: dict | None = None,
+        query: dict,
         **kwargs
-    ) -> Self:
-        """
-        @deprecated use Doc.get instead and select as many instances as
-        you might need
-        """
-        _query: dict = cls._parse_query(query)
-        validation.validate(_query, dict)
+    ) -> Self | None:
+        validation.validate(query, dict)
 
-        return cls._parse_document(
-            cls._get_mongo().find_one(
-                cls._get_collection(),
-                cls._adjust_id_to_mongo(_query),
-                **kwargs
-            )
+        data = MongoUtils.try_get(
+            cls._collection,
+            cls._adjust_sid_to_mongo(query),
+            **kwargs
         )
+        if data is None:
+            return None
 
-    @if_linked
-    def create(
+        return cls._parse_data_to_doc(data)
+
+    def create(self) -> Self:
+        dump: dict = self._adjust_sid_to_mongo(self.model_dump())
+        return self._parse_data_to_doc(MongoUtils.create(self._collection, dump))
+
+    def try_del(
         self,
-        session: ClientSession | None = None
-    ) -> Self:
-        data: dict = self._adjust_id_to_mongo(self.dict())
-
-        try:
-            return self._parse_document(
-                self._get_mongo().create_one(
-                    self._get_collection(), data, session=session
-                )
-            )
-        except PymongoDuplicateKeyError as error:
-            raise DuplicateKeyError(original_error=error) from error
-
-    @if_linked
-    def remove(
-        self, **kwargs
-    ) -> Self:
-        id: str = self.getid()
-        return self._parse_document(
-            self._get_mongo().remove_one(
-                self._get_collection(), {"_id": ObjectId(id)},
-                **kwargs
-            )
-        )
-
-    @if_linked
-    def update(
-        self,
-        *,
-        set: dict | None = None,
-        inc: dict | None = None,
-        operators: dict | None = None,
         **kwargs
-    ) -> Self:
-        """Updates document with given data.
-
-        Args:
-            set (optional):
-                Which fields to set.
-            inc (optional):
-                Which fields to increment.
-            operators(optional):
-                Additional operators besides `$set` and `$inc` to add.
-        """
-        # Optimization tip: Consider adapting $inc in future for appropriate
-        #   cases
-        validation.validate(set, [dict, NoneType])
-        validation.validate(inc, [dict, NoneType])
-
-        id: str = self.getid()
-
-        operation: dict = {}
-        if set is not None:
-            operation["$set"] = set
-        if inc is not None:
-            operation["$inc"] = inc
-        if operators is not None:
-            if "$set" in operators:
-                raise InvalidOperatorError(
-                    operator="$set",
-                    explanation="pass it via keyword argument `set=`"
-                )
-            elif "$inc" in operators:
-                raise InvalidOperatorError(
-                    operator="$inc",
-                    explanation="pass it via keyword argument `inc=`"
-                )
-            else:
-                operation.update(operators)
-
-        return self._parse_document(
-            self._get_mongo().update_one(
-                self._get_collection(),
-                {"_id": ObjectId(id)},
-                operation,
-                **kwargs
-            )
+    ) -> bool:
+        if not self.sid:
+            return False
+        return MongoUtils.try_del(
+            self._collection,
+            {"_id": MongoUtils.convert_to_object_id(self.sid)},
+            **kwargs
         )
 
-    def refresh(
+    def try_upd(
+        self,
+        query: dict,
+        **kwargs
+    ) -> Self | None:
+        """
+        Updates document with given query.
+        """
+        if not self.sid:
+            return None
+
+        data = MongoUtils.try_upd(
+            self._collection,
+            {"_id": MongoUtils.convert_to_object_id(self.sid)},
+            query,
+            **kwargs
+        )
+        if data is None:
+            return None
+
+        return self._parse_data_to_doc(data)
+
+    def try_refresh(
         self
-    ) -> Self:
+    ) -> Self | None:
         """
         Refreshes the document with a new data from the database.
         """
-        return self.find_one({
-            "id": self.getid()
-        })
+        return self.try_get({"sid": self.sid})
 
     @classmethod
-    def _get_collection(cls) -> str:
-        return FormatUtils.snakefy(cls.__name__)
-
-    @classmethod
-    def _get_mongo(cls) -> Mongo:
-        return validation.apply(Di.ie().find("Mongo"), Mongo)
-
-    @classmethod
-    def _parse_document(cls, document: MongoEntity) -> Self:
+    def _parse_data_to_doc(cls, data: dict) -> Self:
         """Parses document to specified Model."""
-        return cls.parse_obj(cls._adjust_id_from_mongo(document))
-
-    @staticmethod
-    def _adjust_id_to_mongo(data: dict) -> dict:
-        if "id" in data:
-            input_id_value: Any = data["id"]
-            if input_id_value is not None:
-                if (
-                    isinstance(input_id_value, (str, dict, list))
-                ):
-                    data["_id"] = convert_to_object_id(input_id_value)
-                else:
-                    raise UnsupportedError(
-                        title="field \"id\" with value",
-                        value=input_id_value
-                    )
-            del data["id"]
-        return data
+        return cls.model_validate(cls._adjust_sid_from_mongo(data))
 
     @staticmethod
     def _parse_query(query: dict | None) -> dict:
-        return {} if query is None else copy.copy(query)
+        return {} if query is None else copy(query)
+
+    @classmethod
+    def _adjust_sid_to_mongo(cls, data: dict) -> dict:
+        if "sid" in data:
+            input_sid_value: Any = data["sid"]
+            if input_sid_value is not None:
+                if (
+                    isinstance(input_sid_value, (str, dict, list))
+                ):
+                    data["_id"] = MongoUtils.convert_to_object_id(
+                        input_sid_value
+                    )
+                else:
+                    raise UnsupportedErr(
+                        f"field \"sid\" with value {input_sid_value}"
+                    )
+            del data["sid"]
+        return data
 
     @staticmethod
-    def _adjust_id_from_mongo(data: dict) -> dict:
+    def _adjust_sid_from_mongo(data: dict) -> dict:
         if "_id" in data:
             if data["_id"] is not None:
-                data["id"] = str(data["_id"])
+                data["sid"] = str(data["_id"])
             del data["_id"]
         return data
 
@@ -279,7 +232,7 @@ class MongoUtils(Utils):
         )
 
     @classmethod
-    def create_one(
+    def create(
         cls,
         collection: str,
         data: dict,
@@ -300,7 +253,7 @@ class MongoUtils(Utils):
         return copied
 
     @classmethod
-    def try_upd_one(
+    def try_upd(
         cls,
         collection: str,
         query: dict,
@@ -327,7 +280,7 @@ class MongoUtils(Utils):
         return upd_doc
 
     @classmethod
-    def try_del_one(
+    def try_del(
         cls,
         collection: str,
         query: dict,
@@ -506,13 +459,6 @@ class MongoUtils(Utils):
             raise ValueError(f"cannot convert {type(obj)}")
 
         return result
-
-    @staticmethod
-    def refresh(doc: TDoc) -> TDoc:
-        """
-        Refreshes document with fresh data from database.
-        """
-        return doc.get({"id": doc.sid})
 
     @classmethod
     def convert_to_object_id(cls, obj: T) -> T | ObjectId:
