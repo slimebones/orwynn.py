@@ -41,7 +41,7 @@ class UploadFile(BaseModel):
 
 
 class PreloadCfg(Cfg):
-    must_clean_on_destroy: bool = False
+    must_clean_preloads_on_destroy: bool = False
 
 
 class PreloadSys(Sys[PreloadCfg]):
@@ -140,7 +140,11 @@ class PreloadSys(Sys[PreloadCfg]):
         return True
 
     async def destroy(self):
-        if self._cfg.must_clean_on_destroy:
+        # cancel all going del tasks in any case
+        for t in self._del_tasks:
+            t.cancel()
+
+        if self._cfg.must_clean_preloads_on_destroy:
             await self.try_del_all()
 
     async def _del_preload_on_expire(self, preload: PreloadDoc):
