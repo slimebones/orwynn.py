@@ -1,12 +1,12 @@
-export PYTEST_SHOW=all
+export pytest_show=all
 export args
-export t=.
+export t
 
 testapp.serve:
 	cd tests/app && $(MAKE) dev
 
 test:
-	poetry run coverage run -m pytest -x --ignore=tests/app -p no:warnings --show-capture=$(PYTEST_SHOW) --failed-first $(args) $(t)
+	poetry run coverage run -m pytest -x --ignore=tests/app -p no:warnings --show-capture=$(pytest_show) --failed-first $(args) tests/$(t)
 
 lint:
 	poetry run ruff $(args) $(t)
@@ -25,14 +25,14 @@ docs.serve:
 docs.build:
 	poetry run mkdocs build
 
-docs.serve_native:
+docs.serve-native:
 	python3 -m http.server -d site 3100
 
-docs.docker.build: docs.build
+docs.build-docker: docs.build
 	docker-compose -f docker-compose.docs.yml up -d --build --remove-orphans
 
-docs.docker.up:
+docs.up-docker:
 	docker-compose -f docker-compose.docs.yml up -d
 
-docs.docker.down:
+docs.down-docker:
 	docker-compose -f docker-compose.docs.yml down
