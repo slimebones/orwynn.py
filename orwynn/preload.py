@@ -127,9 +127,11 @@ class PreloadSys(Sys[PreloadCfg]):
 
     async def try_del_preload(self, preload: PreloadDoc) -> bool:
         preload = preload.refresh()
+        preload.try_del()
         preload_dir = Path(self._BasePreloadDir, preload.sid)
-        assert \
-            preload_dir.exists(), "if preload exists, its dir must exist"
+        if not preload_dir.exists():
+            log.err("if preload exists, its dir must exist")
+            return False
         shutil.rmtree(
             preload_dir,
             ignore_errors=True
@@ -138,7 +140,6 @@ class PreloadSys(Sys[PreloadCfg]):
 
     async def destroy(self):
         if self._cfg.must_clean_on_destroy:
-            raise ValueError("wow")
             await self.try_del_all()
 
     async def _del_preload_on_expire(self, preload: PreloadDoc):

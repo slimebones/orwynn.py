@@ -7,7 +7,7 @@ from pykit.func import FuncSpec
 from orwynn.cfg import Cfg
 from orwynn.sys import Sys
 from orwynn.utils import Utils
-from typing import Any, Callable, Iterable, Self, TypeVar, Generic
+from typing import Any, ClassVar, Iterable, Self, TypeVar, Generic
 
 from pykit import validation
 
@@ -20,7 +20,6 @@ from pykit.search import DbSearch
 from bson import ObjectId
 from bson.errors import InvalidId
 from pykit.types import T
-from pykit.fmt import FormatUtils
 
 MongoCompatibleType = str | int | float | bool | list | dict | None
 MongoCompatibleTypes: tuple[Any, ...] = typing.get_args(MongoCompatibleType)
@@ -48,7 +47,20 @@ class Doc(BaseModel):
     synchronized with db yet.
     """
 
-    _collection: str = FormatUtils.snakefy(__name__)
+    _cached_collection_name: ClassVar[str | None] = None
+
+    @classmethod
+    def get_collection_name(cls) -> str:
+        if not cls._cached_collection_name:
+            name = cls.__name__
+            assert len(name) > 0
+            if len(name) == 1:
+                name = name.lower()
+            else:
+                # camel case
+                name = name[0].lower() + name[1:]
+            cls._cached_collection_name = name
+        return cls._cached_collection_name
 
     @classmethod
     def get_many(
@@ -73,7 +85,7 @@ class Doc(BaseModel):
         validation.validate(_query, dict)
 
         cursor: MongoCursor = MongoUtils.get_many(
-            cls._collection,
+            cls.get_collection_name(),
             cls._adjust_sid_to_mongo(_query),
             **kwargs
         )
@@ -89,7 +101,7 @@ class Doc(BaseModel):
         validation.validate(query, dict)
 
         data = MongoUtils.try_get(
-            cls._collection,
+            cls.get_collection_name(),
             cls._adjust_sid_to_mongo(query),
             **kwargs
         )
@@ -100,7 +112,9 @@ class Doc(BaseModel):
 
     def create(self) -> Self:
         dump: dict = self._adjust_sid_to_mongo(self.model_dump())
-        return self._parse_data_to_doc(MongoUtils.create(self._collection, dump))
+        return self._parse_data_to_doc(MongoUtils.create(
+            self.get_collection_name(), dump
+        ))
 
     def try_del(
         self,
@@ -109,7 +123,7 @@ class Doc(BaseModel):
         if not self.sid:
             return False
         return MongoUtils.try_del(
-            self._collection,
+            self.get_collection_name(),
             {"_id": MongoUtils.convert_to_object_id(self.sid)},
             **kwargs
         )
@@ -136,7 +150,7 @@ class Doc(BaseModel):
             return None
 
         data = MongoUtils.try_upd(
-            self._collection,
+            self.get_collection_name(),
             {"_id": MongoUtils.convert_to_object_id(self.sid)},
             query,
             **kwargs

@@ -1,3 +1,4 @@
+from contextlib import suppress
 import importlib
 from typing import Callable, Self
 import typing
@@ -120,15 +121,19 @@ class Boot(Sys[BootCfg]):
 
             sys_cfg = Cfg()
 
-            sys_cfg_type = None
-            if len(sys_type.__orig_bases__) > 0:  # type: ignore
+            sys_cfg_type = Cfg
+
+            # for systems without generic definitions (just Sys instead of
+            # Sys[MyCfg]) orig bases would be singleton and typing.Generic, 
+            # so in this case we sure sys does not want to use cfg
+            with suppress(IndexError):
                 sys_cfg_type = typing.get_args(
                     sys_type.__orig_bases__[0]  # type: ignore 
                 )[0]
 
-                if not issubclass(sys_cfg_type, Cfg):
-                    log.err(f"wrong {sys_type} cfg generic: {sys_cfg_type}")
-                    sys_cfg_type = None
+            if not issubclass(sys_cfg_type, Cfg):
+                log.err(f"wrong {sys_type} cfg generic: {sys_cfg_type}")
+                sys_cfg_type = None
 
             if sys_cfg_type is not None:
                 if sys_cfg_type in type_to_cfg:
@@ -162,7 +167,6 @@ class Boot(Sys[BootCfg]):
                     f"unhandled err => {err}"
                 )
                 log.err_or_catch(newerr, 2)
-
 
     async def _enable_all_sys(self):
         for sys_type in Sys.__subclasses__():

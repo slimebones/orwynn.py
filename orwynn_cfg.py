@@ -5,13 +5,14 @@ from orwynn.preload import PreloadCfg, handle_preload
 
 default = [
     BootCfg(
+        verbosity=2,
         routedef_funcs=[
             lambda: aiohttp.web.post("/preload", handle_preload)
         ]
     ),
     MongoCfg(
         url="mongodb://localhost:9006",
-        database_name="orwynn-test"
+        database_name="orwynnTestDb"
     ),
     PreloadCfg(
         must_clean_on_destroy=True
