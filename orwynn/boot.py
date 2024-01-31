@@ -27,8 +27,11 @@ class BootCfg(Cfg):
 class Boot(Sys[BootCfg]):
     @classmethod
     async def init_boot(cls) -> Self:
+        bus = Bus.ie()
+        await bus.init()
+
         # attach empty boot cfg now, later the boot will adjust it for itself
-        boot = cls(SysArgs(bus=Bus(), cfg=BootCfg()))
+        boot = cls(SysArgs(bus=bus, cfg=BootCfg()))
 
         # no err guards here: if we fail - we fail
         await boot._internal_init(is_silent=True)  # noqa: SLF001

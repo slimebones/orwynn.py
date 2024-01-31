@@ -6,7 +6,7 @@ class Client:
     def __init__(self, native: _AioTestClient):
         self._native = native
 
-    async def ws(self, url: str = "/rx"):
+    def ws(self, url: str = "/rx"):
         return self._native.ws_connect(url)
 
     async def post(

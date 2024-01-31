@@ -1,3 +1,5 @@
+from contextlib import suppress
+import os
 import typing
 from copy import copy
 from enum import Enum
@@ -9,6 +11,7 @@ from pydantic import BaseModel
 from pykit import validation
 from pykit.err import NotFoundErr, UnsupportedErr
 from pykit.func import FuncSpec
+from pykit.log import log
 from pykit.search import DbSearch
 from pykit.types import T
 from pymongo import MongoClient
@@ -26,6 +29,7 @@ MongoCompatibleTypes: tuple[Any, ...] = typing.get_args(MongoCompatibleType)
 class MongoCfg(Cfg):
     url: str
     database_name: str
+    must_clean_db_on_destroy: bool = False
 
 class Doc(BaseModel):
     """
@@ -227,6 +231,10 @@ class MongoSys(Sys[MongoCfg]):
         self._db: MongoDb = self._client[self._cfg.database_name]
         await MongoUtils.init(self._client, self._db)
 
+    async def destroy(self):
+        if self._cfg.must_clean_db_on_destroy:
+            MongoUtils.drop_db()
+
 class MongoUtils(Utils):
     _client: MongoClient
     _db: MongoDb
@@ -237,7 +245,17 @@ class MongoUtils(Utils):
         cls._db = db
 
     @classmethod
+    async def destroy(cls):
+        with suppress(AttributeError):
+            del cls._client
+        with suppress(AttributeError):
+            del cls._db
+
+    @classmethod
     def drop_db(cls):
+        if not os.environ["ORWYNN_ALLOW_CLEAN"] == "1":
+            log.err("decline db clean - ORWYNN_ALLOW_CLEAN is not set to 1")
+            return
         cls._client.drop_database(cls._db)
 
     @classmethod

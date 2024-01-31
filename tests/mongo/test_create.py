@@ -1,7 +1,7 @@
 from tests.mongo.conftest import SimpleDocument
 
 
-def test_create():
+def test_create(app):
     created = SimpleDocument(name="pizza", price=1.2).create()
 
     assert isinstance(created.sid, str)

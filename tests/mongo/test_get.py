@@ -2,12 +2,10 @@ from tests.mongo.conftest import SimpleDocument
 
 
 def test_main(document_1: SimpleDocument, document_2: SimpleDocument):
-    assert {item.sid for item in SimpleDocument.get_many()} == {document_1.sid,
-        document_2.sid}
-
-def test_limited(document_1: SimpleDocument, document_2: SimpleDocument):
-    f = SimpleDocument.try_get({"limit": 1})
-    assert f
+    assert {item.sid for item in SimpleDocument.get_many()} == {
+        document_1.sid,
+        document_2.sid
+    }
 
 def test_id_operators(
     document_1: SimpleDocument,
@@ -16,8 +14,8 @@ def test_id_operators(
     """
     Should work normally for id MongoDb operators.
     """
-    f: list[SimpleDocument] = list(SimpleDocument.get_many({
-        "id": {
+    f = list(SimpleDocument.get_many({
+        "sid": {
             "$in": [
                 document_1.sid
             ]

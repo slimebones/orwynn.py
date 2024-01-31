@@ -13,9 +13,10 @@ default = [
     ),
     MongoCfg(
         url="mongodb://localhost:9006",
-        database_name="orwynnTestDb"
+        database_name="orwynnTestDb",
+        must_clean_db_on_destroy=True
     ),
     PreloadCfg(
-        must_clean_on_destroy=True
+        must_clean_preloads_on_destroy=True
     )
 ]
