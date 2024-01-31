@@ -168,7 +168,7 @@ class Doc(BaseModel):
 
     @classmethod
     def _adjust_sid_to_mongo(cls, data: dict) -> dict:
-        if "sid" in data:
+        if "sid" in data and data["sid"]:
             input_sid_value: Any = data["sid"]
             if input_sid_value is not None:
                 if (
@@ -501,7 +501,7 @@ class MongoUtils(Utils):
                 result = ObjectId(obj)
             except InvalidId as error:
                 raise ValueError(
-                    f"{obj} has invalid id"
+                    f"{obj} is invalid id"
                 ) from error
         elif type(obj) is dict:
             result = type(obj)()
@@ -593,7 +593,7 @@ class MongoStateFlagSys(Sys):
         except NotFoundErr:
             flag = MongoStateFlagDoc(key=key, value=value).create()
         else:
-            flag = flag.upd({"value": value})
+            flag = flag.upd({"$set": {"value": value}})
 
         return flag
 
@@ -638,7 +638,9 @@ class MongoStateFlagSys(Sys):
             result = on_false.call()
 
         flag.upd({
-            "value": finally_set_to
+            "set": {
+                "value": finally_set_to
+            }
         })
 
         return result

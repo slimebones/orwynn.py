@@ -1,15 +1,14 @@
 from pathlib import Path
-
 import aiohttp
-
+import pytest
 from orwynn.preload import PreloadUdto
 
-
-def test_preload_1(
+@pytest.mark.asyncio
+async def test_preload_1(
     client,
     base_preload_dir: Path
 ):
-    test_file_path = Path(Path.cwd(), "data/share/blueprint1.png")
+    test_file_path = Path(Path.cwd(), "assets/sample.jpg")
 
     formdata = aiohttp.FormData()
     formdata.add_field(
@@ -17,26 +16,26 @@ def test_preload_1(
         Path.open(test_file_path, "rb")
     )
 
-    data: dict = client.post_jsonify(
+    data: dict = await client.post_jsonify(
         "/preload",
         200,
         data=formdata
     )
     preload_dto = PreloadUdto.model_validate(data)
 
-    assert preload_dto.filenames == ["blueprint1.png"]
+    assert preload_dto.filenames == ["sample.jpg"]
 
     preload_dir = Path(base_preload_dir, preload_dto.sid)
     assert preload_dir.is_dir()
-    assert Path(preload_dir, "blueprint1.png").is_file()
+    assert Path(preload_dir, "sample.jpg").is_file()
 
-
-def test_preload_2(
+@pytest.mark.asyncio
+async def test_preload_2(
     client,
     base_preload_dir: Path
 ):
-    test_file_path_1 = Path(Path.cwd(), "data/share/blueprint1.png")
-    test_file_path_2 = Path(Path.cwd(), "data/share/doc1.pdf")
+    test_file_path_1 = Path(Path.cwd(), "assets/sample.jpg")
+    test_file_path_2 = Path(Path.cwd(), "assets/sample.pdf")
 
     formdata = aiohttp.FormData()
     formdata.add_field(
@@ -48,18 +47,18 @@ def test_preload_2(
         Path.open(test_file_path_2, "rb")
     )
 
-    data: dict = client.post_jsonify(
+    data: dict = await client.post_jsonify(
         "/preload",
         200,
         data=formdata
     )
     preload_dto = PreloadUdto.model_validate(data)
 
-    assert preload_dto.filenames == ["blueprint1.png", "doc1.pdf"]
+    assert preload_dto.filenames == ["sample.jpg", "sample.pdf"]
 
     preload_dir = Path(base_preload_dir, preload_dto.sid)
     assert preload_dir.is_dir()
 
-    assert Path(preload_dir, "blueprint1.png").is_file()
-    assert Path(preload_dir, "doc1.pdf").is_file()
+    assert Path(preload_dir, "sample.jpg").is_file()
+    assert Path(preload_dir, "sample.pdf").is_file()
 

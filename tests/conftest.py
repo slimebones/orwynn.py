@@ -2,6 +2,7 @@ import pytest_asyncio
 
 from orwynn.app import App
 from orwynn.boot import Boot
+from orwynn.tst import Client
 
 @pytest_asyncio.fixture
 async def app() -> App:
@@ -9,5 +10,5 @@ async def app() -> App:
 
 @pytest_asyncio.fixture
 async def client(app: App, aiohttp_client):
-    return await aiohttp_client(app)
+    return Client(await aiohttp_client(app))
 

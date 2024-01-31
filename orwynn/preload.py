@@ -3,7 +3,7 @@ Manages preloaded files, i.e. files that need to be loaded before the main
 instruction send.
 """
 import asyncio
-from io import BufferedReader
+from io import BufferedIOBase
 import shutil
 from pathlib import Path
 
@@ -30,7 +30,7 @@ class PreloadDoc(Doc):
 
 class UploadFile(BaseModel):
     filename: str
-    buf: BufferedReader
+    buf: BufferedIOBase
     content_type: str
 
     class Config:
@@ -81,7 +81,9 @@ class PreloadSys(Sys):
                 await out_file.write(content)
 
         preload = preload.upd({
-            "filenames": preload.filenames
+            "$set": {
+                "filenames": preload.filenames
+            }
         })
 
         return PreloadUdto(
@@ -134,13 +136,19 @@ class PreloadSys(Sys):
         await self.try_del_preload(preload)
 
 
-async def handle_preload(webreq: aiohttp.web.BaseRequest):
-    # WARNING: don't do that if you plan to receive large files!
+async def handle_preload(
+    webreq: aiohttp.web.BaseRequest
+) -> aiohttp.web.StreamResponse:
+    # warn: don't do that if you plan to receive large files!
     data = await webreq.post()
 
-    rawfiles: list[aiohttp.web.FileField] = data["files"]
+    rawfiles: list = data.getall("files")
     files: list[UploadFile] = []
     for f in rawfiles:
+        if not isinstance(f, aiohttp.web.FileField):
+            raise ValueError(
+                f"all form data fields should be files, but got {f}"
+            )
         files.append(UploadFile(
             filename=f.filename,
             buf=f.file,

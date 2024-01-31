@@ -1,6 +1,5 @@
 from enum import Enum
 from pydantic import BaseModel
-from pykit.err import AlreadyProcessedErr
 from pykit.singleton import Singleton
 from rxcat import Bus
 
