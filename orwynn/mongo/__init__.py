@@ -109,6 +109,16 @@ class Doc(BaseModel):
             **kwargs
         )
 
+    def upd(
+        self,
+        query: dict,
+        **kwargs
+    ) -> Self:
+        f = self.try_upd(query, **kwargs)
+        if f is None:
+            raise ValueError("cannot upd")
+        return f
+
     def try_upd(
         self,
         query: dict,
@@ -131,13 +141,16 @@ class Doc(BaseModel):
 
         return self._parse_data_to_doc(data)
 
-    def try_refresh(
+    def refresh(
         self
-    ) -> Self | None:
+    ) -> Self:
         """
         Refreshes the document with a new data from the database.
         """
-        return self.try_get({"sid": self.sid})
+        f = self.try_get({"sid": self.sid})
+        if f is None:
+            raise ValueError("unable to refresh")
+        return f
 
     @classmethod
     def _parse_data_to_doc(cls, data: dict) -> Self:

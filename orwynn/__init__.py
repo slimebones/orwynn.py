@@ -1,5 +1,4 @@
 import importlib
-from pathlib import Path
 import typing
 
 import aiohttp.web
@@ -72,12 +71,10 @@ class Boot(Sys):
         Runs the app using a server.
         """
         app = aiohttp.web.Application()
-        app.add_routes([aiohttp.web.get("/rx", self._ws_handler)])
+        app.add_routes([aiohttp.web.get("/rx", self._handle_ws)])
         aiohttp.web.run_app(app)
 
     async def init(self):
-        self._root_dir: Path = Path.cwd()
-
         _cfg_pack = await self._init_cfg_pack()
         _type_to_cfg: dict[type[Cfg], Cfg] = {}
         for cfg in _cfg_pack:
@@ -93,7 +90,7 @@ class Boot(Sys):
         # we will do something more flexible
         await self._enable_all_sys()
 
-    async def _ws_handler(self, webreq: aiohttp.web.BaseRequest):
+    async def _handle_ws(self, webreq: aiohttp.web.BaseRequest):
         ws = Websocket()
         await ws.prepare(webreq)
 
