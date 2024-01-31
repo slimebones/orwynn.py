@@ -3,7 +3,6 @@ from enum import Enum
 from pykit import validation
 
 from orwynn.mongo import MongoUtils
-from orwynn.mongo.errors import MongoTypeConversionError
 
 
 class StringEnum(Enum):
@@ -109,6 +108,6 @@ def test_mongovalue_set():
     """
     validation.expect(
         MongoUtils.convert_compatible,
-        MongoTypeConversionError,
+        ValueError,
         SetObj(),
     )

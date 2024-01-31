@@ -1,16 +1,24 @@
-from contextlib import suppress
 import importlib
-from typing import Callable, Self
 import typing
+from contextlib import suppress
+from typing import Callable, Self
+
 import aiohttp.web
 from pydantic import ValidationError
 from pykit.log import log
-from orwynn.cfg import Cfg
-from orwynn.sys import internal_FailedSysCase, Sys, SysArgs, internal_FailedSysErr, internal_SysErr
 from rxcat import Bus
-from orwynn.ws import Ws
 
 from orwynn.app import App
+from orwynn.cfg import Cfg
+from orwynn.sys import (
+    Sys,
+    SysArgs,
+    internal_FailedSysCase,
+    internal_FailedSysErr,
+    internal_SysErr,
+)
+from orwynn.ws import Ws
+
 
 class BootCfg(Cfg):
     verbosity: int = 0
@@ -21,10 +29,10 @@ class Boot(Sys[BootCfg]):
     async def init_boot(cls) -> Self:
         # attach empty boot cfg now, later the boot will adjust it for itself
         boot = cls(SysArgs(bus=Bus(), cfg=BootCfg()))
-        
+
         # no err guards here: if we fail - we fail
-        await boot._internal_init(is_silent=True)
-        await boot._internal_enable(is_silent=True)
+        await boot._internal_init(is_silent=True)  # noqa: SLF001
+        await boot._internal_enable(is_silent=True)  # noqa: SLF001
 
         return boot
 
@@ -34,11 +42,11 @@ class Boot(Sys[BootCfg]):
 
         app = App()
         routedefs = []
-        routedef_funcs = boot._cfg.routedef_funcs
+        routedef_funcs = boot._cfg.routedef_funcs  # noqa: SLF001
         if routedef_funcs:
             routedefs = [func() for func in routedef_funcs]
         app.add_routes([
-            aiohttp.web.get("/rx", boot._handle_ws),
+            aiohttp.web.get("/rx", boot._handle_ws),  # noqa: SLF001
             *routedefs
         ])
 
@@ -61,7 +69,7 @@ class Boot(Sys[BootCfg]):
                 self._cfg = typing.cast(BootCfg, cfg)
                 log.verbosity = self._cfg.verbosity
                 continue
-            type_to_cfg[cfg_type] = cfg 
+            type_to_cfg[cfg_type] = cfg
 
         await self._init_sys(type_to_cfg)
         # for now all systems are enabled without an option to change, later
@@ -97,7 +105,7 @@ class Boot(Sys[BootCfg]):
                 pack = set(cfg_module.default)
                 for cfg in pack:
                     if not isinstance(cfg, Cfg):
-                        raise TypeError
+                        raise TypeError  # noqa: TRY301
             except TypeError:
                 log.err(
                     "orwynn_cfg.py::default is expected to be iterable of Cfg"
@@ -111,8 +119,8 @@ class Boot(Sys[BootCfg]):
         # all systems visible are initialized. System deeper inheritance is
         # disallowed (here skipped). Systems should init only themselves
         # in their "init" method, to avoid perf hits and unecessary imports.
-        # 
-        # Accesses to bus and other dependent actions should be done in 
+        #
+        # Accesses to bus and other dependent actions should be done in
         # enable/disable, since this is a safe point where all systems are
         # initialized.
         for sys_type in Sys.__subclasses__():
@@ -124,11 +132,11 @@ class Boot(Sys[BootCfg]):
             sys_cfg_type = Cfg
 
             # for systems without generic definitions (just Sys instead of
-            # Sys[MyCfg]) orig bases would be singleton and typing.Generic, 
+            # Sys[MyCfg]) orig bases would be singleton and typing.Generic,
             # so in this case we sure sys does not want to use cfg
             with suppress(IndexError):
                 sys_cfg_type = typing.get_args(
-                    sys_type.__orig_bases__[0]  # type: ignore 
+                    sys_type.__orig_bases__[0]  # type: ignore
                 )[0]
 
             if not issubclass(sys_cfg_type, Cfg):
@@ -154,7 +162,7 @@ class Boot(Sys[BootCfg]):
                         continue
 
             try:
-                await sys_type(SysArgs(
+                await sys_type(SysArgs(  # noqa: SLF001
                     bus=self._bus,
                     cfg=sys_cfg
                 ))._internal_init()
@@ -172,7 +180,7 @@ class Boot(Sys[BootCfg]):
         for sys_type in Sys.__subclasses__():
             try:
                 await sys_type.ie().enable()
-            except internal_SysErr as err:
+            except internal_SysErr as err:  # noqa: PERF203
                 log.catch(err)
             except Exception as err:
                 newerr = internal_FailedSysErr(

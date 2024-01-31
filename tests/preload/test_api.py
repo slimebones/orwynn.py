@@ -1,7 +1,10 @@
 from pathlib import Path
+
 import aiohttp
 import pytest
+
 from orwynn.preload import PreloadUdto
+
 
 @pytest.mark.asyncio
 async def test_preload_1(

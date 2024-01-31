@@ -6,10 +6,18 @@ respect-gitignore = true
 
 exclude = [
     "docs/source/conf.py",
-    ".vscode"
+    ".vscode",
+    "orwynn/legacy"
 ]
 
 ignore = [
+    # gives false-positive
+    "PD011",
+
+    "BLE001",
+
+    "FA102",
+
     # remove ugly trailing commas
     "COM812",
 
@@ -96,10 +104,9 @@ ignore = [
 ]
 
 [per-file-ignores]
-"__init__.py" = ["F401"]
-"test_*.py" = ["S101"]
-"testing.py" = ["S101"]
-"conftest.py" = ["S101", "F401", "F811"]
+"test_*.py" = ["S101", "PLR2004"]
+"testing.py" = ["S101", "PLR2004"]
+"conftest.py" = ["S101", "F811", "PLR2004"]
 
 [mccabe]
 max-complexity = 10

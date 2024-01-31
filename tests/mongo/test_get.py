@@ -1,14 +1,13 @@
-from orwynn.mongo.document.testing import SimpleDocument
+from tests.mongo.conftest import SimpleDocument
 
 
 def test_main(document_1: SimpleDocument, document_2: SimpleDocument):
-    assert {item.id for item in SimpleDocument.get()} == {document_1.id,
-        document_2.id}
-
+    assert {item.sid for item in SimpleDocument.get_many()} == {document_1.sid,
+        document_2.sid}
 
 def test_limited(document_1: SimpleDocument, document_2: SimpleDocument):
-    assert len(list(SimpleDocument.get(limit=1))) == 1
-
+    f = SimpleDocument.try_get({"limit": 1})
+    assert f
 
 def test_id_operators(
     document_1: SimpleDocument,
@@ -17,13 +16,13 @@ def test_id_operators(
     """
     Should work normally for id MongoDb operators.
     """
-    found: list[SimpleDocument] = list(SimpleDocument.get({
+    f: list[SimpleDocument] = list(SimpleDocument.get_many({
         "id": {
             "$in": [
-                document_1.id
+                document_1.sid
             ]
         }
     }))
 
-    assert len(found) == 1
-    assert found[0].id == document_1.id
+    assert len(f) == 1
+    assert f[0].sid == document_1.sid

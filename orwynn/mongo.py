@@ -1,25 +1,24 @@
+import typing
 from copy import copy
 from enum import Enum
-import typing
+from typing import Any, ClassVar, Generic, Iterable, Self, TypeVar
+
+from bson import ObjectId
+from bson.errors import InvalidId
 from pydantic import BaseModel
+from pykit import validation
 from pykit.err import NotFoundErr, UnsupportedErr
 from pykit.func import FuncSpec
-from orwynn.cfg import Cfg
-from orwynn.sys import Sys
-from orwynn.utils import Utils
-from typing import Any, ClassVar, Iterable, Self, TypeVar, Generic
-
-from pykit import validation
-
-from pymongo import MongoClient as MongoClient
+from pykit.search import DbSearch
+from pykit.types import T
+from pymongo import MongoClient
 from pymongo import ReturnDocument as ReturnDocStrat
 from pymongo.cursor import Cursor as MongoCursor
 from pymongo.database import Database as MongoDb
 
-from pykit.search import DbSearch
-from bson import ObjectId
-from bson.errors import InvalidId
-from pykit.types import T
+from orwynn.cfg import Cfg
+from orwynn.sys import Sys
+from orwynn.utils import Utils
 
 MongoCompatibleType = str | int | float | bool | list | dict | None
 MongoCompatibleTypes: tuple[Any, ...] = typing.get_args(MongoCompatibleType)
@@ -159,6 +158,20 @@ class Doc(BaseModel):
             return None
 
         return self._parse_data_to_doc(data)
+
+    def try_set(
+        self,
+        set_query: dict,
+        **kwargs
+    ) -> Self | None:
+        return self.try_upd({"$set": set_query}, **kwargs)
+
+    def try_inc(
+        self,
+        inc_query: dict,
+        **kwargs
+    ) -> Self | None:
+        return self.try_upd({"$inc": inc_query}, **kwargs)
 
     def refresh(
         self
@@ -470,12 +483,12 @@ class MongoUtils(Utils):
         """
         result: MongoCompatibleType
 
-        if type(obj) is dict:
+        if isinstance(obj, dict):
             result = {}
             for k, v in obj.items():
                 result[MongoUtils.convert_compatible(k)] = \
                     MongoUtils.convert_compatible(v)
-        elif type(obj) is list:
+        elif isinstance(obj, list):
             result = []
             for item in obj:
                 result.append(MongoUtils.convert_compatible(item))
@@ -506,18 +519,18 @@ class MongoUtils(Utils):
         """
         result: T | ObjectId
 
-        if type(obj) is str:
+        if isinstance(obj, str):
             try:
                 result = ObjectId(obj)
             except InvalidId as error:
                 raise ValueError(
                     f"{obj} is invalid id"
                 ) from error
-        elif type(obj) is dict:
+        elif isinstance(obj, dict):
             result = type(obj)()
             for k, v in obj.items():
                 result[k] = MongoUtils.convert_to_object_id(v)
-        elif type(obj) is list:
+        elif isinstance(obj, list):
             result = type(obj)([
                 MongoUtils.convert_to_object_id(x) for x in obj
             ])

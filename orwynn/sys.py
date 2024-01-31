@@ -1,14 +1,13 @@
-from contextlib import suppress
 from enum import Enum
-from typing import Any, Generic
-import typing
-from pydantic import BaseModel
+from typing import Generic
+
+from pydantic.generics import GenericModel
 from pykit.log import log
 from pykit.singleton import Singleton
 from rxcat import Bus
-from pydantic.generics import GenericModel
 
-from orwynn.cfg import Cfg, TCfg
+from orwynn.cfg import TCfg
+
 
 class SysArgs(GenericModel, Generic[TCfg]):
     bus: Bus
@@ -27,7 +26,9 @@ class internal_FailedSysCase(Enum):
     Destroy = "destroy"
 
 class internal_FailedSysErr(Exception):
-    def __init__(self, sys_type: type["Sys"], case: internal_FailedSysCase, why: str):
+    def __init__(
+        self, sys_type: type["Sys"], case: internal_FailedSysCase, why: str
+    ):
         msg = f"failed to {case.value} {sys_type}: {why}"
         super().__init__(msg)
 

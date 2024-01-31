@@ -3,10 +3,9 @@ Manages preloaded files, i.e. files that need to be loaded before the main
 instruction send.
 """
 import asyncio
-from io import BufferedIOBase
 import shutil
+from io import BufferedIOBase
 from pathlib import Path
-import typing
 
 import aiofiles
 import aiohttp.web
@@ -14,20 +13,22 @@ from pydantic import BaseModel
 from pykit.dt import DTUtils
 from pykit.err import InpErr
 from pykit.log import log
-from orwynn.cfg import Cfg
-from orwynn.sys import Sys
-from orwynn.mongo import Doc
 
-class PreloadUdto(BaseModel):
-    sid: str
+from orwynn.cfg import Cfg
+from orwynn.dto import Udto
+from orwynn.mongo import Doc
+from orwynn.sys import Sys
+
+
+class PreloadUdto(Udto):
     filenames: list[str]
-    created_time: float
-    expire_time: float
+    createdTime: float
+    expireTime: float
 
 class PreloadDoc(Doc):
     filenames: list[str]
-    created_time: float
-    expire_time: float
+    createdTime: float
+    expireTime: float
 
 
 class UploadFile(BaseModel):
@@ -62,8 +63,8 @@ class PreloadSys(Sys[PreloadCfg]):
 
         preload = PreloadDoc(
             filenames=[],
-            created_time=DTUtils.get_utc_timestamp(),
-            expire_time=DTUtils.get_delta_timestamp(
+            createdTime=DTUtils.get_utc_timestamp(),
+            expireTime=DTUtils.get_delta_timestamp(
                 self._DefaultExpirationDelta
             )
         ).create()
@@ -95,8 +96,8 @@ class PreloadSys(Sys[PreloadCfg]):
         return PreloadUdto(
             sid=preload.sid,
             filenames=preload.filenames,
-            created_time=preload.created_time,
-            expire_time=preload.expire_time
+            createdTime=preload.createdTime,
+            expireTime=preload.expireTime
         )
 
     async def try_del_all(self) -> bool:
@@ -119,9 +120,9 @@ class PreloadSys(Sys[PreloadCfg]):
         if not pl or not pl.filenames:
             return None
 
-        paths: list[Path] = []
-        for f in pl.filenames:
-            paths.append(Path(self._BasePreloadDir, sid, f))
+        paths: list[Path] = [
+            Path(self._BasePreloadDir, sid, f) for f in pl.filenames
+        ]
 
         return paths
 
@@ -143,7 +144,7 @@ class PreloadSys(Sys[PreloadCfg]):
             await self.try_del_all()
 
     async def _del_preload_on_expire(self, preload: PreloadDoc):
-        await asyncio.sleep(preload.expire_time - preload.created_time)
+        await asyncio.sleep(preload.expireTime - preload.createdTime)
         log.info(f"{preload} is expired")
         await self.try_del_preload(preload)
 
@@ -158,7 +159,7 @@ async def handle_preload(
     files: list[UploadFile] = []
     for f in rawfiles:
         if not isinstance(f, aiohttp.web.FileField):
-            raise ValueError(
+            raise TypeError(
                 f"all form data fields should be files, but got {f}"
             )
         files.append(UploadFile(

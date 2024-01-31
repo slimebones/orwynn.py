@@ -1,4 +1,5 @@
 import aiohttp.web
+
 from orwynn.boot import BootCfg
 from orwynn.mongo import MongoCfg
 from orwynn.preload import PreloadCfg, handle_preload

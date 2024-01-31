@@ -1,6 +1,6 @@
 export pytest_show=all
 export args
-export t
+export t="."
 
 testapp.serve:
 	cd tests/app && $(MAKE) dev

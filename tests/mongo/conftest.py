@@ -1,20 +1,20 @@
 import pytest
 
-from orwynn.mongo.document import Document
+from orwynn.mongo import Doc
 
 
-class SimpleDocument(Document):
+class SimpleDocument(Doc):
     name: str
     price: float
     priority: int = 5
 
 
-class NestedDocument(Document):
+class NestedDocument(Doc):
     nested: dict
 
 
 @pytest.fixture
-def document_1(mongo_boot) -> SimpleDocument:
+def document_1() -> SimpleDocument:
     return SimpleDocument(
         name="pizza",
         price=1.2,
@@ -23,7 +23,7 @@ def document_1(mongo_boot) -> SimpleDocument:
 
 
 @pytest.fixture
-def document_2(mongo_boot) -> SimpleDocument:
+def document_2() -> SimpleDocument:
     return SimpleDocument(
         name="donut",
         price=1
@@ -31,7 +31,7 @@ def document_2(mongo_boot) -> SimpleDocument:
 
 
 @pytest.fixture
-def nested_document_1(mongo_boot) -> NestedDocument:
+def nested_document_1() -> NestedDocument:
     return NestedDocument(
         nested={
             "key1": {
