@@ -4,7 +4,7 @@ from typing import Awaitable, Callable, Generic
 from pydantic.generics import GenericModel
 from pykit.log import log
 from pykit.singleton import Singleton
-from rxcat import Bus, SubOpts, TMsg
+from rxcat import Bus, Msg, PubOpts, Raction, SubOpts, TMsg
 
 from orwynn.cfg import TCfg
 
@@ -65,6 +65,14 @@ class Sys(Singleton, Generic[TCfg]):
     ):
         subid = await self._bus.sub(msg_type, action, opts)
         self._subids.append(subid)
+
+    async def _pub(
+        self,
+        msg: Msg,
+        raction: Raction | None = None,
+        opts: PubOpts = PubOpts(),
+    ):
+        await self._bus.pub(msg, raction, opts)
 
     async def _internal_init(self, is_silent: bool = False):
         if self._internal_is_initd:
