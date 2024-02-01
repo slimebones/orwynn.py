@@ -17,13 +17,13 @@ class _Cfg4(Cfg):
 
 @pytest.mark.asyncio
 async def test_bake():
-    f = await CfgPackUtils._bake_cfg_pack_reversed_tree(
+    f = await CfgPackUtils.bake_cfgs(
+        "prod-very-local",
         {
             "__default__": [
                 _Cfg1(num=0),
                 _Cfg2(num=0),
-                _Cfg3(num=0),
-                _Cfg4(num=0)
+                _Cfg3(num=0)
             ],
             "test": [
                 _Cfg1(num=1),
@@ -41,12 +41,18 @@ async def test_bake():
                 _Cfg1(num=4),
                 _Cfg2(num=4),
                 _Cfg3(num=4)
+            ],
+            "prod-local->prod-very-local": [
+                _Cfg3(num=5),
+                _Cfg4(num=5)
             ]
         }
     )
 
-    for x in f:
-        print(x)
-
-    assert 0
+    assert sorted(f, key=lambda cfg: cfg.__class__.__name__) == [
+        _Cfg1(num=4),
+        _Cfg2(num=4),
+        _Cfg3(num=5),
+        _Cfg4(num=5)
+    ]
 

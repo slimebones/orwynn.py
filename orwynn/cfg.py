@@ -2,6 +2,7 @@ import importlib
 from typing import Any, TypeVar
 
 from pydantic import BaseModel
+from pykit.err import AlreadyProcessedErr, NotFoundErr
 from pykit.log import log
 from pykit.tree import ReversedTreeNode, TreeNode, TreeUtils
 
@@ -10,30 +11,12 @@ class Cfg(BaseModel):
     """
     Configurational object used to pass initial arguments to the systems.
     """
-    # def __eq__(self, other) -> bool:
-    #     return hash(self) == hash(other)
-
-    def __hash__(self) -> int:
-        return hash(repr(self))
 
 TCfg = TypeVar("TCfg", bound=Cfg)
 CfgPack = dict[str, list[Cfg]]
+_CfgPackRtree = list[ReversedTreeNode[tuple[str, list[Cfg]]]]
 
 class CfgPackUtils:
-    # async def _merge_cfgs_for_mode_or_action(
-    #     self,
-    #     mode: str,
-    #     pack: CfgPack,
-    #     action: Callable[[Any], None]
-    # ) -> set[Cfg]:
-    #     """
-    #     Finds cfg for mode and if the mode has parent mode, merge it
-    #     into the result recursively.
-
-    #     Calls provided action on err.
-    #     """
-    #     f: set[Cfg] = set()
-
     @classmethod
     async def init_cfg_pack(cls) -> CfgPack:
         """
@@ -77,7 +60,7 @@ class CfgPackUtils:
         return pack
 
     @classmethod
-    async def bake_cfgs(cls, mode: str, pack: CfgPack) -> set[Cfg]:
+    async def bake_cfgs(cls, mode: str, pack: CfgPack) -> list[Cfg]:
         """
         Merges an appropriate cfg collections into one.
 
@@ -85,15 +68,86 @@ class CfgPackUtils:
         used with notation "parent->child". This method finds parent and 
         merges it into child, if the chosen mode is "child".
         """
-
-        # cfgsf = pack.get(mode, None)
-        # if cfgsf is None:
-        #     log.fatal(f"cannot find cfgs for mode {mode}")
+        rtree = await cls._bake_cfg_pack_rtree(pack)
+        chain = await cls._bake_cfg_inheritance_chain(mode, rtree)
+        return await cls._merge_chain(chain)
 
     @classmethod
-    async def _bake_cfg_pack_reversed_tree(
+    async def _merge_chain(
+        cls,
+        chain: list[list[Cfg]]
+    ) -> list[Cfg]:
+        """
+        Merges all chain items into one collection of cfgs.
+
+        Chain is assumed to be: parents first, childs last.
+        """
+        typef_to_cfgf: dict[type[Cfg], Cfg] = {}
+
+        for item in chain:
+            chain_item_cfg_types: list[type[Cfg]] = []
+            for cfg in item:
+                cfg_type = type(cfg)
+                if cfg_type in chain_item_cfg_types:
+                    raise AlreadyProcessedErr(f"{cfg_type} for this chain")
+                if cfg_type not in typef_to_cfgf:
+                    typef_to_cfgf[cfg_type] = cfg
+                    continue
+
+                # upd old cfg with a new one, and since we move from parents
+                # to childs, the final cfg will be overriden by the last
+                # childs
+                dataf = typef_to_cfgf[cfg_type].model_dump()
+                dataf.update(cfg.model_dump())
+                
+                typef_to_cfgf[cfg_type] = cfg_type.model_validate(dataf)
+
+        return list(typef_to_cfgf.values())
+
+    @classmethod
+    async def _bake_cfg_inheritance_chain(
+        cls,
+        mode: str,
+        rtree: _CfgPackRtree
+    ) -> list[list[Cfg]]:
+        f: list[list[Cfg]] = []
+
+        for rn in rtree:
+            rnf = await cls._try_find_rnode_for_mode(mode, rn)
+            if rnf:
+                await cls._expand_inheritance_chain(rn, f)
+                # true inheritance chain goes from parents to childs
+                f.reverse()
+                return f
+
+        raise NotFoundErr(f"rnode for mode {mode}", { "rtree": rtree })
+
+    @classmethod
+    async def _try_find_rnode_for_mode(
+        cls,
+        mode: str,
+        start_rnode: ReversedTreeNode
+    ) -> ReversedTreeNode | None:
+        if start_rnode.val[0] == mode:
+            return start_rnode
+        if not start_rnode.parent:
+            return None
+        return await cls._try_find_rnode_for_mode(mode, start_rnode.parent)
+
+    @classmethod
+    async def _expand_inheritance_chain(
+        cls,
+        rn: ReversedTreeNode,
+        chain: list[list[Cfg]]
+    ):
+        chain.append(rn.val[1])
+        if rn.parent:
+            await cls._expand_inheritance_chain(rn.parent, chain)
+
+    @classmethod
+    async def _bake_cfg_pack_rtree(
         cls, pack: CfgPack
-    ) -> list[ReversedTreeNode[tuple[str, list[Cfg]]]]:
+    ) -> _CfgPackRtree:
         """
         Bakes the cfg pack tree and returns list of its leaves.
         """

@@ -68,6 +68,7 @@ class Boot(Sys[BootCfg]):
     async def init(self):
         cfg_pack = await CfgPackUtils.init_cfg_pack()
         mode = OrwynnEnvUtils.get_mode()
+        log.info(f"chosen mode: {mode}", 1)
         cfgsf = await CfgPackUtils.bake_cfgs(mode, cfg_pack)
 
         type_to_cfg: dict[type[Cfg], Cfg] = {}

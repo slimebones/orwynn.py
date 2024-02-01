@@ -253,6 +253,9 @@ class MongoUtils:
 
     @classmethod
     def drop_db(cls):
+        if not OrwynnEnvUtils.is_debug():
+            log.err("decline db clean - ORWYNN_DEBUG is not set to 1")
+            return
         if not OrwynnEnvUtils.is_clean_allowed():
             log.err("decline db clean - ORWYNN_ALLOW_CLEAN is not set to 1")
             return

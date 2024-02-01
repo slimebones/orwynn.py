@@ -14,6 +14,7 @@ from tests.mongo.conftest import SimpleDocument
 
 @pytest_asyncio.fixture(autouse=True)
 async def autorun():
+    os.environ["ORWYNN_MODE"] = "test"
     os.environ["ORWYNN_DEBUG"] = "1"
     os.environ["ORWYNN_ALLOW_CLEAN"] = "1"
 
