@@ -18,6 +18,7 @@ from pymongo import MongoClient
 from pymongo import ReturnDocument as ReturnDocStrat
 from pymongo.cursor import Cursor as MongoCursor
 from pymongo.database import Database as MongoDb
+from rxcat import Req
 
 from orwynn.cfg import Cfg
 from orwynn.env import OrwynnEnvUtils
@@ -25,6 +26,9 @@ from orwynn.sys import Sys
 
 MongoCompatibleType = str | int | float | bool | list | dict | None
 MongoCompatibleTypes: tuple[Any, ...] = typing.get_args(MongoCompatibleType)
+
+class GetDocsReq(Req):
+    search: dict
 
 class MongoCfg(Cfg):
     url: str
