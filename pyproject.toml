@@ -13,7 +13,6 @@ readme = "readme.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-uvicorn = { extras = ["standard"], version = "^0.20.0" }
 loguru = "^0.7.2"
 pyjwt = "^2.6.0"
 pymongo = "^4.3.3"
@@ -24,6 +23,7 @@ aiohttp = { extras = ["speedups"], version = "^3.9.3" }
 rxcat = { path = "../rxcat/lib/pyrxcat", develop = true }
 fcode = { path = "../fcode/lib/pyfcode", develop = true }
 pykit = { path = "../pykit", develop = true }
+uvicorn = { path = "../uvicorn", develop = true }
 
 pydantic = "^2.6.0"
 aiofiles = "^23.2.1"

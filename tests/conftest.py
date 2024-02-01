@@ -10,7 +10,6 @@ from orwynn.mongo import MongoUtils
 from orwynn.sys import Sys
 from orwynn.tst import Client
 
-
 @pytest_asyncio.fixture(autouse=True)
 async def autorun():
     os.environ["ORWYNN_MODE"] = "test"

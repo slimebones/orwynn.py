@@ -1,6 +1,9 @@
+import asyncio
+import uvicorn
+import argparse
 import typing
 from contextlib import suppress
-from typing import Callable, Self
+from typing import Callable, Coroutine, Self
 
 import aiohttp.web
 from pydantic import ValidationError
@@ -18,6 +21,7 @@ from orwynn.sys import (
     internal_SysErr,
 )
 from orwynn.ws import Ws
+from uvicorn.config import LoopSetupType
 
 
 class BootCfg(Cfg):
@@ -40,7 +44,7 @@ class Boot(Sys[BootCfg]):
         return boot
 
     @classmethod
-    async def get_app(cls) -> aiohttp.web.Application:
+    async def create_app(cls) -> aiohttp.web.Application:
         boot = await cls.init_boot()
 
         app = App()
@@ -56,12 +60,42 @@ class Boot(Sys[BootCfg]):
         return app
 
     @classmethod
-    async def run(cls):  # add server args here
+    async def run_cli(cls):
+        """
+        Run, but get args from CLI.
+        """
+        parser = argparse.ArgumentParser()
+        parser.add_argument("host", type=str)
+        parser.add_argument("port", type=int)
+        args = parser.parse_args()
+        await cls.run(args.host, args.port)
+
+    @classmethod
+    async def run(cls, host: str, port: int):
         """
         Runs the app using a server.
         """
-        app = await cls.get_app()
-        aiohttp.web.run_app(app)
+        app = await cls.create_app()
+        cfg = uvicorn.Config(
+            app,
+            host=host,
+            port=port,
+            factory=True,
+            reload=True,
+            reload_dirs=[
+                ".",
+                "../../lib"
+            ]
+        )
+        server = uvicorn.Server(cfg)
+        await server.serve()
+
+        # aiohttp.web.run_app(
+        #     cls.create_app(),
+        #     host=host,
+        #     port=port,
+        #     loop=asyncio.get_event_loop()
+        # )
 
     async def init(self):
         cfg_pack = await CfgPackUtils.init_cfg_pack()

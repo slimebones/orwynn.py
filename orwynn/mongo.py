@@ -17,7 +17,7 @@ from pymongo import MongoClient
 from pymongo import ReturnDocument as ReturnDocStrat
 from pymongo.cursor import Cursor as MongoCursor
 from pymongo.database import Database as MongoDb
-from rxcat import Req
+from rxcat import Evt, Req, code
 
 from orwynn.cfg import Cfg
 from orwynn.env import OrwynnEnvUtils
@@ -25,9 +25,6 @@ from orwynn.sys import Sys
 
 MongoCompatibleType = str | int | float | bool | list | dict | None
 MongoCompatibleTypes: tuple[Any, ...] = typing.get_args(MongoCompatibleType)
-
-class GetDocsReq(Req):
-    search: dict
 
 class MongoCfg(Cfg):
     url: str
@@ -121,6 +118,18 @@ class Doc(BaseModel):
         return self._parse_data_to_doc(MongoUtils.create(
             self.get_collection_name(), dump
         ))
+
+    @classmethod
+    def try_get_and_del(
+        cls,
+        query: dict,
+        **kwargs
+    ) -> bool: 
+        return MongoUtils.try_del(
+            cls.get_collection_name(),
+            query,
+            **kwargs
+        )
 
     def try_del(
         self,
@@ -356,15 +365,12 @@ class MongoUtils:
         validation.validate(collection, str)
         validation.validate(query, dict)
 
-        removed_document: Any | None = \
-            cls._db[collection].find_one_and_delete(
-                query, **kwargs
-            )
+        del_result = cls._db[collection].delete_one(
+            query,
+            **kwargs
+        )
 
-        if removed_document is None:
-            return False
-
-        return True
+        return del_result.deleted_count > 0
 
     @staticmethod
     def process_search(
@@ -695,4 +701,22 @@ class MongoStateFlagUtils:
         })
 
         return result
+
+@code("orwynn.get-docs-req")
+class GetDocsReq(Req):
+    collection: str
+    query: dict
+
+@code("orwynn.got-doc-evt")
+class GotDocEvt(Evt, Generic[TDoc]):
+    doc: TDoc
+
+@code("orwynn.got-docs-evt")
+class GotDocsEvt(Evt, Generic[TDoc]):
+    docs: list[TDoc]
+
+@code("orwynn.del-doc-req")
+class DelDocReq(Req):
+    collection: str
+    query: dict
 
