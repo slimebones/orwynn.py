@@ -661,7 +661,7 @@ develop = true
 
 [package.source]
 type = "directory"
-url = "../fcode/lib/pyfcode"
+url = "../pyfcode"
 
 [[package]]
 name = "frozenlist"
@@ -865,6 +865,17 @@ files = [
 
 [package.dependencies]
 colorama = ">=0.4"
+
+[[package]]
+name = "h11"
+version = "0.14.0"
+description = "A pure-Python, bring-your-own-I/O implementation of HTTP/1.1"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "h11-0.14.0-py3-none-any.whl", hash = "sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761"},
+    {file = "h11-0.14.0.tar.gz", hash = "sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c6f0a3b699d"},
+]
 
 [[package]]
 name = "idna"
@@ -1552,7 +1563,7 @@ develop = true
 [package.dependencies]
 bcrypt = "^4.1.1"
 dictdiffer = "^0.9.0"
-fcode = {path = "../fcode/lib/pyfcode", develop = true}
+fcode = {path = "../pyfcode", develop = true}
 loguru = "^0.7.2"
 pydantic = "^2.5.2"
 python-benedict = "^0.33.0"
@@ -1775,13 +1786,13 @@ files = [
 
 [[package]]
 name = "python-slugify"
-version = "8.0.2"
+version = "8.0.3"
 description = "A Python slugify application that also handles Unicode"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "python-slugify-8.0.2.tar.gz", hash = "sha256:a1a02b127a95c124fd84f8f88be730e557fd823774bf19b1cd5e8704e2ae0e5e"},
-    {file = "python_slugify-8.0.2-py2.py3-none-any.whl", hash = "sha256:428ea9b00c977b8f6c097724398f190b2c18e2a6011094d1001285875ccacdbf"},
+    {file = "python-slugify-8.0.3.tar.gz", hash = "sha256:e04cba5f1c562502a1175c84a8bc23890c54cdaf23fccaaf0bf78511508cabed"},
+    {file = "python_slugify-8.0.3-py2.py3-none-any.whl", hash = "sha256:c71189c161e8c671f1b141034d9a56308a8a5978cd13d40446c879569212fdd1"},
 ]
 
 [package.dependencies]
@@ -2023,12 +2034,12 @@ develop = true
 
 [package.dependencies]
 aiohttp = {version = "^3.9.3", extras = ["speedups"]}
-fcode = {path = "../../../fcode/lib/pyfcode", develop = true}
-pykit = {path = "../../../pykit", develop = true}
+fcode = {path = "../pyfcode", develop = true}
+pykit = {path = "../pykit", develop = true}
 
 [package.source]
 type = "directory"
-url = "../rxcat/lib/pyrxcat"
+url = "../pyrxcat"
 
 [[package]]
 name = "semver"
@@ -2177,6 +2188,26 @@ brotli = ["brotli (>=1.0.9)", "brotlicffi (>=0.8.0)"]
 h2 = ["h2 (>=4,<5)"]
 socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
+
+[[package]]
+name = "uvicorn"
+version = "0.27.0.post1"
+description = "The lightning-fast ASGI server."
+optional = false
+python-versions = ">=3.8"
+files = []
+develop = true
+
+[package.dependencies]
+click = ">=7.0"
+h11 = ">=0.8"
+
+[package.extras]
+standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)", "pyyaml (>=5.1)", "uvloop (>=0.14.0,!=0.15.0,!=0.15.1)", "watchfiles (>=0.13)", "websockets (>=10.4)"]
+
+[package.source]
+type = "directory"
+url = "../uvicorn"
 
 [[package]]
 name = "watchdog"
@@ -2337,4 +2368,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "c4e4d18f46e949b13f91cdb653608f18c00ac07b01b6ed855b8e6d8e9866d7c3"
+content-hash = "c2220e508b7325e958a0998163b8b40b30f1f3404374c8635f5953d1a1da23c8"

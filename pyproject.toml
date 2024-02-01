@@ -20,8 +20,8 @@ sqlalchemy = "^2.0.3"
 psycopg2 = "^2.9.5"
 typing-extensions = "^4.7.1"
 aiohttp = { extras = ["speedups"], version = "^3.9.3" }
-rxcat = { path = "../rxcat/lib/pyrxcat", develop = true }
-fcode = { path = "../fcode/lib/pyfcode", develop = true }
+rxcat = { path = "../pyrxcat", develop = true }
+fcode = { path = "../pyfcode", develop = true }
 pykit = { path = "../pykit", develop = true }
 uvicorn = { path = "../uvicorn", develop = true }
 
