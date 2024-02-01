@@ -1,15 +1,18 @@
 import importlib
+import os
 import typing
 from contextlib import suppress
-from typing import Callable, Self
+from typing import Any, Callable, Iterable, Self
 
 import aiohttp.web
 from pydantic import ValidationError
 from pykit.log import log
+from pykit.tree import ReversedTreeNode, TreeNode
 from rxcat import Bus
 
 from orwynn.app import App
-from orwynn.cfg import Cfg
+from orwynn.cfg import Cfg, CfgPackUtils
+from orwynn.env import OrwynnEnvUtils
 from orwynn.sys import (
     Sys,
     SysArgs,
@@ -18,7 +21,6 @@ from orwynn.sys import (
     internal_SysErr,
 )
 from orwynn.ws import Ws
-
 
 class BootCfg(Cfg):
     verbosity: int = 0
@@ -64,13 +66,17 @@ class Boot(Sys[BootCfg]):
         aiohttp.web.run_app(app)
 
     async def init(self):
-        cfg_pack = await self._init_cfg_pack()
+        cfg_pack = await CfgPackUtils.init_cfg_pack()
+        mode = OrwynnEnvUtils.get_mode()
+        cfgsf = await CfgPackUtils.bake_cfgs(mode, cfg_pack)
+
         type_to_cfg: dict[type[Cfg], Cfg] = {}
-        for cfg in cfg_pack:
+        for cfg in cfgsf:
             cfg_type = type(cfg)
             if cfg_type is BootCfg:
                 self._cfg = typing.cast(BootCfg, cfg)
                 log.verbosity = self._cfg.verbosity
+                log.is_debug = OrwynnEnvUtils.is_debug()
                 continue
             type_to_cfg[cfg_type] = cfg
 
@@ -86,37 +92,6 @@ class Boot(Sys[BootCfg]):
         await self._bus.conn(ws)  # type: ignore
 
         return ws
-
-    async def _init_cfg_pack(self) -> set[Cfg]:
-        pack = set()
-
-        try:
-            cfg_module = importlib.import_module("orwynn_cfg")
-        except ModuleNotFoundError:
-            log.info("config not found => use default", 2)
-        else:
-            try:
-                pack = cfg_module.default
-            except AttributeError:
-                log.err(
-                    "orwynn_cfg.py is defined, but no 'default' object"
-                    " is found there => use default",
-                    1
-                )
-
-            try:
-                pack = set(cfg_module.default)
-                for cfg in pack:
-                    if not isinstance(cfg, Cfg):
-                        raise TypeError  # noqa: TRY301
-            except TypeError:
-                log.err(
-                    "orwynn_cfg.py::default is expected to be iterable of Cfg"
-                    " instances",
-                    1
-                )
-
-        return pack
 
     async def _init_sys(self, type_to_cfg: dict[type[Cfg], Cfg]):
         # all systems visible are initialized. System deeper inheritance is

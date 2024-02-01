@@ -20,8 +20,8 @@ from pymongo.cursor import Cursor as MongoCursor
 from pymongo.database import Database as MongoDb
 
 from orwynn.cfg import Cfg
+from orwynn.env import OrwynnEnvUtils
 from orwynn.sys import Sys
-from orwynn.utils import Utils
 
 MongoCompatibleType = str | int | float | bool | list | dict | None
 MongoCompatibleTypes: tuple[Any, ...] = typing.get_args(MongoCompatibleType)
@@ -235,7 +235,7 @@ class MongoSys(Sys[MongoCfg]):
         if self._cfg.must_clean_db_on_destroy:
             MongoUtils.drop_db()
 
-class MongoUtils(Utils):
+class MongoUtils:
     _client: MongoClient
     _db: MongoDb
 
@@ -253,7 +253,7 @@ class MongoUtils(Utils):
 
     @classmethod
     def drop_db(cls):
-        if not os.environ["ORWYNN_ALLOW_CLEAN"] == "1":
+        if not OrwynnEnvUtils.is_clean_allowed():
             log.err("decline db clean - ORWYNN_ALLOW_CLEAN is not set to 1")
             return
         cls._client.drop_database(cls._db)
@@ -570,7 +570,7 @@ class MongoStateFlagSearch(DocSearch):
     keys: list[str] | None = None
     values: list[bool] | None = None
 
-class MongoStateFlagUtils(Utils):
+class MongoStateFlagUtils:
     @classmethod
     def get(
         cls,
