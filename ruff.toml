@@ -11,6 +11,9 @@ exclude = [
 ]
 
 ignore = [
+    # we love lambdas
+    "E731",
+
     # gives false-positive
     "PD011",
 

@@ -1,10 +1,10 @@
 from enum import Enum
-from typing import Generic
+from typing import Awaitable, Callable, Generic
 
 from pydantic.generics import GenericModel
 from pykit.log import log
 from pykit.singleton import Singleton
-from rxcat import Bus
+from rxcat import Bus, SubOpts, TMsg
 
 from orwynn.cfg import TCfg
 
@@ -44,6 +44,7 @@ class Sys(Singleton, Generic[TCfg]):
     ):
         self._bus: Bus = args.bus
         self._cfg: TCfg = args.cfg
+        self._subids: list[int] = []
 
         self._internal_is_initd = False
         self._internal_is_enabled = False
@@ -55,6 +56,15 @@ class Sys(Singleton, Generic[TCfg]):
     @property
     def is_enabled(self) -> bool:
         return self._internal_is_enabled
+
+    async def _sub(
+        self,
+        msg_type: type[TMsg],
+        action: Callable[[TMsg], Awaitable],
+        opts: SubOpts = SubOpts(),
+    ):
+        subid = await self._bus.sub(msg_type, action, opts)
+        self._subids.append(subid)
 
     async def _internal_init(self, is_silent: bool = False):
         if self._internal_is_initd:
@@ -112,6 +122,7 @@ class Sys(Singleton, Generic[TCfg]):
                     f"unhandled err => {err}"
                 )
                 log.err_or_catch(newerr, 2)
+            await ie._bus.unsub_many(ie._subids)  # noqa: SLF001
             cls.try_discard()
 
     async def destroy(self):
