@@ -1,5 +1,6 @@
 from pykit.env import EnvSpec, EnvUtils
 
+
 class OrwynnEnvUtils:
     @classmethod
     def is_debug(cls) -> bool:
@@ -7,7 +8,10 @@ class OrwynnEnvUtils:
 
     @classmethod
     def is_clean_allowed(cls) -> bool:
-        return EnvUtils.get_bool(EnvSpec(key="ORWYNN_ALLOW_CLEAN", default="0"))
+        return EnvUtils.get_bool(EnvSpec(
+            key="ORWYNN_ALLOW_CLEAN",
+            default="0"
+        ))
 
     @classmethod
     def get_mode(cls) -> str:

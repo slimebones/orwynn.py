@@ -9,7 +9,6 @@ from orwynn.boot import Boot
 from orwynn.mongo import MongoUtils
 from orwynn.sys import Sys
 from orwynn.tst import Client
-from tests.mongo.conftest import SimpleDocument
 
 
 @pytest_asyncio.fixture(autouse=True)

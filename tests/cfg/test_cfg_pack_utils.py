@@ -1,7 +1,7 @@
-from pykit.tree import TreeUtils
 import pytest
 
 from orwynn.cfg import Cfg, CfgPackUtils
+
 
 class _Cfg1(Cfg):
     num: int

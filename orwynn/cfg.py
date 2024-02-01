@@ -65,7 +65,7 @@ class CfgPackUtils:
         Merges an appropriate cfg collections into one.
 
         Cfgs in cfg pack can be denoted by mode, but inherited modes can be
-        used with notation "parent->child". This method finds parent and 
+        used with notation "parent->child". This method finds parent and
         merges it into child, if the chosen mode is "child".
         """
         rtree = await cls._bake_cfg_pack_rtree(pack)
@@ -99,7 +99,7 @@ class CfgPackUtils:
                 # childs
                 dataf = typef_to_cfgf[cfg_type].model_dump()
                 dataf.update(cfg.model_dump())
-                
+
                 typef_to_cfgf[cfg_type] = cfg_type.model_validate(dataf)
 
         return list(typef_to_cfgf.values())
@@ -166,8 +166,9 @@ class CfgPackUtils:
             await cls._check_cfg_pack_kv_shallow(k, v)
 
             if "->" in k:
+                MaxModeInheritanceDepth = 1
                 parts = k.split("->")
-                if len(parts) != 2:
+                if len(parts) != MaxModeInheritanceDepth + 1:
                     log.fatal(f"invalid mode {k} composition")
 
                 parent_mode, child_mode = parts[0], parts[1]
@@ -176,7 +177,7 @@ class CfgPackUtils:
                 # use structures like "__default__->mymode"
                 await cls._check_mode_name_or_fatal(parent_mode)
                 await cls._check_mode_name_or_fatal(child_mode)
-                
+
                 child_node: TreeNode
                 if child_mode in mode_to_node:
                     child_node = mode_to_node[child_mode]
@@ -195,7 +196,7 @@ class CfgPackUtils:
                 # create/get parent node and assign child
                 parent_node: TreeNode
                 if parent_mode in mode_to_node:
-                    parent_node = mode_to_node[parent_mode] 
+                    parent_node = mode_to_node[parent_mode]
                 else:
                     parent_node = TreeNode((parent_mode, []), [])
                     mode_to_node[parent_mode] = parent_node
@@ -203,7 +204,7 @@ class CfgPackUtils:
 
                 continue
 
-            if not k == "__default__":
+            if k != "__default__":
                 await cls._check_mode_name_or_fatal(k)
             node: TreeNode
             if k in mode_to_node:
@@ -217,7 +218,7 @@ class CfgPackUtils:
                 root_node.childs.append(node)
 
         return await TreeUtils.reverse(root_node)
-    
+
     @classmethod
     async def _check_cfg_pack_kv_shallow(cls, k: Any, v: Any):
         if not isinstance(k, str):
