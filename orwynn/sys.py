@@ -96,6 +96,7 @@ class Sys(Singleton, Generic[TCfg]):
                 return
             raise internal_SysErr
         await self.disable()
+        await self._bus.unsub_many(self._subids)
         self._internal_is_enabled = False
 
     async def init(self):
@@ -107,10 +108,16 @@ class Sys(Singleton, Generic[TCfg]):
 
     async def enable(self):
         """
+        You should sub to bus only in enable, since auto-unsub works on
+        disable.
         """
 
     async def disable(self):
         """
+        When system is disabled, can happen quite often.
+
+        Here is where all subscriptions to the bus are closed internally,
+        so make sure you use bus subs only at enable/disable.
         """
 
     @classmethod
@@ -130,7 +137,6 @@ class Sys(Singleton, Generic[TCfg]):
                     f"unhandled err => {err}"
                 )
                 log.err_or_catch(newerr, 2)
-            await ie._bus.unsub_many(ie._subids)  # noqa: SLF001
             cls.try_discard()
 
     async def destroy(self):

@@ -28,7 +28,7 @@ async def autorun():
 
 @pytest_asyncio.fixture
 async def app() -> App:
-    app = await Boot.get_app()
+    app = await Boot.create_app()
     return app
 
 @pytest_asyncio.fixture
