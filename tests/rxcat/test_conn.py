@@ -35,7 +35,7 @@ async def test_net_conn_and_pub(client: Client):
     await bus.sub(_Evt1, on_msg1)
 
     async with client.ws("/rx") as ws:
-        m = _Evt1(num=1)
+        m = _Evt1(num=1, rsid="__system__")
         data: dict = await ws.receive_json()
 
         mcode = bus.try_get_mcode_for_mcodeid(data["mcodeid"])
