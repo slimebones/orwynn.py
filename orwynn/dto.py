@@ -1,3 +1,5 @@
+from typing import TypeVar
+
 from pydantic import BaseModel
 
 
@@ -12,9 +14,5 @@ class Udto(Dto):
     """
     sid: str
 
-class Cdto(Dto):
-    """
-    @abs
-    """
-    units: list[Udto]
+TUdto = TypeVar("TUdto", bound=Udto)
 

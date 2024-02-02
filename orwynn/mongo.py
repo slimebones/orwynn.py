@@ -20,8 +20,50 @@ from pymongo.database import Database as MongoDb
 from rxcat import Evt, Req, code
 
 from orwynn.cfg import Cfg
+from orwynn.dto import TUdto, Udto
 from orwynn.env import OrwynnEnvUtils
 from orwynn.sys import Sys
+
+# We manage mongo CRUD by Create, Get, Upd and Del requests.
+# Get and Del requests are ready-to-use and fcoded. Create and Upd requests
+# are abstract, since we expect user to add custom fields to the req body.
+#
+# By Orwynn convention, we pub GotDocEvt/GotDocsEvt in response to
+# Create/Get/Upd requests. Del req should receive only OkEvt, without doc
+# payload.
+#
+# For "collection" field, the __default__ db is assumed. Later we might add
+# redefine field to this, but now we're fine.
+
+@code("orwynn.get-docs-req")
+class GetDocsReq(Req):
+    collection: str
+    searchQuery: dict
+
+@code("orwynn.got-doc-udto-evt")
+class GotDocUdtoEvt(Evt, Generic[TUdto]):
+    udto: TUdto
+
+@code("orwynn.got-doc-udtos-evt")
+class GotDocUdtosEvt(Evt, Generic[TUdto]):
+    udtos: list[TUdto]
+
+@code("orwynn.del-doc-req")
+class DelDocReq(Req):
+    collection: str
+    searchQuery: dict
+
+class CreateDocReq(Req):
+    """
+    @abs
+    """
+    # nothing here for now but this is called a setup
+
+class UpdDocReq(Req):
+    """
+    @abs
+    """
+    searchQuery: dict
 
 MongoCompatibleType = str | int | float | bool | list | dict | None
 MongoCompatibleTypes: tuple[Any, ...] = typing.get_args(MongoCompatibleType)
@@ -51,6 +93,28 @@ class Doc(BaseModel):
     """
 
     _cached_collection_name: ClassVar[str | None] = None
+
+    @classmethod
+    def to_udtos(cls, docs: list[Self]) -> list[Udto]:
+        return [doc.to_udto() for doc in docs]
+
+    @classmethod
+    def to_got_doc_udtos_evt(
+        cls,
+        rsid: str,
+        docs: list[Self]
+    ) -> GotDocUdtosEvt:
+        udtos = cls.to_udtos(docs)
+        return GotDocUdtosEvt(rsid=rsid, udtos=udtos)
+
+    def to_udto(self) -> Udto:
+        raise NotImplementedError
+
+    def to_got_doc_udto_evt(
+        self,
+        rsid: str
+    ) -> GotDocUdtoEvt:
+        return GotDocUdtoEvt(rsid=rsid, udto=self.to_udto)
 
     @classmethod
     def get_collection_name(cls) -> str:
@@ -113,10 +177,10 @@ class Doc(BaseModel):
 
         return cls._parse_data_to_doc(data)
 
-    def create(self) -> Self:
+    def create(self, **kwargs) -> Self:
         dump: dict = self._adjust_sid_to_mongo(self.model_dump())
         return self._parse_data_to_doc(MongoUtils.create(
-            self.get_collection_name(), dump
+            self.get_collection_name(), dump, **kwargs
         ))
 
     @classmethod
@@ -143,6 +207,24 @@ class Doc(BaseModel):
             **kwargs
         )
 
+    @classmethod
+    def get(cls, query: dict, **kwargs) -> Self:
+        doc = cls.try_get(query, **kwargs)
+        if doc is None:
+            raise NotFoundErr(cls, query)
+
+    @classmethod
+    def get_and_upd(
+        cls,
+        search_query: dict,
+        upd_query: dict,
+        *,
+        search_kwargs: dict | None = None,
+        upd_kwargs: dict | None = None
+    ) -> Self:
+        doc = cls.get(search_query, **search_kwargs or {})
+        return doc.upd(upd_query, **upd_kwargs or {})
+
     def upd(
         self,
         query: dict,
@@ -150,7 +232,7 @@ class Doc(BaseModel):
     ) -> Self:
         f = self.try_upd(query, **kwargs)
         if f is None:
-            raise ValueError("cannot upd")
+            raise ValueError(f"failed to upd doc {self}, using query {query}")
         return f
 
     def try_upd(
@@ -195,9 +277,10 @@ class Doc(BaseModel):
         """
         Refreshes the document with a new data from the database.
         """
-        f = self.try_get({"sid": self.sid})
+        query = {"sid": self.sid}
+        f = self.try_get(query)
         if f is None:
-            raise ValueError("unable to refresh")
+            raise NotFoundErr(type(self), query)
         return f
 
     @classmethod
@@ -701,22 +784,4 @@ class MongoStateFlagUtils:
         })
 
         return result
-
-@code("orwynn.get-docs-req")
-class GetDocsReq(Req):
-    collection: str
-    query: dict
-
-@code("orwynn.got-doc-evt")
-class GotDocEvt(Evt, Generic[TDoc]):
-    doc: TDoc
-
-@code("orwynn.got-docs-evt")
-class GotDocsEvt(Evt, Generic[TDoc]):
-    docs: list[TDoc]
-
-@code("orwynn.del-doc-req")
-class DelDocReq(Req):
-    collection: str
-    query: dict
 
