@@ -114,7 +114,7 @@ class Doc(BaseModel):
         self,
         rsid: str
     ) -> GotDocUdtoEvt:
-        return GotDocUdtoEvt(rsid=rsid, udto=self.to_udto)
+        return GotDocUdtoEvt(rsid=rsid, udto=self.to_udto())
 
     @classmethod
     def get_collection_name(cls) -> str:
