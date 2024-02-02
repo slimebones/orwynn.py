@@ -1,11 +1,10 @@
-import asyncio
-import uvicorn
 import argparse
 import typing
 from contextlib import suppress
-from typing import Callable, Coroutine, Self
+from typing import Callable, Self
 
 import aiohttp.web
+import uvicorn
 from pydantic import ValidationError
 from pykit.log import log
 from rxcat import Bus
@@ -21,7 +20,6 @@ from orwynn.sys import (
     internal_SysErr,
 )
 from orwynn.ws import Ws
-from uvicorn.config import LoopSetupType
 
 
 class BootCfg(Cfg):

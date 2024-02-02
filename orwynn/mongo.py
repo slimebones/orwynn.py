@@ -124,7 +124,7 @@ class Doc(BaseModel):
         cls,
         query: dict,
         **kwargs
-    ) -> bool: 
+    ) -> bool:
         return MongoUtils.try_del(
             cls.get_collection_name(),
             query,

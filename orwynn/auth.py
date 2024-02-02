@@ -1,12 +1,13 @@
 from typing import Callable
+
 from fcode import code
 from pykit.log import log
-
 from rxcat import Awaitable, Evt, Req
 
 from orwynn.cfg import Cfg
 from orwynn.rbac import PermissionDto
 from orwynn.sys import Sys
+
 
 @code("orwynn.login-req")
 class LoginReq(Req):
