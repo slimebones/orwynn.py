@@ -17,7 +17,7 @@ from pymongo import MongoClient
 from pymongo import ReturnDocument as ReturnDocStrat
 from pymongo.cursor import Cursor as MongoCursor
 from pymongo.database import Database as MongoDb
-from rxcat import Evt, Msg, MsgFilter, Req, code
+from rxcat import Evt, InpErr, Msg, MsgFilter, Req, code
 
 from orwynn.cfg import Cfg
 from orwynn.dto import TUdto, Udto
@@ -227,7 +227,19 @@ class Doc(BaseModel):
     ) -> bool:
         return MongoUtils.try_del(
             cls.get_collection(),
-            query,
+            cls._adjust_sid_to_mongo(query),
+            **kwargs
+        )
+
+    def delete(
+        self,
+        **kwargs
+    ):
+        if not self.sid:
+            raise InpErr(f"unsync doc {self}")
+        return MongoUtils.delete(
+            self.get_collection(),
+            {"_id": MongoUtils.convert_to_object_id(self.sid)},
             **kwargs
         )
 
@@ -314,6 +326,8 @@ class Doc(BaseModel):
         """
         Refreshes the document with a new data from the database.
         """
+        if not self.sid:
+            raise InpErr("empty sid")
         query = {"sid": self.sid}
         f = self.try_get(query)
         if f is None:
@@ -474,6 +488,24 @@ class MongoUtils:
 
         assert isinstance(upd_doc, dict)
         return upd_doc
+
+    @classmethod
+    def delete(
+        cls,
+        collection: str,
+        query: dict,
+        **kwargs
+    ):
+        validation.validate(collection, str)
+        validation.validate(query, dict)
+
+        del_result = cls._db[collection].delete_one(
+            query,
+            **kwargs
+        )
+
+        if del_result.deleted_count == 0:
+            raise NotFoundErr(f"doc in collection {collection}", query)
 
     @classmethod
     def try_del(
