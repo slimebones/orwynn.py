@@ -2,7 +2,7 @@ import os
 
 import pytest_asyncio
 from fcode import FcodeCore
-from rxcat import Bus
+from rxcat import ServerBus
 
 from orwynn.app import App
 from orwynn.boot import Boot
@@ -24,7 +24,7 @@ async def autorun():
 
     FcodeCore.deflock = False
     FcodeCore.clean_non_decorator_codes()
-    await Bus.destroy()
+    await ServerBus.destroy()
     await MongoUtils.destroy()
 
 @pytest_asyncio.fixture

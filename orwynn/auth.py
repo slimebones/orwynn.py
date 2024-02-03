@@ -51,7 +51,10 @@ class AuthSys(Sys[AuthCfg]):
     async def _on_login_req(self, req: LoginReq):
         check_result = await self._cfg.check_user_func(req)
 
-        # todo: tmp always return positive
+        if not check_result:
+            # todo: tmp always return positive
+            check_result = True
+
         permissions = [
             PermissionDto(
                 code="orwynn-test.test-permission",

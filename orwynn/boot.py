@@ -7,7 +7,7 @@ import aiohttp.web
 import uvicorn
 from pydantic import ValidationError
 from pykit.log import log
-from rxcat import Bus
+from rxcat import ServerBus
 
 from orwynn.app import App
 from orwynn.cfg import Cfg, CfgPackUtils
@@ -23,13 +23,13 @@ from orwynn.ws import Ws
 
 
 class BootCfg(Cfg):
-    verbosity: int = 0
+    std_verbosity: int = 1
     routedef_funcs: list[Callable[[], aiohttp.web.RouteDef]] | None = None
 
 class Boot(Sys[BootCfg]):
     @classmethod
     async def init_boot(cls) -> Self:
-        bus = Bus.ie()
+        bus = ServerBus.ie()
         await bus.init()
 
         # attach empty boot cfg now, later the boot will adjust it for itself
@@ -106,7 +106,7 @@ class Boot(Sys[BootCfg]):
             cfg_type = type(cfg)
             if cfg_type is BootCfg:
                 self._cfg = typing.cast(BootCfg, cfg)
-                log.verbosity = self._cfg.verbosity
+                log.std_verbosity = self._cfg.std_verbosity
                 log.is_debug = OrwynnEnvUtils.is_debug()
                 continue
             type_to_cfg[cfg_type] = cfg

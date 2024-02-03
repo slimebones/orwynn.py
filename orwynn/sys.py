@@ -1,16 +1,24 @@
 from enum import Enum
-from typing import Awaitable, Callable, Generic
+from typing import Awaitable, Callable, ClassVar, Generic
 
 from pydantic.generics import GenericModel
 from pykit.log import log
 from pykit.singleton import Singleton
-from rxcat import Bus, Msg, PubOpts, Raction, SubOpts, TMsg
+from rxcat import (
+    Msg,
+    MsgFilter,
+    PubAction,
+    PubOpts,
+    ServerBus,
+    SubOpts,
+    TMsg,
+)
 
 from orwynn.cfg import TCfg
 
 
 class SysArgs(GenericModel, Generic[TCfg]):
-    bus: Bus
+    bus: ServerBus
     cfg: TCfg
 
     class Config:
@@ -38,11 +46,13 @@ class Sys(Singleton, Generic[TCfg]):
 
     @abs
     """
+    CommonSubMsgFilters: ClassVar[list[MsgFilter]] = []
+
     def __init__(
         self,
         args: SysArgs
     ):
-        self._bus: Bus = args.bus
+        self._bus: ServerBus = args.bus
         self._cfg: TCfg = args.cfg
         self._subids: list[int] = []
 
@@ -63,16 +73,18 @@ class Sys(Singleton, Generic[TCfg]):
         action: Callable[[TMsg], Awaitable],
         opts: SubOpts = SubOpts(),
     ):
-        subid = await self._bus.sub(msg_type, action, opts)
+        optsf = opts.model_copy(deep=True)
+        optsf.filters = [*self.CommonSubMsgFilters, *optsf.filters]
+        subid = await self._bus.sub(msg_type, action, optsf)
         self._subids.append(subid)
 
     async def _pub(
         self,
         msg: Msg,
-        raction: Raction | None = None,
+        pubaction: PubAction | None = None,
         opts: PubOpts = PubOpts(),
     ):
-        await self._bus.pub(msg, raction, opts)
+        await self._bus.pub(msg, pubaction, opts)
 
     async def _internal_init(self, is_silent: bool = False):
         if self._internal_is_initd:

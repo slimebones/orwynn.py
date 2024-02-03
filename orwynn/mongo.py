@@ -17,12 +17,39 @@ from pymongo import MongoClient
 from pymongo import ReturnDocument as ReturnDocStrat
 from pymongo.cursor import Cursor as MongoCursor
 from pymongo.database import Database as MongoDb
-from rxcat import Evt, Req, code
+from rxcat import Evt, Msg, MsgFilter, Req, code
 
 from orwynn.cfg import Cfg
 from orwynn.dto import TUdto, Udto
 from orwynn.env import OrwynnEnvUtils
 from orwynn.sys import Sys
+
+
+def filter_collection_factory(collection: str) -> MsgFilter:
+    """
+    Filters incoming msg to have a certain collection.
+
+    If msg doesn't have "collection" field (or it is set to None, the check is
+    not performed and true is returned.
+
+    If collection field exists, but it is not a str, true is returned,
+    but warning is issued.
+    """
+    async def filter_collection(msg: Msg) -> bool:
+        real_collection = getattr(msg, "collection", None)
+        if real_collection is None:
+            return True
+        if not isinstance(real_collection, str):
+            log.warn(
+                f"{msg} uses \"collection\" field = {real_collection},"
+                " which is not instance of str, and probably has not intention"
+                " to connect it with database collection"
+                " => return true from this filter"
+            )
+            return True
+        return collection == real_collection
+
+    return filter_collection
 
 # We manage mongo CRUD by Create, Get, Upd and Del requests.
 # Get and Del requests are ready-to-use and fcoded. Create and Upd requests
@@ -42,10 +69,12 @@ class GetDocsReq(Req):
 
 @code("orwynn.got-doc-udto-evt")
 class GotDocUdtoEvt(Evt, Generic[TUdto]):
+    collection: str
     udto: TUdto
 
 @code("orwynn.got-doc-udtos-evt")
 class GotDocUdtosEvt(Evt, Generic[TUdto]):
+    collection: str
     udtos: list[TUdto]
 
 @code("orwynn.del-doc-req")
@@ -53,17 +82,16 @@ class DelDocReq(Req):
     collection: str
     searchQuery: dict
 
+@code("orwynn.create-doc-req")
 class CreateDocReq(Req):
-    """
-    @abs
-    """
-    # nothing here for now but this is called a setup
+    collection: str
+    createQuery: dict
 
+@code("orwynn.upd-doc-req")
 class UpdDocReq(Req):
-    """
-    @abs
-    """
+    collection: str
     searchQuery: dict
+    updQuery: dict
 
 MongoCompatibleType = str | int | float | bool | list | dict | None
 MongoCompatibleTypes: tuple[Any, ...] = typing.get_args(MongoCompatibleType)
@@ -105,7 +133,11 @@ class Doc(BaseModel):
         docs: list[Self]
     ) -> GotDocUdtosEvt:
         udtos = cls.to_udtos(docs)
-        return GotDocUdtosEvt(rsid=rsid, udtos=udtos)
+        return GotDocUdtosEvt(
+            rsid=rsid,
+            collection=cls.get_collection(),
+            udtos=udtos
+        )
 
     def to_udto(self) -> Udto:
         raise NotImplementedError
@@ -114,10 +146,14 @@ class Doc(BaseModel):
         self,
         rsid: str
     ) -> GotDocUdtoEvt:
-        return GotDocUdtoEvt(rsid=rsid, udto=self.to_udto())
+        return GotDocUdtoEvt(
+            rsid=rsid,
+            collection=self.get_collection(),
+            udto=self.to_udto()
+        )
 
     @classmethod
-    def get_collection_name(cls) -> str:
+    def get_collection(cls) -> str:
         if not cls._cached_collection_name:
             name = cls.__name__
             assert len(name) > 0
@@ -152,7 +188,7 @@ class Doc(BaseModel):
         validation.validate(_query, dict)
 
         cursor: MongoCursor = MongoUtils.get_many(
-            cls.get_collection_name(),
+            cls.get_collection(),
             cls._adjust_sid_to_mongo(_query),
             **kwargs
         )
@@ -168,7 +204,7 @@ class Doc(BaseModel):
         validation.validate(query, dict)
 
         data = MongoUtils.try_get(
-            cls.get_collection_name(),
+            cls.get_collection(),
             cls._adjust_sid_to_mongo(query),
             **kwargs
         )
@@ -180,7 +216,7 @@ class Doc(BaseModel):
     def create(self, **kwargs) -> Self:
         dump: dict = self._adjust_sid_to_mongo(self.model_dump())
         return self._parse_data_to_doc(MongoUtils.create(
-            self.get_collection_name(), dump, **kwargs
+            self.get_collection(), dump, **kwargs
         ))
 
     @classmethod
@@ -190,7 +226,7 @@ class Doc(BaseModel):
         **kwargs
     ) -> bool:
         return MongoUtils.try_del(
-            cls.get_collection_name(),
+            cls.get_collection(),
             query,
             **kwargs
         )
@@ -202,7 +238,7 @@ class Doc(BaseModel):
         if not self.sid:
             return False
         return MongoUtils.try_del(
-            self.get_collection_name(),
+            self.get_collection(),
             {"_id": MongoUtils.convert_to_object_id(self.sid)},
             **kwargs
         )
@@ -212,6 +248,7 @@ class Doc(BaseModel):
         doc = cls.try_get(query, **kwargs)
         if doc is None:
             raise NotFoundErr(cls, query)
+        return doc
 
     @classmethod
     def get_and_upd(
@@ -247,7 +284,7 @@ class Doc(BaseModel):
             return None
 
         data = MongoUtils.try_upd(
-            self.get_collection_name(),
+            self.get_collection(),
             {"_id": MongoUtils.convert_to_object_id(self.sid)},
             query,
             **kwargs

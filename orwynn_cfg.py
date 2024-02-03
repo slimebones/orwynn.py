@@ -7,7 +7,7 @@ from orwynn.preload import PreloadCfg, handle_preload
 default = {
     "test": [
         BootCfg(
-            verbosity=2,
+            std_verbosity=2,
             routedef_funcs=[
                 lambda: aiohttp.web.post("/preload", handle_preload)
             ]
