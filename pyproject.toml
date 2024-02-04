@@ -23,7 +23,7 @@ aiohttp = { extras = ["speedups"], version = "^3.9.3" }
 rxcat = { path = "../pyrxcat", develop = true }
 fcode = { path = "../pyfcode", develop = true }
 pykit = { path = "../pykit", develop = true }
-uvicorn = { path = "../uvicorn", develop = true }
+uvicorn = { path = "../uvicorn", develop = true, extras = ["standard"] }
 
 pydantic = "^2.6.0"
 aiofiles = "^23.2.1"

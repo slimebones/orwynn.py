@@ -7,7 +7,7 @@ import aiohttp.web
 import uvicorn
 from pydantic import ValidationError
 from pykit.log import log
-from rxcat import ServerBus
+from rxcat import ServerBus, asyncio
 
 from orwynn.app import App
 from orwynn.cfg import Cfg, CfgPackUtils
@@ -74,26 +74,45 @@ class Boot(Sys[BootCfg]):
         Runs the app using a server.
         """
         app = await cls.create_app()
-        cfg = uvicorn.Config(
-            app,
-            host=host,
-            port=port,
-            factory=True,
-            reload=True,
-            reload_dirs=[
-                ".",
-                "../../lib"
-            ]
-        )
-        server = uvicorn.Server(cfg)
-        await server.serve()
 
-        # aiohttp.web.run_app(
-        #     cls.create_app(),
+        # UVICORN: does not work for now (rejects ws conn)
+        #
+        # cfg = uvicorn.Config(
+        #     app,
         #     host=host,
         #     port=port,
-        #     loop=asyncio.get_event_loop()
+        #     factory=True,
+        #     reload=True,
+        #     reload_dirs=[
+        #         ".",
+        #         "../../lib"
+        #     ]
         # )
+        # server = uvicorn.Server(cfg)
+        # await server.serve()
+
+        await aiohttp.web._run_app(
+            app,
+            host=host,
+            port=port
+        )
+
+#     @classmethod
+#     async def _aiohttp_run_app(cls, app: App):
+
+#         # add stuff to the loop, e.g. using asyncio.create_task()
+#         # ...
+
+#         runner = aiohttp.web.AppRunner(app)
+#         await runner.setup()
+#         site = aiohttp.web.TCPSite(runner)    
+#         await site.start()
+
+#         # add more stuff to the loop, if needed
+#         # ...
+
+#         # wait forever
+#         await asyncio.Event().wait()
 
     async def init(self):
         cfg_pack = await CfgPackUtils.init_cfg_pack()

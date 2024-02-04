@@ -12,7 +12,7 @@ from orwynn.sys import Sys
 @code("orwynn.login-req")
 class LoginReq(Req):
     username: str
-    hashPassword: str
+    hpassword: str
 
 @code("orwynn.logout-req")
 class LogoutReq(Req):
