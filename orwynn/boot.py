@@ -1,16 +1,18 @@
 import argparse
 import typing
 from contextlib import suppress
-from typing import Callable, Self
+from typing import Any, Awaitable, Callable, Coroutine, Literal, Self
 
 import aiohttp.web
 from pydantic import ValidationError
+from pykit.err import InpErr
 from pykit.log import log
-from rxcat import ServerBus, asyncio
+from rxcat import ServerBus
 
 from orwynn.app import App
 from orwynn.cfg import Cfg, CfgPackUtils
 from orwynn.env import OrwynnEnvUtils
+from orwynn.rbac import RbacUtils, RbacCfg
 from orwynn.sys import (
     Sys,
     SysArgs,
@@ -23,7 +25,11 @@ from orwynn.ws import Ws
 
 class BootCfg(Cfg):
     std_verbosity: int = 1
-    routedef_funcs: list[Callable[[], aiohttp.web.RouteDef]] | None = None
+    routedef_funcs: list[Callable[[], aiohttp.web.RouteDef]] = []
+    bootscripts: dict[
+        Literal["post-sys-enable"],
+        Coroutine[Any, Any, None]
+    ] = {}
 
 class Boot(Sys[BootCfg]):
     @classmethod
@@ -90,7 +96,7 @@ class Boot(Sys[BootCfg]):
         # server = uvicorn.Server(cfg)
         # await server.serve()
 
-        await aiohttp.web._run_app(
+        await aiohttp.web._run_app(  # noqa: SLF001
             app,
             host=host,
             port=port
@@ -104,7 +110,7 @@ class Boot(Sys[BootCfg]):
 
 #         runner = aiohttp.web.AppRunner(app)
 #         await runner.setup()
-#         site = aiohttp.web.TCPSite(runner)    
+#         site = aiohttp.web.TCPSite(runner)
 #         await site.start()
 
 #         # add more stuff to the loop, if needed
@@ -133,6 +139,13 @@ class Boot(Sys[BootCfg]):
         # for now all systems are enabled without an option to change, later
         # we will do something more flexible
         await self._enable_all_sys()
+        await self._run_post_sys_enable_bootscripts()
+
+    async def _run_post_sys_enable_bootscripts(self):
+        for k, v in self._cfg.bootscripts.items():
+            if k not in ["post-sys-enable"]:
+                raise InpErr(f"unknown bootscript run point {k}")
+            await v
 
     async def _handle_ws(self, webreq: aiohttp.web.BaseRequest):
         ws = Ws()

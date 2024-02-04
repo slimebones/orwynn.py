@@ -11,6 +11,7 @@ exclude = [
 ]
 
 ignore = [
+    "RUF012",
     "FIX002",
     # we love lambdas
     "E731",
