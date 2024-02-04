@@ -4,7 +4,6 @@ from contextlib import suppress
 from typing import Callable, Self
 
 import aiohttp.web
-import uvicorn
 from pydantic import ValidationError
 from pykit.log import log
 from rxcat import ServerBus, asyncio

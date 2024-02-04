@@ -129,12 +129,23 @@ class Doc(BaseModel):
     @classmethod
     def to_got_doc_udtos_evt(
         cls,
-        rsid: str,
-        docs: list[Self]
+        req: Req,
+        docs: list[Self],
+        *,
+        override_to_connids: list[int] | None = None
     ) -> GotDocUdtosEvt:
         udtos = cls.to_udtos(docs)
+        rsid = req.msid
+
+        to_connids = []
+        if override_to_connids:
+            to_connids = override_to_connids
+        elif req.m_connid is not None:
+            to_connids = [req.m_connid]
+
         return GotDocUdtosEvt(
             rsid=rsid,
+            m_toConnids=to_connids,
             collection=cls.get_collection(),
             udtos=udtos
         )
@@ -144,10 +155,21 @@ class Doc(BaseModel):
 
     def to_got_doc_udto_evt(
         self,
-        rsid: str
+        req: Req,
+        *,
+        override_to_connids: list[int] | None = None
     ) -> GotDocUdtoEvt:
+        rsid = req.msid
+
+        to_connids = []
+        if override_to_connids:
+            to_connids = override_to_connids
+        elif req.m_connid is not None:
+            to_connids = [req.m_connid]
+
         return GotDocUdtoEvt(
             rsid=rsid,
+            m_toConnids=to_connids,
             collection=self.get_collection(),
             udto=self.to_udto()
         )
