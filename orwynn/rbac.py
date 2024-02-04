@@ -1,13 +1,23 @@
 from typing import Literal
+
 from pykit import check
 from pykit.checking import CheckErr
 from pykit.err import InpErr
 from rxcat import BaseModel, Msg, OkEvt, ServerBus
-from orwynn.cfg import Cfg
 
+from orwynn.cfg import Cfg
 from orwynn.dto import Dto, Udto
-from orwynn.mongo import CreateDocReq, DelDocReq, Doc, GetDocsReq, GotDocUdtosEvt, UpdDocReq, filter_collection_factory
+from orwynn.mongo import (
+    CreateDocReq,
+    DelDocReq,
+    Doc,
+    GetDocsReq,
+    GotDocUdtosEvt,
+    UpdDocReq,
+    filter_collection_factory,
+)
 from orwynn.sys import Sys
+
 
 class PermissionDto(Dto):
     code: str
@@ -83,7 +93,7 @@ class RbacUtils:
             codes.append(p.code)
 
     @classmethod
-    async def req_get_roles_udto(cls, search_query: dict) -> list[RoleUdto]: 
+    async def req_get_roles_udto(cls, search_query: dict) -> list[RoleUdto]:
         f = None
 
         async def on(_, evt: GotDocUdtosEvt[RoleUdto]):

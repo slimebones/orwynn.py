@@ -1,7 +1,7 @@
 import argparse
 import typing
 from contextlib import suppress
-from typing import Any, Awaitable, Callable, Coroutine, Literal, Self
+from typing import Any, Callable, Coroutine, Literal, Self
 
 import aiohttp.web
 from pydantic import ValidationError
@@ -12,7 +12,6 @@ from rxcat import ServerBus
 from orwynn.app import App
 from orwynn.cfg import Cfg, CfgPackUtils
 from orwynn.env import OrwynnEnvUtils
-from orwynn.rbac import RbacUtils, RbacCfg
 from orwynn.sys import (
     Sys,
     SysArgs,
@@ -30,6 +29,9 @@ class BootCfg(Cfg):
         Literal["post-sys-enable"],
         Coroutine[Any, Any, None]
     ] = {}
+
+    class Config:
+        arbitrary_types_allowed = True
 
 class Boot(Sys[BootCfg]):
     @classmethod
