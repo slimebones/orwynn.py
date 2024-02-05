@@ -11,17 +11,16 @@ from orwynn.cfg import Cfg
 from orwynn.rbac import PermissionModel
 from orwynn.sys import Sys
 
-
-@code("orwynn.login-req")
+@code("login-req")
 class LoginReq(Req):
     username: str
-    hpassword: str
+    password: str
 
-@code("orwynn.logout-req")
+@code("logout-req")
 class LogoutReq(Req):
     authToken: str
 
-@code("orwynn.logged-evt")
+@code("logged-evt")
 class LoggedEvt(Evt):
     permissions: list[PermissionModel]
     """
@@ -34,11 +33,11 @@ class LoggedEvt(Evt):
     userAuthToken: str
     userAuthTokenExp: float
 
-@code("orwynn.logout-evt")
+@code("logout-evt")
 class LogoutEvt(Evt):
-    pass
+    userSid: str
 
-@code("orwynn.auth-err")
+@code("auth-err")
 class AuthErr(Exception):
     pass
 
@@ -49,20 +48,26 @@ async def _dummy_check_user(req: LoginReq) -> str | None:
     )
     return None
 
-async def _dummy_set_user_auth_token0(token: str, exp: float):
-    log.warn("replace dummy set user auth token")
+async def _dummy_try_login_user(user_sid: str, token: str, exp: float) -> bool:
+    log.warn("replace dummy login user => ret False")
+    return False
+
+async def _dummy_try_logout_user(user_sid: str) -> bool:
+    log.warn("replace dummy logout user => ret False")
+    return False
 
 class AuthCfg(Cfg):
     check_user_func: Callable[[LoginReq], Awaitable[str | None]] = \
         _dummy_check_user
-    set_user_auth_token0_and_exp_func: Callable[
-        [str, float],
-        Awaitable[None]
-    ] = _dummy_set_user_auth_token0
+    try_login_user: Callable[
+        [str, str, float],
+        Awaitable[bool]
+    ] = _dummy_try_login_user
+    try_logout_user: Callable[[str], Awaitable[bool]] = _dummy_try_logout_user
 
-    auth_token0_secret: str
-    auth_token0_algo: str = "HS256"
-    auth_token0_exp_time: float = 2592000  # 30 days
+    auth_token_secret: str
+    auth_token_algo: str = "HS256"
+    auth_token_exp_time: float = 2592000  # 30 days
 
     class Config:
         arbitrary_types_allowed = True
@@ -81,7 +86,7 @@ class AuthSys(Sys[AuthCfg]):
             raise AuthErr("wrong user data")
 
         token, exp = self._encode_jwt(user_sid)
-        await self._cfg.set_user_auth_token0_and_exp_func(token, exp)
+        await self._cfg.try_login_user(user_sid, token, exp)
         permissions = [
             PermissionModel(
                 code="orwynn-test.test-permission",
@@ -100,31 +105,31 @@ class AuthSys(Sys[AuthCfg]):
         await self._pub(evt)
 
     async def _on_logout_req(self, req: LogoutReq):
-        await self._pub(LogoutEvt(rsid=req.msid))
+        await self._pub(LogoutEvt(rsid=req.msid, userSid=user_sid))
 
     def _encode_jwt(self, user_sid: str) -> tuple[str, float]:
-        exp = DTUtils.get_delta_timestamp(self._cfg.auth_token0_exp_time)
+        exp = DTUtils.get_delta_timestamp(self._cfg.auth_token_exp_time)
         token: str = jwt.encode(
             {
                 "userSid": user_sid,
                 "exp": exp
             },
-            key=self._cfg.auth_token0_secret,
-            algorithm=self._cfg.auth_token0_algo
+            key=self._cfg.auth_token_secret,
+            algorithm=self._cfg.auth_token_algo
         )
 
         return token, exp
 
     def _decode_jwt(
         self,
-        auth_token0: str,
+        auth_token: str,
         should_verify_exp: bool = True
     ) -> str:
         try:
             data: dict = jwt.decode(
-                auth_token0,
-                key=self._cfg.auth_token0_secret,
-                algorithms=[self._cfg.auth_token0_algo],
+                auth_token,
+                key=self._cfg.auth_token_secret,
+                algorithms=[self._cfg.auth_token_algo],
                 options={
                     "verify_exp": should_verify_exp,
                 }

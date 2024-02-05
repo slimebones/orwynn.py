@@ -62,32 +62,32 @@ def filter_collection_factory(collection: str) -> MsgFilter:
 # For "collection" field, the __default__ db is assumed. Later we might add
 # redefine field to this, but now we're fine.
 
-@code("orwynn.get-docs-req")
+@code("get-docs-req")
 class GetDocsReq(Req):
     collection: str
     searchQuery: dict
 
-@code("orwynn.got-doc-udto-evt")
+@code("got-doc-udto-evt")
 class GotDocUdtoEvt(Evt, Generic[TUdto]):
     collection: str
     udto: TUdto
 
-@code("orwynn.got-doc-udtos-evt")
+@code("got-doc-udtos-evt")
 class GotDocUdtosEvt(Evt, Generic[TUdto]):
     collection: str
     udtos: list[TUdto]
 
-@code("orwynn.del-doc-req")
+@code("del-doc-req")
 class DelDocReq(Req):
     collection: str
     searchQuery: dict
 
-@code("orwynn.create-doc-req")
+@code("create-doc-req")
 class CreateDocReq(Req):
     collection: str
     createQuery: dict
 
-@code("orwynn.upd-doc-req")
+@code("upd-doc-req")
 class UpdDocReq(Req):
     collection: str
     searchQuery: dict
