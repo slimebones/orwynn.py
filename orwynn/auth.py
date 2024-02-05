@@ -82,6 +82,7 @@ class AuthSys(Sys[AuthCfg]):
 
     async def enable(self):
         await self._sub(LoginReq, self._on_login_req)
+        await self._sub(LogoutReq, self._on_logout_req)
 
     async def _on_login_req(self, req: LoginReq):
         user_sid = await self._cfg.check_user_func(req)
@@ -106,6 +107,7 @@ class AuthSys(Sys[AuthCfg]):
             userAuthToken=token,
             userAuthTokenExp=exp
         )
+        log.info(f"logged user sid {user_sid}", 2)
         await self._pub(evt)
 
     async def _on_logout_req(self, req: LogoutReq):
@@ -117,6 +119,7 @@ class AuthSys(Sys[AuthCfg]):
         logout_ok = await self._cfg.try_logout_user(user_sid)
         if not logout_ok:
             raise AuthErr(f"logout for user sid {user_sid} failed")
+        log.info(f"logged out user sid {user_sid}", 2)
         await self._pub(
             LogoutEvt(
                 rsid=req.msid,

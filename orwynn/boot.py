@@ -27,7 +27,7 @@ class BootCfg(Cfg):
     routedef_funcs: list[Callable[[], aiohttp.web.RouteDef]] = []
     bootscripts: dict[
         Literal["post-sys-enable"],
-        Coroutine[Any, Any, None]
+        list[Coroutine[Any, Any, None]]
     ] = {}
 
     class Config:
@@ -98,11 +98,14 @@ class Boot(Sys[BootCfg]):
         # server = uvicorn.Server(cfg)
         # await server.serve()
 
-        await aiohttp.web._run_app(  # noqa: SLF001
-            app,
-            host=host,
-            port=port
-        )
+        try:
+            await aiohttp.web._run_app(  # noqa: SLF001
+                app,
+                host=host,
+                port=port
+            )
+        finally:
+            await Boot.ie().destroy()
 
 #     @classmethod
 #     async def _aiohttp_run_app(cls, app: App):
@@ -144,10 +147,11 @@ class Boot(Sys[BootCfg]):
         await self._run_post_sys_enable_bootscripts()
 
     async def _run_post_sys_enable_bootscripts(self):
-        for k, v in self._cfg.bootscripts.items():
-            if k not in ["post-sys-enable"]:
-                raise InpErr(f"unknown bootscript run point {k}")
-            await v
+        for run_point, coros in self._cfg.bootscripts.items():
+            if run_point not in ["post-sys-enable"]:
+                raise InpErr(f"unknown bootscript run point {run_point}")
+            for coro in coros:
+                await coro
 
     async def _handle_ws(self, webreq: aiohttp.web.BaseRequest):
         ws = Ws()
@@ -231,4 +235,10 @@ class Boot(Sys[BootCfg]):
                     f"unhandled err => {err}"
                 )
                 log.err_or_catch(newerr, 2)
+
+    async def destroy(self):
+        log.info("destroy boot")
+        for sys_type in Sys.__subclasses__():
+            if not isinstance(self, sys_type):
+                await sys_type._internal_destroy()  # noqa: SLF001
 

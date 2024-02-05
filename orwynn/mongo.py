@@ -2,7 +2,7 @@ import typing
 from contextlib import suppress
 from copy import copy
 from enum import Enum
-from typing import Any, ClassVar, Generic, Iterable, Self, TypeVar
+from typing import Any, ClassVar, Coroutine, Generic, Iterable, Self, TypeVar
 
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -427,6 +427,7 @@ class MongoUtils:
         if not OrwynnEnvUtils.is_clean_allowed():
             log.err("decline db clean - ORWYNN_ALLOW_CLEAN is not set to 1")
             return
+        log.info("drop mongo db")
         cls._client.drop_database(cls._db)
 
     @classmethod
@@ -562,8 +563,6 @@ class MongoUtils:
             **find_all_kwargs,
         ))
 
-        if len(result) == 0:
-            raise search.get_not_found_error("TDoc")
         if search.expectation is not None:
             search.expectation.check(result)
 
@@ -764,9 +763,9 @@ class MongoStateFlagUtils:
     ) -> list[MongoStateFlagDoc]:
         query: dict[str, Any] = {}
 
-        if search.ids:
-            query["id"] = {
-                "$in": search.ids
+        if search.sids:
+            query["sid"] = {
+                "$in": search.sids
             }
         if search.keys:
             query["key"] = {
@@ -797,7 +796,7 @@ class MongoStateFlagUtils:
             return cls.get(MongoStateFlagSearch(
                 keys=[key]
             ))[0]
-        except NotFoundErr:
+        except IndexError:
             return cls.set(
                 key,
                 default_value
@@ -820,7 +819,7 @@ class MongoStateFlagUtils:
             flag = cls.get(MongoStateFlagSearch(
                 keys=[key]
             ))[0]
-        except NotFoundErr:
+        except IndexError:
             flag = MongoStateFlagDoc(key=key, value=value).create()
         else:
             flag = flag.upd({"$set": {"value": value}})
@@ -828,12 +827,12 @@ class MongoStateFlagUtils:
         return flag
 
     @classmethod
-    def decide(
+    async def decide(
         cls,
         *,
         key: str,
-        on_true: FuncSpec | None = None,
-        on_false: FuncSpec | None = None,
+        on_true: Coroutine | None = None,
+        on_false: Coroutine | None = None,
         finally_set_to: bool,
         default_flag_on_not_found: bool
     ) -> Any:
@@ -864,12 +863,12 @@ class MongoStateFlagUtils:
         )
 
         if flag.value is True and on_true is not None:
-            result = on_true.call()
+            result = await on_true
         if flag.value is False and on_false is not None:
-            result = on_false.call()
+            result = await on_false
 
         flag.upd({
-            "set": {
+            "$set": {
                 "value": finally_set_to
             }
         })

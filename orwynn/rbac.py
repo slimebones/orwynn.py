@@ -3,7 +3,7 @@ from typing import Literal, Self
 from pykit import check
 from pykit.checking import CheckErr
 from pykit.err import InpErr
-from rxcat import BaseModel, Msg, OkEvt, ServerBus
+from rxcat import BaseModel, ErrEvt, Msg, OkEvt, ServerBus
 
 from orwynn.cfg import Cfg
 from orwynn.dto import Dto, Udto
@@ -104,12 +104,15 @@ class RbacUtils:
             codes.append(p.code)
 
     @classmethod
-    async def req_get_roles_udto(cls, search_query: dict) -> list[RoleUdto]:
+    async def req_get_roles_udto(
+        cls,
+        search_query: dict
+    ) -> GotDocUdtosEvt | ErrEvt:
         f = None
 
-        async def on(_, evt: GotDocUdtosEvt[RoleUdto]):
+        async def on(_, evt):
             nonlocal f
-            f = evt.udtos
+            f = evt
 
         req = GetDocsReq(
             collection=RoleDoc.get_collection(),
