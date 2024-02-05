@@ -8,7 +8,7 @@ from pykit.log import log
 from rxcat import Awaitable, Evt, Req
 
 from orwynn.cfg import Cfg
-from orwynn.rbac import PermissionModel
+from orwynn.rbac import PermissionDto, PermissionModel, RbacUtils
 from orwynn.sys import Sys
 
 @code("login-req")
@@ -22,7 +22,7 @@ class LogoutReq(Req):
 
 @code("logged-evt")
 class LoggedEvt(Evt):
-    permissions: list[PermissionModel]
+    permissionDtos: list[PermissionDto]
     """
     List of initial permissions the logged user have.
 
@@ -48,9 +48,13 @@ async def _dummy_check_user(req: LoginReq) -> str | None:
     )
     return None
 
-async def _dummy_try_login_user(user_sid: str, token: str, exp: float) -> bool:
-    log.warn("replace dummy login user => ret False")
-    return False
+async def _dummy_try_login_user(
+    user_sid: str,
+    token: str,
+    exp: float
+) -> list[str] | None:
+    log.warn("replace dummy login user => ret None")
+    return None
 
 async def _dummy_try_logout_user(user_sid: str) -> bool:
     log.warn("replace dummy logout user => ret False")
@@ -61,7 +65,7 @@ class AuthCfg(Cfg):
         _dummy_check_user
     try_login_user: Callable[
         [str, str, float],
-        Awaitable[bool]
+        Awaitable[list[str] | None]
     ] = _dummy_try_login_user
     try_logout_user: Callable[[str], Awaitable[bool]] = _dummy_try_logout_user
 
@@ -86,18 +90,18 @@ class AuthSys(Sys[AuthCfg]):
             raise AuthErr("wrong user data")
 
         token, exp = self._encode_jwt(user_sid)
-        await self._cfg.try_login_user(user_sid, token, exp)
-        permissions = [
-            PermissionModel(
-                code="orwynn-test.test-permission",
-                name="Test permission",
-                dscr="I'm just a test, don't hurt me."
-            )
-        ]
+        permission_codes = await self._cfg.try_login_user(user_sid, token, exp)
+        if permission_codes is None:
+            raise AuthErr("failed to login user")
+
+        permission_dtos = PermissionModel.to_dtos(
+            RbacUtils.get_permissions_by_codes(permission_codes)
+        )
+
         evt = LoggedEvt(
             rsid=req.msid,
             m_toConnids=[req.m_connid] if req.m_connid else [],
-            permissions=permissions,
+            permissionDtos=permission_dtos,
             userSid=user_sid,
             userAuthToken=token,
             userAuthTokenExp=exp
@@ -105,7 +109,21 @@ class AuthSys(Sys[AuthCfg]):
         await self._pub(evt)
 
     async def _on_logout_req(self, req: LogoutReq):
-        await self._pub(LogoutEvt(rsid=req.msid, userSid=user_sid))
+        # todo: for now logout can be made even with old token, need to ensure
+        #       user has this token
+
+        # if token expired, logout must not be prohibited
+        user_sid = self._decode_jwt(req.authToken, should_verify_exp=False)
+        logout_ok = await self._cfg.try_logout_user(user_sid)
+        if not logout_ok:
+            raise AuthErr(f"logout for user sid {user_sid} failed")
+        await self._pub(
+            LogoutEvt(
+                rsid=req.msid,
+                m_toConnids=[req.m_connid] if req.m_connid else [],
+                userSid=user_sid
+            )
+        )
 
     def _encode_jwt(self, user_sid: str) -> tuple[str, float]:
         exp = DTUtils.get_delta_timestamp(self._cfg.auth_token_exp_time)

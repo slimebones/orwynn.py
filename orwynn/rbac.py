@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Self
 
 from pykit import check
 from pykit.checking import CheckErr
@@ -28,6 +28,17 @@ class PermissionModel(BaseModel):
     code: str
     name: str
     dscr: str
+
+    @classmethod
+    def to_dtos(cls, models: list[Self]) -> list[PermissionDto]:
+        return [m.to_dto() for m in models]
+
+    def to_dto(self) -> PermissionDto:
+        return PermissionDto(
+            code=self.code,
+            name=self.name,
+            dscr=self.dscr
+        )
 
 class RoleUdto(Udto):
     name: str
