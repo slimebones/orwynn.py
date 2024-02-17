@@ -1,9 +1,10 @@
 from typing import Literal, Self
+from fcode import code
 
 from pykit import check
 from pykit.checking import CheckErr
 from pykit.err import InpErr
-from rxcat import BaseModel, ErrEvt, Msg, OkEvt, ServerBus
+from rxcat import BaseModel, ErrEvt, Evt, Msg, OkEvt, Req, ServerBus
 
 from orwynn.cfg import Cfg
 from orwynn.dto import Dto, Udto
@@ -18,11 +19,18 @@ from orwynn.mongo import (
 )
 from orwynn.sys import Sys
 
-
 class PermissionDto(Dto):
     code: str
     name: str
     dscr: str
+
+@code("get-permissions-req")
+class GetPermissionsReq(Req):
+    codes: list[str]
+
+@code("got-permission-dtos-evt")
+class GotPermissionDtosEvt(Evt):
+    dtos: list[PermissionDto]
 
 class PermissionModel(BaseModel):
     code: str
@@ -88,6 +96,16 @@ class RoleSys(Sys):
         delf = RoleDoc.try_get_and_del(req.searchQuery)
         if delf:
             await self._pub(OkEvt(rsid=req.msid))
+
+class PermissionSys(Sys):
+    async def enable(self):
+        await self._sub(GetPermissionsReq, self._on_get)
+
+    async def _on_get(self, req: GetPermissionsReq):
+        dtos = PermissionModel.to_dtos(
+            RbacUtils.get_permissions_by_codes(req.codes)
+        )
+        await self._pub(GotPermissionDtosEvt(rsid=req.msid, dtos=dtos))
 
 class RbacUtils:
     _Permissions: list[PermissionModel] = []
