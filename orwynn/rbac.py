@@ -1,7 +1,7 @@
 from typing import Literal, Self
 from fcode import code
 
-from pykit import check
+from pykit import check, log
 from pykit.checking import CheckErr
 from pykit.err import InpErr
 from rxcat import BaseModel, ErrEvt, Evt, Msg, OkEvt, Req, ServerBus
@@ -24,8 +24,8 @@ class PermissionDto(Dto):
     name: str
     dscr: str
 
-@code("get-permissions-req")
-class GetPermissionsReq(Req):
+@code("get-permission-dtos-req")
+class GetPermissionDtosReq(Req):
     codes: list[str]
 
 @code("got-permission-dtos-evt")
@@ -95,17 +95,20 @@ class RoleSys(Sys):
     async def _on_del_doc(self, req: DelDocReq):
         delf = RoleDoc.try_get_and_del(req.searchQuery)
         if delf:
-            await self._pub(OkEvt(rsid=req.msid))
+            await self._pub(OkEvt(rsid="").as_res_from_req(req))
 
 class PermissionSys(Sys):
     async def enable(self):
-        await self._sub(GetPermissionsReq, self._on_get)
+        await self._sub(GetPermissionDtosReq, self._on_get)
 
-    async def _on_get(self, req: GetPermissionsReq):
+    async def _on_get(self, req: GetPermissionDtosReq):
         dtos = PermissionModel.to_dtos(
             RbacUtils.get_permissions_by_codes(req.codes)
         )
-        await self._pub(GotPermissionDtosEvt(rsid=req.msid, dtos=dtos))
+        await self._pub(GotPermissionDtosEvt(
+            rsid="",
+            dtos=dtos
+        ).as_res_from_req(req))
 
 class RbacUtils:
     _Permissions: list[PermissionModel] = []
