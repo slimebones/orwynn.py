@@ -53,18 +53,24 @@ class RoleUdto(Udto):
     name: str
     dscr: str
     permissionCodes: list[str]
+    isSuper: bool
 
 class RoleDoc(Doc):
     name: str
     dscr: str
     permissionCodes: list[str] = []
+    isSuper: bool = False
+    """
+    User with a super role ignore all permissions and can do whateva they want.
+    """
 
     def to_udto(self) -> RoleUdto:
         return RoleUdto(
             sid=self.sid,
             name=self.name,
             dscr=self.dscr,
-            permissionCodes=self.permissionCodes
+            permissionCodes=self.permissionCodes,
+            isSuper=self.isSuper
         )
 
 class RbacCfg(Cfg):
