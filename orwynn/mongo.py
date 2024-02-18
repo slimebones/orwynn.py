@@ -123,14 +123,14 @@ class Doc(BaseModel):
     _cached_collection_name: ClassVar[str | None] = None
 
     @classmethod
-    def to_udtos(cls, docs: list[Self]) -> list[Udto]:
+    def to_udtos(cls, docs: Iterable[Self]) -> list[Udto]:
         return [doc.to_udto() for doc in docs]
 
     @classmethod
     def to_got_doc_udtos_evt(
         cls,
         req: Req,
-        docs: list[Self],
+        docs: Iterable[Self],
         *,
         override_to_connids: list[int] | None = None
     ) -> GotDocUdtosEvt:

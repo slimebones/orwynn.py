@@ -5,6 +5,7 @@ from pydantic.generics import GenericModel
 from pykit.log import log
 from pykit.singleton import Singleton
 from rxcat import (
+    Evt,
     Msg,
     MsgFilter,
     PubAction,
@@ -85,6 +86,13 @@ class Sys(Singleton, Generic[TCfg]):
         opts: PubOpts = PubOpts(),
     ):
         await self._bus.pub(msg, pubaction, opts)
+
+    async def _pubr(
+        self,
+        msg: Msg,
+        opts: PubOpts = PubOpts(),
+    ) -> Evt:
+        return await self._bus.pubr(msg, opts)
 
     async def _internal_init(self, is_silent: bool = False):
         if self._internal_is_initd:
