@@ -9,7 +9,6 @@ from bson.errors import InvalidId
 from pydantic import BaseModel
 from pykit import validation
 from pykit.err import NotFoundErr, UnsupportedErr
-from pykit.func import FuncSpec
 from pykit.log import log
 from pykit.search import DbSearch
 from pykit.types import T

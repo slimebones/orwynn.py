@@ -11,6 +11,7 @@ from orwynn.cfg import Cfg
 from orwynn.rbac import PermissionDto, PermissionModel, RbacUtils
 from orwynn.sys import Sys
 
+
 @code("login-req")
 class LoginReq(Req):
     username: str

@@ -1,7 +1,7 @@
 from typing import Literal, Self
-from fcode import code
 
-from pykit import check, log
+from fcode import code
+from pykit import check
 from pykit.checking import CheckErr
 from pykit.err import InpErr
 from rxcat import BaseModel, ErrEvt, Evt, Msg, OkEvt, Req, ServerBus
@@ -18,6 +18,7 @@ from orwynn.mongo import (
     filter_collection_factory,
 )
 from orwynn.sys import Sys
+
 
 class PermissionDto(Dto):
     code: str
