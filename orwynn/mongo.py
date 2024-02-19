@@ -92,6 +92,27 @@ class UpdDocReq(Req):
     searchQuery: dict
     updQuery: dict
 
+class UpddField(BaseModel):
+    fieldName: str
+    oldValue: Any
+    newValue: Any
+
+@code("created-doc-evt")
+class CreatedDocEvt(Evt):
+    collection: str
+    sid: str
+
+@code("updd-doc-evt")
+class UpddDocEvt(Evt):
+    collection: str
+    sid: str
+    upddFields: list[UpddField]
+
+@code("deld-doc-evt")
+class DeldDocEvt(Evt):
+    collection: str
+    sid: str
+
 MongoCompatibleType = str | int | float | bool | list | dict | None
 MongoCompatibleTypes: tuple[Any, ...] = typing.get_args(MongoCompatibleType)
 
