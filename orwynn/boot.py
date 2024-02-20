@@ -76,6 +76,18 @@ class Boot(Sys[BootCfg]):
         await cls.run(args.host, args.port)
 
     @classmethod
+    async def run_other(cls, coro: Coroutine):
+        """
+        Run other task while setting up boot normally.
+        """
+        app = await cls.create_app()
+
+        try:
+            await coro
+        finally:
+            await Boot.ie().destroy()
+
+    @classmethod
     async def run(cls, host: str, port: int):
         """
         Runs the app using a server.
