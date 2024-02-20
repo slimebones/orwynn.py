@@ -424,20 +424,20 @@ class MongoSys(Sys[MongoCfg]):
             MongoUtils.drop_db()
 
 class MongoUtils:
-    _client: MongoClient
-    _db: MongoDb
+    client: MongoClient
+    db: MongoDb
 
     @classmethod
     async def init(cls, client: MongoClient, db: MongoDb):
-        cls._client = client
-        cls._db = db
+        cls.client = client
+        cls.db = db
 
     @classmethod
     async def destroy(cls):
         with suppress(AttributeError):
-            del cls._client
+            del cls.client
         with suppress(AttributeError):
-            del cls._db
+            del cls.db
 
     @classmethod
     def drop_db(cls):
@@ -446,7 +446,7 @@ class MongoUtils:
         if not OrwynnEnvUtils.is_clean_allowed():
             return
         log.info("drop mongo db")
-        cls._client.drop_database(cls._db)
+        cls.client.drop_database(cls.db)
 
     @classmethod
     def try_get(
@@ -458,7 +458,7 @@ class MongoUtils:
         validation.validate(collection, str)
         validation.validate(query, dict)
 
-        result: Any | None = cls._db[collection].find_one(
+        result: Any | None = cls.db[collection].find_one(
             query, **kwargs
         )
 
@@ -478,7 +478,7 @@ class MongoUtils:
         validation.validate(collection, str)
         validation.validate(query, dict)
 
-        return cls._db[collection].find(
+        return cls.db[collection].find(
             query, **kwargs
         )
 
@@ -492,7 +492,7 @@ class MongoUtils:
         validation.validate(collection, str)
         validation.validate(data, dict)
 
-        inserted_id: str = cls._db[collection].insert_one(
+        inserted_id: str = cls.db[collection].insert_one(
             data,
             **kwargs
         ).inserted_id
@@ -517,7 +517,7 @@ class MongoUtils:
         validation.validate(operation, dict)
 
         upd_doc: Any = \
-            cls._db[collection].find_one_and_update(
+            cls.db[collection].find_one_and_update(
                 query,
                 operation,
                 return_document=ReturnDocStrat.AFTER,
@@ -540,7 +540,7 @@ class MongoUtils:
         validation.validate(collection, str)
         validation.validate(query, dict)
 
-        del_result = cls._db[collection].delete_one(
+        del_result = cls.db[collection].delete_one(
             query,
             **kwargs
         )
@@ -558,7 +558,7 @@ class MongoUtils:
         validation.validate(collection, str)
         validation.validate(query, dict)
 
-        del_result = cls._db[collection].delete_one(
+        del_result = cls.db[collection].delete_one(
             query,
             **kwargs
         )
