@@ -115,13 +115,15 @@ class PreloadSys(Sys[PreloadCfg]):
             return None
         return f
 
-    async def try_get_preload_file_paths(self, sid: str) -> list[Path] | None:
-        pl = await self.try_get_preload(sid)
-        if not pl or not pl.filenames:
+    async def try_get_preload_file_paths(
+        self,
+        preload_doc: PreloadDoc
+    ) -> list[Path] | None:
+        if not preload_doc or not preload_doc.filenames:
             return None
 
         paths: list[Path] = [
-            Path(self._BasePreloadDir, sid, f) for f in pl.filenames
+            Path(self._BasePreloadDir, sid, f) for f in preload_doc.filenames
         ]
 
         return paths
