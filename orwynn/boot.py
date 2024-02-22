@@ -7,7 +7,7 @@ import aiohttp.web
 from pydantic import ValidationError
 from pykit.err import InpErr
 from pykit.log import log
-from rxcat import ServerBus
+from rxcat import Awaitable, ServerBus
 
 from orwynn.app import App
 from orwynn.cfg import Cfg, CfgPackUtils
@@ -27,7 +27,7 @@ class BootCfg(Cfg):
     routedef_funcs: list[Callable[[], aiohttp.web.RouteDef]] = []
     bootscripts: dict[
         Literal["post-sys-enable"],
-        list[Coroutine[Any, Any, None]]
+        list[Callable[[], Awaitable[None]]]
     ] = {}
 
     class Config:
@@ -163,7 +163,7 @@ class Boot(Sys[BootCfg]):
             if run_point not in ["post-sys-enable"]:
                 raise InpErr(f"unknown bootscript run point {run_point}")
             for coro in coros:
-                await coro
+                await coro()
 
     async def _handle_ws(self, webreq: aiohttp.web.BaseRequest):
         ws = Ws()

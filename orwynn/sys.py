@@ -10,6 +10,7 @@ from rxcat import (
     MsgFilter,
     PubAction,
     PubOpts,
+    Req,
     ServerBus,
     SubOpts,
     TMsg,
@@ -89,10 +90,10 @@ class Sys(Singleton, Generic[TCfg]):
 
     async def _pubr(
         self,
-        msg: Msg,
+        req: Req,
         opts: PubOpts = PubOpts(),
     ) -> Evt:
-        return await self._bus.pubr(msg, opts)
+        return await self._bus.pubr(req, opts)
 
     async def _internal_init(self, is_silent: bool = False):
         if self._internal_is_initd:
