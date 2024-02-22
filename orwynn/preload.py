@@ -123,7 +123,11 @@ class PreloadSys(Sys[PreloadCfg]):
             return None
 
         paths: list[Path] = [
-            Path(self._BasePreloadDir, sid, f) for f in preload_doc.filenames
+            Path(
+                self._BasePreloadDir,
+                preload_doc.sid,
+                f
+            ) for f in preload_doc.filenames
         ]
 
         return paths
