@@ -157,11 +157,15 @@ class RbacUtils:
         codes: list[str]
     ) -> list[PermissionModel]:
         f = []
-        for p in cls._Permissions:
-            for c in codes:
-                if p.code == c:
-                    f.append(p)
-                    break
+        if codes:
+            for p in cls._Permissions:
+                for c in codes:
+                    if p.code == c:
+                        f.append(p)
+                        break
+        else:  
+            # empty codes will search for everything
+            f = cls._Permissions
         return f
 
     @classmethod
