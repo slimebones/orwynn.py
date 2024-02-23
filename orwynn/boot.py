@@ -159,11 +159,11 @@ class Boot(Sys[BootCfg]):
         await self._run_post_sys_enable_bootscripts()
 
     async def _run_post_sys_enable_bootscripts(self):
-        for run_point, coros in self._cfg.bootscripts.items():
+        for run_point, corofns in self._cfg.bootscripts.items():
             if run_point not in ["post-sys-enable"]:
                 raise InpErr(f"unknown bootscript run point {run_point}")
-            for coro in coros:
-                await coro()
+            for corofn in corofns:
+                await corofn()
 
     async def _handle_ws(self, webreq: aiohttp.web.BaseRequest):
         ws = Ws()
