@@ -262,6 +262,18 @@ class Doc(BaseModel):
         ))
 
     @classmethod
+    def get_and_del(
+        cls,
+        query: dict,
+        **kwargs
+    ):
+        MongoUtils.delete(
+            cls.get_collection(),
+            cls._adjust_sid_to_mongo(query),
+            **kwargs
+        )
+
+    @classmethod
     def try_get_and_del(
         cls,
         query: dict,
