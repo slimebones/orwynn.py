@@ -5,6 +5,7 @@ from enum import Enum
 from typing import Any, ClassVar, Coroutine, Generic, Iterable, Self, TypeVar
 
 from bson import ObjectId
+from pykit.mark import MarkErr, MarkUtils
 from bson.errors import InvalidId
 from pydantic import BaseModel
 from pykit import validation
@@ -140,6 +141,17 @@ class Doc(BaseModel):
     synchronized with db yet.
     """
 
+    internal_marks: list[str] = []
+
+    IsArchivable: ClassVar[bool] = True
+    """
+    Whether this doc will be archived on delete operation.
+
+    Archived docs are not discoverable in search under normal queries.
+
+    To finally delete an archived doc, the special method "del_archived" should
+    be used.
+    """
     _cached_collection_name: ClassVar[str | None] = None
 
     @classmethod
@@ -285,7 +297,42 @@ class Doc(BaseModel):
             **kwargs
         )
 
+    def archive(self):
+        MarkUtils.add(
+            "archived",
+            self
+        )
+
+    def unarchive(self):
+        MarkUtils.delete(
+            "archived",
+            self
+        )
+
+    def is_archived(self):
+        return MarkUtils.has(
+            "archived",
+            self
+        )
+
+    def del_archived(
+        self,
+        **kwargs
+    ):
+        if not self.IsArchivable:
+            raise MarkErr("cannot del from archive: not archivable")
+        if not self.is_archived:
+            raise MarkErr("not archived")
+        self._delete_for_sure()
+
     def delete(
+        self,
+        **kwargs
+    ):
+        if self.IsArchivable:
+        self._delete_for_sure()
+
+    def _delete_for_sure(
         self,
         **kwargs
     ):
