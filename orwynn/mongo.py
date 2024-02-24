@@ -219,84 +219,6 @@ class Doc(BaseModel):
             cls._cached_collection_name = name
         return cls._cached_collection_name
 
-    @classmethod
-    def get_many(
-        cls,
-        query: dict | None = None,
-        **kwargs
-    ) -> Iterable[Self]:
-        """
-        Fetches all instances matching the query for this document.
-
-        Args:
-            query(optional):
-                MongoDB-compliant dictionary to search. By default all
-                instances of the document is fetched.
-            **kwargs(optional):
-                Additional arguments to Mongo's find method.
-
-        Returns:
-            Iterable with the results of the search.
-        """
-        _query: dict = cls._parse_query(query)
-        validation.validate(_query, dict)
-
-        cursor: MongoCursor = MongoUtils.get_many(
-            cls.get_collection(),
-            cls._adjust_sid_to_mongo(_query),
-            **kwargs
-        )
-
-        return map(cls._parse_data_to_doc, cursor)
-
-    @classmethod
-    def try_get(
-        cls,
-        query: dict,
-        **kwargs
-    ) -> Self | None:
-        validation.validate(query, dict)
-
-        data = MongoUtils.try_get(
-            cls.get_collection(),
-            cls._adjust_sid_to_mongo(query),
-            **kwargs
-        )
-        if data is None:
-            return None
-
-        return cls._parse_data_to_doc(data)
-
-    def create(self, **kwargs) -> Self:
-        dump: dict = self._adjust_sid_to_mongo(self.model_dump())
-        return self._parse_data_to_doc(MongoUtils.create(
-            self.get_collection(), dump, **kwargs
-        ))
-
-    @classmethod
-    def get_and_del(
-        cls,
-        query: dict,
-        **kwargs
-    ):
-        MongoUtils.delete(
-            cls.get_collection(),
-            cls._adjust_sid_to_mongo(query),
-            **kwargs
-        )
-
-    @classmethod
-    def try_get_and_del(
-        cls,
-        query: dict,
-        **kwargs
-    ) -> bool:
-        return MongoUtils.try_del(
-            cls.get_collection(),
-            cls._adjust_sid_to_mongo(query),
-            **kwargs
-        )
-
     def archive(self):
         MarkUtils.add(
             "archived",
@@ -315,6 +237,140 @@ class Doc(BaseModel):
             self
         )
 
+    @classmethod
+    def get_many(
+        cls,
+        search_query: dict | None = None,
+        *,
+        must_search_archived_too: bool = False,
+        **kwargs
+    ) -> Iterable[Self]:
+        """
+        Fetches all instances matching the query for this document.
+
+        Args:
+            query(optional):
+                MongoDB-compliant dictionary to search. By default all
+                instances of the document is fetched.
+            **kwargs(optional):
+                Additional arguments to Mongo's find method.
+
+        Returns:
+            Iterable with the results of the search.
+        """
+        copied_search_query = cls._parsecopy_query(search_query)
+        cls._adjust_data_sid_to_mongo(copied_search_query)
+        if not must_search_archived_too:
+            cls._exclude_archived_from_search_query(copied_search_query)
+
+        validation.validate(copied_search_query, dict)
+
+        cursor: MongoCursor = MongoUtils.get_many(
+            cls.get_collection(),
+            copied_search_query,
+            **kwargs
+        )
+
+        return map(cls._parse_data_to_doc, cursor)
+
+    @classmethod
+    def try_get(
+        cls,
+        search_query: dict,
+        *,
+        must_search_archived_too: bool = False,
+        **kwargs
+    ) -> Self | None:
+        copied_search_query = search_query.copy()
+        cls._adjust_data_sid_to_mongo(copied_search_query)
+        if not must_search_archived_too:
+            cls._exclude_archived_from_search_query(copied_search_query)
+
+        data = MongoUtils.try_get(
+            cls.get_collection(),
+            copied_search_query,
+            **kwargs
+        )
+        if data is None:
+            return None
+
+        return cls._parse_data_to_doc(data)
+
+    def create(self, **kwargs) -> Self:
+        dump = self.model_dump()
+        self._adjust_data_sid_to_mongo(dump)
+
+        if "internal_marks" in dump:
+            raise MarkErr("usage of internal_marks on doc creation")
+
+        return self._parse_data_to_doc(MongoUtils.create(
+            self.get_collection(),
+            dump,
+            **kwargs
+        ))
+
+    @classmethod
+    def get_and_del(
+        cls,
+        search_query: dict,
+        **kwargs
+    ):
+        if not cls.IsArchivable:
+            cls._get_and_del_for_sure(**kwargs)
+            return
+        # mark for archive instead of deleting
+        doc = cls.get(search_query, must_search_archived_too=True)
+        is_archived = doc.is_archived()
+        if is_archived:
+            raise MarkErr("already archived")
+        doc.archive()
+
+    @classmethod
+    def _get_and_del_for_sure(
+        cls,
+        search_query: dict,
+        **kwargs
+    ):
+        copied_search_query = search_query.copy()
+        cls._adjust_data_sid_to_mongo(copied_search_query)
+        MongoUtils.delete(
+            cls.get_collection(),
+            copied_search_query,
+            **kwargs
+        )
+
+    @classmethod
+    def try_get_and_del(
+        cls,
+        search_query: dict,
+        **kwargs
+    ) -> bool:
+        if not cls.IsArchivable:
+            return cls._try_get_and_del_for_sure(**kwargs)
+        # mark for archive instead of deleting
+        doc = cls.try_get(search_query, must_search_archived_too=True)
+        if not doc:
+            return False
+        is_archived = doc.is_archived()
+        if is_archived:
+            return False
+        doc.archive()
+        return True
+
+    @classmethod
+    def _try_get_and_del_for_sure(
+        cls,
+        search_query: dict,
+        **kwargs
+    ) -> bool:
+        copied_search_query = search_query.copy()
+        cls._adjust_data_sid_to_mongo(copied_search_query)
+        return MongoUtils.try_del(
+            cls.get_collection(),
+            copied_search_query,
+            **kwargs
+        )
+
     def del_archived(
         self,
         **kwargs
@@ -323,16 +379,21 @@ class Doc(BaseModel):
             raise MarkErr("cannot del from archive: not archivable")
         if not self.is_archived:
             raise MarkErr("not archived")
-        self._delete_for_sure()
+        self._del_for_sure(**kwargs)
 
     def delete(
         self,
         **kwargs
     ):
-        if self.IsArchivable:
-        self._delete_for_sure()
+        if not self.IsArchivable:
+            self._del_for_sure(**kwargs)
+            return
+        is_archived = self.is_archived()
+        if is_archived:
+            raise MarkErr("already archived")
+        self.archive()
 
-    def _delete_for_sure(
+    def _del_for_sure(
         self,
         **kwargs
     ):
@@ -345,6 +406,18 @@ class Doc(BaseModel):
         )
 
     def try_del(
+        self,
+        **kwargs
+    ) -> bool:
+        if not self.IsArchivable:
+            return self._try_del_for_sure(**kwargs)
+        is_archived = self.is_archived()
+        if is_archived:
+            return False
+        self.archive()
+        return True
+
+    def _try_del_for_sure(
         self,
         **kwargs
     ) -> bool:
@@ -387,7 +460,9 @@ class Doc(BaseModel):
 
     def try_upd(
         self,
-        query: dict,
+        upd_query: dict,
+        *,
+        must_search_archived_too: bool = False,
         **kwargs
     ) -> Self | None:
         """
@@ -396,10 +471,13 @@ class Doc(BaseModel):
         if not self.sid:
             return None
 
+        search_query = { "_id": MongoUtils.convert_to_object_id(self.sid) }
+        if not must_search_archived_too:
+            self._exclude_archived_from_search_query(search_query)
+
         data = MongoUtils.try_upd(
             self.get_collection(),
-            {"_id": MongoUtils.convert_to_object_id(self.sid)},
-            query,
+            upd_query,
             **kwargs
         )
         if data is None:
@@ -436,16 +514,27 @@ class Doc(BaseModel):
         return f
 
     @classmethod
+    def _exclude_archived_from_search_query(cls, search_query: dict):
+        if "internal_marks" in search_query:
+            log.warn(
+                f"usage of internal_marks in search query {search_query} =>"
+                " skip"
+            )
+        search_query["internal_marks"] = {
+            "$nin": ["archived"]
+        }
+
+    @classmethod
     def _parse_data_to_doc(cls, data: dict) -> Self:
         """Parses document to specified Model."""
-        return cls.model_validate(cls._adjust_sid_from_mongo(data))
+        return cls.model_validate(cls._adjust_data_sid_from_mongo(data))
 
     @staticmethod
-    def _parse_query(query: dict | None) -> dict:
+    def _parsecopy_query(query: dict | None) -> dict:
         return {} if query is None else copy(query)
 
     @classmethod
-    def _adjust_sid_to_mongo(cls, data: dict) -> dict:
+    def _adjust_data_sid_to_mongo(cls, data: dict):
         if "sid" in data and data["sid"]:
             input_sid_value: Any = data["sid"]
             if input_sid_value is not None:
@@ -460,10 +549,9 @@ class Doc(BaseModel):
                         f"field \"sid\" with value {input_sid_value}"
                     )
             del data["sid"]
-        return data
 
     @staticmethod
-    def _adjust_sid_from_mongo(data: dict) -> dict:
+    def _adjust_data_sid_from_mongo(data: dict) -> dict:
         if "_id" in data:
             if data["_id"] is not None:
                 data["sid"] = str(data["_id"])
