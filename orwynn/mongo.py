@@ -5,12 +5,12 @@ from enum import Enum
 from typing import Any, ClassVar, Coroutine, Generic, Iterable, Self, TypeVar
 
 from bson import ObjectId
-from pykit.mark import MarkErr, MarkUtils
 from bson.errors import InvalidId
 from pydantic import BaseModel
 from pykit import validation
 from pykit.err import NotFoundErr, UnsupportedErr
 from pykit.log import log
+from pykit.mark import MarkErr, MarkUtils
 from pykit.search import DbSearch
 from pykit.types import T
 from pymongo import MongoClient
@@ -219,16 +219,26 @@ class Doc(BaseModel):
             cls._cached_collection_name = name
         return cls._cached_collection_name
 
-    def archive(self):
-        MarkUtils.add(
-            "archived",
-            self
+    def archive(self) -> Self:
+        # do refresh to avoid nasty mark duplicates if an unsync obj is
+        # provided here
+        refreshed = self.refresh()
+        return refreshed.upd(
+            MarkUtils.get_add_upd_query(
+                "archived",
+                self
+            )
         )
 
-    def unarchive(self):
-        MarkUtils.delete(
-            "archived",
-            self
+    def unarchive(self) -> Self:
+        # do refresh to avoid nasty mark duplicates if an unsync obj is
+        # provided here
+        refreshed = self.refresh()
+        return refreshed.upd(
+            MarkUtils.get_remove_upd_query(
+                "archived",
+                self
+            )
         )
 
     def is_archived(self):
@@ -300,7 +310,7 @@ class Doc(BaseModel):
         dump = self.model_dump()
         self._adjust_data_sid_to_mongo(dump)
 
-        if "internal_marks" in dump:
+        if dump["internal_marks"]:  # non-empty marks in dump
             raise MarkErr("usage of internal_marks on doc creation")
 
         return self._parse_data_to_doc(MongoUtils.create(
@@ -448,21 +458,21 @@ class Doc(BaseModel):
         doc = cls.get(search_query, **search_kwargs or {})
         return doc.upd(upd_query, **upd_kwargs or {})
 
+    # note: for non-classmethod upds archived docs should be affected without
+    #       excluding from the search
     def upd(
         self,
-        query: dict,
+        upd_query: dict,
         **kwargs
     ) -> Self:
-        f = self.try_upd(query, **kwargs)
+        f = self.try_upd(upd_query, **kwargs)
         if f is None:
-            raise ValueError(f"failed to upd doc {self}, using query {query}")
+            raise ValueError(f"failed to upd doc {self}, using query {upd_query}")
         return f
 
     def try_upd(
         self,
         upd_query: dict,
-        *,
-        must_search_archived_too: bool = False,
         **kwargs
     ) -> Self | None:
         """
@@ -472,11 +482,10 @@ class Doc(BaseModel):
             return None
 
         search_query = { "_id": MongoUtils.convert_to_object_id(self.sid) }
-        if not must_search_archived_too:
-            self._exclude_archived_from_search_query(search_query)
 
         data = MongoUtils.try_upd(
             self.get_collection(),
+            search_query,
             upd_query,
             **kwargs
         )
@@ -485,19 +494,75 @@ class Doc(BaseModel):
 
         return self._parse_data_to_doc(data)
 
+    def set(
+        self,
+        query: dict,
+        **kwargs
+    ):
+        return self.upd({"$set": query}, **kwargs)
+
+    def push(
+        self,
+        query: dict,
+        **kwargs
+    ):
+        return self.upd({"$push": query}, **kwargs)
+
+    def pull(
+        self,
+        query: dict,
+        **kwargs
+    ):
+        return self.upd({"$pull": query}, **kwargs)
+
+    def pop(
+        self,
+        query: dict,
+        **kwargs
+    ):
+        return self.upd({"$pop": query}, **kwargs)
+
+    def inc(
+        self,
+        query: dict,
+        **kwargs
+    ):
+        return self.upd({"$inc": query}, **kwargs)
+
     def try_set(
         self,
-        set_query: dict,
+        query: dict,
         **kwargs
     ) -> Self | None:
-        return self.try_upd({"$set": set_query}, **kwargs)
+        return self.try_upd({"$set": query}, **kwargs)
+
+    def try_push(
+        self,
+        query: dict,
+        **kwargs
+    ) -> Self | None:
+        return self.try_upd({"$push": query}, **kwargs)
+
+    def try_pop(
+        self,
+        query: dict,
+        **kwargs
+    ) -> Self | None:
+        return self.try_upd({"$pop": query}, **kwargs)
+
+    def try_pull(
+        self,
+        query: dict,
+        **kwargs
+    ) -> Self | None:
+        return self.try_upd({"$pull": query}, **kwargs)
 
     def try_inc(
         self,
-        inc_query: dict,
+        query: dict,
         **kwargs
     ) -> Self | None:
-        return self.try_upd({"$inc": inc_query}, **kwargs)
+        return self.try_upd({"$inc": query}, **kwargs)
 
     def refresh(
         self
@@ -508,7 +573,11 @@ class Doc(BaseModel):
         if not self.sid:
             raise InpErr("empty sid")
         query = {"sid": self.sid}
-        f = self.try_get(query)
+        f = self.try_get(
+            query,
+            # you can refresh archived docs!
+            must_search_archived_too=True
+        )
         if f is None:
             raise NotFoundErr(type(self), query)
         return f

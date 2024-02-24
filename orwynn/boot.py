@@ -1,7 +1,7 @@
 import argparse
 import typing
 from contextlib import suppress
-from typing import Any, Callable, Coroutine, Literal, Self
+from typing import Callable, Coroutine, Literal, Self
 
 import aiohttp.web
 from pydantic import ValidationError
@@ -80,7 +80,7 @@ class Boot(Sys[BootCfg]):
         """
         Run other task while setting up boot normally.
         """
-        app = await cls.create_app()
+        await cls.create_app()
 
         try:
             await coro

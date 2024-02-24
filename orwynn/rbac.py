@@ -163,7 +163,7 @@ class RbacUtils:
                     if p.code == c:
                         f.append(p)
                         break
-        else:  
+        else:
             # empty codes will search for everything
             f = cls._Permissions
         return f
