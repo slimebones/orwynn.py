@@ -440,10 +440,20 @@ class Doc(BaseModel):
         )
 
     @classmethod
-    def get(cls, query: dict, **kwargs) -> Self:
-        doc = cls.try_get(query, **kwargs)
+    def get(
+        cls,
+        search_query: dict,
+        *,
+        must_search_archived_too: bool = False,
+        **kwargs
+    ) -> Self:
+        doc = cls.try_get(
+            search_query,
+            must_search_archived_too=must_search_archived_too,
+            **kwargs
+        )
         if doc is None:
-            raise NotFoundErr(cls, query)
+            raise NotFoundErr(cls, search_query)
         return doc
 
     @classmethod
@@ -452,10 +462,15 @@ class Doc(BaseModel):
         search_query: dict,
         upd_query: dict,
         *,
+        must_search_archived_too: bool = False,
         search_kwargs: dict | None = None,
         upd_kwargs: dict | None = None
     ) -> Self:
-        doc = cls.get(search_query, **search_kwargs or {})
+        doc = cls.get(
+            search_query,
+            must_search_archived_too=must_search_archived_too,
+            **search_kwargs or {}
+        )
         return doc.upd(upd_query, **upd_kwargs or {})
 
     # note: for non-classmethod upds archived docs should be affected without
