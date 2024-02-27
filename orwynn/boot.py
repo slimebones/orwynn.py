@@ -1,10 +1,10 @@
 import argparse
 import typing
-import aiohttp_cors
 from contextlib import suppress
 from typing import Callable, Coroutine, Literal, Self
 
 import aiohttp.web
+import aiohttp_cors
 from pydantic import ValidationError
 from pykit.err import InpErr
 from pykit.log import log

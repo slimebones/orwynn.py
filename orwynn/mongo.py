@@ -482,7 +482,9 @@ class Doc(BaseModel):
     ) -> Self:
         f = self.try_upd(upd_query, **kwargs)
         if f is None:
-            raise ValueError(f"failed to upd doc {self}, using query {upd_query}")
+            raise ValueError(
+                f"failed to upd doc {self}, using query {upd_query}"
+            )
         return f
 
     def try_upd(

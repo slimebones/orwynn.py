@@ -27,6 +27,7 @@ uvicorn = { path = "../uvicorn", develop = true, extras = ["standard"] }
 
 pydantic = "^2.6.0"
 aiofiles = "^23.2.1"
+aiohttp-cors = "^0.7.0"
 
 [tool.poetry.group.dev.dependencies]
 lorem = "^0.1.1"
