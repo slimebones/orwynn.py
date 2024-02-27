@@ -1,7 +1,5 @@
-import aiohttp.web
 from orwynn.admin import handle_get_indexed_codes
-
-from orwynn.boot import BootCfg
+from orwynn.boot import BootCfg, RouteSpec
 from orwynn.mongo import MongoCfg
 from orwynn.preload import PreloadCfg, handle_preload
 
@@ -9,12 +7,17 @@ default = {
     "test": [
         BootCfg(
             std_verbosity=2,
-            routedef_fns=[
-                lambda: aiohttp.web.post("/preload", handle_preload),
-                lambda: aiohttp.web.get(
-                    "/admin/codes",
-                    handle_get_indexed_codes
-                )
+            route_specs=[
+                RouteSpec(
+                    method="post",
+                    route="/preload",
+                    handler=handle_preload
+                ),
+                RouteSpec(
+                    method="get",
+                    route="/admin/codes",
+                    handler=handle_get_indexed_codes
+                ),
             ]
         ),
         MongoCfg(

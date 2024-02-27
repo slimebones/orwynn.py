@@ -8,7 +8,7 @@ import aiohttp_cors
 from pydantic import ValidationError
 from pykit.err import InpErr
 from pykit.log import log
-from rxcat import Awaitable, ServerBus
+from rxcat import Awaitable, BaseModel, ServerBus
 
 from orwynn.app import App
 from orwynn.cfg import Cfg, CfgPackUtils
@@ -22,10 +22,22 @@ from orwynn.sys import (
 )
 from orwynn.ws import Ws
 
+RouteMethod = Literal["get", "post"]
+
+class RouteSpec(BaseModel):
+    method: RouteMethod
+    route: str
+    handler: Callable[
+        [aiohttp.web.Request],
+        Awaitable[aiohttp.web.StreamResponse]
+    ]
+
+    class Config:
+        arbitrary_types_allowed = True
 
 class BootCfg(Cfg):
     std_verbosity: int = 1
-    routedef_fns: list[Callable[[], aiohttp.web.RouteDef]] = []
+    route_specs: list[RouteSpec] = []
     bootscripts: dict[
         Literal["post-sys-enable"],
         list[Callable[[], Awaitable[None]]]
@@ -54,22 +66,45 @@ class Boot(Sys[BootCfg]):
         boot = await cls.init_boot()
 
         app = App()
-        routedefs = []
-        routedef_funcs = boot._cfg.routedef_fns  # noqa: SLF001
-        if routedef_funcs:
-            routedefs = [func() for func in routedef_funcs]
-        routes = app.add_routes([
-            aiohttp.web.get("/rx", boot._handle_ws),  # noqa: SLF001
-            *routedefs
-        ])
 
+        route_specs = [
+            RouteSpec(
+                route="/rx",
+                method="get",
+                handler=boot._handle_ws  # noqa: SLF001
+            )
+        ]
+        route_specs.extend(boot._cfg.route_specs or [])  # noqa: SLF001
         cors = aiohttp_cors.setup(app)
-        for route in routes:
+
+        for route_spec in route_specs:
+            if route_spec.method.lower() not in ["get", "post"]:
+                log.err(
+                    f"unrecognized route spec {route_spec} method"
+                    f" {route_spec.method} => skip"
+                )
+                continue
+
+            # create or get resource
+            resource = typing.cast(
+                aiohttp.web.Resource,
+                app.router.get(
+                    route_spec.route,
+                    cors.add(app.router.add_resource(
+                        route_spec.route
+                    ))
+                )
+            )
             cors.add(
-                route,
+                resource.add_route(
+                    route_spec.method.upper(),
+                    route_spec.handler
+                ),
                 {
                     "*": aiohttp_cors.ResourceOptions(
-                        allow_credentials=True
+                        allow_credentials=True,
+                        expose_headers="*",
+                        allow_headers="*"
                     )
                 }
             )
