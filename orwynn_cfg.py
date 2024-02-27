@@ -8,7 +8,7 @@ default = {
     "test": [
         BootCfg(
             std_verbosity=2,
-            routedef_funcs=[
+            routedef_fns=[
                 lambda: aiohttp.web.post("/preload", handle_preload)
             ]
         ),

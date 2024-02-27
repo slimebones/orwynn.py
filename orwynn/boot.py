@@ -73,6 +73,7 @@ class Boot(Sys[BootCfg]):
                     )
                 }
             )
+
         return app
 
     @classmethod
