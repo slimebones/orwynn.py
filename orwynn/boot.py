@@ -1,5 +1,6 @@
 import argparse
 import typing
+import aiohttp_cors
 from contextlib import suppress
 from typing import Callable, Coroutine, Literal, Self
 
@@ -24,7 +25,7 @@ from orwynn.ws import Ws
 
 class BootCfg(Cfg):
     std_verbosity: int = 1
-    routedef_funcs: list[Callable[[], aiohttp.web.RouteDef]] = []
+    routedef_fns: list[Callable[[], aiohttp.web.RouteDef]] = []
     bootscripts: dict[
         Literal["post-sys-enable"],
         list[Callable[[], Awaitable[None]]]
@@ -54,14 +55,24 @@ class Boot(Sys[BootCfg]):
 
         app = App()
         routedefs = []
-        routedef_funcs = boot._cfg.routedef_funcs  # noqa: SLF001
+        routedef_funcs = boot._cfg.routedef_fns  # noqa: SLF001
         if routedef_funcs:
             routedefs = [func() for func in routedef_funcs]
-        app.add_routes([
+        routes = app.add_routes([
             aiohttp.web.get("/rx", boot._handle_ws),  # noqa: SLF001
             *routedefs
         ])
 
+        cors = aiohttp_cors.setup(app)
+        for route in routes:
+            cors.add(
+                route,
+                {
+                    "*": aiohttp_cors.ResourceOptions(
+                        allow_credentials=True
+                    )
+                }
+            )
         return app
 
     @classmethod
