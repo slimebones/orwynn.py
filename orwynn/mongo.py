@@ -25,7 +25,7 @@ from orwynn.env import OrwynnEnvUtils
 from orwynn.sys import Sys
 
 
-def filter_collection_factory(collection: str) -> MsgFilter:
+def filter_collection_factory(collections: str | list[str]) -> MsgFilter:
     """
     Filters incoming msg to have a certain collection.
 
@@ -47,7 +47,10 @@ def filter_collection_factory(collection: str) -> MsgFilter:
                 " => return true from this filter"
             )
             return True
-        return collection == real_collection
+        if isinstance(collections, str):
+            return collections == real_collection
+        if isinstance(collections, list):
+            return real_collection in collections
 
     return filter_collection
 
