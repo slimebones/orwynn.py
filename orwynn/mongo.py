@@ -25,38 +25,6 @@ from orwynn.dto import TUdto, Udto
 from orwynn.env import OrwynnEnvUtils
 from orwynn.sys import Sys
 
-
-def filter_collection_factory(*collections: str) -> MsgFilter:
-    """
-    Filters incoming msg to have a certain collection.
-
-    If msg doesn't have "collection" field (or it is set to None, the check is
-    not performed and true is returned.
-
-    If collection field exists, but it is not a str, true is returned,
-    but warning is issued.
-    """
-    async def filter_collection(msg: Msg) -> bool:
-        real_collection = getattr(msg, "collection", None)
-        if real_collection is None:
-            return True
-        if not isinstance(real_collection, str):
-            log.warn(
-                f"{msg} uses \"collection\" field = {real_collection},"
-                " which is not instance of str, and probably has not intention"
-                " to connect it with database collection"
-                " => return true from this filter"
-            )
-            return True
-        if isinstance(collections, str):
-            return collections == real_collection
-        if isinstance(collections, tuple):
-            return real_collection in collections
-
-        raise InpErr(f"collections type {type(collections)}")
-
-    return filter_collection
-
 # We manage mongo CRUD by Create, Get, Upd and Del requests.
 # Get and Del requests are ready-to-use and fcoded. Create and Upd requests
 # are abstract, since we expect user to add custom fields to the req body.
@@ -68,8 +36,22 @@ def filter_collection_factory(*collections: str) -> MsgFilter:
 # For "collection" field, the __default__ db is assumed. Later we might add
 # redefine field to this, but now we're fine.
 
+class DocReq(Req):
+    def __init__(self, **data):
+        for k, v in data:
+            if k.endswith("Query"):
+                if not isinstance(v, (dict, Query)):
+                    raise InpErr(
+                        f"val for key ending with \"Query\" is"
+                         " expected to be of type dict/Query"
+                    )
+                if isinstance(v, dict):
+                    # convert v to query
+                    data[k] = Query(typing.cast(dict, v))
+        super().__init__(**data)
+
 @code("get-docs-req")
-class GetDocsReq(Req):
+class GetDocsReq(DocReq):
     collection: str
     searchQuery: Query
 
@@ -84,17 +66,17 @@ class GotDocUdtosEvt(Evt, Generic[TUdto]):
     udtos: list[TUdto]
 
 @code("del-doc-req")
-class DelDocReq(Req):
+class DelDocReq(DocReq):
     collection: str
     searchQuery: Query
 
 @code("create-doc-req")
-class CreateDocReq(Req):
+class CreateDocReq(DocReq):
     collection: str
     createQuery: Query
 
 @code("upd-doc-req")
-class UpdDocReq(Req):
+class UpdDocReq(DocReq):
     collection: str
     searchQuery: Query
     updQuery: Query
@@ -1124,11 +1106,42 @@ class MongoStateFlagUtils:
         if flag.value is False and on_false is not None:
             result = await on_false
 
-        flag.upd({
+        flag.upd(Query({
             "$set": {
                 "value": finally_set_to
             }
-        })
+        }))
 
         return result
+
+def filter_collection_factory(*collections: str) -> MsgFilter:
+    """
+    Filters incoming msg to have a certain collection.
+
+    If msg doesn't have "collection" field (or it is set to None, the check is
+    not performed and true is returned.
+
+    If collection field exists, but it is not a str, true is returned,
+    but warning is issued.
+    """
+    async def filter_collection(msg: Msg) -> bool:
+        real_collection = getattr(msg, "collection", None)
+        if real_collection is None:
+            return True
+        if not isinstance(real_collection, str):
+            log.warn(
+                f"{msg} uses \"collection\" field = {real_collection},"
+                " which is not instance of str, and probably has not intention"
+                " to connect it with database collection"
+                " => return true from this filter"
+            )
+            return True
+        if isinstance(collections, str):
+            return collections == real_collection
+        if isinstance(collections, tuple):
+            return real_collection in collections
+
+        raise InpErr(f"collections type {type(collections)}")
+
+    return filter_collection
 
