@@ -53,6 +53,8 @@ def filter_collection_factory(*collections: str) -> MsgFilter:
         if isinstance(collections, tuple):
             return real_collection in collections
 
+        raise InpErr(f"collections type {type(collections)}")
+
     return filter_collection
 
 # We manage mongo CRUD by Create, Get, Upd and Del requests.

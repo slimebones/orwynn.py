@@ -4,6 +4,7 @@ from fcode import code
 from pykit import check
 from pykit.checking import CheckErr
 from pykit.err import InpErr
+from pykit.query import Query
 from rxcat import BaseModel, ErrEvt, Evt, Msg, OkEvt, Req, ServerBus
 
 from orwynn.cfg import Cfg
