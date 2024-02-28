@@ -42,7 +42,7 @@ class DocReq(Req):
             if k.endswith("Query"):
                 if not isinstance(v, (dict, Query)):
                     raise InpErr(
-                        f"val for key ending with \"Query\" is"
+                        "val for key ending with \"Query\" is"
                          " expected to be of type dict/Query"
                     )
                 if isinstance(v, dict):
