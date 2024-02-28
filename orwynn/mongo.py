@@ -38,7 +38,7 @@ from orwynn.sys import Sys
 
 class DocReq(Req):
     def __init__(self, **data):
-        for k, v in data:
+        for k, v in data.items():
             if k.endswith("Query"):
                 if not isinstance(v, (dict, Query)):
                     raise InpErr(
