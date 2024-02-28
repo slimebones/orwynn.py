@@ -134,7 +134,7 @@ class RbacUtils:
     @classmethod
     async def req_get_roles_udto(
         cls,
-        search_query: dict
+        search_query: Query
     ) -> GotDocUdtosEvt | ErrEvt:
         f = None
 

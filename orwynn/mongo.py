@@ -11,6 +11,7 @@ from pykit import validation
 from pykit.err import NotFoundErr, UnsupportedErr
 from pykit.log import log
 from pykit.mark import MarkErr, MarkUtils
+from pykit.query import Query
 from pykit.search import DbSearch
 from pykit.types import T
 from pymongo import MongoClient
@@ -25,7 +26,7 @@ from orwynn.env import OrwynnEnvUtils
 from orwynn.sys import Sys
 
 
-def filter_collection_factory(*collections: tuple[str]) -> MsgFilter:
+def filter_collection_factory(*collections: str) -> MsgFilter:
     """
     Filters incoming msg to have a certain collection.
 
@@ -68,7 +69,7 @@ def filter_collection_factory(*collections: tuple[str]) -> MsgFilter:
 @code("get-docs-req")
 class GetDocsReq(Req):
     collection: str
-    searchQuery: dict
+    searchQuery: Query
 
 @code("got-doc-udto-evt")
 class GotDocUdtoEvt(Evt, Generic[TUdto]):
@@ -83,20 +84,20 @@ class GotDocUdtosEvt(Evt, Generic[TUdto]):
 @code("del-doc-req")
 class DelDocReq(Req):
     collection: str
-    searchQuery: dict
+    searchQuery: Query
 
 @code("create-doc-req")
 class CreateDocReq(Req):
     collection: str
-    createQuery: dict
+    createQuery: Query
 
 @code("upd-doc-req")
 class UpdDocReq(Req):
     collection: str
-    searchQuery: dict
-    updQuery: dict
+    searchQuery: Query
+    updQuery: Query
 
-class UpddField(BaseModel):
+class UpdedField(BaseModel):
     fieldName: str
     oldValue: Any
     newValue: Any
@@ -110,7 +111,7 @@ class CreatedDocEvt(Evt):
 class UpddDocEvt(Evt):
     collection: str
     sid: str
-    upddFields: list[UpddField]
+    updedFields: list[UpdedField]
 
 @code("deld-doc-evt")
 class DeldDocEvt(Evt):
@@ -253,7 +254,7 @@ class Doc(BaseModel):
     @classmethod
     def get_many(
         cls,
-        search_query: dict | None = None,
+        search_query: Query | None = None,
         *,
         must_search_archived_too: bool = False,
         **kwargs
@@ -289,7 +290,7 @@ class Doc(BaseModel):
     @classmethod
     def try_get(
         cls,
-        search_query: dict,
+        search_query: Query,
         *,
         must_search_archived_too: bool = False,
         **kwargs
@@ -325,7 +326,7 @@ class Doc(BaseModel):
     @classmethod
     def get_and_del(
         cls,
-        search_query: dict,
+        search_query: Query,
         **kwargs
     ):
         if not cls.IsArchivable:
@@ -341,7 +342,7 @@ class Doc(BaseModel):
     @classmethod
     def _get_and_del_for_sure(
         cls,
-        search_query: dict,
+        search_query: Query,
         **kwargs
     ):
         copied_search_query = search_query.copy()
@@ -355,7 +356,7 @@ class Doc(BaseModel):
     @classmethod
     def try_get_and_del(
         cls,
-        search_query: dict,
+        search_query: Query,
         **kwargs
     ) -> bool:
         if not cls.IsArchivable:
@@ -373,7 +374,7 @@ class Doc(BaseModel):
     @classmethod
     def _try_get_and_del_for_sure(
         cls,
-        search_query: dict,
+        search_query: Query,
         **kwargs
     ) -> bool:
         copied_search_query = search_query.copy()
@@ -445,7 +446,7 @@ class Doc(BaseModel):
     @classmethod
     def get(
         cls,
-        search_query: dict,
+        search_query: Query,
         *,
         must_search_archived_too: bool = False,
         **kwargs
@@ -462,8 +463,8 @@ class Doc(BaseModel):
     @classmethod
     def get_and_upd(
         cls,
-        search_query: dict,
-        upd_query: dict,
+        search_query: Query,
+        upd_query: Query,
         *,
         must_search_archived_too: bool = False,
         search_kwargs: dict | None = None,
@@ -480,7 +481,7 @@ class Doc(BaseModel):
     #       excluding from the search
     def upd(
         self,
-        upd_query: dict,
+        upd_query: Query,
         **kwargs
     ) -> Self:
         f = self.try_upd(upd_query, **kwargs)
@@ -492,7 +493,7 @@ class Doc(BaseModel):
 
     def try_upd(
         self,
-        upd_query: dict,
+        upd_query: Query,
         **kwargs
     ) -> Self | None:
         """
@@ -516,70 +517,70 @@ class Doc(BaseModel):
 
     def set(
         self,
-        query: dict,
+        query: Query,
         **kwargs
     ):
         return self.upd({"$set": query}, **kwargs)
 
     def push(
         self,
-        query: dict,
+        query: Query,
         **kwargs
     ):
         return self.upd({"$push": query}, **kwargs)
 
     def pull(
         self,
-        query: dict,
+        query: Query,
         **kwargs
     ):
         return self.upd({"$pull": query}, **kwargs)
 
     def pop(
         self,
-        query: dict,
+        query: Query,
         **kwargs
     ):
         return self.upd({"$pop": query}, **kwargs)
 
     def inc(
         self,
-        query: dict,
+        query: Query,
         **kwargs
     ):
         return self.upd({"$inc": query}, **kwargs)
 
     def try_set(
         self,
-        query: dict,
+        query: Query,
         **kwargs
     ) -> Self | None:
         return self.try_upd({"$set": query}, **kwargs)
 
     def try_push(
         self,
-        query: dict,
+        query: Query,
         **kwargs
     ) -> Self | None:
         return self.try_upd({"$push": query}, **kwargs)
 
     def try_pop(
         self,
-        query: dict,
+        query: Query,
         **kwargs
     ) -> Self | None:
         return self.try_upd({"$pop": query}, **kwargs)
 
     def try_pull(
         self,
-        query: dict,
+        query: Query,
         **kwargs
     ) -> Self | None:
         return self.try_upd({"$pull": query}, **kwargs)
 
     def try_inc(
         self,
-        query: dict,
+        query: Query,
         **kwargs
     ) -> Self | None:
         return self.try_upd({"$inc": query}, **kwargs)
@@ -603,7 +604,7 @@ class Doc(BaseModel):
         return f
 
     @classmethod
-    def _exclude_archived_from_search_query(cls, search_query: dict):
+    def _exclude_archived_from_search_query(cls, search_query: Query):
         if "internal_marks" in search_query:
             log.warn(
                 f"usage of internal_marks in search query {search_query} =>"
@@ -619,7 +620,7 @@ class Doc(BaseModel):
         return cls.model_validate(cls._adjust_data_sid_from_mongo(data))
 
     @staticmethod
-    def _parsecopy_query(query: dict | None) -> dict:
+    def _parsecopy_query(query: Query | None) -> dict:
         return {} if query is None else copy(query)
 
     @classmethod
@@ -688,7 +689,7 @@ class MongoUtils:
     def try_get(
         cls,
         collection: str,
-        query: dict,
+        query: Query,
         **kwargs
     ) -> dict | None:
         validation.validate(collection, str)
@@ -708,7 +709,7 @@ class MongoUtils:
     def get_many(
         cls,
         collection: str,
-        query: dict,
+        query: Query,
         **kwargs
     ) -> MongoCursor:
         validation.validate(collection, str)
@@ -743,7 +744,7 @@ class MongoUtils:
     def try_upd(
         cls,
         collection: str,
-        query: dict,
+        query: Query,
         operation: dict,
         **kwargs
     ) -> dict | None:
@@ -770,7 +771,7 @@ class MongoUtils:
     def delete(
         cls,
         collection: str,
-        query: dict,
+        query: Query,
         **kwargs
     ):
         validation.validate(collection, str)
@@ -788,7 +789,7 @@ class MongoUtils:
     def try_del(
         cls,
         collection: str,
-        query: dict,
+        query: Query,
         **kwargs
     ) -> bool:
         validation.validate(collection, str)
@@ -803,7 +804,7 @@ class MongoUtils:
 
     @staticmethod
     def process_search(
-        query: dict[str, Any],
+        query: Query[str, Any],
         search: "DocSearch[TDoc]",
         doc_type: type[TDoc],
         *,
@@ -824,7 +825,7 @@ class MongoUtils:
 
     @staticmethod
     def query_by_nested_dict(
-        query: dict[str, Any],
+        query: Query[str, Any],
         nested_dict: dict[str, Any],
         root_key: str,
     ) -> None:
@@ -1015,7 +1016,7 @@ class MongoStateFlagUtils:
         cls,
         search: MongoStateFlagSearch
     ) -> list[MongoStateFlagDoc]:
-        query: dict[str, Any] = {}
+        query: Query[str, Any] = {}
 
         if search.sids:
             query["sid"] = {
