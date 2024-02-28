@@ -42,6 +42,7 @@ class BootCfg(Cfg):
         Literal["post-sys-enable"],
         list[Callable[[], Awaitable[None]]]
     ] = {}
+    client_max_size: int = 1024**3  # = 1GiB
 
     class Config:
         arbitrary_types_allowed = True
@@ -62,10 +63,12 @@ class Boot(Sys[BootCfg]):
         return boot
 
     @classmethod
-    async def create_app(cls) -> aiohttp.web.Application:
+    async def create_app(cls) -> App:
         boot = await cls.init_boot()
 
-        app = App()
+        app = App(
+            client_max_size=boot._cfg.client_max_size  # noqa: SLF001
+        )
 
         route_specs = [
             RouteSpec(
