@@ -19,7 +19,7 @@ class ApiVersion:
     ) -> None:
         if supported is None:
             supported = {1}
-        validation.validate_each(supported, int, expected_sequence_type=set)
+        check.instance_each(supported, int, expected_sequence_type=set)
         self.__supported: set[int] = supported
 
     @property
@@ -65,7 +65,7 @@ class ApiVersion:
             UnsupportedVersionError:
                 The given version is not supported.
         """
-        validation.validate(version, int)
+        check.instance(version, int)
         if version not in self.__supported:
             raise UnsupportedVersionError(
                 f"version {version} is not supported"

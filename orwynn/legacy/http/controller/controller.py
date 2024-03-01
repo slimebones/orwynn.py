@@ -52,7 +52,7 @@ class HttpController(Controller):
                 f" controller {self.__class__}"
             )
         else:
-            validation.validate_each(
+            check.instance_each(
                 self.Endpoints,
                 Endpoint,
                 expected_sequence_type=list,

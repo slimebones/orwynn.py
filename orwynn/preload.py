@@ -10,7 +10,7 @@ from pathlib import Path
 import aiofiles
 import aiohttp.web
 from pydantic import BaseModel
-from pykit.dt import DTUtils
+from pykit.dt import DtUtils
 from pykit.err import InpErr
 from pykit.log import log
 
@@ -63,8 +63,8 @@ class PreloadSys(Sys[PreloadCfg]):
 
         preload = PreloadDoc(
             filenames=[],
-            createdTime=DTUtils.get_utc_timestamp(),
-            expireTime=DTUtils.get_delta_timestamp(
+            createdTime=DtUtils.get_utc_timestamp(),
+            expireTime=DtUtils.get_delta_timestamp(
                 self._DefaultExpirationDelta
             )
         ).create()

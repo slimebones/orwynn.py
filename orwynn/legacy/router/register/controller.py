@@ -372,9 +372,9 @@ class ControllerRegister:
             method:
                 HTTP method function is handling.
         """
-        validation.validate(route, str)
-        validation.validate(func, Callable)
-        validation.validate(method, URLMethod)
+        check.instance(route, str)
+        check.instance(func, Callable)
+        check.instance(method, URLMethod)
 
         app_func: Callable | None = \
             self.__app.HTTP_METHODS_TO_REGISTERING_FUNCTIONS.get(

@@ -150,7 +150,7 @@ async def test_init_enable_mongo(std_struct: Module, set_std_apprc_path_env):
         root_module=std_struct
     )
 
-    validation.validate(Di.ie().find("Mongo"), Mongo)
+    check.instance(Di.ie().find("Mongo"), Mongo)
 
 
 @pytest.mark.asyncio

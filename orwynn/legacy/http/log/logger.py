@@ -29,8 +29,8 @@ class HttpLogger:
         Returns:
             Request assigned ID.
         """
-        validation.validate(request, HttpRequest)
-        validation.validate(request_id, str)
+        check.instance(request, HttpRequest)
+        check.instance(request_id, str)
 
         plain_message: str = \
             f"request {request.method.upper()} {request.url.path}" \
@@ -137,7 +137,7 @@ class HttpLogger:
         # Gets response body from StreamingResponse, see:
         #   https://github.com/encode/starlette/issues/874#issuecomment-1027743996
         #
-        validation.validate(response, StreamingResponse)
+        check.instance(response, StreamingResponse)
 
         response_body = [section async for section in response.body_iterator]
         response.body_iterator = iterate_in_threadpool(iter(response_body))

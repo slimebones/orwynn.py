@@ -19,7 +19,7 @@ def context_manager(
     if data is None:
         data = {}
 
-    validation.validate(data, dict)
+    check.instance(data, dict)
 
     storage: ContextStorage = ContextStorage.ie()
     token: Token = storage.init_data(data)

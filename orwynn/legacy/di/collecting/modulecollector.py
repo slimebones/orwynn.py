@@ -26,10 +26,10 @@ class ModuleCollector:
         *,
         global_modules: list[Module] | None = None
     ) -> None:
-        validation.validate(root_module, Module)
+        check.instance(root_module, Module)
         if not global_modules:
             global_modules = []
-        validation.validate_each(
+        check.instance_each(
             global_modules,
             Module,
             expected_sequence_type=list

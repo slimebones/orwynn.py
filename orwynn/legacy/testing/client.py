@@ -33,7 +33,7 @@ class Client:
         *,
         binded_headers: dict[str, str] | None = None
     ) -> None:
-        validation.validate(embedded_client, EmbeddedTestClient)
+        check.instance(embedded_client, EmbeddedTestClient)
         self._embedded_client: EmbeddedTestClient = embedded_client
 
         if binded_headers is None:
@@ -50,7 +50,7 @@ class Client:
         self,
         headers: dict[str, str]
     ) -> Self:
-        validation.validate_dict(headers, (str, str))
+        check.instance_dict(headers, (str, str))
 
         # Accumulate headers from this client to the new one.
         #
@@ -294,7 +294,7 @@ class Client:
             bool
         )
         api_version: int | None = request_kwargs.get("api_version", None)
-        validation.validate(api_version, [int, NoneType])
+        check.instance(api_version, [int, NoneType])
         final_route: str = self._get_final_route(
             route,
             is_global_route_used=is_global_route_used,

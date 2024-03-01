@@ -147,7 +147,7 @@ def __init_middleware(
             Module and it's covered routes or global middleware setting.
     """
     if isinstance(source, tuple):
-        validation.validate_length(source, 2)
+        check.instance_length(source, 2)
         __init_middleware_from_module(
             container=container,
             module=source[0],

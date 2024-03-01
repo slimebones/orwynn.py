@@ -3,7 +3,7 @@ from typing import Callable
 import jwt
 from fcode import code
 from pykit import check
-from pykit.dt import DTUtils
+from pykit.dt import DtUtils
 from pykit.log import log
 from rxcat import Awaitable, Evt, Req
 
@@ -130,7 +130,7 @@ class AuthSys(Sys[AuthCfg]):
         )
 
     def _encode_jwt(self, user_sid: str) -> tuple[str, float]:
-        exp = DTUtils.get_delta_timestamp(self._cfg.auth_token_exp_time)
+        exp = DtUtils.get_delta_timestamp(self._cfg.auth_token_exp_time)
         token: str = jwt.encode(
             {
                 "userSid": user_sid,

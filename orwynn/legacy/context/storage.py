@@ -40,7 +40,7 @@ class ContextStorage(Worker):
             AlreadyInitializedStorageError:
                 The storage is already initialized.
         """
-        validation.validate(initial_data, dict)
+        check.instance(initial_data, dict)
 
         if self.__storage.get() is not None:
             raise AlreadyInitializedStorageError()
@@ -57,7 +57,7 @@ class ContextStorage(Worker):
             token:
                 Token related to storage's set to be reset.
         """
-        validation.validate(token, Token)
+        check.instance(token, Token)
         self.__storage.reset(token)
 
     def get(self, key: Any) -> Any:

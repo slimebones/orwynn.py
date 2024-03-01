@@ -22,8 +22,8 @@ class WebsocketLogger:
         Returns:
             Request assigned ID.
         """
-        validation.validate(request, Websocket)
-        validation.validate(request_id, str)
+        check.instance(request, Websocket)
+        check.instance(request_id, str)
 
         plain_message: str = \
             f"websocket CONNECT {request.url.path}" \

@@ -101,7 +101,7 @@ class ContainerDTO(DTO):
 
         for obj in objs:
             converted: _TUnitDTO = convertion_func(obj)
-            validation.validate(converted, Base)
+            check.instance(converted, Base)
             result.append(converted)
 
         if not container_kwargs:
@@ -201,12 +201,12 @@ class DTOUtils(Static):
         # [CatDto(...), DogDto(...)]
         ```
         """
-        validation.validate_each(units, dict, expected_sequence_type=list)
+        check.instance_each(units, dict, expected_sequence_type=list)
 
         dtos: Sequence[_TUnitDTO] = []
 
         for raw_item in units:
-            validation.validate(raw_item, dict)
+            check.instance(raw_item, dict)
 
             try:
                 type_code: str = raw_item["code"]

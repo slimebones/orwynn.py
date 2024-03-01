@@ -16,7 +16,7 @@ class ErrorHandlerHttpMiddleware(BuiltinHttpMiddleware):
         handlers: set[ErrorHandler]
     ) -> None:
         super().__init__()
-        validation.validate_each(
+        check.instance_each(
             handlers, ErrorHandler, expected_sequence_type=set
         )
         self.__handlers: set[ErrorHandler] = handlers

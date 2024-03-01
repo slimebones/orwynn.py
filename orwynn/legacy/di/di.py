@@ -58,17 +58,17 @@ class Di(Worker):
         global_middleware: GlobalMiddlewareSetup | None = None
     ) -> None:
         super().__init__()
-        validation.validate(root_module, Module)
+        check.instance(root_module, Module)
 
         if global_modules is None:
             global_modules = []
-        validation.validate_each(
+        check.instance_each(
             global_modules, Module, expected_sequence_type=list
         )
 
         if global_middleware is None:
             global_middleware = {}
-        validation.validate_dict(
+        check.instance_dict(
             global_middleware, (Middleware, list)
         )
 

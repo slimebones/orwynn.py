@@ -38,7 +38,7 @@ class URLUtils(Static):
     @staticmethod
     def join_routes(*routes: str) -> str:
         """Joins all given routes and normalize final result."""
-        validation.validate_each(routes, str, expected_sequence_type=tuple)
+        check.instance_each(routes, str, expected_sequence_type=tuple)
 
         result: str = ""
 

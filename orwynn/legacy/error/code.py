@@ -29,7 +29,7 @@ def get_error_code(err: Exception) -> ErrorCode:
         ) from stack_err
 
     try:
-        validation.validate(
+        check.instance(
             error_code, _ErrorCodeTypes
         )
     except validation.ValidationError as stack_err:

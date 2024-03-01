@@ -19,7 +19,7 @@ class Config(Model):
         if not extra:
             extra = {}
 
-        validation.validate_dict(extra, (str, validation.Validator.SKIP))
+        check.instance_dict(extra, (str, validation.Validator.SKIP))
 
         apprc: "AppRc" = BootProxy.ie().apprc
         config_kwargs: dict[str, Any] = apprc.get(

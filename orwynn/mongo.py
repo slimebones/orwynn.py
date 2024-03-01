@@ -5,9 +5,9 @@ from enum import Enum
 from typing import Any, ClassVar, Coroutine, Generic, Iterable, Self, TypeVar
 
 from bson import ObjectId
+from pykit.check import check
 from bson.errors import InvalidId
 from pydantic import BaseModel
-from pykit import validation
 from pykit.err import NotFoundErr, UnsupportedErr
 from pykit.log import log
 from pykit.mark import MarkErr, MarkUtils
@@ -261,7 +261,7 @@ class Doc(BaseModel):
         if not must_search_archived_too:
             cls._exclude_archived_from_search_query(copied_search_query)
 
-        validation.validate(copied_search_query, dict)
+        check.instance(copied_search_query, dict)
 
         cursor: MongoCursor = MongoUtils.get_many(
             cls.get_collection(),
@@ -676,8 +676,8 @@ class MongoUtils:
         query: Query,
         **kwargs
     ) -> dict | None:
-        validation.validate(collection, str)
-        validation.validate(query, dict)
+        check.instance(collection, str)
+        check.instance(query, dict)
 
         result: Any | None = cls.db[collection].find_one(
             query, **kwargs
@@ -696,8 +696,8 @@ class MongoUtils:
         query: Query,
         **kwargs
     ) -> MongoCursor:
-        validation.validate(collection, str)
-        validation.validate(query, dict)
+        check.instance(collection, str)
+        check.instance(query, dict)
 
         return cls.db[collection].find(
             query, **kwargs
@@ -710,8 +710,8 @@ class MongoUtils:
         data: dict,
         **kwargs
     ) -> dict:
-        validation.validate(collection, str)
-        validation.validate(data, dict)
+        check.instance(collection, str)
+        check.instance(data, dict)
 
         inserted_id: str = cls.db[collection].insert_one(
             data,
@@ -733,9 +733,9 @@ class MongoUtils:
         **kwargs
     ) -> dict | None:
         """Updates a document matching query and returns updated version."""
-        validation.validate(collection, str)
-        validation.validate(query, dict)
-        validation.validate(operation, dict)
+        check.instance(collection, str)
+        check.instance(query, dict)
+        check.instance(operation, dict)
 
         upd_doc: Any = \
             cls.db[collection].find_one_and_update(
@@ -758,8 +758,8 @@ class MongoUtils:
         query: Query,
         **kwargs
     ):
-        validation.validate(collection, str)
-        validation.validate(query, dict)
+        check.instance(collection, str)
+        check.instance(query, dict)
 
         del_result = cls.db[collection].delete_one(
             query,
@@ -776,8 +776,8 @@ class MongoUtils:
         query: Query,
         **kwargs
     ) -> bool:
-        validation.validate(collection, str)
-        validation.validate(query, dict)
+        check.instance(collection, str)
+        check.instance(query, dict)
 
         del_result = cls.db[collection].delete_one(
             query,

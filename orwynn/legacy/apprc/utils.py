@@ -35,9 +35,9 @@ class AppRCUtils(Static):
                 directly, if such apprc is not present to enable environ
                 searching way.
         """
-        validation.validate(root_dir, Path)
-        validation.validate(mode, AppMode)
-        validation.validate(direct_apprc, [AppRc, NoneType])
+        check.instance(root_dir, Path)
+        check.instance(mode, AppMode)
+        check.instance(direct_apprc, [AppRc, NoneType])
 
         # All required for this enabled mode data goes here
         final_apprc: AppRc = {}

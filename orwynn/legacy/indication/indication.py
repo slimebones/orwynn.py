@@ -153,7 +153,7 @@ class Indication:
                                     message += " ;; "
                                 message += err["msg"]
                             err_loc: tuple[str | int] = err["loc"]
-                            validation.validate_each(
+                            check.instance_each(
                                 err_loc,
                                 [str, int],
                                 expected_sequence_type=tuple
@@ -303,7 +303,7 @@ class Indication:
         if isinstance(error_code, Enum):
             enum_value: Any = error_code.value
             try:
-                validation.validate(
+                check.instance(
                     enum_value,
                     [int, str]
                 )

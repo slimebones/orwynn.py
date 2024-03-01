@@ -162,7 +162,7 @@ class Module:
         Generally used to add global imports.
         """
         for module in modules:
-            validation.validate(module, Module)
+            check.instance(module, Module)
             if module in self._imports:
                 raise CircularDependencyError(
                     f"module {module} has been already added to containing"

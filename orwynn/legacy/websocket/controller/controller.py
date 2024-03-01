@@ -78,7 +78,7 @@ class WebsocketController(Controller):
         for k, v in self.__class__.__dict__.items():
             if k[:3] == "on_" or k == "main":
                 try:
-                    validation.validate(v, Callable)
+                    check.instance(v, Callable)
                 except validation.ValidationError as err:
                     raise ValueError(
                         "every websocket controller object starting from"

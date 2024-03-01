@@ -85,7 +85,7 @@ class SQLUtils(Static):
         name: str,
         shd: SHD,
     ) -> StateFlag:
-        validation.validate(name, str)
+        check.instance(name, str)
 
         result: StateFlag | None = shd.scalar(
             shd.select(StateFlag).where(
@@ -115,8 +115,8 @@ class SQLUtils(Static):
         """
         Finds a state flag by name and sets a new value to it.
         """
-        validation.validate(name, str)
-        validation.validate(value, bool)
+        check.instance(name, str)
+        check.instance(value, bool)
 
         state_flag: StateFlag = SQLUtils.get_state_flag_by_name(name, shd)
         state_flag.value = value
@@ -144,9 +144,9 @@ class SQLUtils(Static):
         Returns:
             Table row found.
         """
-        validation.validate(id, str)
-        validation.validate(Table_, Table)
-        validation.validate(shd, SHD)
+        check.instance(id, str)
+        check.instance(Table_, Table)
+        check.instance(shd, SHD)
 
         result: TTable | None = shd.scalar(
             shd.select(Table_).where(
@@ -186,7 +186,7 @@ class SQLUtils(Static):
         Returns:
             Table rows found.
         """
-        validation.validate(ids, list)
+        check.instance(ids, list)
 
         rows: list[TTable] = []
 
@@ -220,9 +220,9 @@ class SQLUtils(Static):
         Returns:
             Converted model.
         """
-        validation.validate(Table_, Table)
-        validation.validate(convertion_func, Callable)
-        validation.validate(shd, SHD)
+        check.instance(Table_, Table)
+        check.instance(convertion_func, Callable)
+        check.instance(shd, SHD)
 
         return convertion_func(SQLUtils.get_one(
             id,
@@ -258,11 +258,11 @@ class SQLUtils(Static):
         Returns:
             Listed model with converted models.
         """
-        validation.validate(Table_, Table)
-        validation.validate(convertion_func, Callable)
-        validation.validate(ListedConvertedModel_, Model)
-        validation.validate(listed_converted_model_units_key, str)
-        validation.validate(shd, SHD)
+        check.instance(Table_, Table)
+        check.instance(convertion_func, Callable)
+        check.instance(ListedConvertedModel_, Model)
+        check.instance(listed_converted_model_units_key, str)
+        check.instance(shd, SHD)
 
         rows: list[TTable] = SQLUtils.get_all(
             Table_,
@@ -296,8 +296,8 @@ class SQLUtils(Static):
         Returns:
             All rows for table.
         """
-        validation.validate(shd, SHD)
-        validation.validate(Table_, Table)
+        check.instance(shd, SHD)
+        check.instance(Table_, Table)
 
         selection = shd.select(Table_)
 
@@ -319,7 +319,7 @@ class SQLUtils(Static):
             )
 
         tables: list[TTable] = list(result)
-        validation.validate_each(tables, Table)
+        check.instance_each(tables, Table)
 
         return tables
 

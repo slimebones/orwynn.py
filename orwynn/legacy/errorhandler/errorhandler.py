@@ -34,9 +34,9 @@ class ErrorHandler:
                 f"{self.__class__} error class is not set"
             )
         else:
-            validation.validate(self.E, Exception)
+            check.instance(self.E, Exception)
 
-        validation.validate(self.Protocol, URLScheme)
+        check.instance(self.Protocol, URLScheme)
 
     @classmethod
     def get_handled_exception_class(cls) -> type[Exception]:

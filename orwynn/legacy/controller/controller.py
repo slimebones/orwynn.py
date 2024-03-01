@@ -27,11 +27,11 @@ class Controller:
                 f" controller {self.__class__}"
             )
         else:
-            validation.validate(self.Route, str)
-            validation.validate_route(self.Route)
+            check.instance(self.Route, str)
+            check.instance_route(self.Route)
             self._route: str = self.Route
 
-        validation.validate(self.Version, [int, set, str, NoneType])
+        check.instance(self.Version, [int, set, str, NoneType])
         if isinstance(self.Version, str) and self.Version != "*":
             raise TypeError(
                 f"unrecognized Version {self.Version}"

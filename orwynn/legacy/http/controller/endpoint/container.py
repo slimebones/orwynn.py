@@ -19,8 +19,8 @@ class EndpointContainer(Worker):
         return self.__spec_by_func.items()
 
     def add(self, func: Callable, spec: Endpoint) -> None:
-        validation.validate(func, Callable)
-        validation.validate(spec, Endpoint)
+        check.instance(func, Callable)
+        check.instance(spec, Endpoint)
 
         if func in self.__spec_by_func:
             raise ValueError(
@@ -30,7 +30,7 @@ class EndpointContainer(Worker):
         self.__spec_by_func[func] = spec
 
     def find_spec(self, func: Callable) -> Endpoint:
-        validation.validate(func, Callable)
+        check.instance(func, Callable)
 
         try:
             return self.__spec_by_func[func]

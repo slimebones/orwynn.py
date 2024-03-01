@@ -180,7 +180,7 @@ class MiddlewareRegister:
             self.__is_websocket_middleware_added = True
 
     def __register_middleware_unit(self, middleware: Middleware) -> None:
-        validation.validate(middleware, Middleware)
+        check.instance(middleware, Middleware)
 
         # Note that dispatch(...) method is linked to be as entrypoint to a
         # middleware. This will be a place where a middleware takes decision
