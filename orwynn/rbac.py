@@ -1,7 +1,7 @@
 from typing import Literal, Self
 
 from fcode import code
-from pykit import check
+from pykit.check import check
 from pykit.check import CheckErr
 from pykit.err import InpErr
 from pykit.query import Query

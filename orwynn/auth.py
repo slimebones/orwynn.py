@@ -2,7 +2,7 @@ from typing import Callable
 
 import jwt
 from fcode import code
-from pykit import check
+from pykit.check import check
 from pykit.dt import DtUtils
 from pykit.log import log
 from rxcat import Awaitable, Evt, Req

@@ -1,4 +1,4 @@
-from pykit import check
+from pykit.check import check
 from pykit.err import NotFoundErr
 from pykit.mark import MarkErr
 
