@@ -577,7 +577,7 @@ class Doc(BaseModel):
         """
         if not self.sid:
             raise InpErr("empty sid")
-        query = {"sid": self.sid}
+        query = Query({"sid": self.sid})
         f = self.try_get(
             query,
             # you can refresh archived docs!
@@ -604,8 +604,8 @@ class Doc(BaseModel):
         return cls.model_validate(cls._adjust_data_sid_from_mongo(data))
 
     @staticmethod
-    def _parsecopy_query(query: Query | None) -> dict:
-        return {} if query is None else copy(query)
+    def _parsecopy_query(query: Query | None) -> Query:
+        return Query() if query is None else query.copy()
 
     @classmethod
     def _adjust_data_sid_to_mongo(cls, data: dict):
@@ -788,7 +788,7 @@ class MongoUtils:
 
     @staticmethod
     def process_search(
-        query: Query[str, Any],
+        query: Query,
         search: "DocSearch[TDoc]",
         doc_type: type[TDoc],
         *,
@@ -809,7 +809,7 @@ class MongoUtils:
 
     @staticmethod
     def query_by_nested_dict(
-        query: Query[str, Any],
+        query: Query,
         nested_dict: dict[str, Any],
         root_key: str,
     ) -> None:
@@ -1000,7 +1000,7 @@ class MongoStateFlagUtils:
         cls,
         search: MongoStateFlagSearch
     ) -> list[MongoStateFlagDoc]:
-        query: Query[str, Any] = {}
+        query = Query()
 
         if search.sids:
             query["sid"] = {
