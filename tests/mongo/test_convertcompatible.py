@@ -1,6 +1,6 @@
 from enum import Enum
 
-from pykit import validation
+from pykit.check import check
 
 from orwynn.mongo import MongoUtils
 
@@ -106,7 +106,7 @@ def test_mongovalue_set():
     """
     Should raise an error for set returning mongovalue attribute.
     """
-    validation.expect(
+    check.expect(
         MongoUtils.convert_compatible,
         ValueError,
         SetObj(),

@@ -5,9 +5,9 @@ from enum import Enum
 from typing import Any, ClassVar, Coroutine, Generic, Iterable, Self, TypeVar
 
 from bson import ObjectId
-from pykit.check import check
 from bson.errors import InvalidId
 from pydantic import BaseModel
+from pykit.check import check
 from pykit.err import NotFoundErr, UnsupportedErr
 from pykit.log import log
 from pykit.mark import MarkErr, MarkUtils

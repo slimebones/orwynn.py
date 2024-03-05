@@ -1,5 +1,5 @@
 from bson import ObjectId
-from pykit import validation
+from pykit.check import check
 
 from orwynn.mongo import MongoUtils
 
@@ -49,7 +49,7 @@ def test_list():
     assert {str(x) for x in result} == {str(object_id_1), str(object_id_2)}
 
 def test_invalid_id():
-    validation.expect(
+    check.expect(
         MongoUtils.convert_to_object_id,
         ValueError,
         "hello"
