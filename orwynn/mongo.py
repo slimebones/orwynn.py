@@ -294,10 +294,9 @@ class Doc(BaseModel):
 
         return cls._parse_data_to_doc(data)
 
-    @classmethod
     def get_or_create(
-        cls,
-        searchcreateq: Query,
+        self,
+        searchq: Query,
         search_kwargs: dict | None = None,
         create_kwargs: dict | None = None
     ) -> tuple[Self, int]:
@@ -307,10 +306,10 @@ class Doc(BaseModel):
             create_kwargs = {}
 
         flag = 0
-        doc = cls.try_get(searchcreateq, **search_kwargs)
+        doc = self.try_get(searchq, **search_kwargs)
         if not doc:
             flag = 1
-            doc = cls(**searchcreateq).create()
+            doc = self.create()
 
         return doc, flag
 
