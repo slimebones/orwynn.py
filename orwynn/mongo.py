@@ -294,6 +294,26 @@ class Doc(BaseModel):
 
         return cls._parse_data_to_doc(data)
 
+    @classmethod
+    def get_or_create(
+        cls,
+        searchcreateq: Query,
+        search_kwargs: dict | None = None,
+        create_kwargs: dict | None = None
+    ) -> tuple[Self, int]:
+        if search_kwargs is None:
+            search_kwargs = {}
+        if create_kwargs is None:
+            create_kwargs = {}
+
+        flag = 0
+        doc = cls.try_get(searchcreateq, **search_kwargs)
+        if not doc:
+            flag = 1
+            doc = cls(**searchcreateq).create()
+
+        return doc, flag
+
     def create(self, **kwargs) -> Self:
         dump = self.model_dump()
         self._adjust_data_sid_to_mongo(dump)
