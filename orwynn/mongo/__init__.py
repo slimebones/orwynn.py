@@ -1,6 +1,5 @@
 import typing
 from contextlib import suppress
-from copy import copy
 from enum import Enum
 from typing import Any, ClassVar, Coroutine, Generic, Iterable, Self, TypeVar
 
