@@ -1155,8 +1155,11 @@ def filter_collection_factory(*collections: str) -> MsgFilter:
                 " => return true from this filter"
             )
             return True
+
+        # todo: maybe remove this
         if isinstance(collections, str):
             return collections == real_collection
+
         if isinstance(collections, tuple):
             return real_collection in collections
 
