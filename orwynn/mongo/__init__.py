@@ -10,7 +10,7 @@ from pykit.check import check
 from pykit.err import NotFoundErr, UnsupportedErr
 from pykit.log import log
 from pykit.mark import MarkErr, MarkUtils
-from pykit.query import Query
+from pykit.query import Query, QueryUpdOperator
 from pykit.search import DbSearch
 from pykit.types import T
 from pymongo import MongoClient
@@ -22,7 +22,12 @@ from rxcat import Evt, InpErr, Msg, MsgFilter, Req, code
 from orwynn.cfg import Cfg
 from orwynn.dto import TUdto, Udto
 from orwynn.env import OrwynnEnvUtils
+from orwynn.mongo.field import DocField, UniqueFieldErr
 from orwynn.sys import Sys
+
+__all__ = [
+    "DocField",
+]
 
 # We manage mongo CRUD by Create, Get, Upd and Del requests.
 # Get and Del requests are ready-to-use and fcoded. Create and Upd requests
@@ -122,6 +127,9 @@ class Doc(BaseModel):
     performed before saving to MongoDB and backwards ObjectId->str before
     forming the document from MongoDB data.
     """
+
+    Fields: ClassVar[list[DocField]] = []
+
     sid: str = ""
     """
     String representation of mongo objectid. Set to empty string if is not
@@ -140,6 +148,34 @@ class Doc(BaseModel):
     be used.
     """
     _cached_collection_name: ClassVar[str | None] = None
+    _cached_name_to_field: ClassVar[dict[str, DocField]] = {}
+
+    @classmethod
+    def _try_get_field(cls, name: str) -> DocField | None:
+        if name in cls._cached_name_to_field:
+            return cls._cached_name_to_field[name]
+        for f in cls.Fields:
+            if f.name == name:
+                cls._cached_name_to_field[name] = f
+                return f
+        return None
+
+    @classmethod
+    def _check_field(
+            cls,
+            name: str,
+            new_val: Any,
+            upd_operator: QueryUpdOperator | None = None):
+
+        field = cls._try_get_field(name)
+        if not field:
+            return
+
+        # archived things are searched too! for now it's according to the
+        # intended logic
+        if field.unique and cls.try_get(Query({name: new_val})):
+            raise UniqueFieldErr(
+                    f"for doc {cls} field {name} is unique")
 
     @classmethod
     def to_udtos(cls, docs: Iterable[Self]) -> list[Udto]:
@@ -314,6 +350,10 @@ class Doc(BaseModel):
 
     def create(self, **kwargs) -> Self:
         dump = self.model_dump()
+
+        for k, v in dump.items():
+            self._check_field(k, v)
+
         self._adjust_data_sid_to_mongo(dump)
 
         if dump["internal_marks"]:  # non-empty marks in dump
@@ -504,7 +544,16 @@ class Doc(BaseModel):
         if not self.sid:
             return None
 
-        search_query = { "_id": MongoUtils.convert_to_object_id(self.sid) }
+        for operator_key, operator_val in upd_query.items():
+            for k, v in operator_val.items():
+                self._check_field(
+                    k,
+                    v,
+                    typing.cast(
+                        QueryUpdOperator, operator_key.replace("$", "")))
+
+        search_query = Query({
+            "_id": MongoUtils.convert_to_object_id(self.sid)})
 
         data = MongoUtils.try_upd(
             self.get_collection(),
