@@ -1,4 +1,6 @@
-# 2.0.0 - UNRELEASED
+# 2.0.0
+
+- going rx
 
 # 1.4.0
 

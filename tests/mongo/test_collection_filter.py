@@ -1,6 +1,6 @@
 import pytest
-from fcode import code
 from pykit.check import check
+from pykit.fcode import code
 from rxcat import OkEvt, Req, ServerBus, ValueErr
 
 from orwynn.mongo import filter_collection_factory

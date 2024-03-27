@@ -1,5 +1,5 @@
-from fcode import code
 from pydantic import BaseModel
+from pykit.fcode import code
 
 
 class DocField(BaseModel):

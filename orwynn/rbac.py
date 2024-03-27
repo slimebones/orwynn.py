@@ -1,8 +1,8 @@
 from typing import Literal, Self
 
-from fcode import code
 from pykit.check import CheckErr, check
 from pykit.err import InpErr
+from pykit.fcode import code
 from pykit.query import Query
 from rxcat import BaseModel, ErrEvt, Evt, Msg, OkEvt, Req, ServerBus
 
