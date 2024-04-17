@@ -1,8 +1,10 @@
+import re
 import typing
 from contextlib import suppress
 from enum import Enum
-from typing import Any, ClassVar, Coroutine, Generic, Iterable, Self, TypeVar
+from typing import Any, ClassVar, Coroutine, Generic, Iterable, Literal, Self, TypeVar
 
+import inflection
 from bson import ObjectId
 from bson.errors import InvalidId
 from pydantic import BaseModel
@@ -114,6 +116,8 @@ class MongoCfg(Cfg):
     database_name: str
     must_clean_db_on_destroy: bool = False
 
+NamingStyle = Literal["camel_case", "snake_case"]
+
 class Doc(BaseModel):
     """
     Mapping to work with MongoDB.
@@ -129,7 +133,8 @@ class Doc(BaseModel):
     """
 
     FIELDS: ClassVar[list[DocField]] = []
-    INTERNAL_BACKLINKS: ClassVar[dict[type[Self], list[str]]] = {}
+    COLLECTION_NAMING: ClassVar[NamingStyle] = "camel_case"
+    _INTERNAL_BACKLINKS: ClassVar[dict[type[Self], list[str]]] = {}
     """
     Map of backlinked docs and their names of their fields, which point to
     this doc.
@@ -187,12 +192,13 @@ class Doc(BaseModel):
         if not sid:
             return
 
-        for backlink_type, backlink_fields in cls.INTERNAL_BACKLINKS.items():
+        for backlink_type, backlink_fields in cls._INTERNAL_BACKLINKS.items():
             for backlink_field in backlink_fields:
                 targets = backlink_type.get_many(Query({backlink_field: {
-                    "$in": sid }}))
+                    "$in": [sid]
+                }}))
                 for target in targets:
-                    target.upd(Query({"$pop": {
+                    target.upd(Query({"$pull": {
                         backlink_field: sid
                     }}))
 
@@ -251,13 +257,22 @@ class Doc(BaseModel):
     @classmethod
     def get_collection(cls) -> str:
         if not cls._cached_collection_name:
-            name = cls.__name__
-            assert len(name) > 0
-            if len(name) == 1:
-                name = name.lower()
-            else:
-                # camel case
-                name = name[0].lower() + name[1:]
+            match cls.COLLECTION_NAMING:
+                case "camel_case":
+                    name = cls.__name__
+                    assert len(name) > 0
+                    if len(name) == 1:
+                        name = name.lower()
+                    else:
+                        # camel case
+                        name = name[0].lower() + name[1:]
+                case "snake_case":
+                    name = inflection.underscore(cls.__name__)
+                case _:
+                    name = cls.__name__
+                    log.warn("unrecognized collection naming style"
+                             f" {cls.COLLECTION_NAMING} of doc {cls}"
+                             " => use untouched doc name")
             cls._cached_collection_name = name
         return cls._cached_collection_name
 
@@ -731,11 +746,29 @@ class MongoUtils:
         cls.db = db
 
         for doc_type in Doc.__subclasses__():
+            # set new dict to not leak it between docs
+            doc_type._INTERNAL_BACKLINKS = {}
             cls._doc_types[doc_type.get_collection()] = doc_type
-        # fill backlinks
         for doc_type in cls._doc_types.values():
             for field in doc_type.FIELDS:
                 cls._process_field_link(doc_type, field)
+
+    @classmethod
+    def add_doc_types(cls, *doc_types: type[Doc]):
+        skip_doc_types = []
+        for doc_type in doc_types:
+            if doc_type.get_collection() in doc_types:
+                skip_doc_types.append(doc_type)
+                continue
+            # set new dict to not leak it between docs
+            doc_type._INTERNAL_BACKLINKS = {}
+            cls._doc_types[doc_type.get_collection()] = doc_type
+        for doc_type in doc_types:
+            if doc_type in skip_doc_types:
+                continue
+            for field in doc_type.FIELDS:
+                cls._process_field_link(doc_type, field)
+
 
     @classmethod
     def _process_field_link(
@@ -746,11 +779,11 @@ class MongoUtils:
         if target is None:
             log.err(
                     f"doc {host_doc_type} links unexistent"
-                    " {link.target_doc}")
+                    f" {field.linked_doc}")
             return
-        if host_doc_type not in target.INTERNAL_BACKLINKS:
-            target.INTERNAL_BACKLINKS[host_doc_type] = []
-        target.INTERNAL_BACKLINKS[host_doc_type].append(field.name)
+        if host_doc_type not in target._INTERNAL_BACKLINKS:
+            target._INTERNAL_BACKLINKS[host_doc_type] = []
+        target._INTERNAL_BACKLINKS[host_doc_type].append(field.name)
 
     @classmethod
     async def destroy(cls):
@@ -758,6 +791,7 @@ class MongoUtils:
             del cls.client
         with suppress(AttributeError):
             del cls.db
+        cls._doc_types = {}
 
     @classmethod
     def try_get_doc_type(cls, name: str) -> type[Doc] | None:
