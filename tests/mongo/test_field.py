@@ -1,6 +1,6 @@
 from pykit.check import check
 
-from orwynn.mongo import Doc, Query, DocFieldLink
+from orwynn.mongo import Doc, Query
 from orwynn.mongo.field import DocField, UniqueFieldErr
 
 
@@ -17,9 +17,10 @@ class _Doc2(Doc):
     FIELDS = [
         DocField(
             name="doc1_sids",
-            link=DocFieldLink(
-                target_doc="_doc1",
-                target_field)
+            linked_doc="_doc1")
+    ]
+
+    doc1_sids: list[str] = []
 
 def test_unique_create(app):
     _Doc1(name="pizza").create()
@@ -37,3 +38,16 @@ def test_unique_upd(app):
     d2 = d2.refresh()
     assert d1.name == "pizza"
     assert d2.name == "notpizza"
+
+def test_links(app):
+    d1 = _Doc1(name="pizza").create()
+    d2 = _Doc1(name="donut").create()
+    dh = _Doc2(doc1_sids=[d1.sid, d2.sid]).create()
+    print(d1.get_collection())
+
+    d1.delete()
+    d1.refresh().del_archived()
+    dh = dh.refresh()
+
+    assert dh.doc1_sids == [d2.sid]
+
