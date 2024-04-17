@@ -22,12 +22,11 @@ from rxcat import Evt, InpErr, Msg, MsgFilter, Req, code
 from orwynn.cfg import Cfg
 from orwynn.dto import TUdto, Udto
 from orwynn.env import OrwynnEnvUtils
-from orwynn.mongo.field import DocField, DocFieldLink, UniqueFieldErr
+from orwynn.mongo.field import DocField, UniqueFieldErr
 from orwynn.sys import Sys
 
 __all__ = [
     "DocField",
-    "DocFieldLink"
 ]
 
 # We manage mongo CRUD by Create, Get, Upd and Del requests.
@@ -130,7 +129,11 @@ class Doc(BaseModel):
     """
 
     FIELDS: ClassVar[list[DocField]] = []
-    INTERNAL_BACKLINKS: ClassVar[dict[type[Self], list[DocFieldLink]]] = {}
+    INTERNAL_BACKLINKS: ClassVar[dict[type[Self], list[str]]] = {}
+    """
+    Map of backlinked docs and their names of their fields, which point to
+    this doc.
+    """
 
     sid: str = ""
     """
@@ -184,18 +187,14 @@ class Doc(BaseModel):
         if not sid:
             return
 
-        for field in cls.FIELDS:
-            if field.link is None:
-                return
-            target_type = MongoUtils.try_get_doc_type(field.link.target_doc)
-            if target_type is None:
-                return
-            targets = target_type.get_many(Query({field.link.target_field: {
-                "$in": sid }}))
-            for target in targets:
-                target.upd(Query({"$pop": {
-                    field.link.target_field: sid
-                }}))
+        for backlink_type, backlink_fields in cls.INTERNAL_BACKLINKS.items():
+            for backlink_field in backlink_fields:
+                targets = backlink_type.get_many(Query({backlink_field: {
+                    "$in": sid }}))
+                for target in targets:
+                    target.upd(Query({"$pop": {
+                        backlink_field: sid
+                    }}))
 
     @classmethod
     def to_udtos(cls, docs: Iterable[Self]) -> list[Udto]:
@@ -392,7 +391,7 @@ class Doc(BaseModel):
         **kwargs
     ):
         if not cls.IsArchivable:
-            cls._get_and_del_for_sure(**kwargs)
+            cls._try_get_and_del_for_sure(**kwargs)
             return
         # mark for archive instead of deleting
         doc = cls.get(search_query, must_search_archived_too=True)
@@ -736,13 +735,14 @@ class MongoUtils:
         # fill backlinks
         for doc_type in cls._doc_types.values():
             for field in doc_type.FIELDS:
-                if field.link is not None:
-                    cls._process_field_link(doc_type, field.link)
+                cls._process_field_link(doc_type, field)
 
     @classmethod
     def _process_field_link(
-            cls, host_doc_type: type[Doc], link: DocFieldLink):
-        target = cls.try_get_doc_type(link.target_doc)
+            cls, host_doc_type: type[Doc], field: DocField):
+        if field.linked_doc is None:
+            return
+        target = cls.try_get_doc_type(field.linked_doc)
         if target is None:
             log.err(
                     f"doc {host_doc_type} links unexistent"
@@ -750,7 +750,7 @@ class MongoUtils:
             return
         if host_doc_type not in target.INTERNAL_BACKLINKS:
             target.INTERNAL_BACKLINKS[host_doc_type] = []
-        target.INTERNAL_BACKLINKS[host_doc_type].append(link)
+        target.INTERNAL_BACKLINKS[host_doc_type].append(field.name)
 
     @classmethod
     async def destroy(cls):
@@ -1164,7 +1164,7 @@ class MongoStateFlagUtils:
         except IndexError:
             flag = MongoStateFlagDoc(key=key, value=value).create()
         else:
-            flag = flag.upd({"$set": {"value": value}})
+            flag = flag.upd(Query({"$set": {"value": value}}))
 
         return flag
 
