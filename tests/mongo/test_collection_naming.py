@@ -1,11 +1,10 @@
 from orwynn.mongo import Doc
-from pykit.str import StringUtils
 
 
 def test_snake_case():
-    class _Doc1(Doc):
+    class _HohoDoc1(Doc):
         COLLECTION_NAMING = "snake_case"
-    assert _Doc1.get_collection() == "_doc1"
+    assert _HohoDoc1.get_collection() == "_hoho_doc1"
 
     class __Doc2_wow(Doc):
         COLLECTION_NAMING = "snake_case"

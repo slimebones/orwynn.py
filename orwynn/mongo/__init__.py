@@ -1,8 +1,16 @@
-import re
 import typing
 from contextlib import suppress
 from enum import Enum
-from typing import Any, ClassVar, Coroutine, Generic, Iterable, Literal, Self, TypeVar
+from typing import (
+    Any,
+    ClassVar,
+    Coroutine,
+    Generic,
+    Iterable,
+    Literal,
+    Self,
+    TypeVar,
+)
 
 import inflection
 from bson import ObjectId
@@ -738,16 +746,20 @@ class MongoSys(Sys[MongoCfg]):
 class MongoUtils:
     client: MongoClient
     db: MongoDb
-    _doc_types: dict[str, type[Doc]] = {}
+    _doc_types: dict[str, type[Doc]]
 
     @classmethod
     async def init(cls, client: MongoClient, db: MongoDb):
         cls.client = client
         cls.db = db
+        cls._doc_types = {}
 
         for doc_type in Doc.__subclasses__():
             # set new dict to not leak it between docs
-            doc_type._INTERNAL_BACKLINKS = {}
+            if doc_type.get_collection() in cls._doc_types:
+                log.err(f"duplicate doc {doc_type}")
+                continue
+            doc_type._INTERNAL_BACKLINKS = {}  # noqa: SLF001
             cls._doc_types[doc_type.get_collection()] = doc_type
         for doc_type in cls._doc_types.values():
             for field in doc_type.FIELDS:
@@ -761,14 +773,13 @@ class MongoUtils:
                 skip_doc_types.append(doc_type)
                 continue
             # set new dict to not leak it between docs
-            doc_type._INTERNAL_BACKLINKS = {}
+            doc_type._INTERNAL_BACKLINKS = {}  # noqa: SLF001
             cls._doc_types[doc_type.get_collection()] = doc_type
         for doc_type in doc_types:
             if doc_type in skip_doc_types:
                 continue
             for field in doc_type.FIELDS:
                 cls._process_field_link(doc_type, field)
-
 
     @classmethod
     def _process_field_link(
@@ -781,9 +792,10 @@ class MongoUtils:
                     f"doc {host_doc_type} links unexistent"
                     f" {field.linked_doc}")
             return
-        if host_doc_type not in target._INTERNAL_BACKLINKS:
-            target._INTERNAL_BACKLINKS[host_doc_type] = []
-        target._INTERNAL_BACKLINKS[host_doc_type].append(field.name)
+        if host_doc_type not in target._INTERNAL_BACKLINKS:  # noqa: SLF001
+            target._INTERNAL_BACKLINKS[host_doc_type] = []  # noqa: SLF001
+        target._INTERNAL_BACKLINKS[host_doc_type].append(  # noqa: SLF001
+            field.name)
 
     @classmethod
     async def destroy(cls):
@@ -791,7 +803,6 @@ class MongoUtils:
             del cls.client
         with suppress(AttributeError):
             del cls.db
-        cls._doc_types = {}
 
     @classmethod
     def try_get_doc_type(cls, name: str) -> type[Doc] | None:
