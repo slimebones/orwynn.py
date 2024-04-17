@@ -29,7 +29,7 @@ rxcat = {git = "https://github.com/slimebones/pyrxcat.git", rev = "0.1.1"}
 
 [tool.poetry.group.dev.dependencies]
 lorem = "^0.1.1"
-ruff = "^0.1.15"
+ruff = "0.1.15"
 git-changelog = "^1.0.0"
 coverage = "^6.5.0"
 pytest = "^7.2.0"
