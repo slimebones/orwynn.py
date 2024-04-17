@@ -1,3 +1,8 @@
+# 2.1.0 - UNRELEASED
+
+- mongo: added field linkage - a deleted sid is removed from related 
+         collections
+
 # 2.0.0
 
 - going rx
