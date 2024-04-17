@@ -22,11 +22,12 @@ from rxcat import Evt, InpErr, Msg, MsgFilter, Req, code
 from orwynn.cfg import Cfg
 from orwynn.dto import TUdto, Udto
 from orwynn.env import OrwynnEnvUtils
-from orwynn.mongo.field import DocField, UniqueFieldErr
+from orwynn.mongo.field import DocField, DocFieldLink, UniqueFieldErr
 from orwynn.sys import Sys
 
 __all__ = [
     "DocField",
+    "DocFieldLink"
 ]
 
 # We manage mongo CRUD by Create, Get, Upd and Del requests.
@@ -128,7 +129,8 @@ class Doc(BaseModel):
     forming the document from MongoDB data.
     """
 
-    Fields: ClassVar[list[DocField]] = []
+    FIELDS: ClassVar[list[DocField]] = []
+    INTERNAL_BACKLINKS: ClassVar[dict[type[Self], list[DocFieldLink]]] = {}
 
     sid: str = ""
     """
@@ -154,7 +156,7 @@ class Doc(BaseModel):
     def _try_get_field(cls, name: str) -> DocField | None:
         if name in cls._cached_name_to_field:
             return cls._cached_name_to_field[name]
-        for f in cls.Fields:
+        for f in cls.FIELDS:
             if f.name == name:
                 cls._cached_name_to_field[name] = f
                 return f
@@ -176,6 +178,24 @@ class Doc(BaseModel):
         if field.unique and cls.try_get(Query({name: new_val})):
             raise UniqueFieldErr(
                     f"for doc {cls} field {name} is unique")
+
+    @classmethod
+    def _deattach_from_links(cls, sid: str):
+        if not sid:
+            return
+
+        for field in cls.FIELDS:
+            if field.link is None:
+                return
+            target_type = MongoUtils.try_get_doc_type(field.link.target_doc)
+            if target_type is None:
+                return
+            targets = target_type.get_many(Query({field.link.target_field: {
+                "$in": sid }}))
+            for target in targets:
+                target.upd(Query({"$pop": {
+                    field.link.target_field: sid
+                }}))
 
     @classmethod
     def to_udtos(cls, docs: Iterable[Self]) -> list[Udto]:
@@ -382,20 +402,6 @@ class Doc(BaseModel):
         doc.archive()
 
     @classmethod
-    def _get_and_del_for_sure(
-        cls,
-        search_query: Query,
-        **kwargs
-    ):
-        copied_search_query = search_query.copy()
-        cls._adjust_data_sid_to_mongo(copied_search_query)
-        MongoUtils.delete(
-            cls.get_collection(),
-            copied_search_query,
-            **kwargs
-        )
-
-    @classmethod
     def try_get_and_del(
         cls,
         search_query: Query,
@@ -421,11 +427,13 @@ class Doc(BaseModel):
     ) -> bool:
         copied_search_query = search_query.copy()
         cls._adjust_data_sid_to_mongo(copied_search_query)
-        return MongoUtils.try_del(
-            cls.get_collection(),
-            copied_search_query,
-            **kwargs
-        )
+        target = cls.try_get(search_query)
+        if target is None:
+            log.err(f"not found doc {cls} for query {search_query}")
+            return False
+        cls._deattach_from_links(target.sid)
+        target.delete(**kwargs)
+        return True
 
     def del_archived(
         self,
@@ -455,9 +463,10 @@ class Doc(BaseModel):
     ):
         if not self.sid:
             raise InpErr(f"unsync doc {self}")
+        self._deattach_from_links(self.sid)
         return MongoUtils.delete(
             self.get_collection(),
-            {"_id": MongoUtils.convert_to_object_id(self.sid)},
+            Query({"_id": MongoUtils.convert_to_object_id(self.sid)}),
             **kwargs
         )
 
@@ -479,9 +488,10 @@ class Doc(BaseModel):
     ) -> bool:
         if not self.sid:
             return False
+        self._deattach_from_links(self.sid)
         return MongoUtils.try_del(
             self.get_collection(),
-            {"_id": MongoUtils.convert_to_object_id(self.sid)},
+            Query({"_id": MongoUtils.convert_to_object_id(self.sid)}),
             **kwargs
         )
 
@@ -571,70 +581,70 @@ class Doc(BaseModel):
         query: Query,
         **kwargs
     ):
-        return self.upd({"$set": query}, **kwargs)
+        return self.upd(Query({"$set": query}), **kwargs)
 
     def push(
         self,
         query: Query,
         **kwargs
     ):
-        return self.upd({"$push": query}, **kwargs)
+        return self.upd(Query({"$push": query}), **kwargs)
 
     def pull(
         self,
         query: Query,
         **kwargs
     ):
-        return self.upd({"$pull": query}, **kwargs)
+        return self.upd(Query({"$pull": query}), **kwargs)
 
     def pop(
         self,
         query: Query,
         **kwargs
     ):
-        return self.upd({"$pop": query}, **kwargs)
+        return self.upd(Query({"$pop": query}), **kwargs)
 
     def inc(
         self,
         query: Query,
         **kwargs
     ):
-        return self.upd({"$inc": query}, **kwargs)
+        return self.upd(Query({"$inc": query}), **kwargs)
 
     def try_set(
         self,
         query: Query,
         **kwargs
     ) -> Self | None:
-        return self.try_upd({"$set": query}, **kwargs)
+        return self.try_upd(Query({"$set": query}), **kwargs)
 
     def try_push(
         self,
         query: Query,
         **kwargs
     ) -> Self | None:
-        return self.try_upd({"$push": query}, **kwargs)
+        return self.try_upd(Query({"$push": query}), **kwargs)
 
     def try_pop(
         self,
         query: Query,
         **kwargs
     ) -> Self | None:
-        return self.try_upd({"$pop": query}, **kwargs)
+        return self.try_upd(Query({"$pop": query}), **kwargs)
 
     def try_pull(
         self,
         query: Query,
         **kwargs
     ) -> Self | None:
-        return self.try_upd({"$pull": query}, **kwargs)
+        return self.try_upd(Query({"$pull": query}), **kwargs)
 
     def try_inc(
         self,
         query: Query,
         **kwargs
     ) -> Self | None:
-        return self.try_upd({"$inc": query}, **kwargs)
+        return self.try_upd(Query({"$inc": query}), **kwargs)
 
     def refresh(
         self
@@ -714,11 +724,33 @@ class MongoSys(Sys[MongoCfg]):
 class MongoUtils:
     client: MongoClient
     db: MongoDb
+    _doc_types: dict[str, type[Doc]] = {}
 
     @classmethod
     async def init(cls, client: MongoClient, db: MongoDb):
         cls.client = client
         cls.db = db
+
+        for doc_type in Doc.__subclasses__():
+            cls._doc_types[doc_type.get_collection()] = doc_type
+        # fill backlinks
+        for doc_type in cls._doc_types.values():
+            for field in doc_type.FIELDS:
+                if field.link is not None:
+                    cls._process_field_link(doc_type, field.link)
+
+    @classmethod
+    def _process_field_link(
+            cls, host_doc_type: type[Doc], link: DocFieldLink):
+        target = cls.try_get_doc_type(link.target_doc)
+        if target is None:
+            log.err(
+                    f"doc {host_doc_type} links unexistent"
+                    " {link.target_doc}")
+            return
+        if host_doc_type not in target.INTERNAL_BACKLINKS:
+            target.INTERNAL_BACKLINKS[host_doc_type] = []
+        target.INTERNAL_BACKLINKS[host_doc_type].append(link)
 
     @classmethod
     async def destroy(cls):
@@ -726,6 +758,10 @@ class MongoUtils:
             del cls.client
         with suppress(AttributeError):
             del cls.db
+
+    @classmethod
+    def try_get_doc_type(cls, name: str) -> type[Doc] | None:
+        return cls._doc_types.get(name, None)
 
     @classmethod
     def drop_db(cls):

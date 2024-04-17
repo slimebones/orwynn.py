@@ -5,7 +5,7 @@ from orwynn.mongo.field import DocField, UniqueFieldErr
 
 
 class _Doc1(Doc):
-    Fields = [
+    FIELDS = [
         DocField(
             name="name",
             unique=True
