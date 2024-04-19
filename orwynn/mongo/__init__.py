@@ -691,7 +691,7 @@ class Doc(BaseModel):
         if "internal_marks" in search_query:
             log.warn(
                 f"usage of internal_marks in search query {search_query} =>"
-                " skip"
+                " overwrite"
             )
         search_query["internal_marks"] = {
             "$nin": ["archived"]
