@@ -1,9 +1,16 @@
-# 2.1.0 - UNRELEASED
+# 2.2.0
 
 ## Features
 
-- mongo: added field linkage - a deleted sid is removed from related 
+- mongo: add locking
+
+# 2.1.0
+
+## Features
+
+- mongo: add field linkage - a deleted sid is removed from related 
          collections
+- mongo: add locking
 
 ## Fixed
 
