@@ -17,7 +17,7 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from pydantic import BaseModel
 from pykit.check import check
-from pykit.err import NotFoundErr, UnsupportedErr
+from pykit.err import LockErr, NotFoundErr, UnsupportedErr
 from pykit.log import log
 from pykit.mark import MarkErr, MarkUtils
 from pykit.query import Query, QueryUpdOperator
@@ -284,10 +284,41 @@ class Doc(BaseModel):
             cls._cached_collection_name = name
         return cls._cached_collection_name
 
-    def archive(self) -> Self:
-        # do refresh to avoid nasty mark duplicates if an unsync obj is
-        # provided here
+    def lock(self) -> Self:
+        if self.is_locked():
+            return self
         refreshed = self.refresh()
+        return refreshed.upd(
+            MarkUtils.get_add_upd_query(
+                "locked",
+                self
+            )
+        )
+
+    def unlock(self) -> Self:
+        if not self.is_locked():
+            return self
+        refreshed = self.refresh()
+        return refreshed.upd(
+            MarkUtils.get_remove_upd_query(
+                "locked",
+                self
+            ),
+            _internal_is_lock_check_skipped=True
+        )
+
+    def is_locked(self):
+        refreshed = self.refresh()
+        return MarkUtils.has(
+            "locked",
+            refreshed
+        )
+
+    def archive(self) -> Self:
+        if self.is_archived():
+            return self
+        refreshed = self.refresh()
+
         return refreshed.upd(
             MarkUtils.get_add_upd_query(
                 "archived",
@@ -296,8 +327,8 @@ class Doc(BaseModel):
         )
 
     def unarchive(self) -> Self:
-        # do refresh to avoid nasty mark duplicates if an unsync obj is
-        # provided here
+        if not self.is_archived():
+            return self
         refreshed = self.refresh()
         return refreshed.upd(
             MarkUtils.get_remove_upd_query(
@@ -307,9 +338,10 @@ class Doc(BaseModel):
         )
 
     def is_archived(self):
+        refreshed = self.refresh()
         return MarkUtils.has(
             "archived",
-            self
+            refreshed
         )
 
     @classmethod
@@ -418,6 +450,10 @@ class Doc(BaseModel):
             return
         # mark for archive instead of deleting
         doc = cls.get(search_query, must_search_archived_too=True)
+
+        if doc.is_locked():
+            raise LockErr(doc)
+
         is_archived = doc.is_archived()
         if is_archived:
             raise MarkErr("already archived")
@@ -433,11 +469,10 @@ class Doc(BaseModel):
             return cls._try_get_and_del_for_sure(**kwargs)
         # mark for archive instead of deleting
         doc = cls.try_get(search_query, must_search_archived_too=True)
-        if not doc:
+
+        if not doc or doc.is_locked() or doc.is_archived():
             return False
-        is_archived = doc.is_archived()
-        if is_archived:
-            return False
+
         doc.archive()
         return True
 
@@ -450,9 +485,9 @@ class Doc(BaseModel):
         copied_search_query = search_query.copy()
         cls._adjust_data_sid_to_mongo(copied_search_query)
         target = cls.try_get(search_query)
-        if target is None:
-            log.err(f"not found doc {cls} for query {search_query}")
+        if target is None or target.is_locked():
             return False
+
         cls._deattach_from_links(target.sid)
         target.delete(**kwargs)
         return True
@@ -461,6 +496,8 @@ class Doc(BaseModel):
         self,
         **kwargs
     ):
+        if self.is_locked():
+            raise LockErr(self)
         if not self.IsArchivable:
             raise MarkErr("cannot del from archive: not archivable")
         if not self.is_archived:
@@ -471,6 +508,8 @@ class Doc(BaseModel):
         self,
         **kwargs
     ):
+        if self.is_locked():
+            raise LockErr(self)
         if not self.IsArchivable:
             self._del_for_sure(**kwargs)
             return
@@ -485,6 +524,8 @@ class Doc(BaseModel):
     ):
         if not self.sid:
             raise InpErr(f"unsync doc {self}")
+        if self.is_locked():
+            raise LockErr(self)
         self._deattach_from_links(self.sid)
         return MongoUtils.delete(
             self.get_collection(),
@@ -498,8 +539,7 @@ class Doc(BaseModel):
     ) -> bool:
         if not self.IsArchivable:
             return self._try_del_for_sure(**kwargs)
-        is_archived = self.is_archived()
-        if is_archived:
+        if self.is_archived() or self.is_locked():
             return False
         self.archive()
         return True
@@ -508,7 +548,7 @@ class Doc(BaseModel):
         self,
         **kwargs
     ) -> bool:
-        if not self.sid:
+        if not self.sid or self.is_locked():
             return False
         self._deattach_from_links(self.sid)
         return MongoUtils.try_del(
@@ -549,6 +589,8 @@ class Doc(BaseModel):
             must_search_archived_too=must_search_archived_too,
             **search_kwargs or {}
         )
+        if doc.is_locked():
+            raise LockErr(doc)
         return doc.upd(upd_query, **upd_kwargs or {})
 
     # note: for non-classmethod upds archived docs should be affected without
@@ -556,9 +598,16 @@ class Doc(BaseModel):
     def upd(
         self,
         upd_query: Query,
+        *,
+        _internal_is_lock_check_skipped: bool = False,
         **kwargs
     ) -> Self:
-        f = self.try_upd(upd_query, **kwargs)
+        if not _internal_is_lock_check_skipped and self.is_locked():
+            raise LockErr(self)
+        f = self.try_upd(
+            upd_query,
+             _internal_is_lock_check_skipped=_internal_is_lock_check_skipped,
+             **kwargs)
         if f is None:
             raise ValueError(
                 f"failed to upd doc {self}, using query {upd_query}"
@@ -568,12 +617,17 @@ class Doc(BaseModel):
     def try_upd(
         self,
         upd_query: Query,
+        *,
+        _internal_is_lock_check_skipped: bool = False,
         **kwargs
     ) -> Self | None:
         """
         Updates document with given query.
         """
-        if not self.sid:
+        if (
+            not self.sid or (
+                not _internal_is_lock_check_skipped
+                and self.is_locked())):
             return None
 
         for operator_key, operator_val in upd_query.items():
