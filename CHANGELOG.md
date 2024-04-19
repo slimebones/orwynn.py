@@ -1,7 +1,13 @@
 # 2.1.0 - UNRELEASED
 
+## Features
+
 - mongo: added field linkage - a deleted sid is removed from related 
          collections
+
+## Fixed
+
+- mongo: fixed archive overwriting strategy
 
 # 2.0.0
 
