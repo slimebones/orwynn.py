@@ -27,7 +27,7 @@ from pymongo import MongoClient
 from pymongo import ReturnDocument as ReturnDocStrat
 from pymongo.cursor import Cursor as MongoCursor
 from pymongo.database import Database as MongoDb
-from rxcat import Evt, InpErr, Msg, MsgFilter, Req, code
+from rxcat import Evt, InpErr, Msg, MsgFilter, OkEvt, Req, code
 
 from orwynn.cfg import Cfg
 from orwynn.dto import TUdto, Udto
@@ -1315,6 +1315,28 @@ class MongoStateFlagUtils:
         }))
 
         return result
+
+@code("lock_doc_req")
+class LockDocReq(Req):
+    doc_collection: str
+    doc_sid: str
+
+@code("unlock_doc_req")
+class UnlockDocReq(Req):
+    doc_collection: str
+    doc_sid: str
+
+class LockDocSys(Sys):
+    async def init(self):
+        await self._sub(LockDocReq, self._on_lock_doc_req)
+        await self._sub(UnlockDocReq, self._on_unlock_doc_req)
+
+    async def _on_lock_doc_req(self, req: LockDocReq):
+        doc_map = MongoUtils.try_get(
+            req.doc_collection, Query({"sid": req.doc_sid}))
+        if doc_map:
+            internal_marks = doc_map.get("internal_marks", None)
+        await self._pub(OkEvt(rsid="").as_res_from_req(req))
 
 def filter_collection_factory(*collections: str) -> MsgFilter:
     """
