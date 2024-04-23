@@ -1,3 +1,9 @@
+# 2.3.2
+
+## Fixes
+
+- mongo: lock sys unlocking problems
+
 # 2.3.1
 
 ## Fixes
