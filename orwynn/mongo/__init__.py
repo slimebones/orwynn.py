@@ -268,6 +268,7 @@ class Doc(BaseModel):
             match cls.COLLECTION_NAMING:
                 case "camel_case":
                     name = inflection.camelize(cls.__name__)
+                    name = name[0].lower() + name[1:]
                 case "snake_case":
                     name = inflection.underscore(cls.__name__)
                 case _:
@@ -1359,10 +1360,13 @@ class LockDocSys(Sys):
             raise ValueErr(
                 f"{req.doc_collection}::{req.doc_sid} already unlocked")
 
-        MongoUtils.try_upd(
+        is_updated = MongoUtils.try_upd(
             req.doc_collection,
             Query({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}),
             {"$pull": {"internal_marks": "locked"}})
+        if not is_updated:
+            raise ValueErr(
+                f"failed to update for {req.doc_collection}::{req.doc_sid}")
         await self._pub(OkEvt(rsid="").as_res_from_req(req))
 
 def filter_collection_factory(*collections: str) -> MsgFilter:

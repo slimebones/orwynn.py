@@ -1,3 +1,9 @@
+# 2.3.1
+
+## Fixes
+
+- mongo: fix collection name retrieval for camel case
+
 # 2.3.0
 
 ## Features
