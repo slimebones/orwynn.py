@@ -17,7 +17,7 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from pydantic import BaseModel
 from pykit.check import check
-from pykit.err import LockErr, NotFoundErr, UnsupportedErr
+from pykit.err import LockErr, NotFoundErr, UnsupportedErr, ValueErr
 from pykit.log import log
 from pykit.mark import MarkErr, MarkUtils
 from pykit.query import Query, QueryUpdOperator
@@ -36,7 +36,7 @@ from orwynn.mongo.field import DocField, UniqueFieldErr
 from orwynn.sys import Sys
 
 __all__ = [
-    "DocField",
+    "DocField"
 ]
 
 # We manage mongo CRUD by Create, Get, Upd and Del requests.
@@ -267,13 +267,7 @@ class Doc(BaseModel):
         if not cls._cached_collection_name:
             match cls.COLLECTION_NAMING:
                 case "camel_case":
-                    name = cls.__name__
-                    assert len(name) > 0
-                    if len(name) == 1:
-                        name = name.lower()
-                    else:
-                        # camel case
-                        name = name[0].lower() + name[1:]
+                    name = inflection.camelize(cls.__name__)
                 case "snake_case":
                     name = inflection.underscore(cls.__name__)
                 case _:
@@ -1333,9 +1327,42 @@ class LockDocSys(Sys):
 
     async def _on_lock_doc_req(self, req: LockDocReq):
         doc_map = MongoUtils.try_get(
-            req.doc_collection, Query({"sid": req.doc_sid}))
-        if doc_map:
-            internal_marks = doc_map.get("internal_marks", None)
+            req.doc_collection,
+            Query({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}))
+
+        if not doc_map:
+            raise NotFoundErr(
+                f"doc for collection {req.doc_collection} of sid"
+                f" {req.doc_sid}")
+        internal_marks = doc_map.get("internal_marks", None)
+        if "locked" in internal_marks:
+            raise ValueErr(
+                f"{req.doc_collection}::{req.doc_sid} already locked")
+
+        MongoUtils.try_upd(
+            req.doc_collection,
+            Query({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}),
+            {"$push": {"internal_marks": "locked"}})
+        await self._pub(OkEvt(rsid="").as_res_from_req(req))
+
+    async def _on_unlock_doc_req(self, req: UnlockDocReq):
+        doc_map = MongoUtils.try_get(
+            req.doc_collection,
+            Query({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}))
+
+        if not doc_map:
+            raise NotFoundErr(
+                f"doc for collection {req.doc_collection} of sid"
+                f" {req.doc_sid}")
+        internal_marks = doc_map.get("internal_marks", None)
+        if "locked" not in internal_marks:
+            raise ValueErr(
+                f"{req.doc_collection}::{req.doc_sid} already unlocked")
+
+        MongoUtils.try_upd(
+            req.doc_collection,
+            Query({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}),
+            {"$pull": {"internal_marks": "locked"}})
         await self._pub(OkEvt(rsid="").as_res_from_req(req))
 
 def filter_collection_factory(*collections: str) -> MsgFilter:

@@ -1,8 +1,10 @@
+import pytest
 from pykit.check import check
 from pykit.err import LockErr
 from pykit.query import Query
+from rxcat import OkEvt, ServerBus
 
-from orwynn.mongo import Doc
+from orwynn.mongo import Doc, LockDocReq, UnlockDocReq
 
 
 def test_lock_write(app):
@@ -31,4 +33,23 @@ def test_lock_write(app):
     assert d.try_upd(Query.as_upd(set={"name": "wow"}))
     d.delete()
     assert not d.try_get(Query({"sid": d.sid}))
+
+@pytest.mark.asyncio
+async def test_sys(app):
+    class TestLockSysDoc(Doc):
+        COLLECTION_NAMING = "snake_case"
+        name: str
+
+    doc = TestLockSysDoc(name="hello").create()
+    bus = ServerBus.ie()
+
+    evt = await bus.pubr(
+        LockDocReq(doc_collection="test_lock_sys_doc", doc_sid=doc.sid))
+    assert isinstance(evt, OkEvt)
+    assert "locked" in doc.refresh().internal_marks
+
+    evt = await bus.pubr(
+        UnlockDocReq(doc_collection="test_lock_sys_doc", doc_sid=doc.sid))
+    assert isinstance(evt, OkEvt)
+    assert "locked" not in doc.refresh().internal_marks
 
