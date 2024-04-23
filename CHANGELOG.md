@@ -1,6 +1,8 @@
-# 2.3.0 - UNRELEASED
+# 2.3.0
 
 ## Features
+
+- mongo: add LockDocSys
 
 # 2.2.0
 

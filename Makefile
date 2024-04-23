@@ -33,3 +33,4 @@ docs.up-docker:
 
 docs.down-docker:
 	docker-compose -f docker-compose.docs.yml down
+
