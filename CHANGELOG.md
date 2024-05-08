@@ -1,3 +1,9 @@
+# 2.3.4
+
+## Fixes
+
+- msg: add missing code for FlagEvt
+
 # 2.3.3
 
 ## Features
