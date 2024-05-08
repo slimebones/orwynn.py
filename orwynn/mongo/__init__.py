@@ -33,6 +33,7 @@ from orwynn.cfg import Cfg
 from orwynn.dto import TUdto, Udto
 from orwynn.env import OrwynnEnvUtils
 from orwynn.mongo.field import DocField, UniqueFieldErr
+from orwynn.msg import FlagEvt
 from orwynn.sys import Sys
 
 __all__ = [
@@ -1313,8 +1314,13 @@ class MongoStateFlagUtils:
 
 @code("lock_doc_req")
 class LockDocReq(Req):
-    doc_collection: str
     doc_sid: str
+    doc_collection: str
+
+@code("check_lock_doc_req")
+class CheckLockDocReq(Req):
+    doc_sid: str
+    doc_collection: str
 
 @code("unlock_doc_req")
 class UnlockDocReq(Req):
@@ -1323,10 +1329,25 @@ class UnlockDocReq(Req):
 
 class LockDocSys(Sys):
     async def init(self):
-        await self._sub(LockDocReq, self._on_lock_doc_req)
-        await self._sub(UnlockDocReq, self._on_unlock_doc_req)
+        await self._sub(LockDocReq, self._on_lock_doc)
+        await self._sub(UnlockDocReq, self._on_unlock_doc)
+        await self._sub(CheckLockDocReq, self._on_check_lock_doc)
 
-    async def _on_lock_doc_req(self, req: LockDocReq):
+    async def _on_check_lock_doc(self, req: CheckLockDocReq):
+        doc_map = MongoUtils.try_get(
+            req.doc_collection,
+            Query({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}))
+        if not doc_map:
+            raise NotFoundErr(
+                f"doc for collection {req.doc_collection} of sid"
+                f" {req.doc_sid}")
+
+        internal_marks = doc_map.get("internal_marks", None)
+        is_locked = "locked" in internal_marks
+
+        await self._pub(FlagEvt(rsid="", val=is_locked).as_res_from_req(req))
+
+    async def _on_lock_doc(self, req: LockDocReq):
         doc_map = MongoUtils.try_get(
             req.doc_collection,
             Query({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}))
@@ -1346,7 +1367,7 @@ class LockDocSys(Sys):
             {"$push": {"internal_marks": "locked"}})
         await self._pub(OkEvt(rsid="").as_res_from_req(req))
 
-    async def _on_unlock_doc_req(self, req: UnlockDocReq):
+    async def _on_unlock_doc(self, req: UnlockDocReq):
         doc_map = MongoUtils.try_get(
             req.doc_collection,
             Query({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}))

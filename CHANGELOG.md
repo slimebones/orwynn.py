@@ -1,3 +1,9 @@
+# 2.3.3
+
+## Features
+
+- mongo: add CheckLockDocReq to checkout if some document is locked
+
 # 2.3.2
 
 ## Fixes

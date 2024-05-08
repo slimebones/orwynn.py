@@ -1,10 +1,13 @@
+import typing
+
 import pytest
 from pykit.check import check
 from pykit.err import LockErr
 from pykit.query import Query
 from rxcat import OkEvt, ServerBus
 
-from orwynn.mongo import Doc, LockDocReq, UnlockDocReq
+from orwynn.mongo import CheckLockDocReq, Doc, LockDocReq, UnlockDocReq
+from orwynn.msg import FlagEvt
 
 
 def test_lock_write(app):
@@ -48,8 +51,18 @@ async def test_sys(app):
     assert isinstance(evt, OkEvt)
     assert "locked" in doc.refresh().internal_marks
 
+    evt = await bus.pubr(CheckLockDocReq(
+        doc_collection="test_lock_sys_doc", doc_sid=doc.sid))
+    assert isinstance(evt, FlagEvt)
+    assert typing.cast(FlagEvt, evt).val is True
+
     evt = await bus.pubr(
         UnlockDocReq(doc_collection="test_lock_sys_doc", doc_sid=doc.sid))
     assert isinstance(evt, OkEvt)
     assert "locked" not in doc.refresh().internal_marks
+
+    evt = await bus.pubr(CheckLockDocReq(
+        doc_collection="test_lock_sys_doc", doc_sid=doc.sid))
+    assert isinstance(evt, FlagEvt)
+    assert typing.cast(FlagEvt, evt).val is False
 
