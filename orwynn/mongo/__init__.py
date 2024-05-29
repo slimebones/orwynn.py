@@ -167,10 +167,13 @@ class Doc(BaseModel):
     be used.
     """
     _cached_collection_name: ClassVar[str | None] = None
-    _cached_name_to_field: ClassVar[dict[str, DocField]] = {}
+    _cached_name_to_field: ClassVar[dict[str, DocField] | None] = None
 
     @classmethod
     def _try_get_field(cls, name: str) -> DocField | None:
+        # avoid shared cache between child classes
+        if cls._cached_name_to_field is None:
+            cls._cached_name_to_field = {}
         if name in cls._cached_name_to_field:
             return cls._cached_name_to_field[name]
         for f in cls.FIELDS:

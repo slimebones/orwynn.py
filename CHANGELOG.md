@@ -1,3 +1,9 @@
+# 2.3.5
+
+## Fixes
+
+- mongo: fix shared cached fields between Doc child classes
+
 # 2.3.4
 
 ## Fixes
