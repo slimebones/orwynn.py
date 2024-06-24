@@ -11,6 +11,7 @@ from typing import (
     Self,
     TypeVar,
 )
+from venv import create
 
 import inflection
 from bson import ObjectId
@@ -454,7 +455,7 @@ class Doc(BaseModel):
         doc = self.try_get(searchq, **search_kwargs)
         if not doc:
             flag = 1
-            doc = self.create()
+            doc = self.create(**create_kwargs)
 
         return doc, flag
 
