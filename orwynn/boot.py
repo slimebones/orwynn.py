@@ -8,7 +8,7 @@ import aiohttp_cors
 from pydantic import ValidationError
 from pykit.err import InpErr
 from pykit.log import log
-from rxcat import Awaitable, BaseModel, ServerBus
+from rxcat import Awaitable, BaseModel, ServerBus, ServerBusCfg
 
 from orwynn.app import App
 from orwynn.cfg import Cfg, CfgPackUtils
@@ -43,6 +43,7 @@ class BootCfg(Cfg):
         list[Callable[[], Awaitable[None]]]
     ] = {}
     client_max_size: int = 1024**3  # = 1GiB
+    server_bus_cfg: ServerBusCfg = ServerBusCfg()
 
     class Config:
         arbitrary_types_allowed = True
@@ -51,7 +52,6 @@ class Boot(Sys[BootCfg]):
     @classmethod
     async def init_boot(cls) -> Self:
         bus = ServerBus.ie()
-        await bus.init()
 
         # attach empty boot cfg now, later the boot will adjust it for itself
         boot = cls(SysArgs(bus=bus, cfg=BootCfg()))
@@ -187,6 +187,7 @@ class Boot(Sys[BootCfg]):
 #         await asyncio.Event().wait()
 
     async def init(self):
+        await self._bus.init(self._cfg.server_bus_cfg)
         cfg_pack = await CfgPackUtils.init_cfg_pack()
         mode = OrwynnEnvUtils.get_mode()
         log.info(f"chosen mode: {mode}", 1)

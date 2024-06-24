@@ -1,3 +1,7 @@
+# 2.4.3
+
+- boot: added support of ServerBusCfg
+
 # 2.4.2
 
 - auth: fix target connids set
