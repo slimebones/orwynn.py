@@ -15,18 +15,20 @@ from typing import (
 import inflection
 from bson import ObjectId
 from bson.errors import InvalidId
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from pykit.check import check
 from pykit.err import LockErr, NotFoundErr, UnsupportedErr, ValueErr
 from pykit.log import log
 from pykit.mark import MarkErr, MarkUtils
 from pykit.query import Query, QueryUpdOperator
+from pykit.res import Res
 from pykit.search import DbSearch
 from pykit.types import T
 from pymongo import MongoClient
 from pymongo import ReturnDocument as ReturnDocStrat
 from pymongo.cursor import Cursor as MongoCursor
 from pymongo.database import Database as MongoDb
+from result import Err, Ok
 from rxcat import Evt, InpErr, Msg, MsgFilter, OkEvt, Req, code
 
 from orwynn.cfg import Cfg
@@ -34,6 +36,7 @@ from orwynn.dto import TUdto, Udto
 from orwynn.env import OrwynnEnvUtils
 from orwynn.mongo.field import DocField, UniqueFieldErr
 from orwynn.msg import FlagEvt
+from orwynn.query_exts import Aggregation
 from orwynn.sys import Sys
 
 __all__ = [
@@ -381,9 +384,51 @@ class Doc(BaseModel):
         )
 
     @classmethod
+    def get_many_as_cursor(
+        cls,
+        sq: Query | None = None,
+        *,
+        must_search_archived_too: bool = False,
+        **kwargs
+    ) -> MongoCursor:
+        copied_sq = cls._parsecopy_query(sq)
+        cls._adjust_data_sid_to_mongo(copied_sq)
+        if not must_search_archived_too:
+            cls._exclude_archived_from_search_query(copied_sq)
+        aggregation = cls._eject_aggregation_from_sq(copied_sq).unwrap_or(None)
+
+        check.instance(copied_sq, dict)
+
+        cursor = MongoUtils.get_many(
+            cls.get_collection(),
+            copied_sq,
+            **kwargs)
+        if aggregation is not None:
+            cursor = aggregation.apply_to_cursor(cursor)
+        return cursor
+
+    @classmethod
+    def _eject_aggregation_from_sq(
+            cls, sq: Query) -> Res[Aggregation]:
+        """
+        WARNING: Modifies given sq.
+        """
+        raw_aggregation = getattr(sq, "$aggregation", None)
+        if raw_aggregation is None:
+            return Err(ValueErr("no aggregation available"))
+        del sq["$aggregation"]
+
+        try:
+            aggregation = Aggregation.model_validate(raw_aggregation)
+        except ValidationError as err:
+            return Err(err)
+
+        return Ok(aggregation)
+
+    @classmethod
     def get_many(
         cls,
-        search_query: Query | None = None,
+        sq: Query | None = None,
         *,
         must_search_archived_too: bool = False,
         **kwargs
@@ -401,19 +446,10 @@ class Doc(BaseModel):
         Returns:
             Iterable with the results of the search.
         """
-        copied_search_query = cls._parsecopy_query(search_query)
-        cls._adjust_data_sid_to_mongo(copied_search_query)
-        if not must_search_archived_too:
-            cls._exclude_archived_from_search_query(copied_search_query)
-
-        check.instance(copied_search_query, dict)
-
-        cursor: MongoCursor = MongoUtils.get_many(
-            cls.get_collection(),
-            copied_search_query,
-            **kwargs
-        )
-
+        cursor = cls.get_many_as_cursor(
+            sq,
+            must_search_archived_too=must_search_archived_too,
+            **kwargs)
         return map(cls._parse_data_to_doc, cursor)
 
     @classmethod
