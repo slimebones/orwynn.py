@@ -2,6 +2,7 @@ from enum import Enum
 from typing import Awaitable, Callable, ClassVar, Generic
 
 from pydantic.generics import GenericModel
+from orwynn.mongo import OkEvt
 from pykit.log import log
 from pykit.singleton import Singleton
 from rxcat import (
@@ -67,6 +68,9 @@ class Sys(Singleton, Generic[TCfg]):
     @property
     def is_enabled(self) -> bool:
         return self._internal_is_enabled
+
+    async def _pub_ok(self, req: Req):
+        await self._pub(OkEvt(rsid=None).as_res_from_req(req))
 
     async def _sub(
         self,
