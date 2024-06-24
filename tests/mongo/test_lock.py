@@ -49,6 +49,7 @@ def test_link_lock(app):
 
 def test_lock_write(app):
     class TestLockDoc(Doc):
+        IS_ARCHIVABLE = True
         name: str
 
     d = TestLockDoc(name="hello").create()
