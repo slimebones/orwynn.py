@@ -2,13 +2,13 @@ from enum import Enum
 from typing import Awaitable, Callable, ClassVar, Generic
 
 from pydantic.generics import GenericModel
-from orwynn.mongo import OkEvt
 from pykit.log import log
 from pykit.singleton import Singleton
 from rxcat import (
     Evt,
     Msg,
     MsgFilter,
+    OkEvt,
     PubAction,
     PubOpts,
     Req,

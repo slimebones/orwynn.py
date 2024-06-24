@@ -31,6 +31,15 @@ def document_2(app) -> SimpleDocument:
 
 
 @pytest.fixture
+def document_3(app) -> SimpleDocument:
+    return SimpleDocument(
+        name="sushi",
+        price=1.5,
+        priority=3
+    ).create()
+
+
+@pytest.fixture
 def nested_document_1(app) -> NestedDocument:
     return NestedDocument(
         nested={

@@ -1,5 +1,7 @@
 from typing import Any, Mapping, Sequence, Tuple, Union
+
 from pydantic import BaseModel
+
 from orwynn.mongo import MongoCursor
 
 _SortComplex = Union[

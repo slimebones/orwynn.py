@@ -413,7 +413,7 @@ class Doc(BaseModel):
         """
         WARNING: Modifies given sq.
         """
-        raw_aggregation = getattr(sq, "$aggregation", None)
+        raw_aggregation = sq.get("$aggregation", None)
         if raw_aggregation is None:
             return Err(ValueErr("no aggregation available"))
         del sq["$aggregation"]
