@@ -1,8 +1,9 @@
 # 2.4.0 - UNRELEASED
 
 - updated rxcat
-- added MongoCfg.default_colection_naming for docs which didn't override
+- mongo: added MongoCfg.default_colection_naming for docs which didn't override
   defaults
+- mongo: is_lock_check_skipped is now public flag for Doc's upd and del methods
 
 # 2.3.5
 

@@ -1,7 +1,7 @@
 set shell := ["nu", "-c"]
 
 test target="" show="all" *flags="":
-	poetry run coverage run -m pytest -x --ignore=tests/app -p no:warnings --show-capture={{show}} --failed-first {{flags}} --asyncio-mode=auto tests/{{target}}
+	poetry run coverage run -m pytest -x --ignore=tests/app -p no:warnings --show-capture={{show}} --failed-first --asyncio-mode=auto {{flags}} tests/{{target}}
 
 lint target="." *flags="":
 	poetry run ruff {{flags}} {{target}}

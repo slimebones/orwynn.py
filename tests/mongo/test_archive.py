@@ -1,17 +1,18 @@
 from pykit.check import check
 from pykit.err import NotFoundErr
 from pykit.mark import MarkErr
+from pykit.query import Query
 
 from orwynn.mongo import Doc
 
 
 class _ArchivableDoc(Doc):
-    IsArchivable = True
+    IS_ARCHIVABLE = True
     name: str
     price: float
 
 class _NonArchivableDoc(Doc):
-    IsArchivable = False
+    IS_ARCHIVABLE = False
     name: str
     price: float
 
@@ -49,7 +50,7 @@ def test_del(app):
         MarkErr
     )
     adoc = _ArchivableDoc.get(
-        { "sid": adoc.sid },
+        Query.as_search_sid(adoc.sid),
         must_search_archived_too=True
     )
     assert adoc.is_archived()

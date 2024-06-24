@@ -6,9 +6,46 @@ from pykit.err import LockErr
 from pykit.query import Query
 from rxcat import OkEvt, ServerBus
 
-from orwynn.mongo import CheckLockDocReq, Doc, LockDocReq, UnlockDocReq
+from orwynn.mongo import CheckLockDocReq, Doc, LockDocReq, MongoUtils, UnlockDocReq
+from orwynn.mongo.field import DocField
 from orwynn.msg import FlagEvt
 
+def test_link_lock(app):
+    class Test1Doc(Doc):
+        IS_ARCHIVABLE = False
+        name: str
+
+    class Test2Doc(Doc):
+        IS_LINKING_IGNORING_LOCK = True
+        FIELDS = [
+            DocField(name="sids", linked_doc="test1_doc")
+        ]
+        name: str
+        sids: list[str]
+
+    class Test3Doc(Doc):
+        IS_ARCHIVABLE = False
+        name: str
+
+    class Test4Doc(Doc):
+        IS_LINKING_IGNORING_LOCK = False
+        FIELDS = [
+            DocField(name="sids", linked_doc="test3_doc")
+        ]
+        name: str
+        sids: list[str]
+
+    MongoUtils.register_doc_types(Test1Doc, Test2Doc, Test3Doc, Test4Doc)
+
+    d1 = Test1Doc(name="child").create()
+    Test2Doc(name="parent", sids=[d1.sid]).create().lock()
+    # should delete normally, since IS_LINKING_IGNORING_LOCK = True
+    d1.delete()
+
+    d3 = Test3Doc(name="child").create()
+    Test4Doc(name="parent", sids=[d3.sid]).create().lock()
+    # should raise LockErr, since IS_LINKING_IGNORING_LOCK = False
+    check.expect(d3.delete, LockErr)
 
 def test_lock_write(app):
     class TestLockDoc(Doc):
@@ -37,7 +74,6 @@ def test_lock_write(app):
     d.delete()
     assert not d.try_get(Query({"sid": d.sid}))
 
-@pytest.mark.asyncio
 async def test_sys(app):
     class TestLockSysDoc(Doc):
         COLLECTION_NAMING = "snake_case"

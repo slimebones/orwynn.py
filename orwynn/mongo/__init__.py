@@ -125,11 +125,17 @@ class MongoCfg(Cfg):
     url: str
     database_name: str
     must_clean_db_on_destroy: bool = False
-    default_collection_naming: NamingStyle = "snake_case"
+    default__collection_naming: NamingStyle = "snake_case"
     """
-    If not None, all docs for which not defined explicitly otherwise, will
+    Docs, for which COLLECTION_NAMING is not defined explicitly, will
     use this collection naming style.
     """
+    default__is_linking_ignoring_lock: bool = True
+    """
+    Docs, for which IS_LINKING_IGNORING_LOCK is not defined explicitly,
+    will use this configuration.
+    """
+    default__is_archivable: bool = False
 
 class Doc(BaseModel):
     """
@@ -147,7 +153,13 @@ class Doc(BaseModel):
 
     FIELDS: ClassVar[list[DocField]] = []
     COLLECTION_NAMING: ClassVar[NamingStyle | None] = None
-    _INTERNAL_BACKLINKS: ClassVar[dict[type[Self], list[str]]] = {}
+    IS_LINKING_IGNORING_LOCK: ClassVar[bool | None] = None
+    """
+    If true, the linking process will ignore active lock on this doc.
+
+    Defaults to MongoCfg.default__is_linking_ignoring_lock.
+    """
+    _BACKLINKS: ClassVar[dict[type[Self], list[str]]] = {}
     """
     Map of backlinked docs and their names of their fields, which point to
     this doc.
@@ -161,7 +173,7 @@ class Doc(BaseModel):
 
     internal_marks: list[str] = []
 
-    IsArchivable: ClassVar[bool] = True
+    IS_ARCHIVABLE: ClassVar[bool | None] = None
     """
     Whether this doc will be archived on delete operation.
 
@@ -172,6 +184,12 @@ class Doc(BaseModel):
     """
     _cached_collection_name: ClassVar[str | None] = None
     _cached_name_to_field: ClassVar[dict[str, DocField] | None] = None
+
+    @classmethod
+    def is_archivable(cls) -> bool:
+        if cls.IS_ARCHIVABLE is None:
+            return MongoUtils.cfg.default__is_archivable
+        return cls.IS_ARCHIVABLE
 
     @classmethod
     def _try_get_field(cls, name: str) -> DocField | None:
@@ -208,15 +226,24 @@ class Doc(BaseModel):
         if not sid:
             return
 
-        for backlink_type, backlink_fields in cls._INTERNAL_BACKLINKS.items():
+        for backlink_type, backlink_fields in cls._BACKLINKS.items():
             for backlink_field in backlink_fields:
                 targets = backlink_type.get_many(Query({backlink_field: {
                     "$in": [sid]
                 }}))
                 for target in targets:
-                    target.upd(Query({"$pull": {
-                        backlink_field: sid
-                    }}))
+                    target.upd(
+                        Query.as_upd(pull={
+                            backlink_field: sid
+                        }),
+                        is_lock_check_skipped=
+                            target.is_linking_ignoring_lock())
+
+    @classmethod
+    def is_linking_ignoring_lock(cls) -> bool:
+        if cls.IS_LINKING_IGNORING_LOCK is None:
+            return MongoUtils.cfg.default__is_linking_ignoring_lock
+        return cls.IS_LINKING_IGNORING_LOCK
 
     @classmethod
     def to_udtos(cls, docs: Iterable[Self]) -> list[Udto]:
@@ -271,15 +298,15 @@ class Doc(BaseModel):
         )
 
     @classmethod
-    def _parse_collection_naming(cls) -> NamingStyle:
+    def get_collection_naming(cls) -> NamingStyle:
         if cls.COLLECTION_NAMING is None:
-            return MongoUtils.cfg.default_collection_naming
+            return MongoUtils.cfg.default__collection_naming
         return cls.COLLECTION_NAMING
 
     @classmethod
     def get_collection(cls) -> str:
         if not cls._cached_collection_name:
-            match cls.COLLECTION_NAMING:
+            match cls.get_collection_naming():
                 case "camel_case":
                     name = inflection.camelize(cls.__name__)
                     name = name[0].lower() + name[1:]
@@ -288,7 +315,7 @@ class Doc(BaseModel):
                 case _:
                     name = cls.__name__
                     log.warn("unrecognized collection naming style"
-                             f" {cls.COLLECTION_NAMING} of doc {cls}"
+                             f" {cls.get_collection_naming()} of doc {cls}"
                              " => use untouched doc name")
             cls._cached_collection_name = name
         return cls._cached_collection_name
@@ -454,7 +481,7 @@ class Doc(BaseModel):
         search_query: Query,
         **kwargs
     ):
-        if not cls.IsArchivable:
+        if not cls.is_archivable():
             cls._try_get_and_del_for_sure(**kwargs)
             return
         # mark for archive instead of deleting
@@ -474,7 +501,7 @@ class Doc(BaseModel):
         search_query: Query,
         **kwargs
     ) -> bool:
-        if not cls.IsArchivable:
+        if not cls.is_archivable():
             return cls._try_get_and_del_for_sure(**kwargs)
         # mark for archive instead of deleting
         doc = cls.try_get(search_query, must_search_archived_too=True)
@@ -507,7 +534,7 @@ class Doc(BaseModel):
     ):
         if self.is_locked():
             raise LockErr(self)
-        if not self.IsArchivable:
+        if not self.is_archivable():
             raise MarkErr("cannot del from archive: not archivable")
         if not self.is_archived:
             raise MarkErr("not archived")
@@ -521,7 +548,7 @@ class Doc(BaseModel):
     ):
         if not is_lock_check_skipped and self.is_locked():
             raise LockErr(self)
-        if not self.IsArchivable:
+        if not self.is_archivable():
             self._del_for_sure(**kwargs)
             return
         is_archived = self.is_archived()
@@ -548,7 +575,7 @@ class Doc(BaseModel):
         self,
         **kwargs
     ) -> bool:
-        if not self.IsArchivable:
+        if not self.is_archivable():
             return self._try_del_for_sure(**kwargs)
         if self.is_archived() or self.is_locked():
             return False
@@ -826,21 +853,28 @@ class MongoUtils:
             if doc_type.get_collection() in cls._doc_types:
                 log.err(f"duplicate doc {doc_type}")
                 continue
-            doc_type._INTERNAL_BACKLINKS = {}  # noqa: SLF001
+            doc_type._BACKLINKS = {}  # noqa: SLF001
             cls._doc_types[doc_type.get_collection()] = doc_type
         for doc_type in cls._doc_types.values():
             for field in doc_type.FIELDS:
                 cls._process_field_link(doc_type, field)
 
     @classmethod
-    def add_doc_types(cls, *doc_types: type[Doc]):
+    def register_doc_types(cls, *doc_types: type[Doc]):
+        """
+        Registers new doc types.
+
+        Useful when some docs are not available in the scope at the init of
+        MongoUtils (like during testing with local classes).
+        """
         skip_doc_types = []
         for doc_type in doc_types:
-            if doc_type.get_collection() in doc_types:
+            # remove already processed types
+            if doc_type in [cls._doc_types]:
                 skip_doc_types.append(doc_type)
                 continue
             # set new dict to not leak it between docs
-            doc_type._INTERNAL_BACKLINKS = {}  # noqa: SLF001
+            doc_type._BACKLINKS = {}  # noqa: SLF001
             cls._doc_types[doc_type.get_collection()] = doc_type
         for doc_type in doc_types:
             if doc_type in skip_doc_types:
@@ -856,12 +890,12 @@ class MongoUtils:
         target = cls.try_get_doc_type(field.linked_doc)
         if target is None:
             log.err(
-                    f"doc {host_doc_type} links unexistent"
-                    f" {field.linked_doc}")
+                f"doc {host_doc_type} links unexistent"
+                f" {field.linked_doc}")
             return
-        if host_doc_type not in target._INTERNAL_BACKLINKS:  # noqa: SLF001
-            target._INTERNAL_BACKLINKS[host_doc_type] = []  # noqa: SLF001
-        target._INTERNAL_BACKLINKS[host_doc_type].append(  # noqa: SLF001
+        if host_doc_type not in target._BACKLINKS:  # noqa: SLF001
+            target._BACKLINKS[host_doc_type] = []  # noqa: SLF001
+        target._BACKLINKS[host_doc_type].append(  # noqa: SLF001
             field.name)
 
     @classmethod

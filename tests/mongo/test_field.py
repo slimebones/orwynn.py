@@ -12,6 +12,7 @@ class _Doc1(Doc):
         )
     ]
     COLLECTION_NAMING = "snake_case"
+    IS_ARCHIVABLE = True
     name: str
 
 class _Doc2(Doc):
@@ -21,6 +22,7 @@ class _Doc2(Doc):
             linked_doc="_doc1")
     ]
     COLLECTION_NAMING = "snake_case"
+    IS_ARCHIVABLE = True
 
     doc1_sids: list[str] = []
 
@@ -62,17 +64,20 @@ def test_links_multiple(app):
             DocField(
                 name="doc3_sids",
                 linked_doc="doc3")]
+        IS_ARCHIVABLE = True
 
         doc2_sids: list[str] = []
         doc3_sids: list[str] = []
 
     class Doc2(Doc):
         COLLECTION_NAMING = "snake_case"
+        IS_ARCHIVABLE = True
 
     class Doc3(Doc):
         COLLECTION_NAMING = "snake_case"
+        IS_ARCHIVABLE = True
 
-    MongoUtils.add_doc_types(Doc1, Doc2, Doc3)
+    MongoUtils.register_doc_types(Doc1, Doc2, Doc3)
 
     d2_1 = Doc2().create()
     d2_2 = Doc2().create()
