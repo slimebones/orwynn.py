@@ -6,6 +6,7 @@
 - mongo: is_lock_check_skipped is now public flag for Doc's upd and del methods
 - mongo: added IS_LINKING_IGNORING_LOCK flag to allow/disallow linking to have
          access to locked objects
+- sys: added Sys._ok() helper method to pub OkEvt
 
 # 2.3.5
 
