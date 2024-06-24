@@ -119,13 +119,17 @@ class DeldDocEvt(Evt):
 
 MongoCompatibleType = str | int | float | bool | list | dict | None
 MongoCompatibleTypes: tuple[Any, ...] = typing.get_args(MongoCompatibleType)
+NamingStyle = Literal["camel_case", "snake_case"]
 
 class MongoCfg(Cfg):
     url: str
     database_name: str
     must_clean_db_on_destroy: bool = False
-
-NamingStyle = Literal["camel_case", "snake_case"]
+    default_collection_naming: NamingStyle = "snake_case"
+    """
+    If not None, all docs for which not defined explicitly otherwise, will
+    use this collection naming style.
+    """
 
 class Doc(BaseModel):
     """
@@ -142,7 +146,7 @@ class Doc(BaseModel):
     """
 
     FIELDS: ClassVar[list[DocField]] = []
-    COLLECTION_NAMING: ClassVar[NamingStyle] = "camel_case"
+    COLLECTION_NAMING: ClassVar[NamingStyle | None] = None
     _INTERNAL_BACKLINKS: ClassVar[dict[type[Self], list[str]]] = {}
     """
     Map of backlinked docs and their names of their fields, which point to
@@ -265,6 +269,12 @@ class Doc(BaseModel):
             collection=self.get_collection(),
             udto=self.to_udto()
         )
+
+    @classmethod
+    def _parse_collection_naming(cls) -> NamingStyle:
+        if cls.COLLECTION_NAMING is None:
+            return MongoUtils.cfg.default_collection_naming
+        return cls.COLLECTION_NAMING
 
     @classmethod
     def get_collection(cls) -> str:
@@ -790,7 +800,7 @@ class MongoSys(Sys[MongoCfg]):
     async def init(self):
         self._client: MongoClient = MongoClient(self._cfg.url)
         self._db: MongoDb = self._client[self._cfg.database_name]
-        await MongoUtils.init(self._client, self._db)
+        await MongoUtils.init(self._client, self._db, self._cfg)
 
     async def destroy(self):
         if self._cfg.must_clean_db_on_destroy:
@@ -799,12 +809,14 @@ class MongoSys(Sys[MongoCfg]):
 class MongoUtils:
     client: MongoClient
     db: MongoDb
+    cfg: MongoCfg
     _doc_types: dict[str, type[Doc]]
 
     @classmethod
-    async def init(cls, client: MongoClient, db: MongoDb):
+    async def init(cls, client: MongoClient, db: MongoDb, cfg: MongoCfg):
         cls.client = client
         cls.db = db
+        cls.cfg = cfg
         cls._doc_types = {}
 
         for doc_type in Doc.__subclasses__():
@@ -856,6 +868,8 @@ class MongoUtils:
             del cls.client
         with suppress(AttributeError):
             del cls.db
+        with suppress(AttributeError):
+            del cls.cfg
 
     @classmethod
     def try_get_doc_type(cls, name: str) -> type[Doc] | None:
