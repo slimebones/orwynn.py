@@ -1,4 +1,4 @@
-# 2.4.0 - UNRELEASED
+# 2.4.0
 
 - updated rxcat
 - mongo: added MongoCfg.default_colection_naming for docs which didn't override
