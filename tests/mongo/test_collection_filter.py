@@ -1,13 +1,13 @@
 import pytest
 from pykit.check import check
 from pykit.fcode import code
-from rxcat import OkEvt, Req, ServerBus, ValueErr
+from rxcat import OkEvt, PubOpts, Req, ServerBus
 
 from orwynn.mongo import filter_collection_factory
 from orwynn.sys import Sys
 
 
-@code("mongo.no-collections.req.test")
+@code("mongo_no_collections_test_req")
 class _Req1(Req):
     collection: str
 
@@ -31,5 +31,5 @@ async def test_has_collection(app):
 async def test_no_collection(app):
     bus = ServerBus.ie()
     await check.aexpect(
-        bus.pubr(_Req1(collection="whocares")),
-        ValueErr)
+        bus.pubr(_Req1(collection="whocares"), PubOpts(pubr_timeout=0.001)),
+        TimeoutError)

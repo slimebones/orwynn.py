@@ -26,7 +26,7 @@ class SysArgs(GenericModel, Generic[TCfg]):
     class Config:
         arbitrary_types_allowed = True
 
-class internal_SysErr(Exception):
+class Internal__SysErr(Exception):
     pass
 
 class internal_FailedSysCase(Enum):
@@ -56,8 +56,7 @@ class Sys(Singleton, Generic[TCfg]):
     ):
         self._bus: ServerBus = args.bus
         self._cfg: TCfg = args.cfg
-        self._subids: list[int] = []
-
+        self._unsubs: list[Callable[[], Awaitable]] = []
         self._internal_is_initd = False
         self._internal_is_enabled = False
 
@@ -77,8 +76,7 @@ class Sys(Singleton, Generic[TCfg]):
     ):
         optsf = opts.model_copy(deep=True)
         optsf.filters = [*self.CommonSubMsgFilters, *optsf.filters]
-        subid = await self._bus.sub(msg_type, action, optsf)
-        self._subids.append(subid)
+        self._unsubs.append(await self._bus.sub(msg_type, action, optsf))
 
     async def _pub(
         self,
@@ -99,7 +97,7 @@ class Sys(Singleton, Generic[TCfg]):
         if self._internal_is_initd:
             if is_silent:
                 return
-            raise internal_SysErr
+            raise Internal__SysErr
         await self.init()
         self._internal_is_initd = True
 
@@ -107,7 +105,7 @@ class Sys(Singleton, Generic[TCfg]):
         if self._internal_is_enabled:
             if is_silent:
                 return
-            raise internal_SysErr
+            raise Internal__SysErr
         await self.enable()
         self._internal_is_enabled = True
 
@@ -115,9 +113,10 @@ class Sys(Singleton, Generic[TCfg]):
         if not self._internal_is_enabled:
             if is_silent:
                 return
-            raise internal_SysErr
+            raise Internal__SysErr
         await self.disable()
-        await self._bus.unsub_many(self._subids)
+        for unsub in self._unsubs:
+            await unsub()
         self._internal_is_enabled = False
 
     async def init(self):

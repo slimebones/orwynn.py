@@ -228,20 +228,20 @@ class Doc(BaseModel):
         req: Req,
         docs: Iterable[Self],
         *,
-        override_to_connids: list[int] | None = None
+        override_to_connsids: list[str] | None = None
     ) -> GotDocUdtosEvt:
         udtos = cls.to_udtos(docs)
         rsid = req.msid
 
-        to_connids = []
-        if override_to_connids:
-            to_connids = override_to_connids
-        elif req.m_connid is not None:
-            to_connids = [req.m_connid]
+        to_connsids = []
+        if override_to_connsids:
+            to_connsids = override_to_connsids
+        elif req.m_connsid is not None:
+            to_connsids = [req.m_connsid]
 
         return GotDocUdtosEvt(
             rsid=rsid,
-            m_toConnids=to_connids,
+            m_target_connsids=to_connsids,
             collection=cls.get_collection(),
             udtos=udtos
         )
@@ -253,19 +253,19 @@ class Doc(BaseModel):
         self,
         req: Req,
         *,
-        override_to_connids: list[int] | None = None
+        override_to_connsids: list[str] | None = None
     ) -> GotDocUdtoEvt:
         rsid = req.msid
 
-        to_connids = []
-        if override_to_connids:
-            to_connids = override_to_connids
-        elif req.m_connid is not None:
-            to_connids = [req.m_connid]
+        to_connsids = []
+        if override_to_connsids:
+            to_connsids = override_to_connsids
+        elif req.m_connsid is not None:
+            to_connsids = [req.m_connsid]
 
         return GotDocUdtoEvt(
             rsid=rsid,
-            m_toConnids=to_connids,
+            m_target_connsids=to_connsids,
             collection=self.get_collection(),
             udto=self.to_udto()
         )

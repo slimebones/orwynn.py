@@ -14,11 +14,11 @@ from orwynn.app import App
 from orwynn.cfg import Cfg, CfgPackUtils
 from orwynn.env import OrwynnEnvUtils
 from orwynn.sys import (
+    Internal__SysErr,
     Sys,
     SysArgs,
     internal_FailedSysCase,
     internal_FailedSysErr,
-    internal_SysErr,
 )
 from orwynn.ws import Ws
 
@@ -272,7 +272,7 @@ class Boot(Sys[BootCfg]):
                     bus=self._bus,
                     cfg=sys_cfg
                 ))._internal_init()
-            except internal_SysErr as err:
+            except Internal__SysErr as err:
                 log.catch(err)
             except Exception as err:
                 newerr = internal_FailedSysErr(
@@ -286,7 +286,7 @@ class Boot(Sys[BootCfg]):
         for sys_type in Sys.__subclasses__():
             try:
                 await sys_type.ie().enable()
-            except internal_SysErr as err:  # noqa: PERF203
+            except Internal__SysErr as err:  # noqa: PERF203
                 log.catch(err)
             except Exception as err:
                 newerr = internal_FailedSysErr(
