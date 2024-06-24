@@ -69,8 +69,8 @@ class Sys(Singleton, Generic[TCfg]):
     def is_enabled(self) -> bool:
         return self._internal_is_enabled
 
-    async def _pub_ok(self, req: Req):
-        await self._pub(OkEvt(rsid=None).as_res_from_req(req))
+    async def _pub_ok(self, req: Req, pub_opts: PubOpts = PubOpts()):
+        await self._pub(OkEvt(rsid=None).as_res_from_req(req), None, pub_opts)
 
     async def _sub(
         self,
