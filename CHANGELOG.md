@@ -1,3 +1,7 @@
+# 2.4.5
+
+- updated rxcat
+
 # 2.4.4
 
 - auth: add dummy register_bus_client
