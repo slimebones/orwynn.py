@@ -7,6 +7,7 @@
 - mongo: added IS_LINKING_IGNORING_LOCK flag to allow/disallow linking to have
          access to locked objects
 - sys: added Sys._ok() helper method to pub OkEvt
+- mongo: Doc.get_many() now support search queries with $aggregate field
 
 # 2.3.5
 
