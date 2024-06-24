@@ -1,3 +1,7 @@
+# 2.4.2
+
+- auth: fix target connids set
+
 # 2.4.1
 
 - mongo: fix collection factory pre-init collection fetching

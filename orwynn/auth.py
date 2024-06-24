@@ -102,7 +102,7 @@ class AuthSys(Sys[AuthCfg]):
 
         evt = LoggedEvt(
             rsid=req.msid,
-            m_toconnsids=req.get_res_connsids(),
+            m_target_connsids=req.get_res_connsids(),
             permissionDtos=permission_dtos,
             userSid=user_sid,
             userAuthToken=token,
@@ -124,7 +124,7 @@ class AuthSys(Sys[AuthCfg]):
         await self._pub(
             LogoutEvt(
                 rsid=req.msid,
-                m_toconnsids=req.get_res_connsids(),
+                m_target_connsids=req.get_res_connsids(),
                 userSid=user_sid
             )
         )
