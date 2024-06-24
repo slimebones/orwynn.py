@@ -1,3 +1,7 @@
+# 2.4.1
+
+- mongo: fix collection factory pre-init collection fetching
+
 # 2.4.0
 
 - updated rxcat

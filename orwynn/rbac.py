@@ -78,7 +78,7 @@ class RbacCfg(Cfg):
 
 class RoleSys(Sys):
     CommonSubMsgFilters = [
-        filter_collection_factory(RoleDoc.get_collection())
+        filter_collection_factory(RoleDoc)
     ]
 
     async def enable(self):

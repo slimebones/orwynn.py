@@ -3,7 +3,7 @@ from pykit.check import check
 from pykit.fcode import code
 from rxcat import OkEvt, PubOpts, Req, ServerBus
 
-from orwynn.mongo import filter_collection_factory
+from orwynn.mongo import Doc, filter_collection_factory
 from orwynn.sys import Sys
 
 
@@ -11,9 +11,12 @@ from orwynn.sys import Sys
 class _Req1(Req):
     collection: str
 
+class TestCollectionFilterDoc(Doc):
+    pass
+
 class _Sys1(Sys):
     CommonSubMsgFilters = [
-        filter_collection_factory("hello")]
+        filter_collection_factory(TestCollectionFilterDoc)]
 
     async def init(self):
         await self._sub(_Req1, self._on_req1)
@@ -24,7 +27,8 @@ class _Sys1(Sys):
 @pytest.mark.asyncio
 async def test_has_collection(app):
     bus = ServerBus.ie()
-    evt = await bus.pubr(_Req1(collection="hello"))
+    evt = await bus.pubr(_Req1(
+        collection=TestCollectionFilterDoc.get_collection()))
     assert isinstance(evt, OkEvt)
 
 @pytest.mark.asyncio

@@ -1479,7 +1479,7 @@ class LockDocSys(Sys):
                 f"failed to update for {req.doc_collection}::{req.doc_sid}")
         await self._pub(OkEvt(rsid="").as_res_from_req(req))
 
-def filter_collection_factory(*collections: str) -> MsgFilter:
+def filter_collection_factory(*docs: type[Doc]) -> MsgFilter:
     """
     Filters incoming msg to have a certain collection.
 
@@ -1502,14 +1502,6 @@ def filter_collection_factory(*collections: str) -> MsgFilter:
             )
             return True
 
-        # todo: maybe remove this
-        if isinstance(collections, str):
-            return collections == real_collection
-
-        if isinstance(collections, tuple):
-            return real_collection in collections
-
-        raise InpErr(f"collections type {type(collections)}")
-
+        # get collections in runtime, so we're sure configs are initialized
+        return real_collection in [d.get_collection() for d in docs]
     return filter_collection
-
