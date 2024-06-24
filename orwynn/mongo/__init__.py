@@ -313,7 +313,7 @@ class Doc(BaseModel):
                 "locked",
                 self
             ),
-            _internal_is_lock_check_skipped=True
+            is_lock_check_skipped=True
         )
 
     def is_locked(self):
@@ -515,9 +515,11 @@ class Doc(BaseModel):
 
     def delete(
         self,
+        *,
+        is_lock_check_skipped: bool = False,
         **kwargs
     ):
-        if self.is_locked():
+        if not is_lock_check_skipped and self.is_locked():
             raise LockErr(self)
         if not self.IsArchivable:
             self._del_for_sure(**kwargs)
@@ -608,15 +610,15 @@ class Doc(BaseModel):
         self,
         upd_query: Query,
         *,
-        _internal_is_lock_check_skipped: bool = False,
+        is_lock_check_skipped: bool = False,
         **kwargs
     ) -> Self:
-        if not _internal_is_lock_check_skipped and self.is_locked():
+        if not is_lock_check_skipped and self.is_locked():
             raise LockErr(self)
         f = self.try_upd(
             upd_query,
-             _internal_is_lock_check_skipped=_internal_is_lock_check_skipped,
-             **kwargs)
+            is_lock_check_skipped=is_lock_check_skipped,
+            **kwargs)
         if f is None:
             raise ValueError(
                 f"failed to upd doc {self}, using query {upd_query}"
@@ -627,7 +629,7 @@ class Doc(BaseModel):
         self,
         upd_query: Query,
         *,
-        _internal_is_lock_check_skipped: bool = False,
+        is_lock_check_skipped: bool = False,
         **kwargs
     ) -> Self | None:
         """
@@ -635,7 +637,7 @@ class Doc(BaseModel):
         """
         if (
             not self.sid or (
-                not _internal_is_lock_check_skipped
+                not is_lock_check_skipped
                 and self.is_locked())):
             return None
 
