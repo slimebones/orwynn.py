@@ -1,14 +1,20 @@
 import typing
 
-import pytest
 from pykit.check import check
 from pykit.err import LockErr
 from pykit.query import Query
 from rxcat import OkEvt, ServerBus
 
-from orwynn.mongo import CheckLockDocReq, Doc, LockDocReq, MongoUtils, UnlockDocReq
+from orwynn.mongo import (
+    CheckLockDocReq,
+    Doc,
+    LockDocReq,
+    MongoUtils,
+    UnlockDocReq,
+)
 from orwynn.mongo.field import DocField
 from orwynn.msg import FlagEvt
+
 
 def test_link_lock(app):
     class Test1Doc(Doc):
