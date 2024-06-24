@@ -34,6 +34,7 @@ class PreloadDoc(Doc):
 
 class UploadFile(BaseModel):
     filename: str
+    # we use any type because of Windows-Linux unknown factors
     buf: Any
     content_type: str
 
