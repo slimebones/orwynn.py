@@ -5,4 +5,4 @@ WORKDIR /app
 COPY site ./site
 COPY Makefile .
 
-CMD ["make", "docs.serve_native"]
+CMD ["make", "serve_native_doc"]
