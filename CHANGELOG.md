@@ -1,3 +1,7 @@
+# 2.4.0 - UNRELEASED
+
+- updated rxcat
+
 # 2.3.5
 
 ## Fixes
@@ -44,7 +48,7 @@
 
 ## Features
 
-- mongo: add field linkage - a deleted sid is removed from related 
+- mongo: add field linkage - a deleted sid is removed from related
          collections
 - mongo: add locking
 

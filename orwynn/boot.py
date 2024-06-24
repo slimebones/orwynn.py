@@ -218,9 +218,7 @@ class Boot(Sys[BootCfg]):
     async def _handle_ws(self, webreq: aiohttp.web.BaseRequest):
         ws = Ws()
         await ws.prepare(webreq)
-
-        await self._bus.conn(ws)  # type: ignore
-
+        await self._bus.conn(ws)
         return ws
 
     async def _init_sys(self, type_to_cfg: dict[type[Cfg], Cfg]):
