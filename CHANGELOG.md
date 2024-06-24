@@ -1,3 +1,7 @@
+# 2.4.4
+
+- auth: add dummy register_bus_client
+
 # 2.4.3
 
 - boot: added support of ServerBusCfg

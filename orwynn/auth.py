@@ -1,16 +1,25 @@
-from typing import Callable
+from typing import Any, Callable
 
 import jwt
 from pykit.check import check
 from pykit.dt import DtUtils
 from pykit.fcode import code
 from pykit.log import log
-from rxcat import Awaitable, Evt, Req
+from pykit.res import Res
+from result import Ok
+from rxcat import Awaitable, Evt, Req, ServerRegisterData
 
 from orwynn.cfg import Cfg
 from orwynn.rbac import PermissionDto, PermissionModel, RbacUtils
 from orwynn.sys import Sys
 
+
+async def register_bus_client(
+        tokens: list[str],
+        client_data: dict[str, Any] | None
+        ) -> Res[ServerRegisterData]:
+    # todo: support gatekeeper implementation
+    return Ok(ServerRegisterData())
 
 @code("login-req")
 class LoginReq(Req):
