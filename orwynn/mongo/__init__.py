@@ -1,27 +1,38 @@
 import typing
 from contextlib import suppress
 from enum import Enum
-from typing import (Any, ClassVar, Coroutine, Generic, Iterable, Literal, Self,
-                    TypeVar)
+from typing import (
+    Any,
+    ClassVar,
+    Coroutine,
+    Generic,
+    Iterable,
+    Literal,
+    Self,
+    TypeVar,
+)
 
 import inflection
 from bson import ObjectId
 from bson.errors import InvalidId
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 from pykit.check import check
 from pykit.err import LockErr, NotFoundErr, UnsupportedErr, ValueErr
 from pykit.log import log
 from pykit.mark import MarkErr, MarkUtils
-from pykit.query import (AggQuery, Query, QueryUpdOperator, SearchQuery,
-                         UpdQuery)
-from pykit.res import Res
+from pykit.query import (
+    AggQuery,
+    Query,
+    SearchQuery,
+    UpdQuery,
+)
 from pykit.search import DbSearch
 from pykit.types import T
 from pymongo import MongoClient
 from pymongo import ReturnDocument as ReturnDocStrat
+from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor as MongoCursor
 from pymongo.database import Database as MongoDb
-from result import Err, Ok
 from rxcat import Evt, InpErr, Msg, MsgFilter, OkEvt, Req, code
 
 from orwynn.cfg import Cfg
@@ -51,7 +62,7 @@ class DocReq(Req):
     def __init__(self, **data):
         for k, v in data.items():
             lower_k = k.lower()
-            if lower_k.endswith("query") or lower_k.endswith("q"):
+            if lower_k.endswith(("query", "q")):
                 if not isinstance(v, (dict, Query)):
                     raise InpErr(
                         "val for key ending with \"Query\" is"
@@ -330,12 +341,27 @@ class Doc(BaseModel):
             cls._cached_collection_name = name
         return cls._cached_collection_name
 
+    @classmethod
+    def agg_as_cursor(cls, aq: AggQuery) -> CommandCursor:
+        return aq.apply(MongoUtils.db[cls.get_collection()])
+
+    @classmethod
+    def agg(cls, aq: AggQuery) -> Iterable[Self]:
+        """
+        Aggregate and parse each item into this Doc.
+
+        Note that some aggregation stages (such as $group) may be uncompatible
+        with this method, since they will not pass the parsing.
+        """
+        cursor = cls.agg_as_cursor(aq)
+        return map(cls._parse_data_to_doc, cursor)
+
     def lock(self) -> Self:
         if self.is_locked():
             return self
         refreshed = self.refresh()
         return refreshed.upd(
-            MarkUtils.get_add_upd_query(
+            MarkUtils.get_push_uq(
                 "locked",
                 self
             )
@@ -346,7 +372,7 @@ class Doc(BaseModel):
             return self
         refreshed = self.refresh()
         return refreshed.upd(
-            MarkUtils.get_remove_upd_query(
+            MarkUtils.get_pull_uq(
                 "locked",
                 self
             ),
@@ -366,7 +392,7 @@ class Doc(BaseModel):
         refreshed = self.refresh()
 
         return refreshed.upd(
-            MarkUtils.get_add_upd_query(
+            MarkUtils.get_push_uq(
                 "archived",
                 self
             )
@@ -377,7 +403,7 @@ class Doc(BaseModel):
             return self
         refreshed = self.refresh()
         return refreshed.upd(
-            MarkUtils.get_remove_upd_query(
+            MarkUtils.get_pull_uq(
                 "archived",
                 self
             )
@@ -426,7 +452,7 @@ class Doc(BaseModel):
         Fetches all instances matching the query for this document.
 
         Args:
-            query(optional):
+            sq(optional):
                 MongoDB-compliant dictionary to search. By default all
                 instances of the document is fetched.
             **kwargs(optional):

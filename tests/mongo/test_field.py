@@ -1,6 +1,7 @@
 from pykit.check import check
+from pykit.query import UpdQuery
 
-from orwynn.mongo import Doc, MongoUtils, Query
+from orwynn.mongo import Doc, MongoUtils
 from orwynn.mongo.field import DocField, UniqueFieldErr
 
 
@@ -35,7 +36,8 @@ def test_unique_upd(app):
     d1 = _Doc1(name="pizza").create()
     d2 = _Doc1(name="notpizza").create()
 
-    check.expect(d2.upd, UniqueFieldErr, Query.as_upd(set={"name": "pizza"}))
+    check.expect(
+        d2.upd, UniqueFieldErr, UpdQuery.create(set={"name": "pizza"}))
     assert len(list(_Doc1.get_many())) == 2
 
     d1 = d1.refresh()

@@ -1,4 +1,4 @@
-from pykit.query import Query
+from pykit.query import AggQuery, SearchQuery
 
 from tests.mongo.conftest import SimpleDocument
 
@@ -16,7 +16,7 @@ def test_id_operators(
     """
     Should work normally for id MongoDb operators.
     """
-    f = list(SimpleDocument.get_many(Query({
+    f = list(SimpleDocument.get_many(SearchQuery({
         "sid": {
             "$in": [document_1.sid]
         }
@@ -29,15 +29,10 @@ def test_aggregation(
         document_1: SimpleDocument,
         document_2: SimpleDocument,
         document_3: SimpleDocument):
-    f = list(SimpleDocument.get_many(Query({
-        "sid": {
-            "$in": [document_1.sid, document_2.sid, document_3.sid]
-        },
-        "$aggregation": {
-            "sort": {"price": -1},
-            "limit": 2
-        }
-    })))
+    f = list(SimpleDocument.agg(AggQuery.create(
+        {"$sort": {"price": -1}},
+        {"$limit": 2}
+    )))
 
     assert len(f) == 2
     assert f[0].name == "sushi"

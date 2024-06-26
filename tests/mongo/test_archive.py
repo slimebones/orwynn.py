@@ -1,7 +1,7 @@
 from pykit.check import check
 from pykit.err import NotFoundErr
 from pykit.mark import MarkErr
-from pykit.query import Query
+from pykit.query import SearchQuery
 
 from orwynn.mongo import Doc
 
@@ -50,7 +50,7 @@ def test_del(app):
         MarkErr
     )
     adoc = _ArchivableDoc.get(
-        Query.as_search_sid(adoc.sid),
+        SearchQuery.create_sid(adoc.sid),
         must_search_archived_too=True
     )
     assert adoc.is_archived()
