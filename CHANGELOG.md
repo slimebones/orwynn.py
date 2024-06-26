@@ -1,4 +1,4 @@
-# 2.4.6 - UNRELEASED
+# 2.4.6
 
 - mongo: adjusted to new queries
 - mongo: added AggDocReq
