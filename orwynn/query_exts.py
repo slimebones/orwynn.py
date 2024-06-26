@@ -1,24 +1,12 @@
-from typing import Any, Mapping, Sequence, Tuple, Union
+from pykit.err import ValueErr
+from pykit.query import Query
+from pykit.res import Res
+from result import Err, Ok
 
-from pydantic import BaseModel
 
-from orwynn.mongo import MongoCursor
-
-_SortComplex = Union[
-    Sequence[
-        Union[str, Tuple[str, Union[int, str, Mapping[str, Any]]]]
-    ],
-    Mapping[str, Any]
-]
-_Sort = Union[str, _SortComplex]
-
-class Aggregation(BaseModel):
-    sort: _Sort | None = None
-    limit: int | None = None
-
-    def apply_to_cursor(self, cursor: MongoCursor) -> MongoCursor:
-        if self.sort is not None:
-            cursor = cursor.sort(self.sort)
-        if self.limit is not None:
-            cursor = cursor.limit(self.limit)
-        return cursor
+class CreateQuery(Query):
+    def check(self) -> Res[None]:
+        for k in self.keys():
+            if k.startswith("$"):
+                return Err(ValueErr(f"cannot have operators, got {k}"))
+        return Ok(None)

@@ -15,7 +15,6 @@ readme = "README.md"
 python = "^3.11"
 loguru = "^0.7.2"
 pyjwt = "^2.6.0"
-pymongo = "^4.3.3"
 sqlalchemy = "^2.0.3"
 psycopg2 = "^2.9.5"
 typing-extensions = "^4.7.1"
@@ -25,7 +24,7 @@ pydantic = "^2.6.0"
 aiofiles = "^23.2.1"
 aiohttp-cors = "^0.7.0"
 uvicorn = {extras = ["standard"], version = "^0.29.0"}
-rxcat = {git = "https://github.com/slimebones/pyrxcat.git", rev = "0.2.1"}
+rxcat = {git = "https://github.com/slimebones/pyrxcat.git", rev = "0.2.2"}
 inflection = "^0.5.1"
 
 [tool.poetry.group.dev.dependencies]

@@ -1,16 +1,8 @@
 import typing
 from contextlib import suppress
 from enum import Enum
-from typing import (
-    Any,
-    ClassVar,
-    Coroutine,
-    Generic,
-    Iterable,
-    Literal,
-    Self,
-    TypeVar,
-)
+from typing import (Any, ClassVar, Coroutine, Generic, Iterable, Literal, Self,
+                    TypeVar)
 
 import inflection
 from bson import ObjectId
@@ -20,7 +12,8 @@ from pykit.check import check
 from pykit.err import LockErr, NotFoundErr, UnsupportedErr, ValueErr
 from pykit.log import log
 from pykit.mark import MarkErr, MarkUtils
-from pykit.query import Query, QueryUpdOperator
+from pykit.query import (AggQuery, Query, QueryUpdOperator, SearchQuery,
+                         UpdQuery)
 from pykit.res import Res
 from pykit.search import DbSearch
 from pykit.types import T
@@ -36,7 +29,7 @@ from orwynn.dto import TUdto, Udto
 from orwynn.env import OrwynnEnvUtils
 from orwynn.mongo.field import DocField, UniqueFieldErr
 from orwynn.msg import FlagEvt
-from orwynn.query_exts import Aggregation
+from orwynn.query_exts import CreateQuery
 from orwynn.sys import Sys
 
 __all__ = [
@@ -57,21 +50,31 @@ __all__ = [
 class DocReq(Req):
     def __init__(self, **data):
         for k, v in data.items():
-            if k.endswith("Query"):
+            lower_k = k.lower()
+            if lower_k.endswith("query") or lower_k.endswith("q"):
                 if not isinstance(v, (dict, Query)):
                     raise InpErr(
                         "val for key ending with \"Query\" is"
                          " expected to be of type dict/Query"
                     )
                 if isinstance(v, dict):
-                    # convert v to query
-                    data[k] = Query(typing.cast(dict, v))
+                    # convert v to according query
+                    if lower_k.startswith("search") or lower_k == "sq":
+                        data[k] = SearchQuery(v)
+                    elif lower_k.startswith("upd") or lower_k == "uq":
+                        data[k] = UpdQuery(v)
+                    elif lower_k.startswith("aggq") or lower_k == "aq":
+                        data[k] = AggQuery(v)
+                    elif lower_k.startswith("create") or lower_k == "cq":
+                        data[k] = CreateQuery(v)
+                    else:
+                        data[k] = Query(v)
         super().__init__(**data)
 
 @code("get-docs-req")
 class GetDocsReq(DocReq):
     collection: str
-    searchQuery: Query
+    searchQuery: SearchQuery
 
 @code("got-doc-udto-evt")
 class GotDocUdtoEvt(Evt, Generic[TUdto]):
@@ -86,18 +89,23 @@ class GotDocUdtosEvt(Evt, Generic[TUdto]):
 @code("del-doc-req")
 class DelDocReq(DocReq):
     collection: str
-    searchQuery: Query
+    searchQuery: SearchQuery
 
 @code("create-doc-req")
 class CreateDocReq(DocReq):
     collection: str
-    createQuery: Query
+    createQuery: CreateQuery
 
 @code("upd-doc-req")
 class UpdDocReq(DocReq):
     collection: str
-    searchQuery: Query
-    updQuery: Query
+    searchQuery: SearchQuery
+    updQuery: UpdQuery
+
+@code("agg_doc_req")
+class AggDocReq(DocReq):
+    collection: str
+    aq: AggQuery
 
 class UpdedField(BaseModel):
     fieldName: str
@@ -211,8 +219,7 @@ class Doc(BaseModel):
     def _check_field(
             cls,
             name: str,
-            new_val: Any,
-            upd_operator: QueryUpdOperator | None = None):
+            new_val: Any):
 
         field = cls._try_get_field(name)
         if not field:
@@ -220,7 +227,7 @@ class Doc(BaseModel):
 
         # archived things are searched too! for now it's according to the
         # intended logic
-        if field.unique and cls.try_get(Query({name: new_val})):
+        if field.unique and cls.try_get(SearchQuery({name: new_val})):
             raise UniqueFieldErr(
                     f"for doc {cls} field {name} is unique")
 
@@ -231,12 +238,12 @@ class Doc(BaseModel):
 
         for backlink_type, backlink_fields in cls._BACKLINKS.items():
             for backlink_field in backlink_fields:
-                targets = backlink_type.get_many(Query({backlink_field: {
+                targets = backlink_type.get_many(SearchQuery({backlink_field: {
                     "$in": [sid]
                 }}))
                 for target in targets:
                     target.upd(
-                        Query.as_upd(pull={
+                        UpdQuery.create(pull={
                             backlink_field: sid
                         }),
                         is_lock_check_skipped=
@@ -386,16 +393,18 @@ class Doc(BaseModel):
     @classmethod
     def get_many_as_cursor(
         cls,
-        sq: Query | None = None,
+        sq: SearchQuery | None = None,
         *,
         must_search_archived_too: bool = False,
         **kwargs
     ) -> MongoCursor:
-        copied_sq = cls._parsecopy_query(sq)
+        if sq is None:
+            copied_sq = SearchQuery({})
+        else:
+            copied_sq = sq.copy()
         cls._adjust_data_sid_to_mongo(copied_sq)
         if not must_search_archived_too:
             cls._exclude_archived_from_search_query(copied_sq)
-        aggregation = cls._eject_aggregation_from_sq(copied_sq).unwrap_or(None)
 
         check.instance(copied_sq, dict)
 
@@ -403,32 +412,12 @@ class Doc(BaseModel):
             cls.get_collection(),
             copied_sq,
             **kwargs)
-        if aggregation is not None:
-            cursor = aggregation.apply_to_cursor(cursor)
         return cursor
-
-    @classmethod
-    def _eject_aggregation_from_sq(
-            cls, sq: Query) -> Res[Aggregation]:
-        """
-        WARNING: Modifies given sq.
-        """
-        raw_aggregation = sq.get("$aggregation", None)
-        if raw_aggregation is None:
-            return Err(ValueErr("no aggregation available"))
-        del sq["$aggregation"]
-
-        try:
-            aggregation = Aggregation.model_validate(raw_aggregation)
-        except ValidationError as err:
-            return Err(err)
-
-        return Ok(aggregation)
 
     @classmethod
     def get_many(
         cls,
-        sq: Query | None = None,
+        sq: SearchQuery | None = None,
         *,
         must_search_archived_too: bool = False,
         **kwargs
@@ -455,7 +444,7 @@ class Doc(BaseModel):
     @classmethod
     def try_get(
         cls,
-        search_query: Query,
+        search_query: SearchQuery,
         *,
         must_search_archived_too: bool = False,
         **kwargs
@@ -477,7 +466,7 @@ class Doc(BaseModel):
 
     def get_or_create(
         self,
-        searchq: Query,
+        searchq: SearchQuery,
         search_kwargs: dict | None = None,
         create_kwargs: dict | None = None
     ) -> tuple[Self, int]:
@@ -514,7 +503,7 @@ class Doc(BaseModel):
     @classmethod
     def get_and_del(
         cls,
-        search_query: Query,
+        search_query: SearchQuery,
         **kwargs
     ):
         if not cls.is_archivable():
@@ -534,7 +523,7 @@ class Doc(BaseModel):
     @classmethod
     def try_get_and_del(
         cls,
-        search_query: Query,
+        search_query: SearchQuery,
         **kwargs
     ) -> bool:
         if not cls.is_archivable():
@@ -551,7 +540,7 @@ class Doc(BaseModel):
     @classmethod
     def _try_get_and_del_for_sure(
         cls,
-        search_query: Query,
+        search_query: SearchQuery,
         **kwargs
     ) -> bool:
         copied_search_query = search_query.copy()
@@ -603,7 +592,7 @@ class Doc(BaseModel):
         self._deattach_from_links(self.sid)
         return MongoUtils.delete(
             self.get_collection(),
-            Query({"_id": MongoUtils.convert_to_object_id(self.sid)}),
+            SearchQuery({"_id": MongoUtils.convert_to_object_id(self.sid)}),
             **kwargs
         )
 
@@ -627,14 +616,14 @@ class Doc(BaseModel):
         self._deattach_from_links(self.sid)
         return MongoUtils.try_del(
             self.get_collection(),
-            Query({"_id": MongoUtils.convert_to_object_id(self.sid)}),
+            SearchQuery({"_id": MongoUtils.convert_to_object_id(self.sid)}),
             **kwargs
         )
 
     @classmethod
     def get(
         cls,
-        search_query: Query,
+        search_query: SearchQuery,
         *,
         must_search_archived_too: bool = False,
         **kwargs
@@ -651,8 +640,8 @@ class Doc(BaseModel):
     @classmethod
     def get_and_upd(
         cls,
-        search_query: Query,
-        upd_query: Query,
+        search_query: SearchQuery,
+        upd_query: UpdQuery,
         *,
         must_search_archived_too: bool = False,
         search_kwargs: dict | None = None,
@@ -671,7 +660,7 @@ class Doc(BaseModel):
     #       excluding from the search
     def upd(
         self,
-        upd_query: Query,
+        upd_query: UpdQuery,
         *,
         is_lock_check_skipped: bool = False,
         **kwargs
@@ -690,7 +679,7 @@ class Doc(BaseModel):
 
     def try_upd(
         self,
-        upd_query: Query,
+        uq: UpdQuery,
         *,
         is_lock_check_skipped: bool = False,
         **kwargs
@@ -704,21 +693,17 @@ class Doc(BaseModel):
                 and self.is_locked())):
             return None
 
-        for operator_key, operator_val in upd_query.items():
+        for operator_val in uq.values():
             for k, v in operator_val.items():
-                self._check_field(
-                    k,
-                    v,
-                    typing.cast(
-                        QueryUpdOperator, operator_key.replace("$", "")))
+                self._check_field(k, v)
 
-        search_query = Query({
+        search_query = SearchQuery({
             "_id": MongoUtils.convert_to_object_id(self.sid)})
 
         data = MongoUtils.try_upd(
             self.get_collection(),
             search_query,
-            upd_query,
+            uq,
             **kwargs
         )
         if data is None:
@@ -728,73 +713,73 @@ class Doc(BaseModel):
 
     def set(
         self,
-        query: Query,
+        data: dict[str, Any],
         **kwargs
     ):
-        return self.upd(Query({"$set": query}), **kwargs)
+        return self.upd(UpdQuery.create(set=data), **kwargs)
 
     def push(
         self,
-        query: Query,
+        data: dict[str, Any],
         **kwargs
     ):
-        return self.upd(Query({"$push": query}), **kwargs)
+        return self.upd(UpdQuery.create(push=data), **kwargs)
 
     def pull(
         self,
-        query: Query,
+        data: dict[str, Any],
         **kwargs
     ):
-        return self.upd(Query({"$pull": query}), **kwargs)
+        return self.upd(UpdQuery.create(pull=data), **kwargs)
 
     def pop(
         self,
-        query: Query,
+        data: dict[str, Any],
         **kwargs
     ):
-        return self.upd(Query({"$pop": query}), **kwargs)
+        return self.upd(UpdQuery.create(pop=data), **kwargs)
 
     def inc(
         self,
-        query: Query,
+        data: dict[str, Any],
         **kwargs
     ):
-        return self.upd(Query({"$inc": query}), **kwargs)
+        return self.upd(UpdQuery.create(inc=data), **kwargs)
 
     def try_set(
         self,
-        query: Query,
+        data: dict[str, Any],
         **kwargs
     ) -> Self | None:
-        return self.try_upd(Query({"$set": query}), **kwargs)
+        return self.try_upd(UpdQuery.create(set=data), **kwargs)
 
     def try_push(
         self,
-        query: Query,
+        data: dict[str, Any],
         **kwargs
     ) -> Self | None:
-        return self.try_upd(Query({"$push": query}), **kwargs)
+        return self.try_upd(UpdQuery.create(push=data), **kwargs)
 
     def try_pop(
         self,
-        query: Query,
+        data: dict[str, Any],
         **kwargs
     ) -> Self | None:
-        return self.try_upd(Query({"$pop": query}), **kwargs)
+        return self.try_upd(UpdQuery.create(pop=data), **kwargs)
 
     def try_pull(
         self,
-        query: Query,
+        data: dict[str, Any],
         **kwargs
     ) -> Self | None:
-        return self.try_upd(Query({"$pull": query}), **kwargs)
+        return self.try_upd(UpdQuery.create(pull=data), **kwargs)
 
     def try_inc(
         self,
-        query: Query,
+        data: dict[str, Any],
         **kwargs
     ) -> Self | None:
-        return self.try_upd(Query({"$inc": query}), **kwargs)
+        return self.try_upd(UpdQuery.create(inc=data), **kwargs)
 
     def refresh(
         self
@@ -804,7 +789,7 @@ class Doc(BaseModel):
         """
         if not self.sid:
             raise InpErr("empty sid")
-        query = Query({"sid": self.sid})
+        query = SearchQuery.create_sid(self.sid)
         f = self.try_get(
             query,
             # you can refresh archived docs!
@@ -815,13 +800,13 @@ class Doc(BaseModel):
         return f
 
     @classmethod
-    def _exclude_archived_from_search_query(cls, search_query: Query):
-        if "internal_marks" in search_query:
+    def _exclude_archived_from_search_query(cls, sq: SearchQuery):
+        if "internal_marks" in sq:
             log.warn(
-                f"usage of internal_marks in search query {search_query} =>"
+                f"usage of internal_marks in search query {sq} =>"
                 " overwrite"
             )
-        search_query["internal_marks"] = {
+        sq["internal_marks"] = {
             "$nin": ["archived"]
         }
 
@@ -829,10 +814,6 @@ class Doc(BaseModel):
     def _parse_data_to_doc(cls, data: dict) -> Self:
         """Parses document to specified Model."""
         return cls.model_validate(cls._adjust_data_sid_from_mongo(data))
-
-    @staticmethod
-    def _parsecopy_query(query: Query | None) -> Query:
-        return Query() if query is None else query.copy()
 
     @classmethod
     def _adjust_data_sid_to_mongo(cls, data: dict):
@@ -960,14 +941,14 @@ class MongoUtils:
     def try_get(
         cls,
         collection: str,
-        query: Query,
+        sq: SearchQuery,
         **kwargs
     ) -> dict | None:
         check.instance(collection, str)
-        check.instance(query, dict)
+        check.instance(sq, dict)
 
         result: Any | None = cls.db[collection].find_one(
-            query, **kwargs
+            sq, **kwargs
         )
 
         if result is None:
@@ -980,14 +961,14 @@ class MongoUtils:
     def get_many(
         cls,
         collection: str,
-        query: Query,
+        sq: SearchQuery,
         **kwargs
     ) -> MongoCursor:
         check.instance(collection, str)
-        check.instance(query, dict)
+        check.instance(sq, dict)
 
         return cls.db[collection].find(
-            query, **kwargs
+            sq, **kwargs
         )
 
     @classmethod
@@ -1015,19 +996,19 @@ class MongoUtils:
     def try_upd(
         cls,
         collection: str,
-        query: Query,
-        operation: dict,
+        sq: SearchQuery,
+        uq: UpdQuery,
         **kwargs
     ) -> dict | None:
         """Updates a document matching query and returns updated version."""
         check.instance(collection, str)
-        check.instance(query, dict)
-        check.instance(operation, dict)
+        check.instance(sq, dict)
+        check.instance(uq, dict)
 
         upd_doc: Any = \
             cls.db[collection].find_one_and_update(
-                query,
-                operation,
+                sq,
+                uq,
                 return_document=ReturnDocStrat.AFTER,
                 **kwargs
             )
@@ -1042,32 +1023,32 @@ class MongoUtils:
     def delete(
         cls,
         collection: str,
-        query: Query,
+        sq: SearchQuery,
         **kwargs
     ):
         check.instance(collection, str)
-        check.instance(query, dict)
+        check.instance(sq, dict)
 
         del_result = cls.db[collection].delete_one(
-            query,
+            sq,
             **kwargs
         )
 
         if del_result.deleted_count == 0:
-            raise NotFoundErr(f"doc in collection {collection}", query)
+            raise NotFoundErr(f"doc in collection {collection}", sq)
 
     @classmethod
     def try_del(
         cls,
         collection: str,
-        query: Query,
+        sq: SearchQuery,
         **kwargs
     ) -> bool:
         check.instance(collection, str)
-        check.instance(query, dict)
+        check.instance(sq, dict)
 
         del_result = cls.db[collection].delete_one(
-            query,
+            sq,
             **kwargs
         )
 
@@ -1075,7 +1056,7 @@ class MongoUtils:
 
     @staticmethod
     def process_search(
-        query: Query,
+        query: SearchQuery,
         search: "DocSearch[TDoc]",
         doc_type: type[TDoc],
         *,
@@ -1096,15 +1077,14 @@ class MongoUtils:
 
     @staticmethod
     def query_by_nested_dict(
-        query: Query,
-        nested_dict: dict[str, Any],
-        root_key: str,
-    ) -> None:
+            sq: SearchQuery,
+            nested_dict: dict[str, Any],
+            root_key: str):
         """
         Updates query for searching nested dict values.
 
         Args:
-            query:
+            sq:
                 Query to update.
             nested_dict:
                 Data to search.
@@ -1137,7 +1117,7 @@ class MongoUtils:
         converted_data: dict[str, Any] = MongoUtils.convert_dict({
             root_key: nested_dict,
         })
-        query.update(converted_data)
+        sq.update(converted_data)
 
     @staticmethod
     def convert_dict(d: dict[str, Any]) -> dict[str, Any]:
@@ -1274,132 +1254,93 @@ class DocSearch(DbSearch[Doc], Generic[TDoc]):
     """
 
 class MongoStateFlagDoc(Doc):
+    COLLECTION_NAMING = "snake_case"
+    IS_ARCHIVABLE = False
     key: str
     value: bool
 
-class MongoStateFlagSearch(DocSearch):
-    keys: list[str] | None = None
-    values: list[bool] | None = None
+def get_state_flag(key: str) -> bool:
+    q = SearchQuery({"key": key})
+    return MongoStateFlagDoc.get(q).value
 
-class MongoStateFlagUtils:
-    @classmethod
-    def get(
-        cls,
-        search: MongoStateFlagSearch
-    ) -> list[MongoStateFlagDoc]:
-        query = Query()
-
-        if search.sids:
-            query["sid"] = {
-                "$in": search.sids
-            }
-        if search.keys:
-            query["key"] = {
-                "$in": search.keys
-            }
-        if search.values:
-            query["value"] = {
-                "$in": search.values
-            }
-
-        return MongoUtils.process_search(
-            query,
-            search,
-            MongoStateFlagDoc
+def get_first_or_set_default(
+        key: str,
+        default_val: bool) -> bool:
+    """
+    Returns first flag found for given search or a new flag initialized
+    with default value.
+    """
+    try:
+        return get_state_flag(key)
+    except NotFoundErr:
+        set_state_flag(
+            key,
+            default_val
         )
+        return default_val
 
-    @classmethod
-    def get_first_or_set_default(
-        cls,
+def set_state_flag(
         key: str,
-        default_value: bool
-    ) -> MongoStateFlagDoc:
-        """
-        Returns first flag found for given search or a new flag initialized
-        with default value.
-        """
-        try:
-            return cls.get(MongoStateFlagSearch(
-                keys=[key]
-            ))[0]
-        except IndexError:
-            return cls.set(
-                key,
-                default_value
-            )
+        value: bool):
+    """
+    Sets new value for a key.
 
-    @classmethod
-    def set(
-        cls,
-        key: str,
-        value: bool
-    ) -> MongoStateFlagDoc:
-        """
-        Sets new value for a key.
+    If the key does not exist, create a new state flag with given value.
+    """
 
-        If the key does not exist, create a new state flag with given value.
-        """
-        flag: MongoStateFlagDoc
+    try:
+        MongoStateFlagDoc \
+            .get(SearchQuery({"key": key})) \
+            .upd(UpdQuery({"$set": {"value": value}}))
+    except NotFoundErr:
+        MongoStateFlagDoc(key=key, value=value).create()
 
-        try:
-            flag = cls.get(MongoStateFlagSearch(
-                keys=[key]
-            ))[0]
-        except IndexError:
-            flag = MongoStateFlagDoc(key=key, value=value).create()
-        else:
-            flag = flag.upd(Query({"$set": {"value": value}}))
+@classmethod
+async def decide(
+    cls,
+    *,
+    key: str,
+    on_true: Coroutine | None = None,
+    on_false: Coroutine | None = None,
+    finally_set_to: bool,
+    default_flag_on_not_found: bool
+) -> Any:
+    """
+    Takes an action based on flag retrieved value.
 
-        return flag
+    Args:
+        key:
+            Key of the flag to search for.
+        finally_set_to:
+            To which value the flag should be set after the operation is
+            done.
+        default_flag_on_not_found:
+            Which value is to set for the unexistent by key flag.
+        on_true(optional):
+            Function to be called if the flag is True. Nothing is called
+            by default.
+        on_false(optional):
+            Function to be called if the flag is False. Nothing is called
+            by default.
 
-    @classmethod
-    async def decide(
-        cls,
-        *,
-        key: str,
-        on_true: Coroutine | None = None,
-        on_false: Coroutine | None = None,
-        finally_set_to: bool,
-        default_flag_on_not_found: bool
-    ) -> Any:
-        """
-        Takes an action based on flag retrieved value.
+    Returns:
+        Chosen function output. None if no function is used.
+    """
+    result: Any = None
+    flag: MongoStateFlagDoc = cls.get_first_or_set_default(
+        key, default_flag_on_not_found
+    )
 
-        Args:
-            key:
-                Key of the flag to search for.
-            finally_set_to:
-                To which value the flag should be set after the operation is
-                done.
-            default_flag_on_not_found:
-                Which value is to set for the unexistent by key flag.
-            on_true(optional):
-                Function to be called if the flag is True. Nothing is called
-                by default.
-            on_false(optional):
-                Function to be called if the flag is False. Nothing is called
-                by default.
+    if flag.value is True and on_true is not None:
+        result = await on_true
+    if flag.value is False and on_false is not None:
+        result = await on_false
 
-        Returns:
-            Chosen function output. None if no function is used.
-        """
-        result: Any = None
-        flag: MongoStateFlagDoc = cls.get_first_or_set_default(
-            key, default_flag_on_not_found
-        )
+    flag.upd(UpdQuery.create(set={
+        "value": finally_set_to
+    }))
 
-        if flag.value is True and on_true is not None:
-            result = await on_true
-        if flag.value is False and on_false is not None:
-            result = await on_false
-
-        flag.upd(Query({
-            "$set": {
-                "value": finally_set_to
-            }
-        }))
-
-        return result
+    return result
 
 @code("lock_doc_req")
 class LockDocReq(Req):
@@ -1425,7 +1366,7 @@ class LockDocSys(Sys):
     async def _on_check_lock_doc(self, req: CheckLockDocReq):
         doc_map = MongoUtils.try_get(
             req.doc_collection,
-            Query({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}))
+            SearchQuery({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}))
         if not doc_map:
             raise NotFoundErr(
                 f"doc for collection {req.doc_collection} of sid"
@@ -1439,7 +1380,7 @@ class LockDocSys(Sys):
     async def _on_lock_doc(self, req: LockDocReq):
         doc_map = MongoUtils.try_get(
             req.doc_collection,
-            Query({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}))
+            SearchQuery({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}))
 
         if not doc_map:
             raise NotFoundErr(
@@ -1452,14 +1393,14 @@ class LockDocSys(Sys):
 
         MongoUtils.try_upd(
             req.doc_collection,
-            Query({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}),
-            {"$push": {"internal_marks": "locked"}})
+            SearchQuery({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}),
+            UpdQuery.create(push={"internal_marks": "locked"}))
         await self._pub(OkEvt(rsid="").as_res_from_req(req))
 
     async def _on_unlock_doc(self, req: UnlockDocReq):
         doc_map = MongoUtils.try_get(
             req.doc_collection,
-            Query({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}))
+            SearchQuery({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}))
 
         if not doc_map:
             raise NotFoundErr(
@@ -1472,8 +1413,8 @@ class LockDocSys(Sys):
 
         is_updated = MongoUtils.try_upd(
             req.doc_collection,
-            Query({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}),
-            {"$pull": {"internal_marks": "locked"}})
+            SearchQuery({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}),
+            UpdQuery.create(pull={"internal_marks": "locked"}))
         if not is_updated:
             raise ValueErr(
                 f"failed to update for {req.doc_collection}::{req.doc_sid}")

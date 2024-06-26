@@ -1666,7 +1666,7 @@ tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
 
 [[package]]
 name = "pykit"
-version = "0.6.0"
+version = "0.7.0"
 description = "Python toolkit."
 optional = false
 python-versions = "^3.11"
@@ -1678,6 +1678,7 @@ bcrypt = "^4.1.1"
 dictdiffer = "^0.9.0"
 loguru = "^0.7.2"
 pydantic = "^2.5.2"
+pymongo = "^4.7.3"
 python-benedict = "^0.33.0"
 pyyaml = "^6.0.1"
 result = "^0.17.0"
@@ -1685,8 +1686,8 @@ result = "^0.17.0"
 [package.source]
 type = "git"
 url = "https://github.com/slimebones/pykit.git"
-reference = "0.6.0"
-resolved_reference = "292d68a2bdc5248331b195abd8ec4d8a47afd3eb"
+reference = "0.7.0"
+resolved_reference = "486134949f4ba663923d11f5a7f2ee7fee66d0d4"
 
 [[package]]
 name = "pymdown-extensions"
@@ -2149,7 +2150,7 @@ files = [
 
 [[package]]
 name = "rxcat"
-version = "0.2.1"
+version = "0.2.2"
 description = ""
 optional = false
 python-versions = "^3.11"
@@ -2158,13 +2159,13 @@ develop = false
 
 [package.dependencies]
 aiohttp = {version = "^3.9.3", extras = ["speedups"]}
-pykit = {git = "https://github.com/slimebones/pykit.git", rev = "0.6.0"}
+pykit = {git = "https://github.com/slimebones/pykit.git", rev = "0.7.0"}
 
 [package.source]
 type = "git"
 url = "https://github.com/slimebones/pyrxcat.git"
-reference = "0.2.1"
-resolved_reference = "5192cc645e5a3c1d26cbb7fa9159f8aeeb69a341"
+reference = "0.2.2"
+resolved_reference = "63a8949cce13c7973b5943b52005008919602171"
 
 [[package]]
 name = "semver"
@@ -2726,4 +2727,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "db2780190510281155db6d7b316a392af35c888945507bc4a5dd81627d61fea9"
+content-hash = "ab4c93bdf014b6c3333490b3a81989732a2cebc6118a2009695dd81be6cf0369"

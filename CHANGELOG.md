@@ -1,3 +1,9 @@
+# 2.4.6 - UNRELEASED
+
+- mongo: adjusted to new queries
+- mongo: added AggDocReq
+- mongo: restructured MongoStateFlag API
+
 # 2.4.5
 
 - updated rxcat
