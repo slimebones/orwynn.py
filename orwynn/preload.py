@@ -13,7 +13,7 @@ from pydantic import BaseModel
 from pykit.dt import DtUtils
 from pykit.err import InpErr
 from pykit.log import log
-from pykit.query import Query
+from pykit.query import UpdQuery, SearchQuery
 
 from orwynn.cfg import Cfg
 from orwynn.dto import Udto
@@ -89,7 +89,7 @@ class PreloadSys(Sys[PreloadCfg]):
                 f.buf.close()
                 await out_file.write(content)
 
-        preload = preload.upd(Query.as_upd(set={
+        preload = preload.upd(UpdQuery.create(set={
             "filenames": preload.filenames
         }))
 
@@ -110,7 +110,7 @@ class PreloadSys(Sys[PreloadCfg]):
         return f
 
     async def try_get_preload(self, sid: str) -> PreloadDoc | None:
-        f = PreloadDoc.try_get(Query.as_search_sid(sid))
+        f = PreloadDoc.try_get(SearchQuery.create_sid(sid))
         if f is None:
             return None
         return f
