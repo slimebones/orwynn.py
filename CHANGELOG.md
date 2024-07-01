@@ -1,3 +1,7 @@
+# 2.4.7
+
+- mongo: fixed decide() being a classmethod, renamed to decide_state_flag()
+
 # 2.4.6
 
 - mongo: adjusted to new queries

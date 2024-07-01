@@ -1321,53 +1321,6 @@ def set_state_flag(
     except NotFoundErr:
         MongoStateFlagDoc(key=key, value=value).create()
 
-@classmethod
-async def decide(
-    cls,
-    *,
-    key: str,
-    on_true: Coroutine | None = None,
-    on_false: Coroutine | None = None,
-    finally_set_to: bool,
-    default_flag_on_not_found: bool
-) -> Any:
-    """
-    Takes an action based on flag retrieved value.
-
-    Args:
-        key:
-            Key of the flag to search for.
-        finally_set_to:
-            To which value the flag should be set after the operation is
-            done.
-        default_flag_on_not_found:
-            Which value is to set for the unexistent by key flag.
-        on_true(optional):
-            Function to be called if the flag is True. Nothing is called
-            by default.
-        on_false(optional):
-            Function to be called if the flag is False. Nothing is called
-            by default.
-
-    Returns:
-        Chosen function output. None if no function is used.
-    """
-    result: Any = None
-    flag: MongoStateFlagDoc = cls.get_first_or_set_default(
-        key, default_flag_on_not_found
-    )
-
-    if flag.value is True and on_true is not None:
-        result = await on_true
-    if flag.value is False and on_false is not None:
-        result = await on_false
-
-    flag.upd(UpdQuery.create(set={
-        "value": finally_set_to
-    }))
-
-    return result
-
 @code("lock_doc_req")
 class LockDocReq(Req):
     doc_sid: str
@@ -1472,3 +1425,49 @@ def filter_collection_factory(*docs: type[Doc]) -> MsgFilter:
         # get collections in runtime, so we're sure configs are initialized
         return real_collection in [d.get_collection() for d in docs]
     return filter_collection
+
+async def decide_state_flag(
+    *,
+    key: str,
+    on_true: Coroutine | None = None,
+    on_false: Coroutine | None = None,
+    finally_set_to: bool,
+    default_flag_on_not_found: bool
+) -> Any:
+    """
+    Takes an action based on flag retrieved value.
+
+    Args:
+        key:
+            Key of the flag to search for.
+        finally_set_to:
+            To which value the flag should be set after the operation is
+            done.
+        default_flag_on_not_found:
+            Which value is to set for the unexistent by key flag.
+        on_true(optional):
+            Function to be called if the flag is True. Nothing is called
+            by default.
+        on_false(optional):
+            Function to be called if the flag is False. Nothing is called
+            by default.
+
+    Returns:
+        Chosen function output. None if no function is used.
+    """
+    result: Any = None
+    flag = get_first_or_set_default(
+        key, default_flag_on_not_found
+    )
+
+    if flag is True and on_true is not None:
+        result = await on_true
+    if flag is False and on_false is not None:
+        result = await on_false
+
+    set_state_flag(
+        key,
+        finally_set_to
+    )
+
+    return result

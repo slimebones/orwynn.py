@@ -13,7 +13,7 @@ from pydantic import BaseModel
 from pykit.dt import DtUtils
 from pykit.err import InpErr
 from pykit.log import log
-from pykit.query import UpdQuery, SearchQuery
+from pykit.query import SearchQuery, UpdQuery
 
 from orwynn.cfg import Cfg
 from orwynn.dto import Udto
