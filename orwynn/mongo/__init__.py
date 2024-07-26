@@ -17,7 +17,7 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from pydantic import BaseModel
 from pykit.check import check
-from pykit.err import LockErr, NotFoundErr, UnsupportedErr, ValueErr
+from pykit.err import LockErr, NotFoundErr, UnsupportedErr
 from pykit.log import log
 from pykit.mark import MarkErr, MarkUtils
 from pykit.query import (
@@ -26,29 +26,24 @@ from pykit.query import (
     SearchQuery,
     UpdQuery,
 )
-from pykit.search import DbSearch
 from pykit.types import T
 from pymongo import MongoClient
 from pymongo import ReturnDocument as ReturnDocStrat
 from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor as MongoCursor
 from pymongo.database import Database as MongoDb
-from rxcat import Evt, InpErr, Msg, MsgFilter, OkEvt, Req, code
 
 from orwynn.cfg import Cfg
 from orwynn.dto import TUdto, Udto
-from orwynn.env import OrwynnEnvUtils
 from orwynn.mongo.field import DocField, UniqueFieldErr
 from orwynn.models import Flag
-from orwynn.query_exts import CreateQuery
-from orwynn.sys import Sys
 
 __all__ = [
     "DocField"
 ]
 
 # We manage mongo CRUD by Create, Get, Upd and Del requests.
-# Get and Del requests are ready-to-use and fcoded. Create and Upd requests
+# Get and Del requests are ready-to-use and coded. Create and Upd requests
 # are abstract, since we expect user to add custom fields to the req body.
 #
 # By Orwynn convention, we pub GotDocEvt/GotDocsEvt in response to
@@ -58,7 +53,7 @@ __all__ = [
 # For "collection" field, the __default__ db is assumed. Later we might add
 # redefine field to this, but now we're fine.
 
-class DocReq(Req):
+class DocReq(BaseModel):
     def __init__(self, **data):
         for k, v in data.items():
             lower_k = k.lower()

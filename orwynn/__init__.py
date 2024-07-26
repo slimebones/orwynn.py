@@ -1,4 +1,5 @@
 import argparse
+from asyncio import SubprocessTransport
 import functools
 import inspect
 import typing
@@ -16,7 +17,7 @@ from orwynn.cfg import Cfg, CfgPackUtils
 from orwynn import env
 from typing import Any, Generic, Protocol
 from pydantic import BaseModel
-from rxcat import Mbody, ServerBus, SubFnRetval
+from rxcat import Mbody, ServerBus, SubFnRetval, SubOpts
 
 from orwynn.cfg import TCfg
 from orwynn.models import Flag
@@ -40,14 +41,14 @@ class SysFn(Protocol, Generic[TCfg]):
             self, args: SysArgs[TCfg], body: Mbody) -> Any:
         ...
 
-def sys(cfgtype: type[TCfg]):
+def sys(cfgtype: type[TCfg], sub_opts: SubOpts):
     """
     Systems are functions!
     """
     def wrapper(target: SysFn[TCfg]):
         def inner(*args, **kwargs):
             return target(*args, **kwargs)
-        App.sys_init_queue.append((cfgtype, target))
+        App.sys_init_queue.append((cfgtype, target, sub_opts))
         return inner
     return wrapper
 
@@ -67,7 +68,7 @@ class AppCfg(Cfg):
     server_bus_cfg: ServerBusCfg = ServerBusCfg()
 
 class App(Singleton):
-    sys_init_queue: list[tuple[type[Cfg], SysFn]]
+    sys_init_queue: list[tuple[type[Cfg], SysFn, SubOpts]]
     rpcsys_init_queue: list[tuple[type[Cfg], SysFn]]
 
     def __init__(self) -> None:
@@ -115,7 +116,7 @@ class App(Singleton):
     async def _init_sys(self):
         type_to_cfg = await self._gen_type_to_cfg()
 
-        for cfgtype, sysfn in self.sys_init_queue:
+        for cfgtype, sysfn, sub_opts in self.sys_init_queue:
             await self._reg_sys_signature(sysfn)
             cfg = type_to_cfg[cfgtype]
             args = SysArgs(
@@ -123,7 +124,7 @@ class App(Singleton):
                 bus=self._bus,
                 cfg=cfg)
             subfn = functools.partial(sysfn, args)
-            unsub = (await self._bus.sub(subfn)).eject()
+            unsub = (await self._bus.sub(subfn, sub_opts)).eject()
             self._unsubs.append(unsub)
 
         for cfgtype, sysfn in self.rpcsys_init_queue:
