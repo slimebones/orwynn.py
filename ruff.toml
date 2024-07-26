@@ -7,7 +7,9 @@ respect-gitignore = true
 exclude = [
     "docs/source/conf.py",
     ".vscode",
-    "orwynn/legacy"
+    "orwynn/legacy",
+    # TODO: remove once start dev
+    "sql"
 ]
 
 ignore = [

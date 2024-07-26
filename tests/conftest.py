@@ -4,8 +4,8 @@ import pytest_asyncio
 from pykit.fcode import FcodeCore
 from rxcat import ServerBus
 
-from orwynn.app import App
-from orwynn.boot import Boot
+from orwynn import App
+from orwynn import App
 from orwynn.mongo import MongoUtils
 from orwynn.sys import Sys
 from orwynn.tst import Client
@@ -29,7 +29,7 @@ async def autorun():
 
 @pytest_asyncio.fixture
 async def app() -> App:
-    app = await Boot.create_app()
+    app = await App.create_app()
     return app
 
 @pytest_asyncio.fixture
