@@ -1,10 +1,10 @@
 from typing import Any
 
-from orwynn.mongo import MongoUtils
+from orwynn.mongo import Mongo
 
 
 def test_s1():
-    result: dict[str, Any] = MongoUtils.convert_dict({
+    result: dict[str, Any] = Mongo.convert_dict({
         "a1": {
             "a2": "b1",
             "a3": "b2",
@@ -18,7 +18,7 @@ def test_s1():
 
 
 def test_s2():
-    result: dict[str, Any] = MongoUtils.convert_dict({
+    result: dict[str, Any] = Mongo.convert_dict({
         "a1": {
             "a2": {
                 "a3": 10,
@@ -38,7 +38,7 @@ def test_s2():
 
 
 def test_s3():
-    result: dict[str, Any] = MongoUtils.convert_dict({
+    result: dict[str, Any] = Mongo.convert_dict({
         "a1": {
             "a2": {
                 "$in": [1, 2, 3],

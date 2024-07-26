@@ -10,7 +10,7 @@ from pykit.t import delta
 
 from orwynn import SysArgs, sys
 from orwynn.cfg import Cfg
-from orwynn.rbac import PermissionDto, PermissionModel, RbacUtils
+from orwynn.rbac import PermissionDto, PermissionModel
 
 
 class Login(BaseModel):

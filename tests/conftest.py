@@ -6,7 +6,7 @@ from rxcat import ServerBus
 
 from orwynn import App
 from orwynn import App
-from orwynn.mongo import MongoUtils
+from orwynn.mongo import Mongo
 from orwynn.sys import Sys
 from orwynn.tst import Client
 
@@ -25,7 +25,7 @@ async def autorun():
     FcodeCore.deflock = False
     FcodeCore.clean_non_decorator_codes()
     await ServerBus.destroy()
-    await MongoUtils.destroy()
+    await Mongo.destroy()
 
 @pytest_asyncio.fixture
 async def app() -> App:

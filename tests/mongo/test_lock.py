@@ -6,11 +6,11 @@ from pykit.query import SearchQuery, UpdQuery
 from rxcat import OkEvt, ServerBus
 
 from orwynn.mongo import (
-    CheckLockDocReq,
+    CheckLockDoc,
     Doc,
-    LockDocReq,
-    MongoUtils,
-    UnlockDocReq,
+    LockDoc,
+    Mongo,
+    UnlockDoc,
 )
 from orwynn.mongo.field import DocField
 from orwynn.models import Flag
@@ -41,7 +41,7 @@ def test_link_lock(app):
         name: str
         sids: list[str]
 
-    MongoUtils.register_doc_types(Test1Doc, Test2Doc, Test3Doc, Test4Doc)
+    Mongo.reg_doc_types(Test1Doc, Test2Doc, Test3Doc, Test4Doc)
 
     d1 = Test1Doc(name="child").create()
     Test2Doc(name="parent", sids=[d1.sid]).create().lock()
@@ -90,21 +90,21 @@ async def test_sys(app):
     bus = ServerBus.ie()
 
     evt = await bus.pubr(
-        LockDocReq(doc_collection="test_lock_sys_doc", doc_sid=doc.sid))
+        LockDoc(doc_collection="test_lock_sys_doc", doc_sid=doc.sid))
     assert isinstance(evt, OkEvt)
     assert "locked" in doc.refresh().internal_marks
 
-    evt = await bus.pubr(CheckLockDocReq(
+    evt = await bus.pubr(CheckLockDoc(
         doc_collection="test_lock_sys_doc", doc_sid=doc.sid))
     assert isinstance(evt, Flag)
     assert typing.cast(Flag, evt).val is True
 
     evt = await bus.pubr(
-        UnlockDocReq(doc_collection="test_lock_sys_doc", doc_sid=doc.sid))
+        UnlockDoc(doc_collection="test_lock_sys_doc", doc_sid=doc.sid))
     assert isinstance(evt, OkEvt)
     assert "locked" not in doc.refresh().internal_marks
 
-    evt = await bus.pubr(CheckLockDocReq(
+    evt = await bus.pubr(CheckLockDoc(
         doc_collection="test_lock_sys_doc", doc_sid=doc.sid))
     assert isinstance(evt, Flag)
     assert typing.cast(Flag, evt).val is False

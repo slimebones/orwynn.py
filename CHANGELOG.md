@@ -1,5 +1,10 @@
 # 3.0.0
 
+Rebuild to simplify core.
+
+- converted systems to functions
+- implemented plugin architecture
+
 # 2.4.7
 
 - mongo: fixed decide() being a classmethod, renamed to decide_state_flag()

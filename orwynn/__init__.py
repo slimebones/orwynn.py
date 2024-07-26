@@ -4,7 +4,7 @@ import functools
 import inspect
 import typing
 from contextlib import suppress
-from typing import Any, Callable, ClassVar, Coroutine, Literal, Self, TypeVar
+from typing import Any, Callable, ClassVar, Coroutine, Iterable, Literal, Self, TypeVar, runtime_checkable
 
 from pykit.code import Ok
 from pykit.res import Res
@@ -14,6 +14,7 @@ from rxcat import Awaitable, BaseModel, RpcFn, ServerBus, ServerBusCfg, SubFn, v
 
 from orwynn import App
 from orwynn.cfg import Cfg, CfgPackUtils
+from orwynn.plugin import Plugin
 from orwynn import env
 from typing import Any, Generic, Protocol
 from pydantic import BaseModel
@@ -27,7 +28,7 @@ __all__ =[
     "SysFn",
     "sys",
     "rpcsys",
-
+    "Plugin",
     "Flag"
 ]
 
@@ -36,6 +37,7 @@ class SysArgs(BaseModel, Generic[TCfg]):
     bus: ServerBus
     cfg: TCfg
 
+@runtime_checkable
 class SysFn(Protocol, Generic[TCfg]):
     async def __call__(
             self, args: SysArgs[TCfg], body: Mbody) -> Any:
@@ -66,6 +68,7 @@ def rpcsys(cfgtype: type[TCfg]):
 class AppCfg(Cfg):
     std_verbosity: int = 1
     server_bus_cfg: ServerBusCfg = ServerBusCfg()
+    plugins: Iterable[Plugin] = []
 
 class App(Singleton):
     sys_init_queue: list[tuple[type[Cfg], SysFn, SubOpts]]
@@ -137,7 +140,10 @@ class App(Singleton):
             rpcfn = functools.partial(sysfn, args)
             # rpc reg depends on proper function name, which we must fix after
             # applying wrapper
-            setattr(rpcfn, "__name__", sysfn.__name__)  # type: ignore
+            setattr(
+                rpcfn,
+                "__name__",
+                sysfn.__name__.replace("sys__", "sub__"))  # type: ignore
             self._bus.reg_rpc(rpcfn).eject()
 
     async def _reg_sys_signature(self, sysfn: SysFn) -> Res[None]:

@@ -26,6 +26,7 @@ from pykit.query import (
     SearchQuery,
     UpdQuery,
 )
+from pykit.singleton import Singleton
 from pykit.types import T
 from pykit.query import CreateQuery
 from pymongo import MongoClient
@@ -34,14 +35,36 @@ from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor as MongoCursor
 from pymongo.database import Database as MongoDb
 
+from orwynn import SysArgs, env, sys
 from orwynn.cfg import Cfg
 from orwynn.dto import TUdto, Udto
 from orwynn.mongo.field import DocField, UniqueFieldErr
 from orwynn.models import Flag
+from orwynn.plugin import Plugin
 
 __all__ = [
-    "DocField"
+    "DocField",
+    "plugin"
 ]
+
+MongoCompatibleType = str | int | float | bool | list | dict | None
+MongoCompatibleTypes: tuple[Any, ...] = typing.get_args(MongoCompatibleType)
+NamingStyle = Literal["camel_case", "snake_case"]
+class MongoCfg(Cfg):
+    url: str
+    database_name: str
+    must_clean_db_on_destroy: bool = False
+    default__collection_naming: NamingStyle = "snake_case"
+    """
+    Docs, for which COLLECTION_NAMING is not defined explicitly, will
+    use this collection naming style.
+    """
+    default__is_linking_ignoring_lock: bool = True
+    """
+    Docs, for which IS_LINKING_IGNORING_LOCK is not defined explicitly,
+    will use this configuration.
+    """
+    default__is_archivable: bool = False
 
 # We manage mongo CRUD by Create, Get, Upd and Del requests.
 # Get and Del requests are ready-to-use and coded. Create and Upd requests
@@ -164,26 +187,6 @@ class DeldDocEvt(BaseModel):
     def code():
         return "orwynn_mongo::deld_doc"
 
-MongoCompatibleType = str | int | float | bool | list | dict | None
-MongoCompatibleTypes: tuple[Any, ...] = typing.get_args(MongoCompatibleType)
-NamingStyle = Literal["camel_case", "snake_case"]
-
-class MongoCfg(Cfg):
-    url: str
-    database_name: str
-    must_clean_db_on_destroy: bool = False
-    default__collection_naming: NamingStyle = "snake_case"
-    """
-    Docs, for which COLLECTION_NAMING is not defined explicitly, will
-    use this collection naming style.
-    """
-    default__is_linking_ignoring_lock: bool = True
-    """
-    Docs, for which IS_LINKING_IGNORING_LOCK is not defined explicitly,
-    will use this configuration.
-    """
-    default__is_archivable: bool = False
-
 class Doc(BaseModel):
     """
     Mapping to work with MongoDB.
@@ -235,7 +238,8 @@ class Doc(BaseModel):
     @classmethod
     def is_archivable(cls) -> bool:
         if cls.IS_ARCHIVABLE is None:
-            return MongoUtils.cfg.default__is_archivable
+            assert is_global_archivable is not None
+            return is_global_archivable
         return cls.IS_ARCHIVABLE
 
     @classmethod
@@ -288,7 +292,7 @@ class Doc(BaseModel):
     @classmethod
     def is_linking_ignoring_lock(cls) -> bool:
         if cls.IS_LINKING_IGNORING_LOCK is None:
-            return MongoUtils.cfg.default__is_linking_ignoring_lock
+            return Mongo.cfg.default__is_linking_ignoring_lock
         return cls.IS_LINKING_IGNORING_LOCK
 
     @classmethod
@@ -310,7 +314,7 @@ class Doc(BaseModel):
     @classmethod
     def get_collection_naming(cls) -> NamingStyle:
         if cls.COLLECTION_NAMING is None:
-            return MongoUtils.cfg.default__collection_naming
+            return Mongo.cfg.default__collection_naming
         return cls.COLLECTION_NAMING
 
     @classmethod
@@ -332,7 +336,7 @@ class Doc(BaseModel):
 
     @classmethod
     def agg_as_cursor(cls, aq: AggQuery) -> CommandCursor:
-        return aq.apply(MongoUtils.db[cls.get_collection()])
+        return aq.apply(Mongo.db[cls.get_collection()])
 
     @classmethod
     def agg(cls, aq: AggQuery) -> Iterable[Self]:
@@ -423,7 +427,7 @@ class Doc(BaseModel):
 
         check.instance(copied_sq, dict)
 
-        cursor = MongoUtils.get_many(
+        cursor = Mongo.get_many(
             cls.get_collection(),
             copied_sq,
             **kwargs)
@@ -469,7 +473,7 @@ class Doc(BaseModel):
         if not must_search_archived_too:
             cls._exclude_archived_from_search_query(copied_search_query)
 
-        data = MongoUtils.try_get(
+        data = Mongo.try_get(
             cls.get_collection(),
             copied_search_query,
             **kwargs
@@ -509,7 +513,7 @@ class Doc(BaseModel):
         if dump["internal_marks"]:  # non-empty marks in dump
             raise MarkErr("usage of internal_marks on doc creation")
 
-        return self._parse_data_to_doc(MongoUtils.create(
+        return self._parse_data_to_doc(Mongo.create(
             self.get_collection(),
             dump,
             **kwargs
@@ -605,9 +609,9 @@ class Doc(BaseModel):
         if self.is_locked():
             raise LockErr(self)
         self._deattach_from_links(self.sid)
-        return MongoUtils.delete(
+        return Mongo.delete(
             self.get_collection(),
-            SearchQuery({"_id": MongoUtils.convert_to_object_id(self.sid)}),
+            SearchQuery({"_id": Mongo.convert_to_object_id(self.sid)}),
             **kwargs
         )
 
@@ -629,9 +633,9 @@ class Doc(BaseModel):
         if not self.sid or self.is_locked():
             return False
         self._deattach_from_links(self.sid)
-        return MongoUtils.try_del(
+        return Mongo.try_del(
             self.get_collection(),
-            SearchQuery({"_id": MongoUtils.convert_to_object_id(self.sid)}),
+            SearchQuery({"_id": Mongo.convert_to_object_id(self.sid)}),
             **kwargs
         )
 
@@ -713,9 +717,9 @@ class Doc(BaseModel):
                 self._check_field(k, v)
 
         search_query = SearchQuery({
-            "_id": MongoUtils.convert_to_object_id(self.sid)})
+            "_id": Mongo.convert_to_object_id(self.sid)})
 
-        data = MongoUtils.try_upd(
+        data = Mongo.try_upd(
             self.get_collection(),
             search_query,
             uq,
@@ -838,7 +842,7 @@ class Doc(BaseModel):
                 if (
                     isinstance(input_sid_value, (str, dict, list))
                 ):
-                    data["_id"] = MongoUtils.convert_to_object_id(
+                    data["_id"] = Mongo.convert_to_object_id(
                         input_sid_value
                     )
                 else:
@@ -855,384 +859,335 @@ class Doc(BaseModel):
             del data["_id"]
         return data
 
+_client: MongoClient | None = None
+_db: MongoDb | None = None
+_doc_types: dict[str, type[Doc]] = {}
 TDoc = TypeVar("TDoc", bound=Doc)
+async def _init_plugin(args: SysArgs[MongoCfg]):
+    _client = MongoClient(args.cfg.url)
+    _db = _client[args.cfg.database_name]
 
-class MongoSys(Sys[MongoCfg]):
-    async def init(self):
-        self._client: MongoClient = MongoClient(self._cfg.url)
-        self._db: MongoDb = self._client[self._cfg.database_name]
-        await MongoUtils.init(self._client, self._db, self._cfg)
+    for doc_type in Doc.__subclasses__():
+        # set new dict to not leak it between docs
+        if doc_type.get_collection() in self._doc_types:
+            log.err(f"duplicate doc {doc_type}")
+            continue
+        doc_type._BACKLINKS = {}  # noqa: SLF001
+        self._doc_types[doc_type.get_collection()] = doc_type
+    for doc_type in self._doc_types.values():
+        for field in doc_type.FIELDS:
+            self._process_field_link(doc_type, field)
 
-    async def destroy(self):
-        if self._cfg.must_clean_db_on_destroy:
-            MongoUtils.drop_db()
+async def destroy(self):
+    _client = None
+    _db = None
+    _doc_types.clear()
+    if self._cfg.must_clean_db_on_destroy:
+        drop_db()
 
-class MongoUtils:
-    client: MongoClient
-    db: MongoDb
-    cfg: MongoCfg
-    _doc_types: dict[str, type[Doc]]
+def reg_doc_types(*doc_types: type[Doc]):
+    """
+    Registers new doc types.
 
-    @classmethod
-    async def init(cls, client: MongoClient, db: MongoDb, cfg: MongoCfg):
-        cls.client = client
-        cls.db = db
-        cls.cfg = cfg
-        cls._doc_types = {}
+    Useful when some docs are not available in the scope at the init of
+    MongoUtils (like during testing with local classes).
+    """
+    skip_doc_types = []
+    for doc_type in doc_types:
+        # remove already processed types
+        if doc_type in [_doc_types]:
+            skip_doc_types.append(doc_type)
+            continue
+        # set new dict to not leak it between docs
+        doc_type._BACKLINKS = {}  # noqa: SLF001
+        _doc_types[doc_type.get_collection()] = doc_type
+    for doc_type in doc_types:
+        if doc_type in skip_doc_types:
+            continue
+        for field in doc_type.FIELDS:
+            _process_field_link(doc_type, field)
 
-        for doc_type in Doc.__subclasses__():
-            # set new dict to not leak it between docs
-            if doc_type.get_collection() in cls._doc_types:
-                log.err(f"duplicate doc {doc_type}")
-                continue
-            doc_type._BACKLINKS = {}  # noqa: SLF001
-            cls._doc_types[doc_type.get_collection()] = doc_type
-        for doc_type in cls._doc_types.values():
-            for field in doc_type.FIELDS:
-                cls._process_field_link(doc_type, field)
+def _process_field_link(host_doc_type: type[Doc], field: DocField):
+    if field.linked_doc is None:
+        return
+    target = cls.try_get_doc_type(field.linked_doc)
+    if target is None:
+        log.err(
+            f"doc {host_doc_type} links unexistent"
+            f" {field.linked_doc}")
+        return
+    if host_doc_type not in target._BACKLINKS:  # noqa: SLF001
+        target._BACKLINKS[host_doc_type] = []  # noqa: SLF001
+    target._BACKLINKS[host_doc_type].append(  # noqa: SLF001
+        field.name)
 
-    @classmethod
-    def register_doc_types(cls, *doc_types: type[Doc]):
-        """
-        Registers new doc types.
+def try_get_doc_type(name: str) -> type[Doc] | None:
+    return _doc_types.get(name, None)
 
-        Useful when some docs are not available in the scope at the init of
-        MongoUtils (like during testing with local classes).
-        """
-        skip_doc_types = []
-        for doc_type in doc_types:
-            # remove already processed types
-            if doc_type in [cls._doc_types]:
-                skip_doc_types.append(doc_type)
-                continue
-            # set new dict to not leak it between docs
-            doc_type._BACKLINKS = {}  # noqa: SLF001
-            cls._doc_types[doc_type.get_collection()] = doc_type
-        for doc_type in doc_types:
-            if doc_type in skip_doc_types:
-                continue
-            for field in doc_type.FIELDS:
-                cls._process_field_link(doc_type, field)
-
-    @classmethod
-    def _process_field_link(
-            cls, host_doc_type: type[Doc], field: DocField):
-        if field.linked_doc is None:
-            return
-        target = cls.try_get_doc_type(field.linked_doc)
-        if target is None:
-            log.err(
-                f"doc {host_doc_type} links unexistent"
-                f" {field.linked_doc}")
-            return
-        if host_doc_type not in target._BACKLINKS:  # noqa: SLF001
-            target._BACKLINKS[host_doc_type] = []  # noqa: SLF001
-        target._BACKLINKS[host_doc_type].append(  # noqa: SLF001
-            field.name)
-
-    @classmethod
-    async def destroy(cls):
-        with suppress(AttributeError):
-            del cls.client
-        with suppress(AttributeError):
-            del cls.db
-        with suppress(AttributeError):
-            del cls.cfg
-
-    @classmethod
-    def try_get_doc_type(cls, name: str) -> type[Doc] | None:
-        return cls._doc_types.get(name, None)
-
-    @classmethod
-    def drop_db(cls):
-        if not OrwynnEnvUtils.is_debug():
-            return
-        if not OrwynnEnvUtils.is_clean_allowed():
-            return
+def drop_db():
+    if not env.is_debug():
+        return
+    if not env.is_clean_allowed():
+        return
+    if _client is not None and _db is not None:
         log.info("drop mongo db")
-        cls.client.drop_database(cls.db)
+        _client.drop_database(_db)
 
-    @classmethod
-    def try_get(
-        cls,
+def try_get(
         collection: str,
         sq: SearchQuery,
+        **kwargs) -> dict | None:
+    if _client is None or _db is None:
+        raise ValErr("no mongo connection")
+
+    check.instance(collection, str)
+    check.instance(sq, dict)
+
+    result: Any | None = _db[collection].find_one(
+        sq, **kwargs
+    )
+
+    if result is None:
+        return None
+
+    assert isinstance(result, dict)
+    return result
+
+def get_many(
+    collection: str,
+    sq: SearchQuery,
+    **kwargs
+) -> MongoCursor:
+    if _client is None or _db is None:
+        raise ValErr("no mongo connection")
+
+    check.instance(collection, str)
+    check.instance(sq, dict)
+
+    return _db[collection].find(sq, **kwargs)
+
+def create(
+    collection: str,
+    data: dict,
+    **kwargs
+) -> dict:
+    if _client is None or _db is None:
+        raise ValErr("no mongo connection")
+
+    check.instance(collection, str)
+    check.instance(data, dict)
+
+    inserted_id: str = _db[collection].insert_one(
+        data,
         **kwargs
-    ) -> dict | None:
-        check.instance(collection, str)
-        check.instance(sq, dict)
+    ).inserted_id
 
-        result: Any | None = cls.db[collection].find_one(
-            sq, **kwargs
-        )
+    # instead of searching for created document, just replace it's id
+    # with mongo's generated one, which is better for performance
+    copied: dict = data.copy()
+    copied["_id"] = inserted_id
+    return copied
 
-        if result is None:
-            return None
+def try_upd(
+    collection: str,
+    sq: SearchQuery,
+    uq: UpdQuery,
+    **kwargs
+) -> dict | None:
+    """Updates a document matching query and returns updated version."""
+    if _client is None or _db is None:
+        raise ValErr("no mongo connection")
 
-        assert isinstance(result, dict)
-        return result
+    check.instance(collection, str)
+    check.instance(sq, dict)
+    check.instance(uq, dict)
 
-    @classmethod
-    def get_many(
-        cls,
+    upd_doc: Any = _db[collection].find_one_and_update(
+        sq,
+        uq,
+        return_document=ReturnDocStrat.AFTER,
+        **kwargs)
+
+    if upd_doc is None:
+        return None
+
+    assert isinstance(upd_doc, dict)
+    return upd_doc
+
+def delete(
+    collection: str,
+    sq: SearchQuery,
+    **kwargs
+):
+    if _client is None or _db is None:
+        raise ValErr("no mongo connection")
+
+    check.instance(collection, str)
+    check.instance(sq, dict)
+
+    del_result = _db[collection].delete_one(
+        sq,
+        **kwargs)
+
+    if del_result.deleted_count == 0:
+        raise NotFoundErr(f"doc in collection {collection}", sq)
+
+def try_del(
         collection: str,
         sq: SearchQuery,
+        **kwargs) -> bool:
+    if _client is None or _db is None:
+        raise ValErr("no mongo connection")
+
+    check.instance(collection, str)
+    check.instance(sq, dict)
+
+    del_result = _db[collection].delete_one(
+        sq,
         **kwargs
-    ) -> MongoCursor:
-        check.instance(collection, str)
-        check.instance(sq, dict)
+    )
 
-        return cls.db[collection].find(
-            sq, **kwargs
-        )
+    return del_result.deleted_count > 0
 
-    @classmethod
-    def create(
-        cls,
-        collection: str,
-        data: dict,
-        **kwargs
-    ) -> dict:
-        check.instance(collection, str)
-        check.instance(data, dict)
-
-        inserted_id: str = cls.db[collection].insert_one(
-            data,
-            **kwargs
-        ).inserted_id
-
-        # instead of searching for created document, just replace it's id
-        # with mongo's generated one, which is better for performance
-        copied: dict = data.copy()
-        copied["_id"] = inserted_id
-        return copied
-
-    @classmethod
-    def try_upd(
-        cls,
-        collection: str,
+def query_by_nested_dict(
         sq: SearchQuery,
-        uq: UpdQuery,
-        **kwargs
-    ) -> dict | None:
-        """Updates a document matching query and returns updated version."""
-        check.instance(collection, str)
-        check.instance(sq, dict)
-        check.instance(uq, dict)
+        nested_dict: dict[str, Any],
+        root_key: str):
+    """
+    Updates query for searching nested dict values.
 
-        upd_doc: Any = \
-            cls.db[collection].find_one_and_update(
-                sq,
-                uq,
-                return_document=ReturnDocStrat.AFTER,
-                **kwargs
-            )
+    Args:
+        sq:
+            Query to update.
+        nested_dict:
+            Data to search.
+        root_key:
+            Outermost key of field containing the nested dict.
 
-        if upd_doc is None:
-            return None
+    Example:
+    ```python
+    class MyDoc(Doc):
+        mydata: dict
 
-        assert isinstance(upd_doc, dict)
-        return upd_doc
-
-    @classmethod
-    def delete(
-        cls,
-        collection: str,
-        sq: SearchQuery,
-        **kwargs
-    ):
-        check.instance(collection, str)
-        check.instance(sq, dict)
-
-        del_result = cls.db[collection].delete_one(
-            sq,
-            **kwargs
-        )
-
-        if del_result.deleted_count == 0:
-            raise NotFoundErr(f"doc in collection {collection}", sq)
-
-    @classmethod
-    def try_del(
-        cls,
-        collection: str,
-        sq: SearchQuery,
-        **kwargs
-    ) -> bool:
-        check.instance(collection, str)
-        check.instance(sq, dict)
-
-        del_result = cls.db[collection].delete_one(
-            sq,
-            **kwargs
-        )
-
-        return del_result.deleted_count > 0
-
-    @staticmethod
-    def process_search(
-        query: SearchQuery,
-        search: "DocSearch[TDoc]",
-        doc_type: type[TDoc],
-        *,
-        find_all_kwargs: dict | None = None,
-    ) -> list[TDoc]:
-        if find_all_kwargs is None:
-            find_all_kwargs = {}
-
-        result: list[TDoc] = list(doc_type.get_many(
-            query,
-            **find_all_kwargs,
-        ))
-
-        if search.expectation is not None:
-            search.expectation.check(result)
-
-        return result
-
-    @staticmethod
-    def query_by_nested_dict(
-            sq: SearchQuery,
-            nested_dict: dict[str, Any],
-            root_key: str):
-        """
-        Updates query for searching nested dict values.
-
-        Args:
-            sq:
-                Query to update.
-            nested_dict:
-                Data to search.
-            root_key:
-                Outermost key of field containing the nested dict.
-
-        Example:
-        ```python
-        class MyDoc(Doc):
-            mydata: dict
-
-        query = {}
-        nd = {
-            "mycode": {
-                "approximate": {
-                    "$in": [12, 34]
-                }
+    query = {}
+    nd = {
+        "mycode": {
+            "approximate": {
+                "$in": [12, 34]
             }
         }
-        root_key = "mydata"
+    }
+    root_key = "mydata"
 
-        MongoUtils.query_by_nested_dict(
-            query,
-            nd,
-            root_key
-        )
-        # query = {"mydata.mycode.approximate": {"$in": [12, 34]}}
-        ```
-        """
-        converted_data: dict[str, Any] = MongoUtils.convert_dict({
-            root_key: nested_dict,
-        })
-        sq.update(converted_data)
+    MongoUtils.query_by_nested_dict(
+        query,
+        nd,
+        root_key
+    )
+    # query = {"mydata.mycode.approximate": {"$in": [12, 34]}}
+    ```
+    """
+    converted_data: dict[str, Any] = convert_dict({
+        root_key: nested_dict,
+    })
+    sq.update(converted_data)
 
-    @staticmethod
-    def convert_dict(d: dict[str, Any]) -> dict[str, Any]:
-        """
-        Converts dictionary into a Mongo search format.
+def convert_dict(d: dict[str, Any]) -> dict[str, Any]:
+    """
+    Converts dictionary into a Mongo search format.
 
-        All key structures is converted to dot-separated string, e.g.
-        `{"key1": {"key2": {"key3_1": 10, "key3_2": 20}}}` is converted to
-        `{"key1.key2.key3_1": 10, "key1.key2.key3_2": 20}`.
+    All key structures is converted to dot-separated string, e.g.
+    `{"key1": {"key2": {"key3_1": 10, "key3_2": 20}}}` is converted to
+    `{"key1.key2.key3_1": 10, "key1.key2.key3_2": 20}`.
 
-        Keys started with dollar sign are not converted and left as it is:
-        ```python
-        # input
-        {
-            "a1": {
-                "a2": {
-                    "$in": my_list
-                }
-            }
-        }
-
-        # output
-        {
-            "a1.a2": {
+    Keys started with dollar sign are not converted and left as it is:
+    ```python
+    # input
+    {
+        "a1": {
+            "a2": {
                 "$in": my_list
             }
         }
-        ```
-        """
-        result: dict[str, Any] = {}
+    }
 
-        for k, v in d.items():
+    # output
+    {
+        "a1.a2": {
+            "$in": my_list
+        }
+    }
+    ```
+    """
+    result: dict[str, Any] = {}
 
-            if k.startswith("$") or not isinstance(v, dict):
-                result[k] = v
+    for k, v in d.items():
+
+        if k.startswith("$") or not isinstance(v, dict):
+            result[k] = v
+            continue
+
+        for k1, v1 in convert_dict(v).items():
+            if k1.startswith("$"):
+                result[k] = {
+                    k1: v1,
+                }
                 continue
+            result[k + "." + k1] = v1
 
-            for k1, v1 in MongoUtils.convert_dict(v).items():
-                if k1.startswith("$"):
-                    result[k] = {
-                        k1: v1,
-                    }
-                    continue
-                result[k + "." + k1] = v1
+    return result
 
-        return result
+def convert_compatible(obj: Any) -> MongoCompatibleType:
+    """
+    Converts object to mongo compatible type.
 
-    @staticmethod
-    def convert_compatible(obj: Any) -> MongoCompatibleType:
-        """
-        Converts object to mongo compatible type.
+    Convertation rules:
+    - object with type listed in already compatible mongo types is returned
+    as it is
+    - elements of list, as well as dictionary's keys and values are
+    converted recursively using this function
+    - in case of Enum, the Enum's value is obtained and converted through
+    this function
+    - objects with defined attribute `mongovalue` (either by variable or
+    property) is called like `obj.mongovalue` and the result is converted
+    again through this function
+    - for all other types the MongoTypeConversionError is raised
 
-        Convertation rules:
-        - object with type listed in already compatible mongo types is returned
-        as it is
-        - elements of list, as well as dictionary's keys and values are
-        converted recursively using this function
-        - in case of Enum, the Enum's value is obtained and converted through
-        this function
-        - objects with defined attribute `mongovalue` (either by variable or
-        property) is called like `obj.mongovalue` and the result is converted
-        again through this function
-        - for all other types the MongoTypeConversionError is raised
+    Args:
+        obj:
+            Object to convert.
 
-        Args:
-            obj:
-                Object to convert.
+    Raises:
+        MongoTypeConversionError:
+            Cannot convert object to mongo-compatible.
+    """
+    result: MongoCompatibleType
 
-        Raises:
-            MongoTypeConversionError:
-                Cannot convert object to mongo-compatible.
-        """
-        result: MongoCompatibleType
+    if isinstance(obj, dict):
+        result = {}
+        for k, v in obj.items():
+            result[convert_compatible(k)] = \
+                convert_compatible(v)
+    elif isinstance(obj, list):
+        result = []
+        for item in obj:
+            result.append(convert_compatible(item))
+    elif type(obj) in MongoCompatibleTypes:
+        result = obj
+    elif hasattr(obj, "mongovalue"):
+        result = convert_compatible(obj.mongovalue)
+    elif isinstance(obj, Enum):
+        result = convert_compatible(obj.value)
+    else:
+        raise ValueError(f"cannot convert {type(obj)}")
 
-        if isinstance(obj, dict):
-            result = {}
-            for k, v in obj.items():
-                result[MongoUtils.convert_compatible(k)] = \
-                    MongoUtils.convert_compatible(v)
-        elif isinstance(obj, list):
-            result = []
-            for item in obj:
-                result.append(MongoUtils.convert_compatible(item))
-        elif type(obj) in MongoCompatibleTypes:
-            result = obj
-        elif hasattr(obj, "mongovalue"):
-            result = MongoUtils.convert_compatible(obj.mongovalue)
-        elif isinstance(obj, Enum):
-            result = MongoUtils.convert_compatible(obj.value)
-        else:
-            raise ValueError(f"cannot convert {type(obj)}")
+    return result
 
-        return result
+def convert_to_object_id(obj: T) -> T | ObjectId:
+    """
+    Converts an object to ObjectId compliant.
 
-    @classmethod
-    def convert_to_object_id(cls, obj: T) -> T | ObjectId:
-        """
-        Converts an object to ObjectId compliant.
-
-        If the object is:
+    If the object is:
         - string: It is passed directly to ObjectId()
         - dict: All values are recursively converted using this method.
         - list: All items are recursively converted using this method.
@@ -1241,32 +1196,27 @@ class MongoUtils:
         Returns:
             ObjectId-compliant representation of the given object.
         """
-        result: T | ObjectId
+    result: T | ObjectId
 
-        if isinstance(obj, str):
-            try:
-                result = ObjectId(obj)
-            except InvalidId as error:
-                raise ValueError(
-                    f"{obj} is invalid id"
-                ) from error
-        elif isinstance(obj, dict):
-            result = type(obj)()
-            for k, v in obj.items():
-                result[k] = MongoUtils.convert_to_object_id(v)
-        elif isinstance(obj, list):
-            result = type(obj)([
-                MongoUtils.convert_to_object_id(x) for x in obj
-            ])
-        else:
-            result = obj
+    if isinstance(obj, str):
+        try:
+            result = ObjectId(obj)
+        except InvalidId as error:
+            raise ValueError(
+                f"{obj} is invalid id"
+            ) from error
+    elif isinstance(obj, dict):
+        result = type(obj)()
+        for k, v in obj.items():
+            result[k] = convert_to_object_id(v)
+    elif isinstance(obj, list):
+        result = type(obj)([
+            convert_to_object_id(x) for x in obj
+        ])
+    else:
+        result = obj
 
-        return result
-
-class DocSearch(DbSearch[Doc], Generic[TDoc]):
-    """
-    Search Mongo Docs.
-    """
+    return result
 
 class MongoStateFlagDoc(Doc):
     COLLECTION_NAMING = "snake_case"
@@ -1310,45 +1260,51 @@ def set_state_flag(
     except NotFoundErr:
         MongoStateFlagDoc(key=key, value=value).create()
 
-@code("lock_doc_req")
-class LockDocReq(Req):
+class LockDoc(BaseModel):
     doc_sid: str
     doc_collection: str
 
-@code("check_lock_doc_req")
-class CheckLockDocReq(Req):
+    @staticmethod
+    def code():
+        return "orwynn_mongo::lock_dock"
+
+class CheckLockDoc(BaseModel):
     doc_sid: str
     doc_collection: str
 
-@code("unlock_doc_req")
-class UnlockDocReq(Req):
+    @staticmethod
+    def code():
+        return "orwynn_mongo::check_lock_doc"
+
+class UnlockDoc(BaseModel):
     doc_collection: str
     doc_sid: str
 
-class LockDocSys(Sys):
-    async def init(self):
-        await self._sub(LockDocReq, self._on_lock_doc)
-        await self._sub(UnlockDocReq, self._on_unlock_doc)
-        await self._sub(CheckLockDocReq, self._on_check_lock_doc)
+    @staticmethod
+    def code():
+        return "orwynn_mongo::unlock_doc"
 
-    async def _on_check_lock_doc(self, req: CheckLockDocReq):
-        doc_map = MongoUtils.try_get(
-            req.doc_collection,
-            SearchQuery({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}))
+    @sys(MongoCfg)
+    async def sys__check_lock_doc(
+            args: SysArgs[MongoCfg],
+            body: CheckLockDoc):
+        doc_map = Mongo.try_get(
+            body.doc_collection,
+            SearchQuery({"_id": Mongo.convert_to_object_id(body.doc_sid)}))
         if not doc_map:
             raise NotFoundErr(
-                f"doc for collection {req.doc_collection} of sid"
-                f" {req.doc_sid}")
+                f"doc for collection {body.doc_collection} of sid"
+                f" {body.doc_sid}")
 
         internal_marks = doc_map.get("internal_marks", None)
         is_locked = "locked" in internal_marks
 
-        await self._pub(Flag(rsid="", val=is_locked).as_res_from_req(req))
+        await self._pub(Flag(rsid="", val=is_locked).as_res_from_req(body))
 
-    async def _on_lock_doc(self, req: LockDocReq):
-        doc_map = MongoUtils.try_get(
+    async def _on_lock_doc(self, req: LockDoc):
+        doc_map = Mongo.try_get(
             req.doc_collection,
-            SearchQuery({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}))
+            SearchQuery({"_id": Mongo.convert_to_object_id(req.doc_sid)}))
 
         if not doc_map:
             raise NotFoundErr(
@@ -1359,16 +1315,16 @@ class LockDocSys(Sys):
             raise ValueErr(
                 f"{req.doc_collection}::{req.doc_sid} already locked")
 
-        MongoUtils.try_upd(
+        Mongo.try_upd(
             req.doc_collection,
-            SearchQuery({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}),
+            SearchQuery({"_id": Mongo.convert_to_object_id(req.doc_sid)}),
             UpdQuery.create(push={"internal_marks": "locked"}))
         await self._pub(OkEvt(rsid="").as_res_from_req(req))
 
-    async def _on_unlock_doc(self, req: UnlockDocReq):
-        doc_map = MongoUtils.try_get(
+    async def _on_unlock_doc(self, req: UnlockDoc):
+        doc_map = Mongo.try_get(
             req.doc_collection,
-            SearchQuery({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}))
+            SearchQuery({"_id": Mongo.convert_to_object_id(req.doc_sid)}))
 
         if not doc_map:
             raise NotFoundErr(
@@ -1379,9 +1335,9 @@ class LockDocSys(Sys):
             raise ValueErr(
                 f"{req.doc_collection}::{req.doc_sid} already unlocked")
 
-        is_updated = MongoUtils.try_upd(
+        is_updated = Mongo.try_upd(
             req.doc_collection,
-            SearchQuery({"_id": MongoUtils.convert_to_object_id(req.doc_sid)}),
+            SearchQuery({"_id": Mongo.convert_to_object_id(req.doc_sid)}),
             UpdQuery.create(pull={"internal_marks": "locked"}))
         if not is_updated:
             raise ValueErr(
@@ -1460,3 +1416,5 @@ async def decide_state_flag(
     )
 
     return result
+
+plugin = Plugin(name="mongo", init=_init_plugin, destroy=_destroy)
