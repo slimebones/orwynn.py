@@ -13,19 +13,21 @@ from rxcat import Awaitable, BaseModel, RpcFn, ServerBus, ServerBusCfg, SubFn, v
 
 from orwynn import App
 from orwynn.cfg import Cfg, CfgPackUtils
-from orwynn.env import OrwynnEnvUtils
-from orwynn.ws import Ws
+from orwynn import env
 from typing import Any, Generic, Protocol
 from pydantic import BaseModel
 from rxcat import Mbody, ServerBus, SubFnRetval
 
 from orwynn.cfg import TCfg
+from orwynn.models import Flag
 
 __all__ =[
     "SysArgs",
     "SysFn",
     "sys",
-    "rpcsys"
+    "rpcsys",
+
+    "Flag"
 ]
 
 class SysArgs(BaseModel, Generic[TCfg]):
@@ -86,7 +88,7 @@ class App(Singleton):
         self._is_initd = True
 
     def _init_mode(self):
-        self._mode = OrwynnEnvUtils.get_mode()
+        self._mode = env.get_mode()
         log.info(f"chosen mode: {self._mode}", 1)
 
     async def _gen_type_to_cfg(self) -> dict[type[Cfg], Cfg]:
@@ -98,7 +100,7 @@ class App(Singleton):
             if cfg_type is AppCfg:
                 self._cfg = typing.cast(AppCfg, cfg)
                 log.std_verbosity = self._cfg.std_verbosity
-                log.is_debug = OrwynnEnvUtils.is_debug()
+                log.is_debug = env.is_debug()
                 continue
             type_to_cfg[cfg_type] = cfg
         return type_to_cfg
@@ -132,6 +134,9 @@ class App(Singleton):
                 bus=self._bus,
                 cfg=cfg)
             rpcfn = functools.partial(sysfn, args)
+            # rpc reg depends on proper function name, which we must fix after
+            # applying wrapper
+            setattr(rpcfn, "__name__", sysfn.__name__)  # type: ignore
             self._bus.reg_rpc(rpcfn).eject()
 
     async def _reg_sys_signature(self, sysfn: SysFn) -> Res[None]:

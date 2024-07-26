@@ -39,7 +39,7 @@ from orwynn.cfg import Cfg
 from orwynn.dto import TUdto, Udto
 from orwynn.env import OrwynnEnvUtils
 from orwynn.mongo.field import DocField, UniqueFieldErr
-from orwynn.msg import FlagEvt
+from orwynn.models import Flag
 from orwynn.query_exts import CreateQuery
 from orwynn.sys import Sys
 
@@ -1354,7 +1354,7 @@ class LockDocSys(Sys):
         internal_marks = doc_map.get("internal_marks", None)
         is_locked = "locked" in internal_marks
 
-        await self._pub(FlagEvt(rsid="", val=is_locked).as_res_from_req(req))
+        await self._pub(Flag(rsid="", val=is_locked).as_res_from_req(req))
 
     async def _on_lock_doc(self, req: LockDocReq):
         doc_map = MongoUtils.try_get(

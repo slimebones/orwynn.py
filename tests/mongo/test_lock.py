@@ -13,7 +13,7 @@ from orwynn.mongo import (
     UnlockDocReq,
 )
 from orwynn.mongo.field import DocField
-from orwynn.msg import FlagEvt
+from orwynn.models import Flag
 
 
 def test_link_lock(app):
@@ -96,8 +96,8 @@ async def test_sys(app):
 
     evt = await bus.pubr(CheckLockDocReq(
         doc_collection="test_lock_sys_doc", doc_sid=doc.sid))
-    assert isinstance(evt, FlagEvt)
-    assert typing.cast(FlagEvt, evt).val is True
+    assert isinstance(evt, Flag)
+    assert typing.cast(Flag, evt).val is True
 
     evt = await bus.pubr(
         UnlockDocReq(doc_collection="test_lock_sys_doc", doc_sid=doc.sid))
@@ -106,6 +106,6 @@ async def test_sys(app):
 
     evt = await bus.pubr(CheckLockDocReq(
         doc_collection="test_lock_sys_doc", doc_sid=doc.sid))
-    assert isinstance(evt, FlagEvt)
-    assert typing.cast(FlagEvt, evt).val is False
+    assert isinstance(evt, Flag)
+    assert typing.cast(Flag, evt).val is False
 
