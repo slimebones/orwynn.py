@@ -34,7 +34,6 @@ pytest-asyncio = "^0.20.3"
 mkdocs = "^1.4.3"
 mkdocstrings = {extras = ["python"], version = "^0.22.0"}
 mkdocs-material = "^9.1.18"
-pytest-aiohttp = "^1.0.5"
 
 [build-system]
 requires = ["poetry-core"]

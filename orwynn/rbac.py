@@ -2,9 +2,7 @@ from typing import Literal, Self
 
 from pykit.check import CheckErr, check
 from pykit.err import InpErr
-from pykit.fcode import code
 from pykit.query import Query
-from rxcat import BaseModel, ErrEvt, Evt, Msg, OkEvt, Req, ServerBus
 
 from orwynn.cfg import Cfg
 from orwynn.dto import Dto, Udto
@@ -17,7 +15,6 @@ from orwynn.mongo import (
     UpdDocReq,
     filter_collection_factory,
 )
-from orwynn.sys import Sys
 
 
 class PermissionDto(Dto):
@@ -117,100 +114,97 @@ class PermissionSys(Sys):
             dtos=dtos
         ).as_res_from_req(req))
 
-class RbacUtils:
-    _Permissions: list[PermissionModel] = []
+_permissions: list[PermissionModel] = []
 
-    @classmethod
-    def init(cls, cfg: RbacCfg):
-        cls._Permissions = cfg.permissions.copy()
+def init_permissions(cfg: RbacCfg):
+    cls._Permissions = cfg.permissions.copy()
 
-        # check duplicates
-        codes: list[str] = []
+    # check duplicates
+    codes: list[str] = []
+    for p in cls._Permissions:
+        if p.code in codes:
+            raise InpErr(f"duplicate code {p.code}")
+        codes.append(p.code)
+
+@classmethod
+async def req_get_roles_udto(
+    cls,
+    search_query: Query) -> GotDocUdtosEvt | ErrEvt:
+    f = None
+
+    async def on(_, evt):
+        nonlocal f
+        f = evt
+
+    req = GetDocsReq(
+        collection=RoleDoc.get_collection(),
+        searchQuery=search_query
+    )
+    await ServerBus.ie().pub(req, on)
+
+    assert f
+    return f
+
+@classmethod
+def get_permissions_by_codes(
+    cls,
+    codes: list[str]
+) -> list[PermissionModel]:
+    f = []
+    if codes:
         for p in cls._Permissions:
-            if p.code in codes:
-                raise InpErr(f"duplicate code {p.code}")
-            codes.append(p.code)
+            for c in codes:
+                if p.code == c:
+                    f.append(p)
+                    break
+    else:
+        # empty codes will search for everything
+        f = cls._Permissions
+    return f
 
-    @classmethod
-    async def req_get_roles_udto(
-        cls,
-        search_query: Query
-    ) -> GotDocUdtosEvt | ErrEvt:
-        f = None
+@classmethod
+def check_if_registered_permission_code(cls, permission_code: str):
+    for permission in cls._Permissions:
+        if permission.code == permission_code:
+            return
+    raise CheckErr(f"permission code {permission_code} is not registered")
 
-        async def on(_, evt):
-            nonlocal f
-            f = evt
+@classmethod
+def is_any_role_has_permission_to_pubsub_msg(
+    cls,
+    msg: Msg,
+    roles: list[RoleUdto],
+    msg_action: Literal["sub", "pub"]
+) -> bool:
+    permission_codes: set[str] = set()
+    for role in roles:
+        permission_codes.update(role.permissionCodes)
 
-        req = GetDocsReq(
-            collection=RoleDoc.get_collection(),
-            searchQuery=search_query
-        )
-        await ServerBus.ie().pub(req, on)
+    for permission_code in permission_codes:
+        cls.check_if_registered_permission_code(permission_code)
+        if msg_action not in ["sub", "pub"]:
+            raise InpErr(msg_action)
 
-        assert f
-        return f
+        permissions: dict[Literal["sub", "pub"], list[str]] | None = \
+            getattr(
+                msg,
+                "Permissions",
+                None
+            )
+        if not permissions:
+            return False
+        check.instance(permissions, dict)
 
-    @classmethod
-    def get_permissions_by_codes(
-        cls,
-        codes: list[str]
-    ) -> list[PermissionModel]:
-        f = []
-        if codes:
-            for p in cls._Permissions:
-                for c in codes:
-                    if p.code == c:
-                        f.append(p)
-                        break
-        else:
-            # empty codes will search for everything
-            f = cls._Permissions
-        return f
+        action_permissions = permissions.get(msg_action, None)
+        if not action_permissions:
+            return False
 
-    @classmethod
-    def check_if_registered_permission_code(cls, permission_code: str):
-        for permission in cls._Permissions:
-            if permission.code == permission_code:
-                return
-        raise CheckErr(f"permission code {permission_code} is not registered")
+        check.instance(action_permissions, list)
+        return permission_code in action_permissions
 
-    @classmethod
-    def is_any_role_has_permission_to_pubsub_msg(
-        cls,
-        msg: Msg,
-        roles: list[RoleUdto],
-        msg_action: Literal["sub", "pub"]
-    ) -> bool:
-        permission_codes: set[str] = set()
-        for role in roles:
-            permission_codes.update(role.permissionCodes)
-
-        for permission_code in permission_codes:
-            cls.check_if_registered_permission_code(permission_code)
-            if msg_action not in ["sub", "pub"]:
-                raise InpErr(msg_action)
-
-            permissions: dict[Literal["sub", "pub"], list[str]] | None = \
-                getattr(
-                    msg,
-                    "Permissions",
-                    None
-                )
-            if not permissions:
-                return False
-            check.instance(permissions, dict)
-
-            action_permissions = permissions.get(msg_action, None)
-            if not action_permissions:
-                return False
-
-            check.instance(action_permissions, list)
-            return permission_code in action_permissions
-
-        return False
+    return False
 
 class RbacSys(Sys[RbacCfg]):
-    async def init(self):
-        RbacUtils.init(self._cfg)
+async def init(self):
+    RbacUtils.init(self._cfg)
 
