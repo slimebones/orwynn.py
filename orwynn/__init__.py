@@ -25,6 +25,7 @@ __all__ =[
     "SysArgs",
     "SysFn",
     "sys",
+    "rpcsys"
 ]
 
 class SysArgs(BaseModel, Generic[TCfg]):

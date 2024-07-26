@@ -4,13 +4,13 @@ import jwt
 from pydantic import BaseModel
 from pykit.check import check
 from pykit.log import log
-from pykit.res import Res
-from pykit.res import Ok
+from pykit.res import Ok, Err, Res
 from rxcat import Awaitable, sub
+from pykit.t import delta
 
+from orwynn import SysArgs, sys
 from orwynn.cfg import Cfg
 from orwynn.rbac import PermissionDto, PermissionModel, RbacUtils
-from orwynn.sys import Sys
 
 
 class Login(BaseModel):
@@ -82,20 +82,24 @@ class AuthCfg(Cfg):
 
     auth_token_secret: str
     auth_token_algo: str = "HS256"
-    auth_token_exp_time: float = 2592000  # 30 days
+    auth_token_lifetime: float = 2592000  # 30 days
 
     class Config:
         arbitrary_types_allowed = True
 
-@sub
-async def _on_login_req(self, req: Login):
-    user_sid = await self._cfg.check_user_func(req)
+@sys(AuthCfg)
+async def sys__login(args: SysArgs[AuthCfg], body: Login):
+    user_sid = await args.cfg.check_user_func(body)
 
     if not user_sid:
         raise AuthErr("wrong user data")
 
-    token, exp = self._encode_jwt(user_sid)
-    permission_codes = await self._cfg.try_login_user(user_sid, token, exp)
+    token, exp = _encode_jwt(
+        user_sid,
+        args.cfg.auth_token_secret,
+        args.cfg.auth_token_algo,
+        args.cfg.auth_token_lifetime)
+    permission_codes = await args.cfg.try_login_user(user_sid, token, exp)
     if permission_codes is None:
         raise AuthErr("failed to login user")
 
@@ -103,60 +107,59 @@ async def _on_login_req(self, req: Login):
         RbacUtils.get_permissions_by_codes(permission_codes)
     )
 
-    evt = Logged(
-        rsid=req.msid,
-        m_target_connsids=req.get_res_connsids(),
+    log.info(f"logged user sid {user_sid}", 2)
+    return Ok(Logged(
         permissions=permission_dtos,
         user_sid=user_sid,
         user_auth_token=token,
-        user_auth_token_exp=exp
-    )
-    log.info(f"logged user sid {user_sid}", 2)
-    await self._pub(evt)
+        user_auth_token_exp=exp))
 
-async def _on_logout_req(self, req: Logout):
-    # todo: for now logout can be made even with old token, need to ensure
+
+@sys(AuthCfg)
+async def sys__logout(args: SysArgs, body: Logout):
+    # TODO: for now logout can be made even with old token, need to ensure
     #       user has this token
 
-    # if token expired, logout must not be prohibited
-    user_sid = self._decode_jwt(req.auth_token, should_verify_exp=False)
-    logout_ok = await self._cfg.try_logout_user(user_sid)
+    # if the token has been expired, logout must not be prohibited
+    user_sid = _decode_jwt(
+        body.auth_token,
+        args.cfg.auth_token_secret,
+        args.cfg.auth_token_algo,
+        False)
+    logout_ok = await args.cfg.try_logout_user(user_sid)
     if not logout_ok:
-        raise AuthErr(f"logout for user sid {user_sid} failed")
+        return Err(AuthErr(f"logout for user sid {user_sid} failed"))
     log.info(f"logged out user sid {user_sid}", 2)
-    await self._pub(
-        LoggedOut(
-            rsid=req.msid,
-            m_target_connsids=req.get_res_connsids(),
-            userSid=user_sid
-        )
-    )
+    return Ok(LoggedOut(user_sid=user_sid))
 
-def _encode_jwt(self, user_sid: str) -> tuple[str, float]:
-    exp = DtUtils.get_delta_timestamp(self._cfg.auth_token_exp_time)
+def _encode_jwt(
+        user_sid: str,
+        secret: str,
+        algo: str,
+        lifetime: float) -> tuple[str, float]:
+    exp = delta(lifetime)
     token: str = jwt.encode(
         {
-            "userSid": user_sid,
+            "user_sid": user_sid,
             "exp": exp
         },
-        key=self._cfg.auth_token_secret,
-        algorithm=self._cfg.auth_token_algo
-    )
+        key=secret,
+        algorithm=algo)
 
     return token, exp
 
 def _decode_jwt(
-    self,
-    auth_token: str,
-    should_verify_exp: bool = True
-) -> str:
+        token: str,
+        secret: str,
+        algo: str,
+        verify_exp: bool = True) -> str:
     try:
         data: dict = jwt.decode(
-            auth_token,
-            key=self._cfg.auth_token_secret,
-            algorithms=[self._cfg.auth_token_algo],
+            token,
+            key=secret,
+            algorithms=[algo],
             options={
-                "verify_exp": should_verify_exp,
+                "verify_exp": verify_exp,
             }
         )
     except jwt.exceptions.ExpiredSignatureError as err:
