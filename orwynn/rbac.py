@@ -7,12 +7,12 @@ from pykit.query import Query
 from orwynn.cfg import Cfg
 from orwynn.dto import Dto, Udto
 from orwynn.mongo import (
-    CreateDocReq,
-    DelDocReq,
+    CreateDoc,
+    DelDoc,
     Doc,
-    GetDocsReq,
-    GotDocUdtosEvt,
-    UpdDocReq,
+    GetDocs,
+    GotDocUdtos,
+    UpdDoc,
     filter_collection_factory,
 )
 
@@ -79,25 +79,25 @@ class RoleSys(Sys):
     ]
 
     async def enable(self):
-        await self._sub(GetDocsReq, self._on_get_docs)
-        await self._sub(CreateDocReq, self._on_create_doc)
-        await self._sub(UpdDocReq, self._on_upd_doc)
-        await self._sub(DelDocReq, self._on_del_doc)
+        await self._sub(GetDocs, self._on_get_docs)
+        await self._sub(CreateDoc, self._on_create_doc)
+        await self._sub(UpdDoc, self._on_upd_doc)
+        await self._sub(DelDoc, self._on_del_doc)
 
-    async def _on_get_docs(self, req: GetDocsReq):
-        docs = list(RoleDoc.get_many(req.searchQuery))
-        await self._pub(RoleDoc.to_got_doc_udtos_evt(req, docs))
+    async def _on_get_docs(self, req: GetDocs):
+        docs = list(RoleDoc.get_many(req.searchq))
+        await self._pub(RoleDoc.to_got_doc_udtos(req, docs))
 
-    async def _on_create_doc(self, req: CreateDocReq):
-        doc = RoleDoc(**req.createQuery).create()
-        await self._pub(doc.to_got_doc_udto_evt(req))
+    async def _on_create_doc(self, req: CreateDoc):
+        doc = RoleDoc(**req.createq).create()
+        await self._pub(doc.to_got_doc_udto(req))
 
-    async def _on_upd_doc(self, req: UpdDocReq):
-        doc = RoleDoc.get_and_upd(req.searchQuery, req.updQuery)
-        await self._pub(doc.to_got_doc_udto_evt(req))
+    async def _on_upd_doc(self, req: UpdDoc):
+        doc = RoleDoc.get_and_upd(req.searchq, req.updq)
+        await self._pub(doc.to_got_doc_udto(req))
 
-    async def _on_del_doc(self, req: DelDocReq):
-        delf = RoleDoc.try_get_and_del(req.searchQuery)
+    async def _on_del_doc(self, req: DelDoc):
+        delf = RoleDoc.try_get_and_del(req.searchq)
         if delf:
             await self._pub(OkEvt(rsid="").as_res_from_req(req))
 
@@ -129,16 +129,16 @@ def init_permissions(cfg: RbacCfg):
 @classmethod
 async def req_get_roles_udto(
     cls,
-    search_query: Query) -> GotDocUdtosEvt | ErrEvt:
+    search_query: Query) -> GotDocUdtos | ErrEvt:
     f = None
 
     async def on(_, evt):
         nonlocal f
         f = evt
 
-    req = GetDocsReq(
+    req = GetDocs(
         collection=RoleDoc.get_collection(),
-        searchQuery=search_query
+        searchq=search_query
     )
     await ServerBus.ie().pub(req, on)
 

@@ -17,7 +17,7 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from pydantic import BaseModel
 from pykit.check import check
-from pykit.err import LockErr, NotFoundErr, UnsupportedErr
+from pykit.err import InpErr, LockErr, NotFoundErr, UnsupportedErr, ValErr
 from pykit.log import log
 from pykit.mark import MarkErr, MarkUtils
 from pykit.query import (
@@ -27,6 +27,7 @@ from pykit.query import (
     UpdQuery,
 )
 from pykit.types import T
+from pykit.query import CreateQuery
 from pymongo import MongoClient
 from pymongo import ReturnDocument as ReturnDocStrat
 from pymongo.command_cursor import CommandCursor
@@ -59,10 +60,9 @@ class DocReq(BaseModel):
             lower_k = k.lower()
             if lower_k.endswith(("query", "q")):
                 if not isinstance(v, (dict, Query)):
-                    raise InpErr(
+                    raise ValErr(
                         "val for key ending with \"Query\" is"
-                         " expected to be of type dict/Query"
-                    )
+                         " expected to be of type dict/Query")
                 if isinstance(v, dict):
                     # convert v to according query
                     if lower_k.startswith("search") or lower_k == "sq":
@@ -77,62 +77,92 @@ class DocReq(BaseModel):
                         data[k] = Query(v)
         super().__init__(**data)
 
-@code("get-docs-req")
-class GetDocsReq(DocReq):
+class GetDocs(DocReq):
     collection: str
-    searchQuery: SearchQuery
+    searchq: SearchQuery
 
-@code("got-doc-udto-evt")
-class GotDocUdtoEvt(Evt, Generic[TUdto]):
+    @staticmethod
+    def code():
+        return "orwynn_mongo::get_docs"
+
+class GotDocUdto(BaseModel, Generic[TUdto]):
     collection: str
     udto: TUdto
 
-@code("got-doc-udtos-evt")
-class GotDocUdtosEvt(Evt, Generic[TUdto]):
+    @staticmethod
+    def code():
+        return "orwynn_mongo::got_doc_udto"
+
+class GotDocUdtos(BaseModel, Generic[TUdto]):
     collection: str
     udtos: list[TUdto]
 
-@code("del-doc-req")
-class DelDocReq(DocReq):
+    @staticmethod
+    def code():
+        return "orwynn_mongo::got_doc_udtos"
+
+class DelDoc(DocReq):
     collection: str
-    searchQuery: SearchQuery
+    searchq: SearchQuery
 
-@code("create-doc-req")
-class CreateDocReq(DocReq):
+    @staticmethod
+    def code():
+        return "orwynn_mongo::del_doc"
+
+class CreateDoc(DocReq):
     collection: str
-    createQuery: CreateQuery
+    createq: CreateQuery
 
-@code("upd-doc-req")
-class UpdDocReq(DocReq):
+    @staticmethod
+    def code():
+        return "orwynn_mongo::create_doc"
+
+class UpdDoc(DocReq):
     collection: str
-    searchQuery: SearchQuery
-    updQuery: UpdQuery
+    searchq: SearchQuery
+    updq: UpdQuery
 
-@code("agg_doc_req")
-class AggDocReq(DocReq):
+    @staticmethod
+    def code():
+        return "orwynn_mongo::upd_doc"
+
+class AggDoc(DocReq):
     collection: str
-    aq: AggQuery
+    aggq: AggQuery
 
-class UpdedField(BaseModel):
-    fieldName: str
-    oldValue: Any
-    newValue: Any
+    @staticmethod
+    def code():
+        return "orwynn_mongo::agg_doc"
 
-@code("created-doc-evt")
-class CreatedDocEvt(Evt):
+class UpddField(BaseModel):
+    fieldname: str
+    oldval: Any
+    newval: Any
+
+class CreatedDocEvt(BaseModel):
     collection: str
     sid: str
 
-@code("updd-doc-evt")
-class UpddDocEvt(Evt):
-    collection: str
-    sid: str
-    updedFields: list[UpdedField]
+    @staticmethod
+    def code():
+        return "orwynn_mongo::created_doc"
 
-@code("deld-doc-evt")
-class DeldDocEvt(Evt):
+class UpddDocEvt(BaseModel):
     collection: str
     sid: str
+    updd_fields: list[UpddField]
+
+    @staticmethod
+    def code():
+        return "orwynn_mongo::updd_doc"
+
+class DeldDocEvt(BaseModel):
+    collection: str
+    sid: str
+
+    @staticmethod
+    def code():
+        return "orwynn_mongo::deld_doc"
 
 MongoCompatibleType = str | int | float | bool | list | dict | None
 MongoCompatibleTypes: tuple[Any, ...] = typing.get_args(MongoCompatibleType)
@@ -266,52 +296,16 @@ class Doc(BaseModel):
         return [doc.to_udto() for doc in docs]
 
     @classmethod
-    def to_got_doc_udtos_evt(
-        cls,
-        req: Req,
-        docs: Iterable[Self],
-        *,
-        override_to_connsids: list[str] | None = None
-    ) -> GotDocUdtosEvt:
+    def to_got_doc_udtos(cls, docs: Iterable[Self]) -> GotDocUdtos:
         udtos = cls.to_udtos(docs)
-        rsid = req.msid
-
-        to_connsids = []
-        if override_to_connsids:
-            to_connsids = override_to_connsids
-        elif req.m_connsid is not None:
-            to_connsids = [req.m_connsid]
-
-        return GotDocUdtosEvt(
-            rsid=rsid,
-            m_target_connsids=to_connsids,
-            collection=cls.get_collection(),
-            udtos=udtos
-        )
+        return GotDocUdtos(collection=cls.get_collection(), udtos=udtos)
 
     def to_udto(self) -> Udto:
         raise NotImplementedError
 
-    def to_got_doc_udto_evt(
-        self,
-        req: Req,
-        *,
-        override_to_connsids: list[str] | None = None
-    ) -> GotDocUdtoEvt:
-        rsid = req.msid
-
-        to_connsids = []
-        if override_to_connsids:
-            to_connsids = override_to_connsids
-        elif req.m_connsid is not None:
-            to_connsids = [req.m_connsid]
-
-        return GotDocUdtoEvt(
-            rsid=rsid,
-            m_target_connsids=to_connsids,
-            collection=self.get_collection(),
-            udto=self.to_udto()
-        )
+    def to_got_doc_udto(self) -> GotDocUdto:
+        return GotDocUdto(
+            collection=self.get_collection(), udto=self.to_udto())
 
     @classmethod
     def get_collection_naming(cls) -> NamingStyle:
