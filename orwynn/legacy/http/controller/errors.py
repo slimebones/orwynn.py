@@ -1,5 +1,0 @@
-
-
-
-class DefinedTwiceControllerMethodError(Exception):
-    pass

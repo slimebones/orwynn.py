@@ -1,4 +1,0 @@
-Provider = object
-"""
-Injectable entity.
-"""
