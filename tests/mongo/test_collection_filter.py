@@ -3,7 +3,7 @@ from pykit.check import check
 from pykit.fcode import code
 from rxcat import OkEvt, PubOpts, Req, ServerBus
 
-from orwynn.mongo import Doc, filter_collection_factory
+from orwynn.mongo import Doc, body_collection_factory
 from orwynn.sys import Sys
 
 
@@ -16,7 +16,7 @@ class TestCollectionFilterDoc(Doc):
 
 class _Sys1(Sys):
     CommonSubMsgFilters = [
-        filter_collection_factory(TestCollectionFilterDoc)]
+        body_collection_factory(TestCollectionFilterDoc)]
 
     async def init(self):
         await self._sub(_Req1, self._on_req1)

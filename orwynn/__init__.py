@@ -43,7 +43,7 @@ class SysFn(Protocol, Generic[TCfg]):
             self, args: SysArgs[TCfg], body: Mbody) -> Any:
         ...
 
-def sys(cfgtype: type[TCfg], sub_opts: SubOpts):
+def sys(cfgtype: type[TCfg], sub_opts: SubOpts = SubOpts()):
     """
     Systems are functions!
     """

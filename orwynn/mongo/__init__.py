@@ -26,6 +26,7 @@ from pykit.query import (
     SearchQuery,
     UpdQuery,
 )
+from pykit.res import Res, Ok, Err
 from pykit.singleton import Singleton
 from pykit.types import T
 from pykit.query import CreateQuery
@@ -33,6 +34,7 @@ from pymongo import MongoClient
 from pymongo import ReturnDocument as ReturnDocStrat
 from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor as MongoCursor
+from rxcat import MbodyCondition
 from pymongo.database import Database as MongoDb
 
 from orwynn import SysArgs, env, sys
@@ -65,6 +67,16 @@ class MongoCfg(Cfg):
     will use this configuration.
     """
     default__is_archivable: bool = False
+
+def _get_global_cfg() -> MongoCfg:
+    if _g__cfg is None:
+        raise ValErr(f"non-initialized mongo plugin")
+    return _g__cfg
+
+def _get_global_db() -> MongoDb:
+    if _g__db is None:
+        raise ValErr(f"non-initialized mongo plugin")
+    return _g__db
 
 # We manage mongo CRUD by Create, Get, Upd and Del requests.
 # Get and Del requests are ready-to-use and coded. Create and Upd requests
@@ -238,8 +250,7 @@ class Doc(BaseModel):
     @classmethod
     def is_archivable(cls) -> bool:
         if cls.IS_ARCHIVABLE is None:
-            assert is_global_archivable is not None
-            return is_global_archivable
+            return _get_global_cfg().default__is_archivable
         return cls.IS_ARCHIVABLE
 
     @classmethod
@@ -292,7 +303,7 @@ class Doc(BaseModel):
     @classmethod
     def is_linking_ignoring_lock(cls) -> bool:
         if cls.IS_LINKING_IGNORING_LOCK is None:
-            return Mongo.cfg.default__is_linking_ignoring_lock
+            return _get_global_cfg().default__is_linking_ignoring_lock
         return cls.IS_LINKING_IGNORING_LOCK
 
     @classmethod
@@ -314,7 +325,7 @@ class Doc(BaseModel):
     @classmethod
     def get_collection_naming(cls) -> NamingStyle:
         if cls.COLLECTION_NAMING is None:
-            return Mongo.cfg.default__collection_naming
+            return _get_global_cfg().default__collection_naming
         return cls.COLLECTION_NAMING
 
     @classmethod
@@ -336,7 +347,7 @@ class Doc(BaseModel):
 
     @classmethod
     def agg_as_cursor(cls, aq: AggQuery) -> CommandCursor:
-        return aq.apply(Mongo.db[cls.get_collection()])
+        return aq.apply(_get_global_db()[cls.get_collection()])
 
     @classmethod
     def agg(cls, aq: AggQuery) -> Iterable[Self]:
@@ -427,7 +438,7 @@ class Doc(BaseModel):
 
         check.instance(copied_sq, dict)
 
-        cursor = Mongo.get_many(
+        cursor = get_many(
             cls.get_collection(),
             copied_sq,
             **kwargs)
@@ -473,7 +484,7 @@ class Doc(BaseModel):
         if not must_search_archived_too:
             cls._exclude_archived_from_search_query(copied_search_query)
 
-        data = Mongo.try_get(
+        data = try_get(
             cls.get_collection(),
             copied_search_query,
             **kwargs
@@ -513,7 +524,7 @@ class Doc(BaseModel):
         if dump["internal_marks"]:  # non-empty marks in dump
             raise MarkErr("usage of internal_marks on doc creation")
 
-        return self._parse_data_to_doc(Mongo.create(
+        return self._parse_data_to_doc(create(
             self.get_collection(),
             dump,
             **kwargs
@@ -609,9 +620,9 @@ class Doc(BaseModel):
         if self.is_locked():
             raise LockErr(self)
         self._deattach_from_links(self.sid)
-        return Mongo.delete(
+        return delete(
             self.get_collection(),
-            SearchQuery({"_id": Mongo.convert_to_object_id(self.sid)}),
+            SearchQuery({"_id": convert_to_object_id(self.sid)}),
             **kwargs
         )
 
@@ -633,9 +644,9 @@ class Doc(BaseModel):
         if not self.sid or self.is_locked():
             return False
         self._deattach_from_links(self.sid)
-        return Mongo.try_del(
+        return try_del(
             self.get_collection(),
-            SearchQuery({"_id": Mongo.convert_to_object_id(self.sid)}),
+            SearchQuery({"_id": convert_to_object_id(self.sid)}),
             **kwargs
         )
 
@@ -717,9 +728,9 @@ class Doc(BaseModel):
                 self._check_field(k, v)
 
         search_query = SearchQuery({
-            "_id": Mongo.convert_to_object_id(self.sid)})
+            "_id": convert_to_object_id(self.sid)})
 
-        data = Mongo.try_upd(
+        data = try_upd(
             self.get_collection(),
             search_query,
             uq,
@@ -842,7 +853,7 @@ class Doc(BaseModel):
                 if (
                     isinstance(input_sid_value, (str, dict, list))
                 ):
-                    data["_id"] = Mongo.convert_to_object_id(
+                    data["_id"] = convert_to_object_id(
                         input_sid_value
                     )
                 else:
@@ -859,9 +870,6 @@ class Doc(BaseModel):
             del data["_id"]
         return data
 
-_client: MongoClient | None = None
-_db: MongoDb | None = None
-_doc_types: dict[str, type[Doc]] = {}
 TDoc = TypeVar("TDoc", bound=Doc)
 async def _init_plugin(args: SysArgs[MongoCfg]) -> Res[None]:
     _client = MongoClient(args.cfg.url)
@@ -869,21 +877,26 @@ async def _init_plugin(args: SysArgs[MongoCfg]) -> Res[None]:
 
     for doc_type in Doc.__subclasses__():
         # set new dict to not leak it between docs
-        if doc_type.get_collection() in self._doc_types:
+        if doc_type.get_collection() in _g__doc_types:
             log.err(f"duplicate doc {doc_type}")
             continue
         doc_type._BACKLINKS = {}  # noqa: SLF001
-        self._doc_types[doc_type.get_collection()] = doc_type
-    for doc_type in self._doc_types.values():
+        _g__doc_types[doc_type.get_collection()] = doc_type
+    for doc_type in _g__doc_types.values():
         for field in doc_type.FIELDS:
-            self._process_field_link(doc_type, field)
+            _process_field_link(doc_type, field)
+
+    return Ok(None)
 
 async def _destroy_plugin(args: SysArgs[MongoCfg]) -> Res[None]:
-    _client = None
-    _db = None
-    _doc_types.clear()
-    if self._cfg.must_clean_db_on_destroy:
+    _g__client = None
+    _g__db = None
+    _g__doc_types.clear()
+
+    if _get_global_cfg().must_clean_db_on_destroy:
         drop_db()
+
+    return Ok(None)
 
 def reg_doc_types(*doc_types: type[Doc]):
     """
@@ -895,12 +908,12 @@ def reg_doc_types(*doc_types: type[Doc]):
     skip_doc_types = []
     for doc_type in doc_types:
         # remove already processed types
-        if doc_type in [_doc_types]:
+        if doc_type in [_g__doc_types]:
             skip_doc_types.append(doc_type)
             continue
         # set new dict to not leak it between docs
         doc_type._BACKLINKS = {}  # noqa: SLF001
-        _doc_types[doc_type.get_collection()] = doc_type
+        _g__doc_types[doc_type.get_collection()] = doc_type
     for doc_type in doc_types:
         if doc_type in skip_doc_types:
             continue
@@ -910,7 +923,7 @@ def reg_doc_types(*doc_types: type[Doc]):
 def _process_field_link(host_doc_type: type[Doc], field: DocField):
     if field.linked_doc is None:
         return
-    target = cls.try_get_doc_type(field.linked_doc)
+    target = try_get_doc_type(field.linked_doc)
     if target is None:
         log.err(
             f"doc {host_doc_type} links unexistent"
@@ -922,28 +935,28 @@ def _process_field_link(host_doc_type: type[Doc], field: DocField):
         field.name)
 
 def try_get_doc_type(name: str) -> type[Doc] | None:
-    return _doc_types.get(name, None)
+    return _g__doc_types.get(name, None)
 
 def drop_db():
     if not env.is_debug():
         return
     if not env.is_clean_allowed():
         return
-    if _client is not None and _db is not None:
+    if _g__client is not None and _g__db is not None:
         log.info("drop mongo db")
-        _client.drop_database(_db)
+        _g__client.drop_database(_g__db)
 
 def try_get(
         collection: str,
         sq: SearchQuery,
         **kwargs) -> dict | None:
-    if _client is None or _db is None:
+    if _g__client is None or _g__db is None:
         raise ValErr("no mongo connection")
 
     check.instance(collection, str)
     check.instance(sq, dict)
 
-    result: Any | None = _db[collection].find_one(
+    result: Any | None = _g__db[collection].find_one(
         sq, **kwargs
     )
 
@@ -958,26 +971,26 @@ def get_many(
     sq: SearchQuery,
     **kwargs
 ) -> MongoCursor:
-    if _client is None or _db is None:
+    if _g__client is None or _g__db is None:
         raise ValErr("no mongo connection")
 
     check.instance(collection, str)
     check.instance(sq, dict)
 
-    return _db[collection].find(sq, **kwargs)
+    return _g__db[collection].find(sq, **kwargs)
 
 def create(
     collection: str,
     data: dict,
     **kwargs
 ) -> dict:
-    if _client is None or _db is None:
+    if _g__client is None or _g__db is None:
         raise ValErr("no mongo connection")
 
     check.instance(collection, str)
     check.instance(data, dict)
 
-    inserted_id: str = _db[collection].insert_one(
+    inserted_id: str = _g__db[collection].insert_one(
         data,
         **kwargs
     ).inserted_id
@@ -995,14 +1008,14 @@ def try_upd(
     **kwargs
 ) -> dict | None:
     """Updates a document matching query and returns updated version."""
-    if _client is None or _db is None:
+    if _g__client is None or _g__db is None:
         raise ValErr("no mongo connection")
 
     check.instance(collection, str)
     check.instance(sq, dict)
     check.instance(uq, dict)
 
-    upd_doc: Any = _db[collection].find_one_and_update(
+    upd_doc: Any = _g__db[collection].find_one_and_update(
         sq,
         uq,
         return_document=ReturnDocStrat.AFTER,
@@ -1019,13 +1032,13 @@ def delete(
     sq: SearchQuery,
     **kwargs
 ):
-    if _client is None or _db is None:
+    if _g__client is None or _g__db is None:
         raise ValErr("no mongo connection")
 
     check.instance(collection, str)
     check.instance(sq, dict)
 
-    del_result = _db[collection].delete_one(
+    del_result = _g__db[collection].delete_one(
         sq,
         **kwargs)
 
@@ -1036,13 +1049,13 @@ def try_del(
         collection: str,
         sq: SearchQuery,
         **kwargs) -> bool:
-    if _client is None or _db is None:
+    if _g__client is None or _g__db is None:
         raise ValErr("no mongo connection")
 
     check.instance(collection, str)
     check.instance(sq, dict)
 
-    del_result = _db[collection].delete_one(
+    del_result = _g__db[collection].delete_one(
         sq,
         **kwargs
     )
@@ -1266,7 +1279,7 @@ class LockDoc(BaseModel):
 
     @staticmethod
     def code():
-        return "orwynn_mongo::lock_dock"
+        return "orwynn_mongo::lock_doc"
 
 class CheckLockDoc(BaseModel):
     doc_sid: str
@@ -1284,67 +1297,67 @@ class UnlockDoc(BaseModel):
     def code():
         return "orwynn_mongo::unlock_doc"
 
-    @sys(MongoCfg)
-    async def sys__check_lock_doc(
-            args: SysArgs[MongoCfg],
-            body: CheckLockDoc):
-        doc_map = Mongo.try_get(
-            body.doc_collection,
-            SearchQuery({"_id": Mongo.convert_to_object_id(body.doc_sid)}))
-        if not doc_map:
-            raise NotFoundErr(
-                f"doc for collection {body.doc_collection} of sid"
-                f" {body.doc_sid}")
+@sys(MongoCfg)
+async def sys__check_lock_doc(
+        args: SysArgs[MongoCfg],
+        body: CheckLockDoc):
+    doc_map = try_get(
+        body.doc_collection,
+        SearchQuery({"_id": convert_to_object_id(body.doc_sid)}))
+    if not doc_map:
+        raise NotFoundErr(
+            f"doc for collection {body.doc_collection} of sid"
+            f" {body.doc_sid}")
 
-        internal_marks = doc_map.get("internal_marks", None)
-        is_locked = "locked" in internal_marks
+    internal_marks = doc_map.get("internal_marks", None)
+    is_locked = "locked" in internal_marks
 
-        await self._pub(Flag(rsid="", val=is_locked).as_res_from_req(body))
+    return Ok(Flag(val=is_locked))
 
-    async def _on_lock_doc(self, req: LockDoc):
-        doc_map = Mongo.try_get(
-            req.doc_collection,
-            SearchQuery({"_id": Mongo.convert_to_object_id(req.doc_sid)}))
+@sys(MongoCfg)
+async def sys__lock_doc(args: SysArgs[MongoCfg], body: LockDoc):
+    doc_map = try_get(
+        body.doc_collection,
+        SearchQuery({"_id": convert_to_object_id(body.doc_sid)}))
 
-        if not doc_map:
-            raise NotFoundErr(
-                f"doc for collection {req.doc_collection} of sid"
-                f" {req.doc_sid}")
-        internal_marks = doc_map.get("internal_marks", None)
-        if "locked" in internal_marks:
-            raise ValueErr(
-                f"{req.doc_collection}::{req.doc_sid} already locked")
+    if not doc_map:
+        raise NotFoundErr(
+            f"doc for collection {body.doc_collection} of sid"
+            f" {body.doc_sid}")
+    internal_marks = doc_map.get("internal_marks", None)
+    if "locked" in internal_marks:
+        raise ValErr(
+            f"{body.doc_collection}::{body.doc_sid} already locked")
 
-        Mongo.try_upd(
-            req.doc_collection,
-            SearchQuery({"_id": Mongo.convert_to_object_id(req.doc_sid)}),
-            UpdQuery.create(push={"internal_marks": "locked"}))
-        await self._pub(OkEvt(rsid="").as_res_from_req(req))
+    try_upd(
+        body.doc_collection,
+        SearchQuery({"_id": convert_to_object_id(body.doc_sid)}),
+        UpdQuery.create(push={"internal_marks": "locked"}))
 
-    async def _on_unlock_doc(self, req: UnlockDoc):
-        doc_map = Mongo.try_get(
-            req.doc_collection,
-            SearchQuery({"_id": Mongo.convert_to_object_id(req.doc_sid)}))
+@sys(MongoCfg)
+async def sys__unlock_doc(args: SysArgs[MongoCfg], body: UnlockDoc):
+    doc_map = try_get(
+        body.doc_collection,
+        SearchQuery({"_id": convert_to_object_id(body.doc_sid)}))
 
-        if not doc_map:
-            raise NotFoundErr(
-                f"doc for collection {req.doc_collection} of sid"
-                f" {req.doc_sid}")
-        internal_marks = doc_map.get("internal_marks", None)
-        if "locked" not in internal_marks:
-            raise ValueErr(
-                f"{req.doc_collection}::{req.doc_sid} already unlocked")
+    if not doc_map:
+        raise NotFoundErr(
+            f"doc for collection {body.doc_collection} of sid"
+            f" {body.doc_sid}")
+    internal_marks = doc_map.get("internal_marks", None)
+    if "locked" not in internal_marks:
+        raise ValErr(
+            f"{body.doc_collection}::{body.doc_sid} already unlocked")
 
-        is_updated = Mongo.try_upd(
-            req.doc_collection,
-            SearchQuery({"_id": Mongo.convert_to_object_id(req.doc_sid)}),
-            UpdQuery.create(pull={"internal_marks": "locked"}))
-        if not is_updated:
-            raise ValueErr(
-                f"failed to update for {req.doc_collection}::{req.doc_sid}")
-        await self._pub(OkEvt(rsid="").as_res_from_req(req))
+    is_updated = try_upd(
+        body.doc_collection,
+        SearchQuery({"_id": convert_to_object_id(body.doc_sid)}),
+        UpdQuery.create(pull={"internal_marks": "locked"}))
+    if not is_updated:
+        raise ValErr(
+            f"failed to update for {body.doc_collection}::{body.doc_sid}")
 
-def filter_collection_factory(*docs: type[Doc]) -> MsgFilter:
+def body_collection_factory(*docs: type[Doc]) -> MbodyCondition:
     """
     Filters incoming msg to have a certain collection.
 
@@ -1354,13 +1367,13 @@ def filter_collection_factory(*docs: type[Doc]) -> MsgFilter:
     If collection field exists, but it is not a str, true is returned,
     but warning is issued.
     """
-    async def filter_collection(msg: Msg) -> bool:
-        real_collection = getattr(msg, "collection", None)
+    async def condition(body: Any) -> bool:
+        real_collection = getattr(body, "collection", None)
         if real_collection is None:
             return True
         if not isinstance(real_collection, str):
             log.warn(
-                f"{msg} uses \"collection\" field = {real_collection},"
+                f"{body} uses \"collection\" field = {real_collection},"
                 " which is not instance of str, and probably has not intention"
                 " to connect it with database collection"
                 " => return true from this filter"
@@ -1369,7 +1382,7 @@ def filter_collection_factory(*docs: type[Doc]) -> MsgFilter:
 
         # get collections in runtime, so we're sure configs are initialized
         return real_collection in [d.get_collection() for d in docs]
-    return filter_collection
+    return condition
 
 async def decide_state_flag(
     *,
@@ -1422,3 +1435,8 @@ plugin = Plugin(
     cfgtype=MongoCfg,
     init=_init_plugin,
     destroy=_destroy_plugin)
+
+_g__client: MongoClient | None = None
+_g__db: MongoDb | None = None
+_g__doc_types: dict[str, type[Doc]] = {}
+_g__cfg: MongoCfg | None = None

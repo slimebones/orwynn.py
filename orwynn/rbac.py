@@ -13,7 +13,7 @@ from orwynn.mongo import (
     GetDocs,
     GotDocUdtos,
     UpdDoc,
-    filter_collection_factory,
+    body_collection_factory,
 )
 
 
@@ -75,7 +75,7 @@ class RbacCfg(Cfg):
 
 class RoleSys(Sys):
     CommonSubMsgFilters = [
-        filter_collection_factory(RoleDoc)
+        body_collection_factory(RoleDoc)
     ]
 
     async def enable(self):
