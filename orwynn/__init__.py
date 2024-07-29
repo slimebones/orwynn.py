@@ -26,7 +26,7 @@ from rxcat import (
 )
 
 from orwynn import env
-from orwynn._cfg import Cfg, CfgPackUtils, TCfg
+from orwynn._cfg import Cfg, CfgPackUtils, TCfg, CfgPack
 from orwynn._models import Dto, Fdto, Flag, TDto, TFdto, TUdto, Udto
 from orwynn._plugin import Plugin
 
@@ -34,6 +34,7 @@ __all__ =[
     "App",
     "AppCfg",
     "Cfg",
+    "CfgPack",
     "SysArgs",
     "SysFn",
     "sys",
@@ -88,6 +89,7 @@ class AppCfg(Cfg):
     std_verbosity: int = 1
     server_bus_cfg: ServerBusCfg = ServerBusCfg()
     plugins: Iterable[Plugin] = []
+    extend_cfg_pack: CfgPack = {}
 
 class App(Singleton):
     sys_init_queue: list[tuple[type[Cfg], SysFn, SubOpts]]
@@ -167,6 +169,7 @@ class App(Singleton):
 
     async def _gen_type_to_cfg(self) -> dict[type[Cfg], Cfg]:
         cfg_pack = await CfgPackUtils.init_cfg_pack()
+        cfg_pack.update(self._cfg.extend_cfg_pack)
         cfgsf = await CfgPackUtils.bake_cfgs(self._mode, cfg_pack)
         type_to_cfg: dict[type[Cfg], Cfg] = {}
         for cfg in cfgsf:

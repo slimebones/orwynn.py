@@ -25,7 +25,12 @@ def app_cfg() -> AppCfg:
                     is_server=True,
                     conn_type=MockConn
                 )
-            ]))
+            ]),
+        extend_cfg_pack={
+            "test": [
+                MockCfg(num=1)
+            ]
+        })
 
 class MockConn(Conn[None]):
     def __init__(self, args: ConnArgs[None]) -> None:
