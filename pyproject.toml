@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "orwynn"
+name = "sb-orwynn"
 version = "2.4.7"
 description = "Scalable web-framework with out-of-the-box architecture"
 homepage = "https://orwynn.ryzhovalex.com"
@@ -10,6 +10,9 @@ keywords = [
 repository = "https://github.com/ryzhovalex/orwynn"
 authors = ["ryzhovalex <thed4rkof@gmail.com>"]
 readme = "README.md"
+packages = [
+    { include = "orwynn" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -18,7 +21,7 @@ typing-extensions = "^4.7.1"
 
 pydantic = "^2.6.0"
 aiofiles = "^23.2.1"
-rxcat = {git = "https://github.com/slimebones/pyrxcat.git", rev = "1.0.2"}
+sb-rxcat = "^1.0.2"
 inflection = "^0.5.1"
 
 [tool.poetry.group.dev.dependencies]

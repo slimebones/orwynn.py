@@ -1,13 +1,9 @@
+from asyncio import Queue
 import os
-
+from typing import Self
 import pytest_asyncio
-from pykit.fcode import FcodeCore
-from rxcat import ServerBus
-
-from orwynn import App
-from orwynn.mongo import Mongo
-from orwynn.sys import Sys
-from orwynn.tst import Client
+from orwynn import App, AppCfg, Cfg
+from rxcat import Conn, ConnArgs, ServerBusCfg, Transport
 
 
 @pytest_asyncio.fixture(autouse=True)
@@ -17,21 +13,49 @@ async def autorun():
     os.environ["ORWYNN_ALLOW_CLEAN"] = "1"
 
     yield
+    await App.ie().destroy(is_hard=True)
 
-    for sys_type in Sys.__subclasses__():
-        await sys_type._internal_destroy()  # noqa: SLF001
+def app_cfg() -> AppCfg:
+    return AppCfg(
+        server_bus_cfg=ServerBusCfg(
+            transports=[
+                Transport(
+                    is_server=True,
+                    conn_type=MockConn
+                )
+            ]))
 
-    FcodeCore.deflock = False
-    FcodeCore.clean_non_decorator_codes()
-    await ServerBus.destroy()
-    await Mongo.destroy()
+class MockConn(Conn[None]):
+    def __init__(self, args: ConnArgs[None]) -> None:
+        super().__init__(args)
+        self.inp_queue: Queue[dict] = Queue()
+        self.out_queue: Queue[dict] = Queue()
+
+    def __aiter__(self) -> Self:
+        return self
+
+    async def __anext__(self) -> dict:
+        return await self.recv()
+
+    async def recv(self) -> dict:
+        return await self.inp_queue.get()
+
+    async def send(self, data: dict):
+        await self.out_queue.put(data)
+
+    async def close(self):
+        self._is_closed = True
+
+    async def client__send(self, data: dict):
+        await self.inp_queue.put(data)
+
+    async def client__recv(self) -> dict:
+        return await self.out_queue.get()
 
 @pytest_asyncio.fixture
-async def app() -> App:
-    app = await App.create_app()
+async def app(cfg: AppCfg) -> App:
+    app = await App().init(cfg)
     return app
 
-@pytest_asyncio.fixture
-async def client(app: App, aiohttp_client):
-    return Client(await aiohttp_client(app))
-
+class MockCfg(Cfg):
+    num: int

@@ -1516,38 +1516,14 @@ files = [
 windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
-name = "pykit"
-version = "0.12.3"
-description = "Python toolkit."
-optional = false
-python-versions = "^3.11"
-files = []
-develop = false
-
-[package.dependencies]
-aiofile = "^3.8.8"
-bcrypt = "^4.1.1"
-dictdiffer = "^0.9.0"
-loguru = "^0.7.2"
-pydantic = "^2.5.2"
-pymongo = "^4.7.3"
-pyyaml = "^6.0.1"
-
-[package.source]
-type = "git"
-url = "https://github.com/slimebones/pykit.git"
-reference = "0.12.3"
-resolved_reference = "ca3255d337949f897c97166c730bddeb02cc7d66"
-
-[[package]]
 name = "pymdown-extensions"
-version = "10.8.1"
+version = "10.9"
 description = "Extension pack for Python Markdown."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pymdown_extensions-10.8.1-py3-none-any.whl", hash = "sha256:f938326115884f48c6059c67377c46cf631c733ef3629b6eed1349989d1b30cb"},
-    {file = "pymdown_extensions-10.8.1.tar.gz", hash = "sha256:3ab1db5c9e21728dabf75192d71471f8e50f216627e9a1fa9535ecb0231b9940"},
+    {file = "pymdown_extensions-10.9-py3-none-any.whl", hash = "sha256:d323f7e90d83c86113ee78f3fe62fc9dee5f56b54d912660703ea1816fed5626"},
+    {file = "pymdown_extensions-10.9.tar.gz", hash = "sha256:6ff740bcd99ec4172a938970d42b96128bdc9d4b9bcad72494f29921dc69b753"},
 ]
 
 [package.dependencies]
@@ -1891,23 +1867,39 @@ files = [
 ]
 
 [[package]]
-name = "rxcat"
+name = "sb-pykit"
+version = "0.12.3"
+description = "Python toolkit."
+optional = false
+python-versions = "<4.0,>=3.11"
+files = [
+    {file = "sb_pykit-0.12.3-py3-none-any.whl", hash = "sha256:24f66058b1b402d1943281fcef29cd92c2924a0c7a1df3351c80b0413428e4ac"},
+    {file = "sb_pykit-0.12.3.tar.gz", hash = "sha256:073a24567215c618140730c37497cd1a11022678c6211e4fd31ff948fc538630"},
+]
+
+[package.dependencies]
+aiofile = ">=3.8.8,<4.0.0"
+bcrypt = ">=4.1.1,<5.0.0"
+dictdiffer = ">=0.9.0,<0.10.0"
+loguru = ">=0.7.2,<0.8.0"
+pydantic = ">=2.5.2,<3.0.0"
+pymongo = ">=4.7.3,<5.0.0"
+pyyaml = ">=6.0.1,<7.0.0"
+
+[[package]]
+name = "sb-rxcat"
 version = "1.0.2"
 description = ""
 optional = false
-python-versions = "^3.11"
-files = []
-develop = false
+python-versions = "<4.0,>=3.11"
+files = [
+    {file = "sb_rxcat-1.0.2-py3-none-any.whl", hash = "sha256:40e4faa66d5cf6a646b67e4454d906aea62ea5c99b7b09e14e444c6eb62e5094"},
+    {file = "sb_rxcat-1.0.2.tar.gz", hash = "sha256:dbd77fe7c0d821aaf5e5619f6792caacf2a8ccbade3e7d8abbf69b0c5f8e5117"},
+]
 
 [package.dependencies]
-aiohttp = {version = "^3.9.3", extras = ["speedups"]}
-pykit = {git = "https://github.com/slimebones/pykit.git", rev = "0.12.3"}
-
-[package.source]
-type = "git"
-url = "https://github.com/slimebones/pyrxcat.git"
-reference = "1.0.2"
-resolved_reference = "5e11d374934150a1a29ff8b8059f99299e623724"
+aiohttp = {version = ">=3.9.3,<4.0.0", extras = ["speedups"]}
+sb-pykit = ">=0.12.3,<0.13.0"
 
 [[package]]
 name = "semver"
@@ -2123,4 +2115,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "afc79de643aba221846bfec918f4daab93e329b4979d58d1123c37b8571b03a7"
+content-hash = "80e42b65325fed6f1f31b3f54efdc79f8b3709c2353d8ee57c841dc204303b6d"

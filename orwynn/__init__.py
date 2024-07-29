@@ -7,6 +7,7 @@ from typing import (
     Generic,
     Iterable,
     Protocol,
+    Self,
     runtime_checkable,
 )
 
@@ -30,6 +31,9 @@ from orwynn._models import Dto, Fdto, Flag, TDto, TFdto, TUdto, Udto
 from orwynn._plugin import Plugin
 
 __all__ =[
+    "App",
+    "AppCfg",
+    "Cfg",
     "SysArgs",
     "SysFn",
     "sys",
@@ -90,9 +94,9 @@ class App(Singleton):
     def __init__(self) -> None:
         self._is_initd = False
 
-    async def init(self, cfg: AppCfg):
+    async def init(self, cfg: AppCfg = AppCfg()) -> Self:
         if self._is_initd:
-            return
+            return self
 
         self._bus = ServerBus.ie()
         self._unsubs: list[Callable[[], Awaitable[Res[None]]]] = []
@@ -108,7 +112,9 @@ class App(Singleton):
 
         self._is_initd = True
 
-    async def destroy(self, is_hard: bool = False):
+        return self
+
+    async def destroy(self, *, is_hard: bool = False):
         # destroy plugins
         for plugin in self._plugins:
             if plugin.cfgtype not in self._type_to_cfg:
@@ -131,6 +137,9 @@ class App(Singleton):
         if is_hard:
             self.sys_init_queue.clear()
             self.rpcsys_init_queue.clear()
+
+        # destroy bus data since it's deeply associated with the app
+        await self._bus.destroy()
 
     async def _init_plugins(self):
         for plugin in self._plugins:
