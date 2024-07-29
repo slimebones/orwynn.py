@@ -1,7 +1,7 @@
-from orwynn import AppCfg, App, Plugin, SysArgs
-from pykit.res import Res, Ok
-from rxcat import ServerBus, ServerBusCfg, Transport
+from pykit.res import Ok, Res
+from rxcat import ServerBusCfg, Transport
 
+from orwynn import App, AppCfg, Plugin, SysArgs
 from tests.conftest import MockCfg, MockConn
 
 

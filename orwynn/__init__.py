@@ -25,7 +25,7 @@ from rxcat import (
     valerr,
 )
 
-from orwynn import App, _env
+from orwynn import env
 from orwynn._cfg import Cfg, CfgPackUtils, TCfg
 from orwynn._models import Dto, Fdto, Flag, TDto, TFdto, TUdto, Udto
 from orwynn._plugin import Plugin
@@ -49,9 +49,12 @@ __all__ =[
 ]
 
 class SysArgs(BaseModel, Generic[TCfg]):
-    app: App
+    app: "App"
     bus: ServerBus
     cfg: TCfg
+
+    class Config:
+        arbitrary_types_allowed = True
 
 @runtime_checkable
 class SysFn(Protocol, Generic[TCfg]):
@@ -115,6 +118,10 @@ class App(Singleton):
         return self
 
     async def destroy(self, *, is_hard: bool = False):
+        if not self._is_initd:
+            return
+        self._is_initd = False
+
         # destroy plugins
         for plugin in self._plugins:
             if plugin.cfgtype not in self._type_to_cfg:
@@ -155,7 +162,7 @@ class App(Singleton):
                     await log.atrack(err, f"({plugin}) init")
 
     def _init_mode(self):
-        self._mode = _env.get_mode()
+        self._mode = env.get_mode()
         log.info(f"chosen mode: {self._mode}", 1)
 
     async def _gen_type_to_cfg(self) -> dict[type[Cfg], Cfg]:
@@ -167,7 +174,7 @@ class App(Singleton):
             if cfg_type is AppCfg:
                 self._cfg = typing.cast(AppCfg, cfg)
                 log.std_verbosity = self._cfg.std_verbosity
-                log.is_debug = _env.is_debug()
+                log.is_debug = env.is_debug()
                 continue
             type_to_cfg[cfg_type] = cfg
         return type_to_cfg

@@ -1,15 +1,17 @@
-from typing import Generic, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Generic, Protocol, runtime_checkable
 
 from pydantic import BaseModel
 from pykit.res import Res
 
-from orwynn import SysArgs
 from orwynn._cfg import TCfg
+
+if TYPE_CHECKING:
+    from orwynn import SysArgs
 
 
 @runtime_checkable
 class PluginFn(Protocol, Generic[TCfg]):
-    async def __call__(self, args: SysArgs[TCfg]) -> Res[None]: ...
+    async def __call__(self, args: "SysArgs[TCfg]") -> Res[None]: ...
 
 class Plugin(BaseModel, Generic[TCfg]):
     name: str
@@ -19,3 +21,6 @@ class Plugin(BaseModel, Generic[TCfg]):
 
     def __str__(self) -> str:
         return f"< plugin {self.name} of cfgtype {self.cfgtype} >"
+
+    class Config:
+        arbitrary_types_allowed = True

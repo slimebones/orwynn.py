@@ -1,9 +1,11 @@
-from asyncio import Queue
 import os
+from asyncio import Queue
 from typing import Self
+
 import pytest_asyncio
-from orwynn import App, AppCfg, Cfg
 from rxcat import Conn, ConnArgs, ServerBusCfg, Transport
+
+from orwynn import App, AppCfg, Cfg
 
 
 @pytest_asyncio.fixture(autouse=True)
