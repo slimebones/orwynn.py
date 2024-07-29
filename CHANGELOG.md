@@ -4,6 +4,7 @@ Rebuild to simplify core.
 
 - converted systems to functions
 - implemented plugin architecture
+- moved plugins to separate repos
 
 # 2.4.7
 
