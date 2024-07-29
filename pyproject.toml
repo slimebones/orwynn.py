@@ -14,9 +14,6 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 loguru = "^0.7.2"
-pyjwt = "^2.6.0"
-sqlalchemy = "^2.0.3"
-psycopg2 = "^2.9.5"
 typing-extensions = "^4.7.1"
 
 pydantic = "^2.6.0"
