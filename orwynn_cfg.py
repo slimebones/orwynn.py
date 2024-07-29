@@ -1,5 +1,5 @@
-from orwynn.admin import handle_get_codes
 from orwynn import AppCfg, RouteSpec
+from orwynn.admin import handle_get_codes
 from orwynn.mongo import MongoCfg
 from orwynn.preload import PreloadCfg, handle_preload
 

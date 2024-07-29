@@ -1,27 +1,33 @@
-import argparse
-from asyncio import SubprocessTransport
 import functools
 import inspect
 import typing
-from contextlib import suppress
-from typing import Any, Callable, ClassVar, Coroutine, Iterable, Literal, Self, TypeVar, runtime_checkable
+from typing import (
+    Any,
+    Callable,
+    Generic,
+    Iterable,
+    Protocol,
+    runtime_checkable,
+)
 
-from pykit.code import Err, Ok
-from pykit.res import Res, aresultify
-from pykit.log import log
-from pykit.singleton import Singleton
-from rxcat import Awaitable, BaseModel, RpcFn, ServerBus, ServerBusCfg, SubFn, valerr
-
-from orwynn import App
-from orwynn._cfg import Cfg, CfgPackUtils
-from orwynn._plugin import Plugin
-from orwynn import _env
-from typing import Any, Generic, Protocol
 from pydantic import BaseModel
-from rxcat import Mbody, ServerBus, SubFnRetval, SubOpts
+from pykit.code import Ok
+from pykit.log import log
+from pykit.res import Res
+from pykit.singleton import Singleton
+from rxcat import (
+    Awaitable,
+    Mbody,
+    ServerBus,
+    ServerBusCfg,
+    SubOpts,
+    valerr,
+)
 
-from orwynn._cfg import TCfg
-from orwynn._models import Flag, Udto, Dto, Fdto, TDto, TUdto, TFdto
+from orwynn import App, _env
+from orwynn._cfg import Cfg, CfgPackUtils, TCfg
+from orwynn._models import Dto, Fdto, Flag, TDto, TFdto, TUdto, Udto
+from orwynn._plugin import Plugin
 
 __all__ =[
     "SysArgs",
@@ -79,6 +85,7 @@ class AppCfg(Cfg):
 class App(Singleton):
     sys_init_queue: list[tuple[type[Cfg], SysFn, SubOpts]]
     rpcsys_init_queue: list[tuple[type[Cfg], SysFn]]
+    _SYS_SIGNATURE_PARAMS_LEN: int = 2
 
     def __init__(self) -> None:
         self._is_initd = False
@@ -178,16 +185,13 @@ class App(Singleton):
             rpcfn = functools.partial(sysfn, args)
             # rpc reg depends on proper function name, which we must fix after
             # applying wrapper
-            setattr(
-                rpcfn,
-                "__name__",
-                sysfn.__name__.replace("sys__", "sub__"))  # type: ignore
+            rpcfn.__name__ = sysfn.__name__.replace("sys__", "sub__")  # type: ignore
             self._bus.reg_rpc(rpcfn).eject()
 
     async def _reg_sys_signature(self, sysfn: SysFn) -> Res[None]:
         signature = inspect.signature(sysfn)
         params = list(signature.parameters.values())
-        if len(params) != 2:
+        if len(params) != self._SYS_SIGNATURE_PARAMS_LEN:
             return valerr(f"sysfn {sysfn} must accept only two args => skip")
         if params[0].annotation is not SysArgs:
             return valerr(

@@ -1,4 +1,4 @@
-from pykit.env import getenv_bool, getenv
+from pykit.env import getenv, getenv_bool
 
 
 def is_debug() -> bool:

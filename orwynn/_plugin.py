@@ -1,9 +1,11 @@
-from typing import Any, Coroutine, Generic, Iterable, Protocol, runtime_checkable
+from typing import Generic, Protocol, runtime_checkable
+
 from pydantic import BaseModel
 from pykit.res import Res
 
 from orwynn import SysArgs
 from orwynn._cfg import TCfg
+
 
 @runtime_checkable
 class PluginFn(Protocol, Generic[TCfg]):

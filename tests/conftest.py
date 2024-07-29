@@ -5,7 +5,6 @@ from pykit.fcode import FcodeCore
 from rxcat import ServerBus
 
 from orwynn import App
-from orwynn import App
 from orwynn.mongo import Mongo
 from orwynn.sys import Sys
 from orwynn.tst import Client
