@@ -1,6 +1,6 @@
 import pytest
 
-from orwynn.cfg import Cfg, CfgPackUtils
+from orwynn._cfg import Cfg, CfgPackUtils
 
 
 class _Cfg1(Cfg):

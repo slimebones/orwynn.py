@@ -1,5 +1,5 @@
+from pydantic import BaseModel
 from typing import TypeVar
-
 from pydantic import BaseModel
 
 
@@ -24,4 +24,11 @@ class Fdto(Udto):
 TDto = TypeVar("TDto", bound=Dto)
 TUdto = TypeVar("TUdto", bound=Udto)
 TFdto = TypeVar("TFdto", bound=Fdto)
+
+class Flag(BaseModel):
+    val: bool
+
+    @staticmethod
+    def code():
+        return "orwynn::flag"
 

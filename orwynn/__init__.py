@@ -13,15 +13,15 @@ from pykit.singleton import Singleton
 from rxcat import Awaitable, BaseModel, RpcFn, ServerBus, ServerBusCfg, SubFn, valerr
 
 from orwynn import App
-from orwynn.cfg import Cfg, CfgPackUtils
-from orwynn.plugin import Plugin
-from orwynn import env
+from orwynn._cfg import Cfg, CfgPackUtils
+from orwynn._plugin import Plugin
+from orwynn import _env
 from typing import Any, Generic, Protocol
 from pydantic import BaseModel
 from rxcat import Mbody, ServerBus, SubFnRetval, SubOpts
 
-from orwynn.cfg import TCfg
-from orwynn.models import Flag
+from orwynn._cfg import TCfg
+from orwynn._models import Flag, Udto, Dto, Fdto, TDto, TUdto, TFdto
 
 __all__ =[
     "SysArgs",
@@ -29,7 +29,13 @@ __all__ =[
     "sys",
     "rpcsys",
     "Plugin",
-    "Flag"
+    "Flag",
+    "Dto",
+    "Udto",
+    "Fdto",
+    "TDto",
+    "TUdto",
+    "TFdto"
 ]
 
 class SysArgs(BaseModel, Generic[TCfg]):
@@ -133,7 +139,7 @@ class App(Singleton):
                     await log.atrack(err, f"({plugin}) init")
 
     def _init_mode(self):
-        self._mode = env.get_mode()
+        self._mode = _env.get_mode()
         log.info(f"chosen mode: {self._mode}", 1)
 
     async def _gen_type_to_cfg(self) -> dict[type[Cfg], Cfg]:
@@ -145,7 +151,7 @@ class App(Singleton):
             if cfg_type is AppCfg:
                 self._cfg = typing.cast(AppCfg, cfg)
                 log.std_verbosity = self._cfg.std_verbosity
-                log.is_debug = env.is_debug()
+                log.is_debug = _env.is_debug()
                 continue
             type_to_cfg[cfg_type] = cfg
         return type_to_cfg

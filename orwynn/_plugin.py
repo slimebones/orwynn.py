@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from pykit.res import Res
 
 from orwynn import SysArgs
-from orwynn.cfg import TCfg
+from orwynn._cfg import TCfg
 
 @runtime_checkable
 class PluginFn(Protocol, Generic[TCfg]):
