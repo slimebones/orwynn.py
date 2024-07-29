@@ -6,8 +6,8 @@ import typing
 from contextlib import suppress
 from typing import Any, Callable, ClassVar, Coroutine, Iterable, Literal, Self, TypeVar, runtime_checkable
 
-from pykit.code import Ok
-from pykit.res import Res
+from pykit.code import Err, Ok
+from pykit.res import Res, aresultify
 from pykit.log import log
 from pykit.singleton import Singleton
 from rxcat import Awaitable, BaseModel, RpcFn, ServerBus, ServerBusCfg, SubFn, valerr
@@ -87,9 +87,50 @@ class App(Singleton):
         self._cfg = cfg
         self._init_mode()
         await self._bus.init(self._cfg.server_bus_cfg)
+
+        self._type_to_cfg = await self._gen_type_to_cfg()
+        self._plugins = list(self._cfg.plugins)
+        await self._init_plugins()
         await self._init_sys()
 
         self._is_initd = True
+
+    async def destroy(self, is_hard: bool = False):
+        # destroy plugins
+        for plugin in self._plugins:
+            if plugin.cfgtype not in self._type_to_cfg:
+                log.err(f"({plugin}) unrecognized cfg type")
+                continue
+            cfg = self._type_to_cfg[plugin.cfgtype]
+            args = SysArgs(app=self, bus=self._bus, cfg=cfg)
+            if plugin.destroy is not None:
+                try:
+                    await (await plugin.destroy(args)).atrack(
+                        f"({plugin}) destroy")
+                except Exception as err:
+                    await log.atrack(err, f"({plugin}) destroy")
+
+        # unsub all
+        for unsub in self._unsubs:
+            (await unsub()).atrack("on app destroy unsub")
+
+        # destroy meta data if needed
+        if is_hard:
+            self.sys_init_queue.clear()
+            self.rpcsys_init_queue.clear()
+
+    async def _init_plugins(self):
+        for plugin in self._plugins:
+            if plugin.cfgtype not in self._type_to_cfg:
+                log.err(f"({plugin}) unrecognized cfg type")
+                continue
+            cfg = self._type_to_cfg[plugin.cfgtype]
+            args = SysArgs(app=self, bus=self._bus, cfg=cfg)
+            if plugin.init is not None:
+                try:
+                    await (await plugin.init(args)).atrack(f"({plugin}) init")
+                except Exception as err:
+                    await log.atrack(err, f"({plugin}) init")
 
     def _init_mode(self):
         self._mode = env.get_mode()
@@ -109,19 +150,10 @@ class App(Singleton):
             type_to_cfg[cfg_type] = cfg
         return type_to_cfg
 
-    async def destroy(self, is_hard: bool = False):
-        for unsub in self._unsubs:
-            (await unsub()).atrack("on app destroy unsub")
-        if is_hard:
-            self.sys_init_queue.clear()
-            self.rpcsys_init_queue.clear()
-
     async def _init_sys(self):
-        type_to_cfg = await self._gen_type_to_cfg()
-
         for cfgtype, sysfn, sub_opts in self.sys_init_queue:
             await self._reg_sys_signature(sysfn)
-            cfg = type_to_cfg[cfgtype]
+            cfg = self._type_to_cfg[cfgtype]
             args = SysArgs(
                 app=self,
                 bus=self._bus,
@@ -132,7 +164,7 @@ class App(Singleton):
 
         for cfgtype, sysfn in self.rpcsys_init_queue:
             await self._reg_sys_signature(sysfn)
-            cfg = type_to_cfg[cfgtype]
+            cfg = self._type_to_cfg[cfgtype]
             args = SysArgs(
                 app=self,
                 bus=self._bus,

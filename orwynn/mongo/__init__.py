@@ -863,7 +863,7 @@ _client: MongoClient | None = None
 _db: MongoDb | None = None
 _doc_types: dict[str, type[Doc]] = {}
 TDoc = TypeVar("TDoc", bound=Doc)
-async def _init_plugin(args: SysArgs[MongoCfg]):
+async def _init_plugin(args: SysArgs[MongoCfg]) -> Res[None]:
     _client = MongoClient(args.cfg.url)
     _db = _client[args.cfg.database_name]
 
@@ -878,7 +878,7 @@ async def _init_plugin(args: SysArgs[MongoCfg]):
         for field in doc_type.FIELDS:
             self._process_field_link(doc_type, field)
 
-async def destroy(self):
+async def _destroy_plugin(args: SysArgs[MongoCfg]) -> Res[None]:
     _client = None
     _db = None
     _doc_types.clear()
@@ -1417,4 +1417,8 @@ async def decide_state_flag(
 
     return result
 
-plugin = Plugin(name="mongo", init=_init_plugin, destroy=_destroy)
+plugin = Plugin(
+    name="mongo",
+    cfgtype=MongoCfg,
+    init=_init_plugin,
+    destroy=_destroy_plugin)
