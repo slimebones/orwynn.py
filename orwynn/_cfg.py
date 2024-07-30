@@ -120,7 +120,8 @@ class CfgPackUtils:
                 f.reverse()
                 return f
 
-        raise NotFoundErr(f"rnode for mode {mode}", { "rtree": rtree })
+        log.warn(f"rnode for mode {mode} is not found => skip")
+        return f
 
     @classmethod
     async def _try_find_rnode_for_mode(

@@ -26,7 +26,7 @@ from rxcat import (
 )
 
 from orwynn import env
-from orwynn._cfg import Cfg, CfgPackUtils, TCfg, CfgPack
+from orwynn._cfg import Cfg, CfgPack, CfgPackUtils, TCfg
 from orwynn._models import Dto, Fdto, Flag, TDto, TFdto, TUdto, Udto
 from orwynn._plugin import Plugin
 
@@ -92,8 +92,8 @@ class AppCfg(Cfg):
     extend_cfg_pack: CfgPack = {}
 
 class App(Singleton):
-    sys_init_queue: list[tuple[type[Cfg], SysFn, SubOpts]]
-    rpcsys_init_queue: list[tuple[type[Cfg], SysFn]]
+    sys_init_queue: list[tuple[type[Cfg], SysFn, SubOpts]] = []
+    rpcsys_init_queue: list[tuple[type[Cfg], SysFn]] = []
     _SYS_SIGNATURE_PARAMS_LEN: int = 2
 
     def __init__(self) -> None:
@@ -127,8 +127,14 @@ class App(Singleton):
         # destroy plugins
         for plugin in self._plugins:
             if plugin.cfgtype not in self._type_to_cfg:
-                log.err(f"({plugin}) unrecognized cfg type")
-                continue
+                # try to init cfgtype without params
+                try:
+                    self._type_to_cfg[plugin.cfgtype] = plugin.cfgtype()
+                except Exception as err:
+                    log.err(
+                        f"({plugin}) unspecified config {plugin.cfgtype}"
+                        " => skip")
+                    continue
             cfg = self._type_to_cfg[plugin.cfgtype]
             args = SysArgs(app=self, bus=self._bus, cfg=cfg)
             if plugin.destroy is not None:

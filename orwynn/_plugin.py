@@ -20,7 +20,7 @@ class Plugin(BaseModel, Generic[TCfg]):
     destroy: PluginFn[TCfg] | None = None
 
     def __str__(self) -> str:
-        return f"< plugin {self.name} of cfgtype {self.cfgtype} >"
+        return f"<plugin {self.name} of cfgtype {self.cfgtype}>"
 
     class Config:
         arbitrary_types_allowed = True
