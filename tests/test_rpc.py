@@ -11,6 +11,7 @@ async def test_main(app_cfg: AppCfg):
     @rsys(MockCfg)
     async def rsys__mock(args: SysArgs[MockCfg], body: Mock_1):
         assert body.key == "hello"
+        assert args.cfg.num == 1
         return Ok(152)
 
     app = await App().init(app_cfg)
