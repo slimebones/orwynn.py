@@ -99,6 +99,11 @@ class App(Singleton):
     def __init__(self) -> None:
         self._is_initd = False
 
+    def get_bus(self) -> Res[ServerBus]:
+        if not self._is_initd:
+            return valerr(f"not initialized")
+        return Ok(self._bus)
+
     async def init(self, cfg: AppCfg = AppCfg()) -> Self:
         if self._is_initd:
             return self

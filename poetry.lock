@@ -1888,13 +1888,13 @@ pyyaml = ">=6.0.1,<7.0.0"
 
 [[package]]
 name = "sb-rxcat"
-version = "1.0.2"
+version = "1.0.3"
 description = ""
 optional = false
 python-versions = "<4.0,>=3.11"
 files = [
-    {file = "sb_rxcat-1.0.2-py3-none-any.whl", hash = "sha256:40e4faa66d5cf6a646b67e4454d906aea62ea5c99b7b09e14e444c6eb62e5094"},
-    {file = "sb_rxcat-1.0.2.tar.gz", hash = "sha256:dbd77fe7c0d821aaf5e5619f6792caacf2a8ccbade3e7d8abbf69b0c5f8e5117"},
+    {file = "sb_rxcat-1.0.3-py3-none-any.whl", hash = "sha256:3801072dacdac449ad6410b10a28c813d045e72b58961ad0c97c19723b6670ba"},
+    {file = "sb_rxcat-1.0.3.tar.gz", hash = "sha256:b646aadd40cd51da1eccff1428614a10d671d507d68dc3a1cf804640e450c99c"},
 ]
 
 [package.dependencies]
@@ -2115,4 +2115,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "80e42b65325fed6f1f31b3f54efdc79f8b3709c2353d8ee57c841dc204303b6d"
+content-hash = "f50c5d9b9c93861340c4e79cca3facc5b412e1217a1b03b8e242cf533bfa2f8a"

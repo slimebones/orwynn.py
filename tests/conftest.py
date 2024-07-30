@@ -36,7 +36,7 @@ def app_cfg() -> AppCfg:
         })
 
 class MockConn(Conn[None]):
-    def __init__(self, args: ConnArgs[None]) -> None:
+    def __init__(self, args: ConnArgs[None] = ConnArgs(core=None)) -> None:
         super().__init__(args)
         self.inp_queue: Queue[dict] = Queue()
         self.out_queue: Queue[dict] = Queue()
