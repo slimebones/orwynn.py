@@ -1,5 +1,6 @@
 import asyncio
 from pykit.code import Code
+from pykit.res import Ok
 from rxcat import ConnArgs, ServerBus, SrpcSend, ok, PubOpts
 from orwynn import App, SysArgs, rsys, sys, AppCfg
 from tests.conftest import Mock_1, MockCfg, MockConn
@@ -10,7 +11,7 @@ async def test_main(app_cfg: AppCfg):
     @rsys(MockCfg)
     async def rsys__mock(args: SysArgs[MockCfg], body: Mock_1):
         assert body.key == "hello"
-        return 152
+        return Ok(152)
 
     app = await App().init(app_cfg)
     bus = app.get_bus().eject()
@@ -31,7 +32,8 @@ async def test_main(app_cfg: AppCfg):
     # welcome
     await asyncio.wait_for(conn.client__recv(), 1)
     r = await asyncio.wait_for(conn.client__recv(), 1)
-    assert r["key"] == rpckey
-    assert r["val"] == 152
+    body = r["body"]
+    assert body["key"] == rpckey
+    assert body["val"] == 152
 
     conn_task.cancel()
