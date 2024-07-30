@@ -4,7 +4,7 @@ Rebuild to simplify core.
 
 - converted systems to functions
 - implemented plugin architecture
-- moved plugins to separate repos
+- moved plugins (mongo, auth, rbac) to separate repos
 
 # 2.4.7
 

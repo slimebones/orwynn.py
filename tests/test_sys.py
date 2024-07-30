@@ -1,5 +1,6 @@
-from rxcat import ServerBus, ok, PubOpts
-from orwynn import App, SysArgs, sys, AppCfg
+from rxcat import PubOpts, ServerBus, ok
+
+from orwynn import App, AppCfg, SysArgs, sys
 from tests.conftest import Mock_1, MockCfg
 
 

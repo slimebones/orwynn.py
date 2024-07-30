@@ -1,10 +1,12 @@
 import asyncio
+
 from pykit.code import Code
 from pykit.res import Ok
-from rxcat import ConnArgs, ServerBus, SrpcSend, ok, PubOpts
-from orwynn import App, SysArgs, rsys, sys, AppCfg
-from tests.conftest import Mock_1, MockCfg, MockConn
 from pykit.uuid import uuid4
+from rxcat import SrpcSend
+
+from orwynn import App, AppCfg, SysArgs, rsys
+from tests.conftest import Mock_1, MockCfg, MockConn
 
 
 async def test_main(app_cfg: AppCfg):

@@ -2,7 +2,7 @@ import importlib
 from typing import Any, TypeVar
 
 from pydantic import BaseModel
-from pykit.err import AlreadyProcessedErr, NotFoundErr
+from pykit.err import AlreadyProcessedErr
 from pykit.log import log
 from pykit.tree import ReversedTreeNode, TreeNode, TreeUtils
 

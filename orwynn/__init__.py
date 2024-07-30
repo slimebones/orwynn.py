@@ -101,7 +101,7 @@ class App(Singleton):
 
     def get_bus(self) -> Res[ServerBus]:
         if not self._is_initd:
-            return valerr(f"not initialized")
+            return valerr("not initialized")
         return Ok(self._bus)
 
     async def init(self, cfg: AppCfg = AppCfg()) -> Self:
@@ -135,7 +135,7 @@ class App(Singleton):
                 # try to init cfgtype without params
                 try:
                     self._type_to_cfg[plugin.cfgtype] = plugin.cfgtype()
-                except Exception as err:
+                except Exception:
                     log.err(
                         f"({plugin}) unspecified config {plugin.cfgtype}"
                         " => skip")
