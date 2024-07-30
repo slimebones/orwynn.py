@@ -8,8 +8,6 @@ exclude = [
     "docs/source/conf.py",
     ".vscode",
     "orwynn/legacy",
-    # TODO: remove once start dev
-    "sql"
 ]
 
 ignore = [
