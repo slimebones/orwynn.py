@@ -38,7 +38,7 @@ __all__ =[
     "SysArgs",
     "SysFn",
     "sys",
-    "rpcsys",
+    "rsys",
     "Plugin",
     "Flag",
     "Dto",
@@ -74,14 +74,14 @@ def sys(cfgtype: type[TCfg], sub_opts: SubOpts = SubOpts()):
         return inner
     return wrapper
 
-def rpcsys(cfgtype: type[TCfg]):
+def rsys(cfgtype: type[TCfg]):
     """
-    Systems are functions!
+    RPC System marking.
     """
     def wrapper(target: SysFn[TCfg]):
         def inner(*args, **kwargs):
             return target(*args, **kwargs)
-        App.rpcsys_init_queue.append((cfgtype, target))
+        App.rsys_init_queue.append((cfgtype, target))
         return inner
     return wrapper
 
@@ -93,7 +93,7 @@ class AppCfg(Cfg):
 
 class App(Singleton):
     sys_init_queue: list[tuple[type[Cfg], SysFn, SubOpts]] = []
-    rpcsys_init_queue: list[tuple[type[Cfg], SysFn]] = []
+    rsys_init_queue: list[tuple[type[Cfg], SysFn]] = []
     _SYS_SIGNATURE_PARAMS_LEN: int = 2
 
     def __init__(self) -> None:
@@ -156,7 +156,7 @@ class App(Singleton):
         # destroy meta data if needed
         if is_hard:
             self.sys_init_queue.clear()
-            self.rpcsys_init_queue.clear()
+            self.rsys_init_queue.clear()
 
         # destroy bus data since it's deeply associated with the app
         await self._bus.destroy()
@@ -210,10 +210,10 @@ class App(Singleton):
             unsub = (await self._bus.sub(subfn, sub_opts)).eject()
             self._unsubs.append(unsub)
 
-        for cfgtype, sysfn in self.rpcsys_init_queue:
-            if not sysfn.__name__.startswith("sys__"):  # type: ignore
+        for cfgtype, sysfn in self.rsys_init_queue:
+            if not sysfn.__name__.startswith("rsys__"):  # type: ignore
                 log.err(
-                    f"sysfn {sysfn} name must start with \"sys__\" => skip")
+                    f"rpcsys {sysfn} name must start with \"rsys__\" => skip")
                 continue
             await self._reg_sys_signature(sysfn)
             cfg = self._type_to_cfg[cfgtype]
@@ -222,7 +222,7 @@ class App(Singleton):
                 bus=self._bus,
                 cfg=cfg)
             rpcfn = functools.partial(sysfn, args)
-            rpcfn.__name__ = sysfn.__name__.replace("sys__", "sub__")  # type: ignore
+            rpcfn.__name__ = sysfn.__name__.replace("rsys__", "srpc__")  # type: ignore
             self._bus.reg_rpc(rpcfn).eject()
 
     async def _reg_sys_signature(self, sysfn: SysFn) -> Res[None]:
