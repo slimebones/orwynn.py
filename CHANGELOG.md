@@ -1,3 +1,7 @@
+# 3.0.1
+
+- env: fix logic
+
 # 3.0.0
 
 Rebuild to simplify core.
