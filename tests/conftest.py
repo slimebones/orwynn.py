@@ -2,6 +2,7 @@ import os
 from asyncio import Queue
 from typing import Self
 
+import pytest
 import pytest_asyncio
 from rxcat import Conn, ConnArgs, ServerBusCfg, Transport
 
@@ -17,6 +18,7 @@ async def autorun():
     yield
     await App.ie().destroy(is_hard=True)
 
+@pytest.fixture
 def app_cfg() -> AppCfg:
     return AppCfg(
         server_bus_cfg=ServerBusCfg(
@@ -25,7 +27,8 @@ def app_cfg() -> AppCfg:
                     is_server=True,
                     conn_type=MockConn
                 )
-            ]),
+            ],
+            reg_types=[Mock_1]),
         extend_cfg_pack={
             "test": [
                 MockCfg(num=1)
@@ -60,9 +63,16 @@ class MockConn(Conn[None]):
         return await self.out_queue.get()
 
 @pytest_asyncio.fixture
-async def app(cfg: AppCfg) -> App:
-    app = await App().init(cfg)
+async def app(app_cfg: AppCfg) -> App:
+    app = await App().init(app_cfg)
     return app
 
 class MockCfg(Cfg):
     num: int
+
+class Mock_1(Cfg):
+    key: str
+
+    @staticmethod
+    def code():
+        return "orwynn_test::mock_1"

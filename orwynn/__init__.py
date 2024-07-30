@@ -190,6 +190,10 @@ class App(Singleton):
 
     async def _init_sys(self):
         for cfgtype, sysfn, sub_opts in self.sys_init_queue:
+            if not sysfn.__name__.startswith("sys__"):  # type: ignore
+                log.err(
+                    f"sysfn {sysfn} name must start with \"sys__\" => skip")
+                continue
             await self._reg_sys_signature(sysfn)
             cfg = self._type_to_cfg[cfgtype]
             args = SysArgs(
@@ -197,10 +201,15 @@ class App(Singleton):
                 bus=self._bus,
                 cfg=cfg)
             subfn = functools.partial(sysfn, args)
+            subfn.__name__ = sysfn.__name__.replace("sys__", "sub__")  # type: ignore
             unsub = (await self._bus.sub(subfn, sub_opts)).eject()
             self._unsubs.append(unsub)
 
         for cfgtype, sysfn in self.rpcsys_init_queue:
+            if not sysfn.__name__.startswith("sys__"):  # type: ignore
+                log.err(
+                    f"sysfn {sysfn} name must start with \"sys__\" => skip")
+                continue
             await self._reg_sys_signature(sysfn)
             cfg = self._type_to_cfg[cfgtype]
             args = SysArgs(
@@ -208,8 +217,6 @@ class App(Singleton):
                 bus=self._bus,
                 cfg=cfg)
             rpcfn = functools.partial(sysfn, args)
-            # rpc reg depends on proper function name, which we must fix after
-            # applying wrapper
             rpcfn.__name__ = sysfn.__name__.replace("sys__", "sub__")  # type: ignore
             self._bus.reg_rpc(rpcfn).eject()
 

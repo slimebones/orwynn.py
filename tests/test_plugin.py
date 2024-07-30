@@ -20,13 +20,21 @@ async def test_main():
 
     plugin = Plugin(
         name="test_plugin", cfgtype=MockCfg, init=_init, destroy=_destroy)
-    await App().init(AppCfg(
+    app = await App().init(AppCfg(
         server_bus_cfg=ServerBusCfg(
             transports=[
                 Transport(is_server=True, conn_type=MockConn)
             ]
         ),
-        plugins=[plugin]
+        plugins=[plugin],
+        extend_cfg_pack={
+            "test": [
+                MockCfg(num=1)
+            ]
+        }
     ))
     assert init_flag
+    assert not destroy_flag
+
+    await app.destroy(is_hard=True)
     assert destroy_flag
