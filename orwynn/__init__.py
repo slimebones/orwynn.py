@@ -11,7 +11,7 @@ from typing import (
 )
 
 from pydantic import BaseModel
-from pykit.code import Ok
+from pykit.code import Coded, Ok
 from pykit.log import log
 from pykit.res import Err, Res, aresultify
 from pykit.singleton import Singleton
@@ -25,7 +25,6 @@ from rxcat import (
 
 from orwynn import env
 from orwynn._cfg import Cfg, CfgPack, CfgPackUtils, TCfg
-from orwynn._models import Dto, Fdto, Flag, TDto, TFdto, TUdto, Udto
 
 __all__ =[
     "App",
@@ -34,14 +33,7 @@ __all__ =[
     "CfgPack",
     "SysArgs",
     "SysFn",
-    "Plugin",
-    "Flag",
-    "Dto",
-    "Udto",
-    "Fdto",
-    "TDto",
-    "TUdto",
-    "TFdto"
+    "Plugin"
 ]
 
 class SysArgs(BaseModel, Generic[TCfg]):
@@ -80,7 +72,7 @@ class Plugin(BaseModel, Generic[TCfg]):
 
     sys: list[SysFn[TCfg] | OptedSysFn[TCfg]] | None = None
     rsys: list[SysFn[TCfg] | OptedRsysFn[TCfg]] | None = None
-    reg_types: list[type] | None = None
+    reg_types: list[type | Coded[type]] | None = None
 
     init: PluginFn[TCfg] | None = None
     destroy: PluginFn[TCfg] | None = None
@@ -208,6 +200,9 @@ class App(Singleton):
                     self._plugin_to_destructors[plugin].append(destructor)
 
     async def _init_plugin(self, plugin: Plugin):
+        if plugin.reg_types:
+            await self._bus.reg_types(plugin.reg_types)
+
         args_res = self._get_sys_args_for_plugin(plugin)
         if isinstance(args_res, Err):
             await args_res.atrack(f"get args for plugin {plugin}")

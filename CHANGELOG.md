@@ -1,3 +1,8 @@
+# 3.1.0
+
+- integrate with plugins deeply, disallow sys usage without plugins
+- remove Dtos, Flag
+
 # 3.0.1
 
 - env: fix logic
