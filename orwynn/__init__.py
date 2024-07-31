@@ -335,7 +335,7 @@ class App(Singleton):
             return valerr(f"sysfn {sysfn} must accept only two args => skip")
         # don't check direct "is" since it's associated with generic,
         # thought we're not sure this is the case
-        if issubclass(params[0].annotation, SysArgs):
+        if not issubclass(params[0].annotation, SysArgs):
             return valerr(
                 f"sysfn {sysfn} accept incorrect \"args\" type"
                 f" {params[0].annotation} => skip")
