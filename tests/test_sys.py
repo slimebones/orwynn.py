@@ -1,14 +1,15 @@
 from rxcat import PubOpts, ServerBus, ok
 
-from orwynn import App, AppCfg, SysArgs, sys
+from orwynn import App, AppCfg, Plugin, SysArgs
 from tests.conftest import Mock_1, MockCfg
 
 
 async def test_main(app_cfg: AppCfg):
-    @sys(MockCfg)
     async def sys__mock(args: SysArgs[MockCfg], body: Mock_1):
         assert body.key == "hello"
 
+    plugin = Plugin(name="test", cfgtype=MockCfg, sys=[sys__mock])
+    app_cfg.plugins.append(plugin)
     await App().init(app_cfg)
 
     r = (await ServerBus.ie().pubr(
@@ -17,10 +18,11 @@ async def test_main(app_cfg: AppCfg):
 
 
 async def test_incorrect_name(app_cfg: AppCfg):
-    @sys(MockCfg)
     async def whocares__mock(args: SysArgs[MockCfg], body: Mock_1):
         assert body.key == "hello"
 
+    plugin = Plugin(name="test", cfgtype=MockCfg, sys=[whocares__mock])
+    app_cfg.plugins.append(plugin)
     await App().init(app_cfg)
 
     try:

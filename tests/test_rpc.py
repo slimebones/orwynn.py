@@ -15,6 +15,11 @@ async def test_main(app_cfg: AppCfg):
         assert args.cfg.num == 1
         return Ok(152)
 
+    plugin = Plugin(
+        name="test",
+        cfgtype=MockCfg,
+        rsys=[rsys__mock])
+    app_cfg.plugins.append(plugin)
     app = await App().init(app_cfg)
     bus = app.get_bus().eject()
     conn = MockConn()

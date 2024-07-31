@@ -101,7 +101,7 @@ class Plugin(BaseModel, Generic[TCfg]):
 class AppCfg(Cfg):
     std_verbosity: int = 1
     server_bus_cfg: ServerBusCfg = ServerBusCfg()
-    plugins: Iterable[Plugin] = []
+    plugins: list[Plugin] = []
     extend_cfg_pack: CfgPack = {}
 
 class App(Singleton):
