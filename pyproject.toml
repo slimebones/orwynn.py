@@ -21,7 +21,7 @@ typing-extensions = "^4.7.1"
 
 pydantic = "^2.6.0"
 aiofiles = "^23.2.1"
-sb-rxcat = "^1.0.6"
+sb-rxcat = "^1.0.7"
 inflection = "^0.5.1"
 
 [tool.poetry.group.dev.dependencies]
