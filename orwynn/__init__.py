@@ -127,17 +127,12 @@ class App(Singleton):
 
         return self
 
-    async def destroy(self, *, is_hard: bool = False):
+    async def destroy(self):
         if not self._is_initd:
             return
         self._is_initd = False
 
         await self._destroy_all_plugins()
-
-        # destroy meta data if needed
-        # if is_hard:
-        #     self.sys_init_queue.clear()
-        #     self.rsys_init_queue.clear()
 
         # destroy bus data since it's deeply associated with the app
         await self._bus.destroy()

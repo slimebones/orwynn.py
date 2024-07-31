@@ -16,7 +16,7 @@ async def autorun():
     os.environ["ORWYNN_ALLOW_CLEAN"] = "1"
 
     yield
-    await App.ie().destroy(is_hard=True)
+    await App.ie().destroy()
 
 @pytest.fixture
 def app_cfg() -> AppCfg:

@@ -1,25 +1,33 @@
+import asyncio
 from pykit.res import Ok, Res
-from rxcat import ServerBusCfg, Transport
+from rxcat import EmptyRpcArgs, ServerBusCfg, Transport
 
 from orwynn import App, AppCfg, Plugin, SysArgs
-from tests.conftest import MockCfg, MockConn
+from tests.conftest import Mock_1, MockCfg, MockConn
 
 
 async def test_main():
     init_flag = False
     destroy_flag = False
+    rpc_flag = False
+
+    async def rsys__test(args: SysArgs[MockCfg], body: Mock_1):
+        assert body.key == "hello"
+        nonlocal rpc_flag
+        rpc_flag = True
 
     async def _init(args: SysArgs[MockCfg]) -> Res[None]:
         nonlocal init_flag
         init_flag = True
         return Ok(None)
+
     async def _destroy(args: SysArgs[MockCfg]) -> Res[None]:
         nonlocal destroy_flag
         destroy_flag = True
         return Ok(None)
 
     plugin = Plugin(
-        name="test_plugin", cfgtype=MockCfg, init=_init, destroy=_destroy)
+        name="test", cfgtype=MockCfg, init=_init, destroy=_destroy)
     app = await App().init(AppCfg(
         server_bus_cfg=ServerBusCfg(
             transports=[
@@ -36,5 +44,13 @@ async def test_main():
     assert init_flag
     assert not destroy_flag
 
-    await app.destroy(is_hard=True)
+    assert rpc_flag
+    conn = MockConn()
+    conn_task = asyncio.create_task(app.get_bus().eject().conn(conn))
+    await conn.client__recv()
+    await conn.client__send({
+    })
+
+    await app.destroy()
     assert destroy_flag
+    conn_task.cancel()
