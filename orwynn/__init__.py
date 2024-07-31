@@ -51,6 +51,12 @@ class SysFn(Protocol, Generic[TCfg]):
         ...
 
 @runtime_checkable
+class RsysFn(Protocol, Generic[TCfg]):
+    async def __call__(
+            self, args: SysArgs[TCfg], body: Mbody) -> Res[Any]:
+        ...
+
+@runtime_checkable
 class PluginFn(Protocol, Generic[TCfg]):
     async def __call__(self, args: "SysArgs[TCfg]") -> Res[None]: ...
 
@@ -59,7 +65,7 @@ class OptedSysFn(Generic[TCfg]):
     opts: SubOpts
 
 class OptedRsysFn(Generic[TCfg]):
-    fn: SysFn[TCfg]
+    fn: RsysFn[TCfg]
     opts: None
 
 class Plugin(BaseModel, Generic[TCfg]):
@@ -71,7 +77,7 @@ class Plugin(BaseModel, Generic[TCfg]):
     global_rsys_opts: None = None
 
     sys: list[SysFn[TCfg] | OptedSysFn[TCfg]] | None = None
-    rsys: list[SysFn[TCfg] | OptedRsysFn[TCfg]] | None = None
+    rsys: list[RsysFn[TCfg] | OptedRsysFn[TCfg]] | None = None
     reg_types: list[type | Coded[type]] | None = None
 
     init: PluginFn[TCfg] | None = None
@@ -82,7 +88,7 @@ class Plugin(BaseModel, Generic[TCfg]):
     """
 
     def __str__(self) -> str:
-        return f"<plugin {self.name} of cfgtype {self.cfgtype}>"
+        return f"<plugin \"{self.name}\" of cfgtype {self.cfgtype}>"
 
     def __hash__(self) -> int:
         return hash(id(self))
@@ -293,7 +299,7 @@ class App(Singleton):
 
     async def _init_rsys(
             self,
-            rsysfn: SysFn[TCfg],
+            rsysfn: RsysFn[TCfg],
             plugin: Plugin)  -> Coroutine[Any, Any, Res[None]] | None:
         cfgtype = plugin.cfgtype
 
@@ -311,16 +317,15 @@ class App(Singleton):
             bus=self._bus,
             cfg=cfg)
         rpcfn = functools.partial(rsysfn, args)
-        rpcfn_code = rsysfn.__name__.replace("rsys__", "")  # type: ignore
+        rpcfn_key = rsysfn.__name__.replace("rsys__", "")  # type: ignore
         rpcfn.__name__ = rsysfn.__name__.replace("rsys__", "srpc__")  # type: ignore
-        rpcfn_key = rpcfn.__name__.replace("srpc__", "")  # type: ignore
         self._bus.reg_rpc(rpcfn, plugin.name + "::" + rpcfn_key).eject()
-        return functools.partial(self._dereg_rpc, rpcfn_code)()
+        return functools.partial(self._dereg_rpc, rpcfn_key)()
 
-    async def _dereg_rpc(self, rpcfn_code: str) -> Res[None]:
+    async def _dereg_rpc(self, rpcfn_key: str) -> Res[None]:
         # TODO: replace with bus.dereg_rpc coro once rxcat supports it
-        if rpcfn_code in self._bus._rpckey_to_fn:  # noqa: SLF001
-            del self._bus._rpckey_to_fn[rpcfn_code]  # noqa: SLF001
+        if rpcfn_key in self._bus._rpckey_to_fn:  # noqa: SLF001
+            del self._bus._rpckey_to_fn[rpcfn_key]  # noqa: SLF001
         return Ok(None)
 
     async def _reg_sys_signature(self, sysfn: SysFn) -> Res[None]:
