@@ -15,7 +15,7 @@ from typing import (
 from pydantic import BaseModel
 from pykit.code import Ok
 from pykit.log import log
-from pykit.res import Res, aresultify
+from pykit.res import Res, aresultify, Err
 from pykit.singleton import Singleton
 from rxcat import (
     Awaitable,
@@ -87,6 +87,10 @@ class Plugin(BaseModel, Generic[TCfg]):
 
     init: PluginFn[TCfg] | None = None
     destroy: PluginFn[TCfg] | None = None
+    postinit: PluginFn[TCfg] | None = None
+    """
+    Called once all other plugins are initialized.
+    """
 
     def __str__(self) -> str:
         return f"<plugin {self.name} of cfgtype {self.cfgtype}>"
@@ -117,7 +121,7 @@ class App(Singleton):
 
         self._bus = ServerBus.ie()
         self._plugin_to_destructors: dict[
-            Plugin, list[Coroutine[Any, Any, None]]] = {}
+            Plugin, list[Coroutine[Any, Any, Res[None]]]] = {}
 
         self._cfg = cfg
         self._init_mode()
@@ -146,18 +150,12 @@ class App(Singleton):
         # destroy bus data since it's deeply associated with the app
         await self._bus.destroy()
 
-    async def _init_plugin(self, plugin: Plugin):
-        if plugin.cfgtype not in self._type_to_cfg:
-            log.err(f"({plugin}) unrecognized cfg type")
-            return
-        cfg = self._type_to_cfg[plugin.cfgtype]
-        args = SysArgs(app=self, bus=self._bus, cfg=cfg)
-
-        global_sys_opts_dump = {}
-        if plugin.global_sys_opts:
-            global_sys_opts_dump = plugin.global_sys_opts.model_dump()
-
+    async def _init_plugin_systems(self, plugin: Plugin):
         if plugin.sys:
+            global_sys_opts_dump = {}
+            if plugin.global_sys_opts:
+                global_sys_opts_dump = plugin.global_sys_opts.model_dump()
+
             for sysfn_or_opted in plugin.sys:
                 if isinstance(sysfn_or_opted, OptedSysFn):
                     sub_opts = SubOpts.model_validate({
@@ -183,10 +181,41 @@ class App(Singleton):
                     sub_opts = plugin.global_sys_opts or SubOpts()
                     sysfn = sysfn_or_opted
 
-                await self._init_sys(
+                destructor = await self._init_sys(
                     sysfn,
                     plugin.cfgtype,
                     sub_opts)
+                if destructor:
+                    if plugin not in self._plugin_to_destructors:
+                        self._plugin_to_destructors[plugin] = []
+                    self._plugin_to_destructors[plugin].append(destructor)
+
+    async def _init_plugin_rsystems(self, plugin: Plugin):
+        if plugin.rsys:
+            # TODO: add rpc opts as soon as it's supported by rxcat
+            for rsysfn_or_opted in plugin.rsys:
+                if isinstance(rsysfn_or_opted, OptedRsysFn):
+                    rsysfn = rsysfn_or_opted.fn
+                else:
+                    rsysfn = rsysfn_or_opted
+
+                destructor = await self._init_rsys(
+                    rsysfn,
+                    plugin.cfgtype)
+                if destructor:
+                    if plugin not in self._plugin_to_destructors:
+                        self._plugin_to_destructors[plugin] = []
+                    self._plugin_to_destructors[plugin].append(destructor)
+
+    async def _init_plugin(self, plugin: Plugin):
+        args_res = self._get_sys_args_for_plugin(plugin)
+        if isinstance(args_res, Err):
+            await args_res.atrack(f"get args for plugin {plugin}")
+            return
+        args = args_res.okval
+
+        await self._init_plugin_systems(plugin)
+        await self._init_plugin_rsystems(plugin)
 
         if plugin.init is not None:
             await (await aresultify(plugin.init(args))).atrack(
@@ -204,10 +233,26 @@ class App(Singleton):
             for destructor in self._plugin_to_destructors[plugin]:
                 await (await aresultify(destructor)).atrack(
                     f"plugin {plugin} destroy")
+            del self._plugin_to_destructors[plugin]
+
+    def _get_sys_args_for_plugin(
+            self, plugin: Plugin[TCfg]) -> Res[SysArgs[TCfg]]:
+        if plugin.cfgtype not in self._type_to_cfg:
+            return valerr(f"({plugin}) unrecognized cfg type")
+        cfg = typing.cast(TCfg, self._type_to_cfg[plugin.cfgtype])
+        return Ok(SysArgs(app=self, bus=self._bus, cfg=cfg))
 
     async def _init_all_plugins(self):
         for plugin in self._plugins:
             await self._init_plugin(plugin)
+        for plugin in self._plugins:
+            if not plugin.postinit:
+                continue
+            args_res = self._get_sys_args_for_plugin(plugin)
+            if isinstance(args_res, Err):
+                await args_res.atrack(f"get args for plugin {plugin}")
+                continue
+            await plugin.postinit(args_res.okval)
 
     async def _destroy_all_plugins(self):
         for plugin in self._plugins:

@@ -5,12 +5,11 @@ from pykit.res import Ok
 from pykit.uuid import uuid4
 from rxcat import SrpcSend
 
-from orwynn import App, AppCfg, SysArgs, rsys
+from orwynn import App, AppCfg, Plugin, SysArgs
 from tests.conftest import Mock_1, MockCfg, MockConn
 
 
 async def test_main(app_cfg: AppCfg):
-    @rsys(MockCfg)
     async def rsys__mock(args: SysArgs[MockCfg], body: Mock_1):
         assert body.key == "hello"
         assert args.cfg.num == 1
