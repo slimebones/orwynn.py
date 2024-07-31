@@ -92,6 +92,9 @@ class Plugin(BaseModel, Generic[TCfg]):
     def __str__(self) -> str:
         return f"<plugin {self.name} of cfgtype {self.cfgtype}>"
 
+    def __hash__(self) -> int:
+        return hash(id(self))
+
     class Config:
         arbitrary_types_allowed = True
 
