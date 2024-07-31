@@ -3,10 +3,8 @@ import inspect
 import typing
 from typing import (
     Any,
-    Callable,
     Coroutine,
     Generic,
-    Iterable,
     Protocol,
     Self,
     runtime_checkable,
@@ -15,10 +13,9 @@ from typing import (
 from pydantic import BaseModel
 from pykit.code import Ok
 from pykit.log import log
-from pykit.res import Res, aresultify, Err
+from pykit.res import Err, Res, aresultify
 from pykit.singleton import Singleton
 from rxcat import (
-    Awaitable,
     Mbody,
     ServerBus,
     ServerBusCfg,
@@ -285,7 +282,7 @@ class App(Singleton):
         if not sysfn.__name__.startswith("sys__"):  # type: ignore
             log.err(
                 f"sysfn {sysfn} name must start with \"sys__\" => skip")
-            return
+            return None
         await self._reg_sys_signature(sysfn)
         cfg = self._type_to_cfg[cfgtype]
         args = SysArgs(
@@ -307,7 +304,7 @@ class App(Singleton):
         if not rsysfn.__name__.startswith("rsys__"):  # type: ignore
             log.err(
                 f"rsys {rsysfn} name must start with \"rsys__\" => skip")
-            return
+            return None
 
         # no need to reg signature for rpc function - the body of it
         # doesn't have to have the code
@@ -325,8 +322,8 @@ class App(Singleton):
 
     async def _dereg_rpc(self, rpcfn_code: str) -> Res[None]:
         # TODO: replace with bus.dereg_rpc coro once rxcat supports it
-        if rpcfn_code in self._bus._rpccode_to_fn:
-            del self._bus._rpccode_to_fn[rpcfn_code]
+        if rpcfn_code in self._bus._rpccode_to_fn:  # noqa: SLF001
+            del self._bus._rpccode_to_fn[rpcfn_code]  # noqa: SLF001
         return Ok(None)
 
     async def _reg_sys_signature(self, sysfn: SysFn) -> Res[None]:
