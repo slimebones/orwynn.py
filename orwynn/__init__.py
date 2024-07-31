@@ -152,6 +152,42 @@ class App(Singleton):
             return
         cfg = self._type_to_cfg[plugin.cfgtype]
         args = SysArgs(app=self, bus=self._bus, cfg=cfg)
+
+        global_sys_opts_dump = {}
+        if plugin.global_sys_opts:
+            global_sys_opts_dump = plugin.global_sys_opts.model_dump()
+
+        if plugin.sys:
+            for sysfn_or_opted in plugin.sys:
+                if isinstance(sysfn_or_opted, OptedSysFn):
+                    sub_opts = SubOpts.model_validate({
+                        **global_sys_opts_dump,
+                        **sysfn_or_opted.opts.model_dump()
+                    })
+                    # merge known lists instead of overwrite
+                    if plugin.global_sys_opts:
+                        sub_opts.conditions = [
+                            *(plugin.global_sys_opts.conditions or []),
+                            *(sub_opts.conditions or [])
+                        ]
+                        sub_opts.inp_filters = [
+                            *(plugin.global_sys_opts.inp_filters or []),
+                            *(sub_opts.inp_filters or [])
+                        ]
+                        sub_opts.out_filters = [
+                            *(plugin.global_sys_opts.out_filters or []),
+                            *(sub_opts.out_filters or [])
+                        ]
+                    sysfn = sysfn_or_opted.fn
+                else:
+                    sub_opts = plugin.global_sys_opts or SubOpts()
+                    sysfn = sysfn_or_opted
+
+                await self._init_sys(
+                    sysfn,
+                    plugin.cfgtype,
+                    sub_opts)
+
         if plugin.init is not None:
             await (await aresultify(plugin.init(args))).atrack(
                 f"({plugin}) init")
