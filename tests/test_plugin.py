@@ -1,6 +1,8 @@
 import asyncio
+from pykit.code import Code
 from pykit.res import Ok, Res
-from rxcat import EmptyRpcArgs, ServerBusCfg, Transport
+from pykit.uuid import uuid4
+from rxcat import EmptyRpcArgs, ServerBusCfg, Transport, SrpcSend
 
 from orwynn import App, AppCfg, Plugin, SysArgs
 from tests.conftest import Mock_1, MockCfg, MockConn
@@ -49,6 +51,11 @@ async def test_main():
     conn_task = asyncio.create_task(app.get_bus().eject().conn(conn))
     await conn.client__recv()
     await conn.client__send({
+        "sid": uuid4(),
+        "bodycodeid": (await Code.get_regd_codeid_by_type(SrpcSend)),
+        "body": {
+            "key": ""
+        }
     })
 
     await app.destroy()

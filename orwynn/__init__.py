@@ -170,7 +170,7 @@ class App(Singleton):
 
                 destructor = await self._init_sys(
                     sysfn,
-                    plugin.cfgtype,
+                    plugin,
                     sub_opts)
                 if destructor:
                     if plugin not in self._plugin_to_destructors:
@@ -188,7 +188,7 @@ class App(Singleton):
 
                 destructor = await self._init_rsys(
                     rsysfn,
-                    plugin.cfgtype)
+                    plugin)
                 if destructor:
                     if plugin not in self._plugin_to_destructors:
                         self._plugin_to_destructors[plugin] = []
@@ -270,8 +270,9 @@ class App(Singleton):
     async def _init_sys(
             self,
             sysfn: SysFn[TCfg],
-            cfgtype: type[TCfg],
+            plugin: Plugin,
             sub_opts: SubOpts) -> Coroutine[Any, Any, Res[None]] | None:
+        cfgtype = plugin.cfgtype
         if not sysfn.__name__.startswith("sys__"):  # type: ignore
             log.err(
                 f"sysfn {sysfn} name must start with \"sys__\" => skip")
@@ -293,7 +294,9 @@ class App(Singleton):
     async def _init_rsys(
             self,
             rsysfn: SysFn[TCfg],
-            cfgtype: type[TCfg]) -> Coroutine[Any, Any, Res[None]] | None:
+            plugin: Plugin)  -> Coroutine[Any, Any, Res[None]] | None:
+        cfgtype = plugin.cfgtype
+
         if not rsysfn.__name__.startswith("rsys__"):  # type: ignore
             log.err(
                 f"rsys {rsysfn} name must start with \"rsys__\" => skip")
@@ -310,13 +313,14 @@ class App(Singleton):
         rpcfn = functools.partial(rsysfn, args)
         rpcfn_code = rsysfn.__name__.replace("rsys__", "")  # type: ignore
         rpcfn.__name__ = rsysfn.__name__.replace("rsys__", "srpc__")  # type: ignore
-        self._bus.reg_rpc(rpcfn).eject()
+        rpcfn_key = rpcfn.__name__.replace("srpc__", "")  # type: ignore
+        self._bus.reg_rpc(rpcfn, plugin.name + "::" + rpcfn_key).eject()
         return functools.partial(self._dereg_rpc, rpcfn_code)()
 
     async def _dereg_rpc(self, rpcfn_code: str) -> Res[None]:
         # TODO: replace with bus.dereg_rpc coro once rxcat supports it
-        if rpcfn_code in self._bus._rpccode_to_fn:  # noqa: SLF001
-            del self._bus._rpccode_to_fn[rpcfn_code]  # noqa: SLF001
+        if rpcfn_code in self._bus._rpckey_to_fn:  # noqa: SLF001
+            del self._bus._rpckey_to_fn[rpcfn_code]  # noqa: SLF001
         return Ok(None)
 
     async def _reg_sys_signature(self, sysfn: SysFn) -> Res[None]:
