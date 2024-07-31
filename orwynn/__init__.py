@@ -4,6 +4,7 @@ import typing
 from typing import (
     Any,
     Callable,
+    Coroutine,
     Generic,
     Iterable,
     Protocol,
@@ -14,7 +15,7 @@ from typing import (
 from pydantic import BaseModel
 from pykit.code import Ok
 from pykit.log import log
-from pykit.res import Res
+from pykit.res import Res, aresultify
 from pykit.singleton import Singleton
 from rxcat import (
     Awaitable,
@@ -28,7 +29,6 @@ from rxcat import (
 from orwynn import env
 from orwynn._cfg import Cfg, CfgPack, CfgPackUtils, TCfg
 from orwynn._models import Dto, Fdto, Flag, TDto, TFdto, TUdto, Udto
-from orwynn._plugin import Plugin
 
 __all__ =[
     "App",
@@ -37,8 +37,6 @@ __all__ =[
     "CfgPack",
     "SysArgs",
     "SysFn",
-    "sys",
-    "rsys",
     "Plugin",
     "Flag",
     "Dto",
@@ -63,27 +61,38 @@ class SysFn(Protocol, Generic[TCfg]):
             self, args: SysArgs[TCfg], body: Mbody) -> Any:
         ...
 
-def sys(cfgtype: type[TCfg], sub_opts: SubOpts = SubOpts()):
-    """
-    Systems are functions!
-    """
-    def wrapper(target: SysFn[TCfg]):
-        def inner(*args, **kwargs):
-            return target(*args, **kwargs)
-        App.sys_init_queue.append((cfgtype, target, sub_opts))
-        return inner
-    return wrapper
+@runtime_checkable
+class PluginFn(Protocol, Generic[TCfg]):
+    async def __call__(self, args: "SysArgs[TCfg]") -> Res[None]: ...
 
-def rsys(cfgtype: type[TCfg]):
-    """
-    RPC System marking.
-    """
-    def wrapper(target: SysFn[TCfg]):
-        def inner(*args, **kwargs):
-            return target(*args, **kwargs)
-        App.rsys_init_queue.append((cfgtype, target))
-        return inner
-    return wrapper
+class OptedSysFn(Generic[TCfg]):
+    fn: SysFn[TCfg]
+    opts: SubOpts
+
+class OptedRsysFn(Generic[TCfg]):
+    fn: SysFn[TCfg]
+    opts: None
+
+class Plugin(BaseModel, Generic[TCfg]):
+    name: str
+    cfgtype: type[TCfg]
+
+    global_sys_opts: SubOpts = SubOpts()
+    # TODO: impl rpc opts once it gets support at rxcat
+    global_rsys_opts: None = None
+
+    sys: list[SysFn[TCfg] | OptedSysFn[TCfg]] | None = None
+    rsys: list[SysFn[TCfg] | OptedRsysFn[TCfg]] | None = None
+    reg_types: list[type] | None = None
+
+    init: PluginFn[TCfg] | None = None
+    destroy: PluginFn[TCfg] | None = None
+
+    def __str__(self) -> str:
+        return f"<plugin {self.name} of cfgtype {self.cfgtype}>"
+
+    class Config:
+        arbitrary_types_allowed = True
 
 class AppCfg(Cfg):
     std_verbosity: int = 1
@@ -92,8 +101,6 @@ class AppCfg(Cfg):
     extend_cfg_pack: CfgPack = {}
 
 class App(Singleton):
-    sys_init_queue: list[tuple[type[Cfg], SysFn, SubOpts]] = []
-    rsys_init_queue: list[tuple[type[Cfg], SysFn]] = []
     _SYS_SIGNATURE_PARAMS_LEN: int = 2
 
     def __init__(self) -> None:
@@ -109,7 +116,8 @@ class App(Singleton):
             return self
 
         self._bus = ServerBus.ie()
-        self._unsubs: list[Callable[[], Awaitable[Res[None]]]] = []
+        self._plugin_to_destructors: dict[
+            Plugin, list[Coroutine[Any, Any, None]]] = {}
 
         self._cfg = cfg
         self._init_mode()
@@ -117,8 +125,7 @@ class App(Singleton):
 
         self._type_to_cfg = await self._gen_type_to_cfg()
         self._plugins = list(self._cfg.plugins)
-        await self._init_plugins()
-        await self._init_sys()
+        await self._init_all_plugins()
 
         self._is_initd = True
 
@@ -129,50 +136,46 @@ class App(Singleton):
             return
         self._is_initd = False
 
-        # destroy plugins
-        for plugin in self._plugins:
-            if plugin.cfgtype not in self._type_to_cfg:
-                # try to init cfgtype without params
-                try:
-                    self._type_to_cfg[plugin.cfgtype] = plugin.cfgtype()
-                except Exception:
-                    log.err(
-                        f"({plugin}) unspecified config {plugin.cfgtype}"
-                        " => skip")
-                    continue
-            cfg = self._type_to_cfg[plugin.cfgtype]
-            args = SysArgs(app=self, bus=self._bus, cfg=cfg)
-            if plugin.destroy is not None:
-                try:
-                    await (await plugin.destroy(args)).atrack(
-                        f"({plugin}) destroy")
-                except Exception as err:
-                    await log.atrack(err, f"({plugin}) destroy")
-
-        # unsub all
-        for unsub in self._unsubs:
-            (await unsub()).atrack("on app destroy unsub")
+        await self._destroy_all_plugins()
 
         # destroy meta data if needed
-        if is_hard:
-            self.sys_init_queue.clear()
-            self.rsys_init_queue.clear()
+        # if is_hard:
+        #     self.sys_init_queue.clear()
+        #     self.rsys_init_queue.clear()
 
         # destroy bus data since it's deeply associated with the app
         await self._bus.destroy()
 
-    async def _init_plugins(self):
+    async def _init_plugin(self, plugin: Plugin):
+        if plugin.cfgtype not in self._type_to_cfg:
+            log.err(f"({plugin}) unrecognized cfg type")
+            return
+        cfg = self._type_to_cfg[plugin.cfgtype]
+        args = SysArgs(app=self, bus=self._bus, cfg=cfg)
+        if plugin.init is not None:
+            await (await aresultify(plugin.init(args))).atrack(
+                f"({plugin}) init")
+
+    async def _destroy_plugin(self, plugin: Plugin):
+        assert plugin.cfgtype in self._type_to_cfg, \
+            "plugin must be initd in order to be destroyed"
+        cfg = self._type_to_cfg[plugin.cfgtype]
+        args = SysArgs(app=self, bus=self._bus, cfg=cfg)
+        if plugin.destroy is not None:
+            await (await aresultify(plugin.destroy(args))).atrack(
+                f"({plugin}) destroy")
+        if plugin in self._plugin_to_destructors:
+            for destructor in self._plugin_to_destructors[plugin]:
+                await (await aresultify(destructor)).atrack(
+                    f"plugin {plugin} destroy")
+
+    async def _init_all_plugins(self):
         for plugin in self._plugins:
-            if plugin.cfgtype not in self._type_to_cfg:
-                log.err(f"({plugin}) unrecognized cfg type")
-                continue
-            cfg = self._type_to_cfg[plugin.cfgtype]
-            args = SysArgs(app=self, bus=self._bus, cfg=cfg)
-            if plugin.init is not None:
-                try:
-                    await (await plugin.init(args)).atrack(f"({plugin}) init")
-                except Exception as err:
-                    await log.atrack(err, f"({plugin}) init")
+            await self._init_plugin(plugin)
+
+    async def _destroy_all_plugins(self):
+        for plugin in self._plugins:
+            await self._destroy_plugin(plugin)
 
     def _init_mode(self):
         self._mode = env.get_mode()
@@ -193,37 +196,57 @@ class App(Singleton):
             type_to_cfg[cfg_type] = cfg
         return type_to_cfg
 
-    async def _init_sys(self):
-        for cfgtype, sysfn, sub_opts in self.sys_init_queue:
-            if not sysfn.__name__.startswith("sys__"):  # type: ignore
-                log.err(
-                    f"sysfn {sysfn} name must start with \"sys__\" => skip")
-                continue
-            await self._reg_sys_signature(sysfn)
-            cfg = self._type_to_cfg[cfgtype]
-            args = SysArgs(
-                app=self,
-                bus=self._bus,
-                cfg=cfg)
-            subfn = functools.partial(sysfn, args)
-            subfn.__name__ = sysfn.__name__.replace("sys__", "sub__")  # type: ignore
-            unsub = (await self._bus.sub(subfn, sub_opts)).eject()
-            self._unsubs.append(unsub)
+    async def _init_sys(
+            self,
+            sysfn: SysFn[TCfg],
+            cfgtype: type[TCfg],
+            sub_opts: SubOpts) -> Coroutine[Any, Any, Res[None]] | None:
+        if not sysfn.__name__.startswith("sys__"):  # type: ignore
+            log.err(
+                f"sysfn {sysfn} name must start with \"sys__\" => skip")
+            return
+        await self._reg_sys_signature(sysfn)
+        cfg = self._type_to_cfg[cfgtype]
+        args = SysArgs(
+            app=self,
+            bus=self._bus,
+            cfg=cfg)
+        subfn = functools.partial(sysfn, args)
+        subfn.__name__ = sysfn.__name__.replace("sys__", "sub__")  # type: ignore
 
-        for cfgtype, sysfn in self.rsys_init_queue:
-            if not sysfn.__name__.startswith("rsys__"):  # type: ignore
-                log.err(
-                    f"rpcsys {sysfn} name must start with \"rsys__\" => skip")
-                continue
-            await self._reg_sys_signature(sysfn)
-            cfg = self._type_to_cfg[cfgtype]
-            args = SysArgs(
-                app=self,
-                bus=self._bus,
-                cfg=cfg)
-            rpcfn = functools.partial(sysfn, args)
-            rpcfn.__name__ = sysfn.__name__.replace("rsys__", "srpc__")  # type: ignore
-            self._bus.reg_rpc(rpcfn).eject()
+        unsub_coro_res = typing.cast(
+            Res[Coroutine[Any, Any, Res[None]]],
+            (await self._bus.sub(subfn, sub_opts)))
+        return unsub_coro_res.eject()
+
+    async def _init_rsys(
+            self,
+            rsysfn: SysFn[TCfg],
+            cfgtype: type[TCfg]) -> Coroutine[Any, Any, Res[None]] | None:
+        if not rsysfn.__name__.startswith("rsys__"):  # type: ignore
+            log.err(
+                f"rsys {rsysfn} name must start with \"rsys__\" => skip")
+            return
+
+        # no need to reg signature for rpc function - the body of it
+        # doesn't have to have the code
+
+        cfg = self._type_to_cfg[cfgtype]
+        args = SysArgs(
+            app=self,
+            bus=self._bus,
+            cfg=cfg)
+        rpcfn = functools.partial(rsysfn, args)
+        rpcfn_code = rsysfn.__name__.replace("rsys__", "")  # type: ignore
+        rpcfn.__name__ = rsysfn.__name__.replace("rsys__", "srpc__")  # type: ignore
+        self._bus.reg_rpc(rpcfn).eject()
+        return functools.partial(self._dereg_rpc, rpcfn_code)()
+
+    async def _dereg_rpc(self, rpcfn_code: str) -> Res[None]:
+        # TODO: replace with bus.dereg_rpc coro once rxcat supports it
+        if rpcfn_code in self._bus._rpccode_to_fn:
+            del self._bus._rpccode_to_fn[rpcfn_code]
+        return Ok(None)
 
     async def _reg_sys_signature(self, sysfn: SysFn) -> Res[None]:
         signature = inspect.signature(sysfn)
