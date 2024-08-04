@@ -1,3 +1,7 @@
+# 3.1.1
+
+- use classic "orwynn" name for PyPI
+
 # 3.1.0
 
 - integrate with plugins deeply, disallow sys usage without plugins
