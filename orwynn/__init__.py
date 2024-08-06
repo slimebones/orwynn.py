@@ -15,7 +15,7 @@ from pykit.code import Coded, Ok
 from pykit.log import log
 from pykit.res import Err, Res, aresultify
 from pykit.singleton import Singleton
-from rxcat import (
+from yon import (
     Mbody,
     ServerBus,
     ServerBusCfg,
@@ -73,7 +73,7 @@ class Plugin(BaseModel, Generic[TCfg]):
     cfgtype: type[TCfg]
 
     global_sys_opts: SubOpts = SubOpts()
-    # TODO: impl rpc opts once it gets support at rxcat
+    # TODO: impl rpc opts once it gets support at yon
     global_rsys_opts: None = None
 
     sys: list[SysFn[TCfg] | OptedSysFn[TCfg]] | None = None
@@ -185,7 +185,7 @@ class App(Singleton):
 
     async def _init_plugin_rsystems(self, plugin: Plugin):
         if plugin.rsys:
-            # TODO: add rpc opts as soon as it's supported by rxcat
+            # TODO: add rpc opts as soon as it's supported by yon
             for rsysfn_or_opted in plugin.rsys:
                 if isinstance(rsysfn_or_opted, OptedRsysFn):
                     rsysfn = rsysfn_or_opted.fn
@@ -323,7 +323,7 @@ class App(Singleton):
         return functools.partial(self._dereg_rpc, rpcfn_key)()
 
     async def _dereg_rpc(self, rpcfn_key: str) -> Res[None]:
-        # TODO: replace with bus.dereg_rpc coro once rxcat supports it
+        # TODO: replace with bus.dereg_rpc coro once yon supports it
         if rpcfn_key in self._bus._rpckey_to_fn:  # noqa: SLF001
             del self._bus._rpckey_to_fn[rpcfn_key]  # noqa: SLF001
         return Ok(None)

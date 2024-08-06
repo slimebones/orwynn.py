@@ -4,7 +4,7 @@ from pykit.code import Code
 from pykit.err import ValErr
 from pykit.res import Ok, Res, valerr
 from pykit.uuid import uuid4
-from rxcat import ServerBusCfg, SrpcRecv, SrpcSend, Transport, ok
+from yon import ServerBusCfg, SrpcRecv, SrpcSend, Transport, ok
 
 from orwynn import App, AppCfg, Plugin, SysArgs
 from tests.conftest import Mock_1, MockCfg, MockConn

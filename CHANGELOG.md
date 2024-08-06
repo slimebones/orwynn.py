@@ -1,3 +1,7 @@
+# 3.1.2
+
+- update deps
+
 # 3.1.1
 
 - use classic "orwynn" name for PyPI

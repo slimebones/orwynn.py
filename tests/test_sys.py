@@ -1,4 +1,4 @@
-from rxcat import PubOpts, ServerBus, ok
+from yon import PubOpts, ServerBus, ok
 
 from orwynn import App, AppCfg, Plugin, SysArgs
 from tests.conftest import Mock_1, MockCfg

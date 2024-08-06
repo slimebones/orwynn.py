@@ -4,7 +4,7 @@ from typing import Self
 
 import pytest
 import pytest_asyncio
-from rxcat import Conn, ConnArgs, ServerBusCfg, Transport
+from yon import Conn, ConnArgs, ServerBusCfg, Transport
 
 from orwynn import App, AppCfg, Cfg
 
