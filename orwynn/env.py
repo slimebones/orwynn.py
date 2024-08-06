@@ -1,4 +1,4 @@
-from pykit.env import getenv
+from ryz.env import getenv
 
 
 def is_debug() -> bool:

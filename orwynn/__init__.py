@@ -11,10 +11,10 @@ from typing import (
 )
 
 from pydantic import BaseModel
-from pykit.code import Coded, Ok
-from pykit.log import log
-from pykit.res import Err, Res, aresultify
-from pykit.singleton import Singleton
+from ryz.code import Coded, Ok
+from ryz.log import log
+from ryz.res import Err, Res, aresultify
+from ryz.singleton import Singleton
 from yon import (
     Mbody,
     ServerBus,
