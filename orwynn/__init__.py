@@ -295,7 +295,7 @@ class App(Singleton):
             bus=self._bus,
             cfg=cfg
         )
-        subfn = self._new_subfn(sysfn, args, msgtype)
+        subfn = functools.partial(sysfn, args=args)
         subfn.__name__ = sysfn.__name__.replace("sys__", "sub__")  # type: ignore
 
         unsub_coro_res = typing.cast(
@@ -303,22 +303,6 @@ class App(Singleton):
             (await self._bus.sub(subfn, sub_opts))
         )
         return unsub_coro_res.eject()
-
-    @staticmethod
-    def _new_subfn(
-        fn: SysFn, args: SysArgs, msgtype: TMsg_contra
-    ) -> SubFn[TMsg_contra]:
-        async def subfn(msg: TMsg_contra):
-            return await fn(msg, args)
-        return subfn
-
-    @staticmethod
-    def _new_rpcfn(
-        fn: SysFn, args: SysArgs, msgtype: TMsg_contra
-    ) -> RpcFn[TMsg_contra]:
-        async def rpcfn(msg: TMsg_contra):
-            return await fn(msg, args)
-        return rpcfn
 
     async def _init_rsys(
         self,
@@ -340,8 +324,7 @@ class App(Singleton):
             app=self,
             bus=self._bus,
             cfg=cfg)
-        msgtype = self._get_msg_type_from_sysfn(sysfn)
-        rpcfn = self._new_rpcfn(sysfn, args, msgtype)
+        rpcfn = functools.partial(sysfn, args=args)
         rpcfn_key = sysfn.__name__.replace("rsys__", "")  # type: ignore
         rpcfn.__name__ = sysfn.__name__.replace("rsys__", "srpc__")  # type: ignore
         self._bus.reg_rpc(rpcfn, plugin.name + "::" + rpcfn_key).eject()
