@@ -54,7 +54,7 @@ class SysFn(Protocol, Generic[TCfg]):
 @runtime_checkable
 class RsysFn(Protocol, Generic[TCfg]):
     async def __call__(
-        self, body: Msg, args: SysArgs[TCfg]
+        self, msg: Msg, args: SysArgs[TCfg]
     ) -> Res[Any]:
         ...
 

@@ -15,8 +15,8 @@ async def test_rsys():
     destroy_flag = False
     rpc_flag = False
 
-    async def rsys__test(args: SysArgs[MockCfg], body: Mock_1) -> Res[None]:
-        assert body.key == "hello"
+    async def rsys__test(msg: Mock_1, args: SysArgs[MockCfg]) -> Res[None]:
+        assert msg.key == "hello"
         nonlocal rpc_flag
         rpc_flag = True
         return Ok(None)
@@ -84,7 +84,7 @@ async def test_rsys_err():
     destroy_flag = False
     rpc_flag = False
 
-    async def rsys__test(args: SysArgs[MockCfg], body: Mock_1) -> Res[None]:
+    async def rsys__test(msg: Mock_1, args: SysArgs[MockCfg]) -> Res[None]:
         assert body.key == "hello"
         nonlocal rpc_flag
         rpc_flag = True
@@ -155,8 +155,8 @@ async def test_sys():
     destroy_flag = False
     sys_flag = False
 
-    async def sys__test(args: SysArgs[MockCfg], body: Mock_1):
-        assert body.key == "hello"
+    async def sys__test(msg: Mock_1, args: SysArgs[MockCfg]):
+        assert msg.key == "hello"
         nonlocal sys_flag
         sys_flag = True
 
@@ -220,8 +220,8 @@ async def test_sys_err():
     destroy_flag = False
     sys_flag = False
 
-    async def sys__test(args: SysArgs[MockCfg], body: Mock_1):
-        assert body.key == "hello"
+    async def sys__test(msg: Mock_1, args: SysArgs[MockCfg]):
+        assert msg.key == "hello"
         nonlocal sys_flag
         sys_flag = True
         return valerr("whoops")

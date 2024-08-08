@@ -5,8 +5,8 @@ from tests.conftest import Mock_1, MockCfg
 
 
 async def test_main(app_cfg: AppCfg):
-    async def sys__mock(args: SysArgs[MockCfg], body: Mock_1):
-        assert body.key == "hello"
+    async def sys__mock(msg: Mock_1, args: SysArgs[MockCfg]):
+        assert msg.key == "hello"
 
     plugin = Plugin(name="test", cfgtype=MockCfg, sys=[sys__mock])
     app_cfg.plugins.append(plugin)
@@ -18,8 +18,8 @@ async def test_main(app_cfg: AppCfg):
 
 
 async def test_incorrect_name(app_cfg: AppCfg):
-    async def whocares__mock(args: SysArgs[MockCfg], body: Mock_1):
-        assert body.key == "hello"
+    async def whocares__mock(msg: Mock_1, args: SysArgs[MockCfg]):
+        assert msg.key == "hello"
 
     plugin = Plugin(name="test", cfgtype=MockCfg, sys=[whocares__mock])
     app_cfg.plugins.append(plugin)
