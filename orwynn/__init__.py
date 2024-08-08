@@ -288,13 +288,15 @@ class App(Singleton):
             log.err(
                 f"sysfn {sysfn} name must start with \"sys__\" => skip")
             return None
-        await self._reg_sys_signature(sysfn)
+        (await self._reg_sys_signature(sysfn)).eject()
         cfg = self._type_to_cfg[cfgtype]
         args = SysArgs(
             app=self,
             bus=self._bus,
             cfg=cfg
         )
+        orig_bus_fn = self._bus._get_msgtype_from_subfn
+        self._bus._get_msgtype_from_subfn = self._monkeypatch_get_msgtype_from_subfn
         subfn = functools.partial(sysfn, args=args)
         subfn.__name__ = sysfn.__name__.replace("sys__", "sub__")  # type: ignore
 
@@ -302,7 +304,23 @@ class App(Singleton):
             Res[Coroutine[Any, Any, Res[None]]],
             (await self._bus.sub(subfn, sub_opts))
         )
+        self._bus._get_msgtype_from_subfn = orig_bus_fn
         return unsub_coro_res.eject()
+
+    def _monkeypatch_get_msgtype_from_subfn(
+        self,
+        subfn: SubFn[TMsg_contra]
+    ) -> Res[type[TMsg_contra]]:
+        sig = inspect.signature(subfn)
+        params = list(sig.parameters.values())
+        # don't raise err for incorrect params amount, since we use
+        # functools.partial(sysfn, args=args) and it still leave two arguments
+        # if len(params) != 1:
+        #     return valerr(
+        #         f"subfn {subfn} must accept one argument, got {len(params)}")
+        param = params[0]
+        assert inspect.isclass(param.annotation)
+        return Ok(param.annotation)
 
     async def _init_rsys(
         self,
@@ -343,10 +361,10 @@ class App(Singleton):
             return valerr(f"sysfn {sysfn} must accept only two args")
         # don't check direct "is" since it's associated with generic,
         # thought we're not sure this is the case
-        if not issubclass(params[0].annotation, SysArgs):
+        if not issubclass(params[1].annotation, SysArgs):
             return valerr(
                 f"sysfn {sysfn} accept incorrect \"args\" type"
                 f" {params[0].annotation} => skip")
-        msgtype = params[1].annotation
+        msgtype = params[0].annotation
         (await self._bus.reg_types([msgtype])).eject()
         return Ok(None)
