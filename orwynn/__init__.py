@@ -295,6 +295,7 @@ class App(Singleton):
             bus=self._bus,
             cfg=cfg
         )
+        # apply monkey patch to avoid yon annotation checking
         orig_bus_fn = self._bus._get_msgtype_from_subfn
         self._bus._get_msgtype_from_subfn = self._monkeypatch_get_msgtype_from_subfn
         subfn = functools.partial(sysfn, args=args)
