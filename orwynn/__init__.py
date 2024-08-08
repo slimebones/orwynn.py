@@ -17,8 +17,10 @@ from ryz.res import Err, Res, aresultify
 from ryz.singleton import Singleton
 from yon import (
     Msg,
+    RpcFn,
     ServerBus,
     ServerBusCfg,
+    SubFn,
     SubOpts,
     valerr,
 )
@@ -291,7 +293,7 @@ class App(Singleton):
             app=self,
             bus=self._bus,
             cfg=cfg)
-        subfn = functools.partial(sysfn, args)
+        subfn = self._new_subfn(sysfn, args)
         subfn.__name__ = sysfn.__name__.replace("sys__", "sub__")  # type: ignore
 
         unsub_coro_res = typing.cast(
@@ -299,10 +301,23 @@ class App(Singleton):
             (await self._bus.sub(subfn, sub_opts)))
         return unsub_coro_res.eject()
 
+    @staticmethod
+    def _new_subfn(fn: SysFn, args: SysArgs) -> SubFn:
+        async def subfn(msg: Msg):
+            return await fn(msg, args)
+        return subfn
+
+    @staticmethod
+    def _new_rpcfn(fn: RsysFn, args: SysArgs) -> RpcFn:
+        async def rpcfn(msg: Msg):
+            return await fn(msg, args)
+        return rpcfn
+
     async def _init_rsys(
-            self,
-            rsysfn: RsysFn[TCfg],
-            plugin: Plugin)  -> Coroutine[Any, Any, Res[None]] | None:
+        self,
+        rsysfn: RsysFn[TCfg],
+        plugin: Plugin
+    )  -> Coroutine[Any, Any, Res[None]] | None:
         cfgtype = plugin.cfgtype
 
         if not rsysfn.__name__.startswith("rsys__"):  # type: ignore
@@ -310,7 +325,7 @@ class App(Singleton):
                 f"rsys {rsysfn} name must start with \"rsys__\" => skip")
             return None
 
-        # no need to reg signature for rpc function - the body of it
+        # no need to reg signature for rpc function - the msg of it
         # doesn't have to have the code
 
         cfg = self._type_to_cfg[cfgtype]
@@ -318,7 +333,7 @@ class App(Singleton):
             app=self,
             bus=self._bus,
             cfg=cfg)
-        rpcfn = functools.partial(rsysfn, args)
+        rpcfn = self._new_rpcfn(rsysfn, args)
         rpcfn_key = rsysfn.__name__.replace("rsys__", "")  # type: ignore
         rpcfn.__name__ = rsysfn.__name__.replace("rsys__", "srpc__")  # type: ignore
         self._bus.reg_rpc(rpcfn, plugin.name + "::" + rpcfn_key).eject()
@@ -334,13 +349,13 @@ class App(Singleton):
         signature = inspect.signature(sysfn)
         params = list(signature.parameters.values())
         if len(params) != self._SYS_SIGNATURE_PARAMS_LEN:
-            return valerr(f"sysfn {sysfn} must accept only two args => skip")
+            return valerr(f"sysfn {sysfn} must accept only two args")
         # don't check direct "is" since it's associated with generic,
         # thought we're not sure this is the case
         if not issubclass(params[0].annotation, SysArgs):
             return valerr(
                 f"sysfn {sysfn} accept incorrect \"args\" type"
                 f" {params[0].annotation} => skip")
-        bodytype = params[1].annotation
-        (await self._bus.reg_types([bodytype])).eject()
+        msgtype = params[1].annotation
+        (await self._bus.reg_types([msgtype])).eject()
         return Ok(None)

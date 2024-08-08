@@ -59,10 +59,10 @@ async def test_rsys():
     send_msid = uuid4()
     await con.client__send({
         "sid": send_msid,
-        "bodycodeid": (await Code.get_regd_codeid_by_type(SrpcSend)).eject(),
-        "body": {
+        "codeid": (await Code.get_regd_codeid_by_type(SrpcSend)).eject(),
+        "msg": {
             "key": "test::test",
-            "body": {
+            "data": {
                 "key": "hello"
             }
         }
@@ -70,9 +70,9 @@ async def test_rsys():
     await asyncio.sleep(0.1)
     assert rpc_flag
     recv = await asyncio.wait_for(con.client__recv(), 1)
-    assert "body" not in recv
+    assert "msg" not in recv
     assert recv["lsid"] == send_msid
-    assert recv["bodycodeid"] \
+    assert recv["codeid"] \
         == (await Code.get_regd_codeid_by_type(SrpcRecv)).eject()
 
     await app.destroy()
@@ -85,7 +85,7 @@ async def test_rsys_err():
     rpc_flag = False
 
     async def rsys__test(msg: Mock_1, args: SysArgs[MockCfg]) -> Res[None]:
-        assert body.key == "hello"
+        assert msg.key == "hello"
         nonlocal rpc_flag
         rpc_flag = True
         return valerr("whoops")
@@ -128,10 +128,10 @@ async def test_rsys_err():
     send_msid = uuid4()
     await con.client__send({
         "sid": send_msid,
-        "bodycodeid": (await Code.get_regd_codeid_by_type(SrpcSend)).eject(),
-        "body": {
+        "codeid": (await Code.get_regd_codeid_by_type(SrpcSend)).eject(),
+        "msg": {
             "key": "test::test",
-            "body": {
+            "data": {
                 "key": "hello"
             }
         }
@@ -140,11 +140,11 @@ async def test_rsys_err():
     assert rpc_flag
     recv = await asyncio.wait_for(con.client__recv(), 1)
     assert recv["lsid"] == send_msid
-    assert recv["bodycodeid"] \
+    assert recv["codeid"] \
         == (await Code.get_regd_codeid_by_type(SrpcRecv)).eject()
-    body = recv["body"]
-    assert body["errcode"] == "val_err"
-    assert body["msg"] == "whoops"
+    msg = recv["msg"]
+    assert msg["errcode"] == "val_err"
+    assert msg["msg"] == "whoops"
 
     await app.destroy()
     assert destroy_flag
@@ -198,17 +198,17 @@ async def test_sys():
     send_msid = uuid4()
     await con.client__send({
         "sid": send_msid,
-        "bodycodeid": (await Code.get_regd_codeid_by_type(Mock_1)).eject(),
-        "body": {
+        "codeid": (await Code.get_regd_codeid_by_type(Mock_1)).eject(),
+        "msg": {
             "key": "hello"
         }
     })
     await asyncio.sleep(0.1)
     assert sys_flag
     recv = await asyncio.wait_for(con.client__recv(), 1)
-    assert "body" not in recv
+    assert "msg" not in recv
     assert recv["lsid"] == send_msid
-    assert recv["bodycodeid"] \
+    assert recv["codeid"] \
         == (await Code.get_regd_codeid_by_type(ok)).eject()
 
     await app.destroy()
@@ -264,8 +264,8 @@ async def test_sys_err():
     send_msid = uuid4()
     await con.client__send({
         "sid": send_msid,
-        "bodycodeid": (await Code.get_regd_codeid_by_type(Mock_1)).eject(),
-        "body": {
+        "codeid": (await Code.get_regd_codeid_by_type(Mock_1)).eject(),
+        "msg": {
             "key": "hello"
         }
     })
@@ -273,11 +273,11 @@ async def test_sys_err():
     assert sys_flag
     recv = await asyncio.wait_for(con.client__recv(), 1)
     assert recv["lsid"] == send_msid
-    assert recv["bodycodeid"] \
+    assert recv["codeid"] \
         == (await Code.get_regd_codeid_by_type(ValErr)).eject()
-    body = recv["body"]
-    assert body["errcode"] == "val_err"
-    assert body["msg"] == "whoops"
+    msg = recv["msg"]
+    assert msg["errcode"] == "val_err"
+    assert msg["msg"] == "whoops"
 
     await app.destroy()
     assert destroy_flag
