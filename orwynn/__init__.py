@@ -1,7 +1,6 @@
 import functools
 import inspect
 import typing
-from yon import TMsg_contra
 from typing import (
     Any,
     Coroutine,
@@ -18,11 +17,11 @@ from ryz.res import Err, Res, aresultify
 from ryz.singleton import Singleton
 from yon import (
     Msg,
-    RpcFn,
     ServerBus,
     ServerBusCfg,
     SubFn,
     SubOpts,
+    TMsg_contra,
     valerr,
 )
 
@@ -270,7 +269,7 @@ class App(Singleton):
             type_to_cfg[cfg_type] = cfg
         return type_to_cfg
 
-    def _get_msg_type_from_sysfn(self, fn: SysFn | SysFn) -> type:
+    def _get_msg_type_from_sysfn(self, fn: SysFn) -> type:
         sig = inspect.signature(fn)
         params = list(sig.parameters.values())
         param = params[0]
@@ -296,8 +295,10 @@ class App(Singleton):
             cfg=cfg
         )
         # apply monkey patch to avoid yon annotation checking
-        orig_bus_fn = self._bus._get_msgtype_from_subfn
-        self._bus._get_msgtype_from_subfn = self._monkeypatch_get_msgtype_from_subfn
+        orig_bus_fn = self._bus._get_msgtype_from_subfn  # noqa: SLF001
+        self._bus._get_msgtype_from_subfn = \
+            self._monkeypatch_get_msgtype_from_subfn  # noqa: SLF001
+
         subfn = functools.partial(sysfn, args=args)
         subfn.__name__ = sysfn.__name__.replace("sys__", "sub__")  # type: ignore
 
@@ -305,7 +306,8 @@ class App(Singleton):
             Res[Coroutine[Any, Any, Res[None]]],
             (await self._bus.sub(subfn, sub_opts))
         )
-        self._bus._get_msgtype_from_subfn = orig_bus_fn
+
+        self._bus._get_msgtype_from_subfn = orig_bus_fn  # noqa: SLF001
         return unsub_coro_res.eject()
 
     def _monkeypatch_get_msgtype_from_subfn(
