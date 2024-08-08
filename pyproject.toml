@@ -21,7 +21,7 @@ typing-extensions = "^4.7.1"
 
 pydantic = "^2.6.0"
 aiofiles = "^23.2.1"
-yon = "^1.0.9"
+yon = "^1.0.10"
 inflection = "^0.5.1"
 
 [tool.poetry.group.dev.dependencies]

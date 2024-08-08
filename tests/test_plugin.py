@@ -7,7 +7,7 @@ from ryz.uuid import uuid4
 from yon import ServerBusCfg, SrpcRecv, SrpcSend, Transport, ok
 
 from orwynn import App, AppCfg, Plugin, SysArgs
-from tests.conftest import Mock_1, MockCfg, MockConn
+from tests.conftest import Mock_1, MockCfg, MockCon
 
 
 async def test_rsys():
@@ -40,7 +40,7 @@ async def test_rsys():
     app = await App().init(AppCfg(
         server_bus_cfg=ServerBusCfg(
             transports=[
-                Transport(is_server=True, conn_type=MockConn)
+                Transport(is_server=True, con_type=MockCon)
             ]
         ),
         plugins=[plugin],
@@ -53,11 +53,11 @@ async def test_rsys():
     assert init_flag
     assert not destroy_flag
 
-    conn = MockConn()
-    conn_task = asyncio.create_task(app.get_bus().eject().conn(conn))
-    await conn.client__recv()
+    con = MockCon()
+    con_task = asyncio.create_task(app.get_bus().eject().con(con))
+    await con.client__recv()
     send_msid = uuid4()
-    await conn.client__send({
+    await con.client__send({
         "sid": send_msid,
         "bodycodeid": (await Code.get_regd_codeid_by_type(SrpcSend)).eject(),
         "body": {
@@ -69,7 +69,7 @@ async def test_rsys():
     })
     await asyncio.sleep(0.1)
     assert rpc_flag
-    recv = await asyncio.wait_for(conn.client__recv(), 1)
+    recv = await asyncio.wait_for(con.client__recv(), 1)
     assert "body" not in recv
     assert recv["lsid"] == send_msid
     assert recv["bodycodeid"] \
@@ -77,7 +77,7 @@ async def test_rsys():
 
     await app.destroy()
     assert destroy_flag
-    conn_task.cancel()
+    con_task.cancel()
 
 async def test_rsys_err():
     init_flag = False
@@ -109,7 +109,7 @@ async def test_rsys_err():
     app = await App().init(AppCfg(
         server_bus_cfg=ServerBusCfg(
             transports=[
-                Transport(is_server=True, conn_type=MockConn)
+                Transport(is_server=True, con_type=MockCon)
             ]
         ),
         plugins=[plugin],
@@ -122,11 +122,11 @@ async def test_rsys_err():
     assert init_flag
     assert not destroy_flag
 
-    conn = MockConn()
-    conn_task = asyncio.create_task(app.get_bus().eject().conn(conn))
-    await conn.client__recv()
+    con = MockCon()
+    con_task = asyncio.create_task(app.get_bus().eject().con(con))
+    await con.client__recv()
     send_msid = uuid4()
-    await conn.client__send({
+    await con.client__send({
         "sid": send_msid,
         "bodycodeid": (await Code.get_regd_codeid_by_type(SrpcSend)).eject(),
         "body": {
@@ -138,7 +138,7 @@ async def test_rsys_err():
     })
     await asyncio.sleep(0.1)
     assert rpc_flag
-    recv = await asyncio.wait_for(conn.client__recv(), 1)
+    recv = await asyncio.wait_for(con.client__recv(), 1)
     assert recv["lsid"] == send_msid
     assert recv["bodycodeid"] \
         == (await Code.get_regd_codeid_by_type(SrpcRecv)).eject()
@@ -148,7 +148,7 @@ async def test_rsys_err():
 
     await app.destroy()
     assert destroy_flag
-    conn_task.cancel()
+    con_task.cancel()
 
 async def test_sys():
     init_flag = False
@@ -179,7 +179,7 @@ async def test_sys():
     app = await App().init(AppCfg(
         server_bus_cfg=ServerBusCfg(
             transports=[
-                Transport(is_server=True, conn_type=MockConn)
+                Transport(is_server=True, con_type=MockCon)
             ]
         ),
         plugins=[plugin],
@@ -192,11 +192,11 @@ async def test_sys():
     assert init_flag
     assert not destroy_flag
 
-    conn = MockConn()
-    conn_task = asyncio.create_task(app.get_bus().eject().conn(conn))
-    await conn.client__recv()
+    con = MockCon()
+    con_task = asyncio.create_task(app.get_bus().eject().con(con))
+    await con.client__recv()
     send_msid = uuid4()
-    await conn.client__send({
+    await con.client__send({
         "sid": send_msid,
         "bodycodeid": (await Code.get_regd_codeid_by_type(Mock_1)).eject(),
         "body": {
@@ -205,7 +205,7 @@ async def test_sys():
     })
     await asyncio.sleep(0.1)
     assert sys_flag
-    recv = await asyncio.wait_for(conn.client__recv(), 1)
+    recv = await asyncio.wait_for(con.client__recv(), 1)
     assert "body" not in recv
     assert recv["lsid"] == send_msid
     assert recv["bodycodeid"] \
@@ -213,7 +213,7 @@ async def test_sys():
 
     await app.destroy()
     assert destroy_flag
-    conn_task.cancel()
+    con_task.cancel()
 
 async def test_sys_err():
     init_flag = False
@@ -245,7 +245,7 @@ async def test_sys_err():
     app = await App().init(AppCfg(
         server_bus_cfg=ServerBusCfg(
             transports=[
-                Transport(is_server=True, conn_type=MockConn)
+                Transport(is_server=True, con_type=MockCon)
             ]
         ),
         plugins=[plugin],
@@ -258,11 +258,11 @@ async def test_sys_err():
     assert init_flag
     assert not destroy_flag
 
-    conn = MockConn()
-    conn_task = asyncio.create_task(app.get_bus().eject().conn(conn))
-    await conn.client__recv()
+    con = MockCon()
+    con_task = asyncio.create_task(app.get_bus().eject().con(con))
+    await con.client__recv()
     send_msid = uuid4()
-    await conn.client__send({
+    await con.client__send({
         "sid": send_msid,
         "bodycodeid": (await Code.get_regd_codeid_by_type(Mock_1)).eject(),
         "body": {
@@ -271,7 +271,7 @@ async def test_sys_err():
     })
     await asyncio.sleep(0.1)
     assert sys_flag
-    recv = await asyncio.wait_for(conn.client__recv(), 1)
+    recv = await asyncio.wait_for(con.client__recv(), 1)
     assert recv["lsid"] == send_msid
     assert recv["bodycodeid"] \
         == (await Code.get_regd_codeid_by_type(ValErr)).eject()
@@ -281,4 +281,4 @@ async def test_sys_err():
 
     await app.destroy()
     assert destroy_flag
-    conn_task.cancel()
+    con_task.cancel()

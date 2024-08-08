@@ -16,7 +16,7 @@ from ryz.log import log
 from ryz.res import Err, Res, aresultify
 from ryz.singleton import Singleton
 from yon import (
-    Mbody,
+    Msg,
     ServerBus,
     ServerBusCfg,
     SubOpts,
@@ -47,13 +47,15 @@ class SysArgs(BaseModel, Generic[TCfg]):
 @runtime_checkable
 class SysFn(Protocol, Generic[TCfg]):
     async def __call__(
-            self, args: SysArgs[TCfg], body: Mbody) -> Any:
+        self, msg: Msg, args: SysArgs[TCfg]
+    ) -> Any:
         ...
 
 @runtime_checkable
 class RsysFn(Protocol, Generic[TCfg]):
     async def __call__(
-            self, args: SysArgs[TCfg], body: Mbody) -> Res[Any]:
+        self, body: Msg, args: SysArgs[TCfg]
+    ) -> Res[Any]:
         ...
 
 @runtime_checkable

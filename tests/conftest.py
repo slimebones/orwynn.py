@@ -4,7 +4,7 @@ from typing import Self
 
 import pytest
 import pytest_asyncio
-from yon import Conn, ConnArgs, ServerBusCfg, Transport
+from yon import Con, ConArgs, ServerBusCfg, Transport
 
 from orwynn import App, AppCfg, Cfg
 
@@ -25,7 +25,7 @@ def app_cfg() -> AppCfg:
             transports=[
                 Transport(
                     is_server=True,
-                    conn_type=MockConn
+                    con_type=MockCon
                 )
             ],
             reg_types=[Mock_1]),
@@ -35,8 +35,8 @@ def app_cfg() -> AppCfg:
             ]
         })
 
-class MockConn(Conn[None]):
-    def __init__(self, args: ConnArgs[None] = ConnArgs(core=None)) -> None:
+class MockCon(Con[None]):
+    def __init__(self, args: ConArgs[None] = ConArgs(core=None)) -> None:
         super().__init__(args)
         self.inp_queue: Queue[dict] = Queue()
         self.out_queue: Queue[dict] = Queue()
