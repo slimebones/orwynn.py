@@ -1,6 +1,7 @@
 import functools
 import inspect
 import typing
+from yon import TMsg_contra
 from typing import (
     Any,
     Coroutine,
@@ -54,23 +55,12 @@ class SysFn(Protocol, Generic[TCfg]):
         ...
 
 @runtime_checkable
-class RsysFn(Protocol, Generic[TCfg]):
-    async def __call__(
-        self, msg: Msg, args: SysArgs[TCfg]
-    ) -> Res[Any]:
-        ...
-
-@runtime_checkable
 class PluginFn(Protocol, Generic[TCfg]):
     async def __call__(self, args: "SysArgs[TCfg]") -> Res[None]: ...
 
 class OptedSysFn(Generic[TCfg]):
     fn: SysFn[TCfg]
-    opts: SubOpts
-
-class OptedRsysFn(Generic[TCfg]):
-    fn: RsysFn[TCfg]
-    opts: None
+    opts: SubOpts | None
 
 class Plugin(BaseModel, Generic[TCfg]):
     name: str
@@ -81,7 +71,7 @@ class Plugin(BaseModel, Generic[TCfg]):
     global_rsys_opts: None = None
 
     sys: list[SysFn[TCfg] | OptedSysFn[TCfg]] | None = None
-    rsys: list[RsysFn[TCfg] | OptedRsysFn[TCfg]] | None = None
+    rsys: list[SysFn[TCfg] | OptedSysFn[TCfg]] | None = None
     reg_types: list[type | Coded[type]] | None = None
 
     init: PluginFn[TCfg] | None = None
@@ -155,9 +145,12 @@ class App(Singleton):
 
             for sysfn_or_opted in plugin.sys:
                 if isinstance(sysfn_or_opted, OptedSysFn):
+                    opts = sysfn_or_opted.opts
+                    if opts is None:
+                        opts = SubOpts()
                     sub_opts = SubOpts.model_validate({
                         **global_sys_opts_dump,
-                        **sysfn_or_opted.opts.model_dump()
+                        **opts.model_dump()
                     })
                     # merge known lists instead of overwrite
                     if plugin.global_sys_opts:
@@ -190,14 +183,14 @@ class App(Singleton):
     async def _init_plugin_rsystems(self, plugin: Plugin):
         if plugin.rsys:
             # TODO: add rpc opts as soon as it's supported by yon
-            for rsysfn_or_opted in plugin.rsys:
-                if isinstance(rsysfn_or_opted, OptedRsysFn):
-                    rsysfn = rsysfn_or_opted.fn
+            for sysfn_or_opted in plugin.rsys:
+                if isinstance(sysfn_or_opted, OptedSysFn):
+                    sysfn = sysfn_or_opted.fn
                 else:
-                    rsysfn = rsysfn_or_opted
+                    sysfn = sysfn_or_opted
 
                 destructor = await self._init_rsys(
-                    rsysfn,
+                    sysfn,
                     plugin)
                 if destructor:
                     if plugin not in self._plugin_to_destructors:
@@ -277,11 +270,19 @@ class App(Singleton):
             type_to_cfg[cfg_type] = cfg
         return type_to_cfg
 
+    def _get_msg_type_from_sysfn(self, fn: SysFn | SysFn) -> type:
+        sig = inspect.signature(fn)
+        params = list(sig.parameters.values())
+        param = params[0]
+        assert inspect.isclass(param.annotation)
+        return param.annotation
+
     async def _init_sys(
-            self,
-            sysfn: SysFn[TCfg],
-            plugin: Plugin,
-            sub_opts: SubOpts) -> Coroutine[Any, Any, Res[None]] | None:
+        self,
+        sysfn: SysFn[TCfg],
+        plugin: Plugin,
+        sub_opts: SubOpts
+    ) -> Coroutine[Any, Any, Res[None]] | None:
         cfgtype = plugin.cfgtype
         if not sysfn.__name__.startswith("sys__"):  # type: ignore
             log.err(
@@ -292,8 +293,9 @@ class App(Singleton):
         args = SysArgs(
             app=self,
             bus=self._bus,
-            cfg=cfg)
-        subfn = self._new_subfn(sysfn, args)
+            cfg=cfg
+        )
+        subfn = self._new_subfn(sysfn, args, msgtype)
         subfn.__name__ = sysfn.__name__.replace("sys__", "sub__")  # type: ignore
 
         unsub_coro_res = typing.cast(
@@ -303,27 +305,31 @@ class App(Singleton):
         return unsub_coro_res.eject()
 
     @staticmethod
-    def _new_subfn(fn: SysFn, args: SysArgs) -> SubFn:
-        async def subfn(msg: Msg):
+    def _new_subfn(
+        fn: SysFn, args: SysArgs, msgtype: TMsg_contra
+    ) -> SubFn[TMsg_contra]:
+        async def subfn(msg: TMsg_contra):
             return await fn(msg, args)
         return subfn
 
     @staticmethod
-    def _new_rpcfn(fn: RsysFn, args: SysArgs) -> RpcFn:
-        async def rpcfn(msg: Msg):
+    def _new_rpcfn(
+        fn: SysFn, args: SysArgs, msgtype: TMsg_contra
+    ) -> RpcFn[TMsg_contra]:
+        async def rpcfn(msg: TMsg_contra):
             return await fn(msg, args)
         return rpcfn
 
     async def _init_rsys(
         self,
-        rsysfn: RsysFn[TCfg],
+        sysfn: SysFn[TCfg],
         plugin: Plugin
     )  -> Coroutine[Any, Any, Res[None]] | None:
         cfgtype = plugin.cfgtype
 
-        if not rsysfn.__name__.startswith("rsys__"):  # type: ignore
+        if not sysfn.__name__.startswith("rsys__"):  # type: ignore
             log.err(
-                f"rsys {rsysfn} name must start with \"rsys__\" => skip")
+                f"rsys {sysfn} name must start with \"rsys__\" => skip")
             return None
 
         # no need to reg signature for rpc function - the msg of it
@@ -334,9 +340,10 @@ class App(Singleton):
             app=self,
             bus=self._bus,
             cfg=cfg)
-        rpcfn = self._new_rpcfn(rsysfn, args)
-        rpcfn_key = rsysfn.__name__.replace("rsys__", "")  # type: ignore
-        rpcfn.__name__ = rsysfn.__name__.replace("rsys__", "srpc__")  # type: ignore
+        msgtype = self._get_msg_type_from_sysfn(sysfn)
+        rpcfn = self._new_rpcfn(sysfn, args, msgtype)
+        rpcfn_key = sysfn.__name__.replace("rsys__", "")  # type: ignore
+        rpcfn.__name__ = sysfn.__name__.replace("rsys__", "srpc__")  # type: ignore
         self._bus.reg_rpc(rpcfn, plugin.name + "::" + rpcfn_key).eject()
         return functools.partial(self._dereg_rpc, rpcfn_key)()
 
