@@ -298,7 +298,8 @@ class App(Singleton):
 
         unsub_coro_res = typing.cast(
             Res[Coroutine[Any, Any, Res[None]]],
-            (await self._bus.sub(subfn, sub_opts)))
+            (await self._bus.sub(subfn, sub_opts))
+        )
         return unsub_coro_res.eject()
 
     @staticmethod
