@@ -295,8 +295,8 @@ class App(Singleton):
             cfg=cfg
         )
         # apply monkey patch to avoid yon annotation checking
-        orig_bus_fn = self._bus._get_msgtype_from_subfn  # noqa: SLF001
-        self._bus._get_msgtype_from_subfn = \
+        orig_bus_fn = self._bus._get_bodytype_from_subfn  # noqa: SLF001
+        self._bus._get_bodytype_from_subfn = \
             self._monkeypatch_get_msgtype_from_subfn  # noqa: SLF001
 
         subfn = functools.partial(sysfn, args=args)
@@ -307,7 +307,7 @@ class App(Singleton):
             (await self._bus.sub(subfn, sub_opts))
         )
 
-        self._bus._get_msgtype_from_subfn = orig_bus_fn  # noqa: SLF001
+        self._bus._get_bodytype_from_subfn = orig_bus_fn  # noqa: SLF001
         return unsub_coro_res.eject()
 
     def _monkeypatch_get_msgtype_from_subfn(

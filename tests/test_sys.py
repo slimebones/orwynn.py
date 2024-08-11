@@ -13,7 +13,7 @@ async def test_main(app_cfg: AppCfg):
     await App().init(app_cfg)
 
     r = (await ServerBus.ie().pubr(
-        Mock_1(key="hello"), PubOpts(pubr__timeout=1))).eject()
+        Mock_1(key="hello"), PubOpts(pubr_timeout=1))).eject()
     assert isinstance(r, ok)
 
 
@@ -27,7 +27,7 @@ async def test_incorrect_name(app_cfg: AppCfg):
 
     try:
         (await ServerBus.ie().pubr(
-            Mock_1(key="hello"), PubOpts(pubr__timeout=0.2))).eject()
+            Mock_1(key="hello"), PubOpts(pubr_timeout=0.2))).eject()
     except TimeoutError:
         # no systems were registered => ok
         pass
