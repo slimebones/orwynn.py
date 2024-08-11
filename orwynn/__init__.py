@@ -283,9 +283,9 @@ class App(Singleton):
         sub_opts: SubOpts
     ) -> Coroutine[Any, Any, Res[None]] | None:
         cfgtype = plugin.cfgtype
-        if not sysfn.__name__.startswith("sys__"):  # type: ignore
+        if not sysfn.__name__.startswith("sys_"):  # type: ignore
             log.err(
-                f"sysfn {sysfn} name must start with \"sys__\" => skip")
+                f"sysfn {sysfn} name must start with \"sys_\" => skip")
             return None
         (await self._reg_sys_signature(sysfn)).eject()
         cfg = self._type_to_cfg[cfgtype]
@@ -300,7 +300,7 @@ class App(Singleton):
             self._monkeypatch_get_msgtype_from_subfn  # noqa: SLF001
 
         subfn = functools.partial(sysfn, args=args)
-        subfn.__name__ = sysfn.__name__.replace("sys__", "sub__")  # type: ignore
+        subfn.__name__ = sysfn.__name__.replace("sys_", "sub__")  # type: ignore
 
         unsub_coro_res = typing.cast(
             Res[Coroutine[Any, Any, Res[None]]],
@@ -332,9 +332,9 @@ class App(Singleton):
     )  -> Coroutine[Any, Any, Res[None]] | None:
         cfgtype = plugin.cfgtype
 
-        if not sysfn.__name__.startswith("rsys__"):  # type: ignore
+        if not sysfn.__name__.startswith("rsys_"):  # type: ignore
             log.err(
-                f"rsys {sysfn} name must start with \"rsys__\" => skip")
+                f"rsys {sysfn} name must start with \"rsys_\" => skip")
             return None
 
         # no need to reg signature for rpc function - the msg of it
@@ -346,8 +346,8 @@ class App(Singleton):
             bus=self._bus,
             cfg=cfg)
         rpcfn = functools.partial(sysfn, args=args)
-        rpcfn_key = sysfn.__name__.replace("rsys__", "")  # type: ignore
-        rpcfn.__name__ = sysfn.__name__.replace("rsys__", "srpc__")  # type: ignore
+        rpcfn_key = sysfn.__name__.replace("rsys_", "")  # type: ignore
+        rpcfn.__name__ = sysfn.__name__.replace("rsys_", "srpc__")  # type: ignore
         self._bus.reg_rpc(rpcfn, plugin.name + "::" + rpcfn_key).eject()
         return functools.partial(self._dereg_rpc, rpcfn_key)()
 

@@ -15,7 +15,7 @@ async def test_rsys():
     destroy_flag = False
     rpc_flag = False
 
-    async def rsys__test(msg: Mock_1, args: SysArgs[MockCfg]) -> Res[None]:
+    async def rsys_test(msg: Mock_1, args: SysArgs[MockCfg]) -> Res[None]:
         assert msg.key == "hello"
         nonlocal rpc_flag
         rpc_flag = True
@@ -36,7 +36,7 @@ async def test_rsys():
         cfgtype=MockCfg,
         init=_init,
         destroy=_destroy,
-        rsys=[rsys__test])
+        rsys=[rsys_test])
     app = await App().init(AppCfg(
         server_bus_cfg=ServerBusCfg(
             transports=[
@@ -84,7 +84,7 @@ async def test_rsys_err():
     destroy_flag = False
     rpc_flag = False
 
-    async def rsys__test(msg: Mock_1, args: SysArgs[MockCfg]) -> Res[None]:
+    async def rsys_test(msg: Mock_1, args: SysArgs[MockCfg]) -> Res[None]:
         assert msg.key == "hello"
         nonlocal rpc_flag
         rpc_flag = True
@@ -105,7 +105,7 @@ async def test_rsys_err():
         cfgtype=MockCfg,
         init=_init,
         destroy=_destroy,
-        rsys=[rsys__test])
+        rsys=[rsys_test])
     app = await App().init(AppCfg(
         server_bus_cfg=ServerBusCfg(
             transports=[
@@ -155,7 +155,7 @@ async def test_sys():
     destroy_flag = False
     sys_flag = False
 
-    async def sys__test(msg: Mock_1, args: SysArgs[MockCfg]):
+    async def sys_test(msg: Mock_1, args: SysArgs[MockCfg]):
         assert msg.key == "hello"
         nonlocal sys_flag
         sys_flag = True
@@ -175,7 +175,7 @@ async def test_sys():
         cfgtype=MockCfg,
         init=_init,
         destroy=_destroy,
-        sys=[sys__test])
+        sys=[sys_test])
     app = await App().init(AppCfg(
         server_bus_cfg=ServerBusCfg(
             transports=[
@@ -220,7 +220,7 @@ async def test_sys_err():
     destroy_flag = False
     sys_flag = False
 
-    async def sys__test(msg: Mock_1, args: SysArgs[MockCfg]):
+    async def sys_test(msg: Mock_1, args: SysArgs[MockCfg]):
         assert msg.key == "hello"
         nonlocal sys_flag
         sys_flag = True
@@ -241,7 +241,7 @@ async def test_sys_err():
         cfgtype=MockCfg,
         init=_init,
         destroy=_destroy,
-        sys=[sys__test])
+        sys=[sys_test])
     app = await App().init(AppCfg(
         server_bus_cfg=ServerBusCfg(
             transports=[

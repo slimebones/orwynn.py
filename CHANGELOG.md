@@ -1,3 +1,7 @@
+# 3.1.4
+
+- disallow double underscores for sys and rsys functions
+
 # 3.1.3
 
 - adjust to yon refactors

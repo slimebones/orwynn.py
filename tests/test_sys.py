@@ -5,10 +5,10 @@ from tests.conftest import Mock_1, MockCfg
 
 
 async def test_main(app_cfg: AppCfg):
-    async def sys__mock(msg: Mock_1, args: SysArgs[MockCfg]):
+    async def sys_mock(msg: Mock_1, args: SysArgs[MockCfg]):
         assert msg.key == "hello"
 
-    plugin = Plugin(name="test", cfgtype=MockCfg, sys=[sys__mock])
+    plugin = Plugin(name="test", cfgtype=MockCfg, sys=[sys_mock])
     app_cfg.plugins.append(plugin)
     await App().init(app_cfg)
 
