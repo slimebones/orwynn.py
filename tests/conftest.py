@@ -4,9 +4,9 @@ from typing import Self
 
 import pytest
 import pytest_asyncio
-from yon.server import Con, ConArgs, BusCfg, Transport
+from yon.server import BusCfg, Con, ConArgs, Transport
 
-from orwynn import App, AppCfg, Cfg
+from orwynn import App, AppCfg, Cfg, reg_scope_model_codes
 
 
 @pytest_asyncio.fixture(autouse=True)

@@ -1,15 +1,11 @@
-from copy import deepcopy
-from enum import Enum
 import functools
 import inspect
-from orwynn._pepel import AsyncPipeline
-from re import L
 import typing
+from copy import deepcopy
 from typing import (
     Any,
     Coroutine,
     Generic,
-    Iterable,
     Protocol,
     Self,
     runtime_checkable,
@@ -21,22 +17,18 @@ from ryz.log import log
 from ryz.res import Err, Res, aresultify
 from ryz.singleton import Singleton
 from yon.server import (
-    RpcFn,
-    Msg,
-    SubFnRetval,
     Bus,
     BusCfg,
+    Msg,
+    RpcFn,
     SubFn,
-    SubOpts,
-    TMsg_contra,
+    SubFnRetval,
     valerr,
-    MsgCondition,
-    MsgFilter,
-    SubFnRetvalFilter
 )
 
 from orwynn import env
 from orwynn._cfg import Cfg, CfgPack, CfgPackUtils, TCfg
+from orwynn._pepel import AsyncPipeline
 
 __all__ =[
     "App",
@@ -45,8 +37,20 @@ __all__ =[
     "CfgPack",
     "SysArgs",
     "Sys",
-    "Plugin"
+    "Plugin",
+    "reg_scope_model_codes"
 ]
+
+async def reg_scope_model_codes() -> Res[None]:
+    """
+    Searches for all subclasses of [pydantic::BaseModel] in the scope, and
+    registers a code for those who implement [ryz::code::Coded] trait.
+    """
+    selected: list[type[BaseModel]] = []
+    for t in BaseModel.__subclasses__():
+        if getattr(t, "code", None) is not None:
+            selected.append(t)
+    return await Bus.ie().reg_types(selected)
 
 class SysArgs(BaseModel, Generic[TCfg]):
     app: "App"
@@ -59,6 +63,9 @@ class SysArgs(BaseModel, Generic[TCfg]):
 class SysOpts(BaseModel):
     pipeline_before: AsyncPipeline[SubFnRetval] = AsyncPipeline()
     pipeline_after: AsyncPipeline[Msg] = AsyncPipeline()
+
+    class Config:
+        arbitrary_types_allowed = True
 
 @runtime_checkable
 class Sys(Protocol, Generic[TCfg]):
@@ -81,6 +88,9 @@ class SysSpec(BaseModel, Generic[TCfg]):
     fn: Sys[TCfg]
     opts: SysOpts = SysOpts()
 
+    class Config:
+        arbitrary_types_allowed = True
+
     @classmethod
     def new(
         cls, msgtype: type[Msg], fn: Sys[TCfg], opts: SysOpts = SysOpts()
@@ -92,6 +102,9 @@ class RsysSpec(BaseModel, Generic[TCfg]):
     msgtype: type[Msg]
     fn: Sys[TCfg]
     opts: SysOpts = SysOpts()
+
+    class Config:
+        arbitrary_types_allowed = True
 
     @classmethod
     def new(
@@ -144,6 +157,11 @@ class AppCfg(Cfg):
     global_opts: GlobalSysOpts = GlobalSysOpts()
     plugins: list[Plugin] = []
     extend_cfg_pack: CfgPack = {}
+    reg_scope_model_codes: bool = True
+    """
+    Whether to automatically register all available [`pydantic::BaseModel`]
+    subclasses.
+    """
 
 def _merge(to_dict: dict, from_dict: dict) -> Res[dict]:
     """
@@ -195,7 +213,7 @@ def _merge_sys_opts(
     elif isinstance(spec, RsysSpec):
         d.update(app_cfg.global_opts.rsys.model_dump())
     else:
-        raise SystemError("panic")
+        raise SystemError("panic")  # noqa: TRY004
 
     d.update(plugin.global_opts.all.model_dump())
     if isinstance(spec, SysSpec):
@@ -203,7 +221,7 @@ def _merge_sys_opts(
     elif isinstance(spec, RsysSpec):
         d.update(plugin.global_opts.rsys.model_dump())
     else:
-        raise SystemError("panic")
+        raise SystemError("panic")  # noqa: TRY004
 
     d.update(spec.opts.model_dump())
 
@@ -221,6 +239,9 @@ class App(Singleton):
         return Ok(self._bus)
 
     async def init(self, cfg: AppCfg = AppCfg()) -> Self:
+        if cfg.reg_scope_model_codes:
+            (await reg_scope_model_codes()).eject()
+
         if self._is_initd:
             return self
 

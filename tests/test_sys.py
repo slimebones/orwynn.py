@@ -1,4 +1,4 @@
-from yon.server import PubOpts, Bus, ok
+from yon.server import Bus, PubOpts, ok
 
 from orwynn import App, AppCfg, Plugin, SysArgs, SysSpec
 from tests.conftest import Mock_1, MockCfg
