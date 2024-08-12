@@ -21,7 +21,7 @@ async def autorun():
 @pytest.fixture
 def app_cfg() -> AppCfg:
     return AppCfg(
-        server_bus_cfg=BusCfg(
+        bus_cfg=BusCfg(
             transports=[
                 Transport(
                     is_server=True,

@@ -6,7 +6,7 @@ from ryz.res import Ok, Res, valerr
 from ryz.uuid import uuid4
 from yon.server import BusCfg, RpcRecv, RpcSend, Transport, ok
 
-from orwynn import App, AppCfg, Plugin, RsysSpec, SysArgs, SysSpec
+from orwynn import App, AppCfg, Plugin, PluginInp, RsysSpec, SysInp, SysSpec
 from tests.conftest import Mock_1, MockCfg, MockCon
 
 
@@ -15,18 +15,18 @@ async def test_rsys():
     destroy_flag = False
     rpc_flag = False
 
-    async def rsys_test(msg: Mock_1, args: SysArgs[MockCfg]) -> Res[None]:
-        assert msg.key == "hello"
+    async def rsys_test(inp: SysInp[Mock_1, MockCfg]) -> Res[None]:
+        assert inp.msg.key == "hello"
         nonlocal rpc_flag
         rpc_flag = True
         return Ok(None)
 
-    async def _init(args: SysArgs[MockCfg]) -> Res[None]:
+    async def _init(inp: PluginInp[MockCfg]) -> Res[None]:
         nonlocal init_flag
         init_flag = True
         return Ok(None)
 
-    async def _destroy(args: SysArgs[MockCfg]) -> Res[None]:
+    async def _destroy(inp: PluginInp[MockCfg]) -> Res[None]:
         nonlocal destroy_flag
         destroy_flag = True
         return Ok(None)
@@ -39,7 +39,7 @@ async def test_rsys():
         rsys=[RsysSpec.new("test", Mock_1, rsys_test)]
     )
     app = await App().init(AppCfg(
-        server_bus_cfg=BusCfg(
+        bus_cfg=BusCfg(
             transports=[
                 Transport(is_server=True, con_type=MockCon)
             ]
@@ -85,18 +85,18 @@ async def test_rsys_err():
     destroy_flag = False
     rpc_flag = False
 
-    async def rsys_test(msg: Mock_1, args: SysArgs[MockCfg]) -> Res[None]:
+    async def rsys_test(inp: SysInp[Mock_1, MockCfg]) -> Res[None]:
         assert msg.key == "hello"
         nonlocal rpc_flag
         rpc_flag = True
         return valerr("whoops")
 
-    async def _init(args: SysArgs[MockCfg]) -> Res[None]:
+    async def _init(inp: PluginInp[MockCfg]) -> Res[None]:
         nonlocal init_flag
         init_flag = True
         return Ok(None)
 
-    async def _destroy(args: SysArgs[MockCfg]) -> Res[None]:
+    async def _destroy(inp: PluginInp[MockCfg]) -> Res[None]:
         nonlocal destroy_flag
         destroy_flag = True
         return Ok(None)
@@ -108,7 +108,7 @@ async def test_rsys_err():
         destroy=_destroy,
         rsys=[RsysSpec.new("test", Mock_1, rsys_test)])
     app = await App().init(AppCfg(
-        server_bus_cfg=BusCfg(
+        bus_cfg=BusCfg(
             transports=[
                 Transport(is_server=True, con_type=MockCon)
             ]
@@ -156,17 +156,17 @@ async def test_sys():
     destroy_flag = False
     sys_flag = False
 
-    async def sys_test(msg: Mock_1, args: SysArgs[MockCfg]):
-        assert msg.key == "hello"
+    async def sys_test(inp: SysInp[Mock_1, MockCfg]):
+        assert inp.msg.key == "hello"
         nonlocal sys_flag
         sys_flag = True
 
-    async def _init(args: SysArgs[MockCfg]) -> Res[None]:
+    async def _init(inp: PluginInp[MockCfg]) -> Res[None]:
         nonlocal init_flag
         init_flag = True
         return Ok(None)
 
-    async def _destroy(args: SysArgs[MockCfg]) -> Res[None]:
+    async def _destroy(inp: PluginInp[MockCfg]) -> Res[None]:
         nonlocal destroy_flag
         destroy_flag = True
         return Ok(None)
@@ -179,7 +179,7 @@ async def test_sys():
         sys=[SysSpec.new(Mock_1, sys_test)]
     )
     app = await App().init(AppCfg(
-        server_bus_cfg=BusCfg(
+        bus_cfg=BusCfg(
             transports=[
                 Transport(is_server=True, con_type=MockCon)
             ]
@@ -222,18 +222,18 @@ async def test_sys_err():
     destroy_flag = False
     sys_flag = False
 
-    async def sys_test(msg: Mock_1, args: SysArgs[MockCfg]):
-        assert msg.key == "hello"
+    async def sys_test(inp: SysInp[Mock_1, MockCfg]):
+        assert inp.msg.key == "hello"
         nonlocal sys_flag
         sys_flag = True
         return valerr("whoops")
 
-    async def _init(args: SysArgs[MockCfg]) -> Res[None]:
+    async def _init(inp: PluginInp[MockCfg]) -> Res[None]:
         nonlocal init_flag
         init_flag = True
         return Ok(None)
 
-    async def _destroy(args: SysArgs[MockCfg]) -> Res[None]:
+    async def _destroy(inp: PluginInp[MockCfg]) -> Res[None]:
         nonlocal destroy_flag
         destroy_flag = True
         return Ok(None)
@@ -243,9 +243,10 @@ async def test_sys_err():
         cfgtype=MockCfg,
         init=_init,
         destroy=_destroy,
-        sys=[SysSpec.new(Mock_1, sys_test)])
+        sys=[SysSpec.new(Mock_1, sys_test)]
+    )
     app = await App().init(AppCfg(
-        server_bus_cfg=BusCfg(
+        bus_cfg=BusCfg(
             transports=[
                 Transport(is_server=True, con_type=MockCon)
             ]

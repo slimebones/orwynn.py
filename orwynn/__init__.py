@@ -8,6 +8,7 @@ from typing import (
     Generic,
     Protocol,
     Self,
+    TypeVar,
     runtime_checkable,
 )
 
@@ -18,6 +19,7 @@ from ryz.res import Err, Res, aresultify
 from ryz.singleton import Singleton
 from yon.server import (
     Bus,
+    TMsg_contra,
     BusCfg,
     Msg,
     RpcFn,
@@ -35,9 +37,13 @@ __all__ =[
     "AppCfg",
     "Cfg",
     "CfgPack",
-    "SysArgs",
+    "SysInp",
     "Sys",
     "Plugin",
+    "PluginInp",
+    "SysSpec",
+    "RsysSpec",
+    "SysOpts",
     "reg_scope_model_codes"
 ]
 
@@ -52,8 +58,8 @@ async def reg_scope_model_codes() -> Res[None]:
             selected.append(t)
     return await Bus.ie().reg_types(selected)
 
-class SysArgs(BaseModel, Generic[TCfg]):
-    msg: Msg
+class SysInp(BaseModel, Generic[TMsg_contra, TCfg]):
+    msg: TMsg_contra
     app: "App"
     bus: Bus
     cfg: TCfg
@@ -63,33 +69,34 @@ class SysArgs(BaseModel, Generic[TCfg]):
         arbitrary_types_allowed = True
 
 class SysOpts(BaseModel):
-    pipeline_before: AsyncPipeline[SysArgs] = AsyncPipeline()
-    pipeline_after: AsyncPipeline[SysArgs] = AsyncPipeline()
+    pipeline_before: AsyncPipeline[SysInp] = AsyncPipeline()
+    pipeline_after: AsyncPipeline[SysInp] = AsyncPipeline()
 
     class Config:
         arbitrary_types_allowed = True
 
+TMsg_co = TypeVar("TMsg_co", bound=Msg, covariant=True)
 @runtime_checkable
-class Sys(Protocol, Generic[TCfg]):
-    async def __call__(self, val: SysArgs[TCfg]) -> Any: ...
+class Sys(Protocol, Generic[TMsg_co, TCfg]):
+    async def __call__(self, inp: SysInp[TMsg_co, TCfg]) -> Any: ...
 
-class PluginArgs(BaseModel, Generic[TCfg]):
+class PluginInp(BaseModel, Generic[TCfg]):
     app: "App"
     bus: Bus
     cfg: TCfg
 
 @runtime_checkable
 class PluginFn(Protocol, Generic[TCfg]):
-    async def __call__(self, val: "PluginArgs[TCfg]") -> Res[None]: ...
+    async def __call__(self, inp: "PluginInp[TCfg]") -> Res[None]: ...
 
 class GlobalSysOpts(BaseModel):
     all: SysOpts = SysOpts()
     sys: SysOpts = SysOpts()
     rsys: SysOpts = SysOpts()
 
-class SysSpec(BaseModel, Generic[TCfg]):
-    msgtype: type[Msg]
-    fn: Sys[TCfg]
+class SysSpec(BaseModel, Generic[TMsg_contra, TCfg]):
+    msgtype: type[TMsg_contra]
+    fn: Sys[TMsg_contra, TCfg]
     opts: SysOpts = SysOpts()
 
     class Config:
@@ -97,14 +104,17 @@ class SysSpec(BaseModel, Generic[TCfg]):
 
     @classmethod
     def new(
-        cls, msgtype: type[Msg], fn: Sys[TCfg], opts: SysOpts = SysOpts()
+        cls,
+        msgtype: type[TMsg_contra],
+        fn: Sys[TMsg_contra, TCfg],
+        opts: SysOpts = SysOpts()
     ) -> Self:
         return cls(msgtype=msgtype, fn=fn, opts=opts)
 
-class RsysSpec(BaseModel, Generic[TCfg]):
+class RsysSpec(BaseModel, Generic[TMsg_contra, TCfg]):
     key: str
     msgtype: type[Msg]
-    fn: Sys[TCfg]
+    fn: Sys[TMsg_contra, TCfg]
     opts: SysOpts = SysOpts()
 
     class Config:
@@ -114,8 +124,8 @@ class RsysSpec(BaseModel, Generic[TCfg]):
     def new(
         cls,
         key: str,
-        msgtype: type[Msg],
-        fn: Sys[TCfg],
+        msgtype: type[TMsg_contra],
+        fn: Sys[TMsg_contra, TCfg],
         opts: SysOpts = SysOpts()
     ) -> Self:
         return cls(key=key, msgtype=msgtype, fn=fn, opts=opts)
@@ -157,7 +167,7 @@ class Plugin(BaseModel, Generic[TCfg]):
 
 class AppCfg(Cfg):
     std_verbosity: int = 1
-    server_bus_cfg: BusCfg = BusCfg()
+    bus_cfg: BusCfg = BusCfg()
     global_opts: GlobalSysOpts = GlobalSysOpts()
     plugins: list[Plugin] = []
     extend_cfg_pack: CfgPack = {}
@@ -255,7 +265,7 @@ class App(Singleton):
 
         self._cfg = cfg
         self._init_mode()
-        await self._bus.init(self._cfg.server_bus_cfg)
+        await self._bus.init(self._cfg.bus_cfg)
 
         self._type_to_cfg = await self._gen_type_to_cfg()
         self._plugins = list(self._cfg.plugins)
@@ -332,11 +342,11 @@ class App(Singleton):
 
     def _get_plugin_args(
         self, plugin: Plugin[TCfg]
-    ) -> Res[PluginArgs[TCfg]]:
+    ) -> Res[PluginInp[TCfg]]:
         if plugin.cfgtype not in self._type_to_cfg:
             return valerr(f"({plugin}) unrecognized cfg type")
         cfg = typing.cast(TCfg, self._type_to_cfg[plugin.cfgtype])
-        return Ok(PluginArgs(app=self, bus=self._bus, cfg=cfg))
+        return Ok(PluginInp(app=self, bus=self._bus, cfg=cfg))
 
     async def _init_all_plugins(self):
         for plugin in self._plugins:
@@ -382,7 +392,7 @@ class App(Singleton):
 
     async def _init_sys(
         self,
-        spec: SysSpec[TCfg],
+        spec: SysSpec[TMsg_contra, TCfg],
         plugin: Plugin
     ) -> Coroutine[Any, Any, Res[None]] | None:
         sys_opts = _merge_sys_opts(
@@ -393,7 +403,7 @@ class App(Singleton):
 
         cfgtype = plugin.cfgtype
         cfg = self._type_to_cfg[cfgtype]
-        args = SysArgs(
+        args = SysInp(
             msg=None,
             app=self,
             bus=self._bus,
@@ -418,7 +428,7 @@ class App(Singleton):
 
     async def _init_rsys(
         self,
-        spec: RsysSpec[TCfg],
+        spec: RsysSpec,
         plugin: Plugin
     )  -> Coroutine[Any, Any, Res[None]] | None:
         sys_opts = _merge_sys_opts(
@@ -433,7 +443,7 @@ class App(Singleton):
         # doesn't have to have the code
 
         cfg = self._type_to_cfg[cfgtype]
-        args = SysArgs(
+        args = SysInp(
             msg=None,
             app=self,
             bus=self._bus,
@@ -454,7 +464,9 @@ class App(Singleton):
         return functools.partial(self._dereg_rpc, spec.key)()
 
     def _wrap_pipeline_as_sub(
-        self, pipeline: AsyncPipeline, args: SysArgs[TCfg]
+        self,
+        pipeline: AsyncPipeline,
+        args: SysInp
     ) -> SubFn:
         args = args.model_copy()
         async def inner(msg: Msg) -> SubFnRetval:
@@ -463,7 +475,7 @@ class App(Singleton):
         return inner
 
     def _wrap_pipeline_as_rpc(
-        self, pipeline: AsyncPipeline, args: SysArgs[TCfg]
+        self, pipeline: AsyncPipeline, args: SysInp
     ) -> RpcFn:
         args = args.model_copy()
         async def inner(msg: Msg) -> Res[Msg]:
