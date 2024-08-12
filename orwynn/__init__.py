@@ -74,13 +74,13 @@ class SysInp(BaseModel, Generic[TMsg, TCfg]):
     class Config:
         arbitrary_types_allowed = True
 
-    def res(self, msg: TMsg) -> Res["SysInp[TMsg, TCfg]"]:
+    def ok(self, msg: TMsg | None = None) -> Res["SysInp[TMsg, TCfg]"]:
         """
         Generates Ok() res with new message.
 
         Used generally at systems to return a message to publish.
         """
-        self.msg = msg
+        self.msg = msg  # type: ignore
         return Ok(self)
 
 class SysOpts(BaseModel):
@@ -503,8 +503,8 @@ class App(Singleton):
         self, pipeline: AsyncPipeline, args: SysInp
     ) -> RpcFn:
         # we copy inp here so pipes can skip copying. It's highly recommended
-        # for pipes to not create side effects with the inp objects since it's
-        # allowed to be changed throughout pipeline.
+        # for pipes to not create side effects with the inp objects since they
+        # are allowed to be changed throughout pipeline.
         args = args.model_copy()
         async def inner(msg: Msg) -> Res[Msg]:
             args.msg = msg

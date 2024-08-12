@@ -16,21 +16,21 @@ async def test_rsys():
     destroy_flag = False
     rpc_flag = False
 
-    async def rsys_test(inp: SysInp[Mock_1, MockCfg]) -> Res[None]:
+    async def rsys_test(inp: SysInp[Mock_1, MockCfg]) -> Res[SysInp]:
         assert inp.msg.key == "hello"
         nonlocal rpc_flag
         rpc_flag = True
-        return Ok(None)
+        return inp.ok()
 
     async def _init(inp: PluginInp[MockCfg]) -> Res[None]:
         nonlocal init_flag
         init_flag = True
-        return Ok(None)
+        return Ok()
 
     async def _destroy(inp: PluginInp[MockCfg]) -> Res[None]:
         nonlocal destroy_flag
         destroy_flag = True
-        return Ok(None)
+        return Ok()
 
     plugin = Plugin(
         name="test",
@@ -86,7 +86,7 @@ async def test_rsys_err():
     destroy_flag = False
     rpc_flag = False
 
-    async def rsys_test(inp: SysInp[Mock_1, MockCfg]) -> Res[None]:
+    async def rsys_test(inp: SysInp[Mock_1, MockCfg]) -> Res[SysInp]:
         assert msg.key == "hello"
         nonlocal rpc_flag
         rpc_flag = True
@@ -157,10 +157,11 @@ async def test_sys():
     destroy_flag = False
     sys_flag = False
 
-    async def sys_test(inp: SysInp[Mock_1, MockCfg]):
+    async def sys_test(inp: SysInp[Mock_1, MockCfg]) -> Res[SysInp]:
         assert inp.msg.key == "hello"
         nonlocal sys_flag
         sys_flag = True
+        return inp.ok()
 
     async def _init(inp: PluginInp[MockCfg]) -> Res[None]:
         nonlocal init_flag

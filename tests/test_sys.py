@@ -2,11 +2,13 @@ from yon.server import Bus, PubOpts, ok
 
 from orwynn import App, AppCfg, Plugin, SysInp, SysSpec
 from tests.conftest import Mock_1, MockCfg
+from ryz.res import Res
 
 
 async def test_main(app_cfg: AppCfg):
-    async def sys_mock(inp: SysInp[Mock_1, MockCfg]):
+    async def sys_mock(inp: SysInp[Mock_1, MockCfg]) -> Res[SysInp]:
         assert inp.msg.key == "hello"
+        return inp.ok()
 
     plugin = Plugin(
         name="test",
@@ -22,8 +24,9 @@ async def test_main(app_cfg: AppCfg):
 
 
 async def test_incorrect_name(app_cfg: AppCfg):
-    async def whocares__mock(inp: SysInp[Mock_1, MockCfg]):
+    async def whocares__mock(inp: SysInp[Mock_1, MockCfg]) -> Res[SysInp]:
         assert inp.msg.key == "hello"
+        return inp.ok()
 
     plugin = Plugin(
         name="test", cfgtype=MockCfg, sys=[SysSpec.new(Mock_1, whocares__mock)]
