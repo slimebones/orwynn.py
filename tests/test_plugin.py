@@ -4,7 +4,7 @@ from ryz.code import Code
 from ryz.err import ValErr
 from ryz.res import Ok, Res, valerr
 from ryz.uuid import uuid4
-from yon import ServerBusCfg, SrpcRecv, SrpcSend, Transport, ok
+from yon.server import BusCfg, SrpcRecv, SrpcSend, Transport, ok
 
 from orwynn import App, AppCfg, Plugin, SysArgs
 from tests.conftest import Mock_1, MockCfg, MockCon
@@ -38,7 +38,7 @@ async def test_rsys():
         destroy=_destroy,
         rsys=[rsys_test])
     app = await App().init(AppCfg(
-        server_bus_cfg=ServerBusCfg(
+        server_bus_cfg=BusCfg(
             transports=[
                 Transport(is_server=True, con_type=MockCon)
             ]
@@ -107,7 +107,7 @@ async def test_rsys_err():
         destroy=_destroy,
         rsys=[rsys_test])
     app = await App().init(AppCfg(
-        server_bus_cfg=ServerBusCfg(
+        server_bus_cfg=BusCfg(
             transports=[
                 Transport(is_server=True, con_type=MockCon)
             ]
@@ -177,7 +177,7 @@ async def test_sys():
         destroy=_destroy,
         sys=[sys_test])
     app = await App().init(AppCfg(
-        server_bus_cfg=ServerBusCfg(
+        server_bus_cfg=BusCfg(
             transports=[
                 Transport(is_server=True, con_type=MockCon)
             ]
@@ -243,7 +243,7 @@ async def test_sys_err():
         destroy=_destroy,
         sys=[sys_test])
     app = await App().init(AppCfg(
-        server_bus_cfg=ServerBusCfg(
+        server_bus_cfg=BusCfg(
             transports=[
                 Transport(is_server=True, con_type=MockCon)
             ]

@@ -1,5 +1,8 @@
+from copy import deepcopy
+from enum import Enum
 import functools
 import inspect
+from re import L
 import typing
 from typing import (
     Any,
@@ -15,10 +18,10 @@ from ryz.code import Coded, Ok
 from ryz.log import log
 from ryz.res import Err, Res, aresultify
 from ryz.singleton import Singleton
-from yon import (
+from yon.server import (
     Msg,
-    ServerBus,
-    ServerBusCfg,
+    Bus,
+    BusCfg,
     SubFn,
     SubOpts,
     TMsg_contra,
@@ -34,20 +37,23 @@ __all__ =[
     "Cfg",
     "CfgPack",
     "SysArgs",
-    "SysFn",
+    "Sys",
     "Plugin"
 ]
 
 class SysArgs(BaseModel, Generic[TCfg]):
     app: "App"
-    bus: ServerBus
+    bus: Bus
     cfg: TCfg
 
     class Config:
         arbitrary_types_allowed = True
 
+class SysOpts(BaseModel):
+    pass
+
 @runtime_checkable
-class SysFn(Protocol, Generic[TCfg]):
+class Sys(Protocol, Generic[TCfg]):
     async def __call__(
         self, msg: Msg, args: SysArgs[TCfg]
     ) -> Any:
@@ -57,20 +63,32 @@ class SysFn(Protocol, Generic[TCfg]):
 class PluginFn(Protocol, Generic[TCfg]):
     async def __call__(self, args: "SysArgs[TCfg]") -> Res[None]: ...
 
-class OptedSysFn(Generic[TCfg]):
-    fn: SysFn[TCfg]
-    opts: SubOpts | None
+class OptedSys(Generic[TCfg]):
+    fn: Sys[TCfg]
+    opts: SysOpts = SysOpts()
+
+class GlobalSysOpts(BaseModel):
+    all: SysOpts = SysOpts()
+    sys: SysOpts = SysOpts()
+    rsys: SysOpts = SysOpts()
 
 class Plugin(BaseModel, Generic[TCfg]):
+    """
+    # SysOpts merge order
+
+    * app_cfg.global_opts.all
+    * app_cfg.global_opts.<sys_type>
+    * plugin.global_opts.all
+    * plugin.global_opts.<sys_type>
+    * opted_sys.opts (if [`OptedSys`] is provided)
+    """
     name: str
     cfgtype: type[TCfg]
 
-    global_sys_opts: SubOpts = SubOpts()
-    # TODO: impl rpc opts once it gets support at yon
-    global_rsys_opts: None = None
+    global_opts: GlobalSysOpts = GlobalSysOpts()
 
-    sys: list[SysFn[TCfg] | OptedSysFn[TCfg]] | None = None
-    rsys: list[SysFn[TCfg] | OptedSysFn[TCfg]] | None = None
+    sys: list[Sys[TCfg] | OptedSys[TCfg]] | None = None
+    rsys: list[Sys[TCfg] | OptedSys[TCfg]] | None = None
     reg_types: list[type | Coded[type]] | None = None
 
     init: PluginFn[TCfg] | None = None
@@ -81,7 +99,7 @@ class Plugin(BaseModel, Generic[TCfg]):
     """
 
     def __str__(self) -> str:
-        return f"<plugin \"{self.name}\" of cfgtype {self.cfgtype}>"
+        return f"plugin \"{self.name}\" of cfgtype {self.cfgtype}"
 
     def __hash__(self) -> int:
         return hash(id(self))
@@ -91,9 +109,82 @@ class Plugin(BaseModel, Generic[TCfg]):
 
 class AppCfg(Cfg):
     std_verbosity: int = 1
-    server_bus_cfg: ServerBusCfg = ServerBusCfg()
+    server_bus_cfg: BusCfg = BusCfg()
+    global_opts: GlobalSysOpts = GlobalSysOpts()
     plugins: list[Plugin] = []
     extend_cfg_pack: CfgPack = {}
+
+class SysType(Enum):
+    sys = "sys"
+    rsys = "rsys"
+
+def _merge(to_dict: dict, from_dict: dict) -> Res[dict]:
+    """
+    Updates `to_dict` using recursive strategies, merging all nested mergeable
+    collections.
+    """
+    to_dict = deepcopy(to_dict)
+
+    for k_from, v_from in from_dict.items():
+        v = v_from
+        if k_from in to_dict:
+            v_to = to_dict[k_from]
+            if type(v_to) is not type(v_from):
+                return valerr(
+                    f"incompatible types for dict key {k_from} - {type(v_to)}"
+                    f" is not {type(v_from)}"
+                )
+            elif isinstance(v_to, dict):
+                r = _merge(v_to, v_from)
+                if isinstance(r, Err):
+                    return r
+                v = r.okval
+            elif isinstance(v_to, list):
+                v = v_to.extend(v_from)
+            elif isinstance(v_to, set):
+                v = v_to.update(v_from)
+            # all other types are just overwritten
+        to_dict[k_from] = v
+
+    return Ok(to_dict)
+
+def _merge_sys_opts(
+    app_cfg: AppCfg,
+    plugin: Plugin,
+    sys: Sys | OptedSys,
+    systype: SysType
+) -> SysOpts:
+    """
+    # Merge order
+
+    * app_cfg.global_opts.all
+    * app_cfg.global_opts.<sys_type>
+    * plugin.global_opts.all
+    * plugin.global_opts.<sys_type>
+    * opted_sys.opts (if [`OptedSys`] is provided)
+    """
+    d = app_cfg.global_opts.all.model_dump()
+    match systype:
+        case SysType.sys:
+            d.update(app_cfg.global_opts.sys.model_dump())
+        case SysType.rsys:
+            d.update(app_cfg.global_opts.rsys.model_dump())
+        case _:
+            raise SystemError("panic")
+
+    d.update(plugin.global_opts.all.model_dump())
+    match systype:
+        case SysType.sys:
+            d.update(plugin.global_opts.sys.model_dump())
+        case SysType.rsys:
+            d.update(plugin.global_opts.rsys.model_dump())
+        case _:
+            raise SystemError("panic")
+
+    if isinstance(sys, OptedSys):
+        d.update(sys.opts.model_dump())
+
+    return SysOpts.model_validate(d)
 
 class App(Singleton):
     _SYS_SIGNATURE_PARAMS_LEN: int = 2
@@ -101,7 +192,7 @@ class App(Singleton):
     def __init__(self) -> None:
         self._is_initd = False
 
-    def get_bus(self) -> Res[ServerBus]:
+    def get_bus(self) -> Res[Bus]:
         if not self._is_initd:
             return valerr("not initialized")
         return Ok(self._bus)
@@ -110,7 +201,7 @@ class App(Singleton):
         if self._is_initd:
             return self
 
-        self._bus = ServerBus.ie()
+        self._bus = Bus.ie()
         self._plugin_to_destructors: dict[
             Plugin, list[Coroutine[Any, Any, Res[None]]]] = {}
 
@@ -138,42 +229,23 @@ class App(Singleton):
 
     async def _init_plugin_systems(self, plugin: Plugin):
         if plugin.sys:
-            global_sys_opts_dump = {}
-            if plugin.global_sys_opts:
-                global_sys_opts_dump = plugin.global_sys_opts.model_dump()
-
-            for sysfn_or_opted in plugin.sys:
-                if isinstance(sysfn_or_opted, OptedSysFn):
-                    opts = sysfn_or_opted.opts
-                    if opts is None:
-                        opts = SubOpts()
-                    sub_opts = SubOpts.model_validate({
-                        **global_sys_opts_dump,
-                        **opts.model_dump()
-                    })
-                    # merge known lists instead of overwrite
-                    if plugin.global_sys_opts:
-                        sub_opts.conditions = [
-                            *(plugin.global_sys_opts.conditions or []),
-                            *(sub_opts.conditions or [])
-                        ]
-                        sub_opts.inp_filters = [
-                            *(plugin.global_sys_opts.inp_filters or []),
-                            *(sub_opts.inp_filters or [])
-                        ]
-                        sub_opts.out_filters = [
-                            *(plugin.global_sys_opts.out_filters or []),
-                            *(sub_opts.out_filters or [])
-                        ]
-                    sysfn = sysfn_or_opted.fn
+            for sys_or_opted in plugin.sys:
+                sys_opts = _merge_sys_opts(
+                    self._cfg,
+                    plugin,
+                    sys_or_opted,
+                    SysType.sys
+                )
+                if isinstance(sys_or_opted, OptedSys):
+                    sys = sys_or_opted.fn
                 else:
-                    sub_opts = plugin.global_sys_opts or SubOpts()
-                    sysfn = sysfn_or_opted
+                    sys = sys_or_opted
 
                 destructor = await self._init_sys(
-                    sysfn,
+                    sys,
                     plugin,
-                    sub_opts)
+                    sys_opts
+                )
                 if destructor:
                     if plugin not in self._plugin_to_destructors:
                         self._plugin_to_destructors[plugin] = []
@@ -183,7 +255,7 @@ class App(Singleton):
         if plugin.rsys:
             # TODO: add rpc opts as soon as it's supported by yon
             for sysfn_or_opted in plugin.rsys:
-                if isinstance(sysfn_or_opted, OptedSysFn):
+                if isinstance(sysfn_or_opted, OptedSys):
                     sysfn = sysfn_or_opted.fn
                 else:
                     sysfn = sysfn_or_opted
@@ -269,7 +341,7 @@ class App(Singleton):
             type_to_cfg[cfg_type] = cfg
         return type_to_cfg
 
-    def _get_msg_type_from_sysfn(self, fn: SysFn) -> type:
+    def _get_msg_type_from_sysfn(self, fn: Sys) -> type:
         sig = inspect.signature(fn)
         params = list(sig.parameters.values())
         param = params[0]
@@ -278,56 +350,36 @@ class App(Singleton):
 
     async def _init_sys(
         self,
-        sysfn: SysFn[TCfg],
+        sysfn: Sys[TCfg],
         plugin: Plugin,
-        sub_opts: SubOpts
+        sys_opts: SysOpts
     ) -> Coroutine[Any, Any, Res[None]] | None:
         cfgtype = plugin.cfgtype
-        if not sysfn.__name__.startswith("sys_"):  # type: ignore
-            log.err(
-                f"sysfn {sysfn} name must start with \"sys_\" => skip")
-            return None
-        (await self._reg_sys_signature(sysfn)).eject()
         cfg = self._type_to_cfg[cfgtype]
         args = SysArgs(
             app=self,
             bus=self._bus,
             cfg=cfg
         )
-        # apply monkey patch to avoid yon annotation checking
-        orig_bus_fn = self._bus._get_bodytype_from_subfn  # noqa: SLF001
-        self._bus._get_bodytype_from_subfn = \
-            self._monkeypatch_get_msgtype_from_subfn  # noqa: SLF001
+
+        # TODO: remove once yon::Bus::sub supports auto signature evaluation
+        sig = inspect.signature(sysfn)
+        msg_param = sig.parameters.get("msg")
+        if not msg_param:
+            log.err(f"failed to init {sysfn} - must accept msg parameter")
+            return
+        msgtype = msg_param.annotation
 
         subfn = functools.partial(sysfn, args=args)
-        subfn.__name__ = sysfn.__name__.replace("sys_", "sub__")  # type: ignore
-
-        unsub_coro_res = typing.cast(
+        unsub = typing.cast(
             Res[Coroutine[Any, Any, Res[None]]],
-            (await self._bus.sub(subfn, sub_opts))
+            (await self._bus.sub(msgtype, subfn, sys_opts))
         )
-
-        self._bus._get_bodytype_from_subfn = orig_bus_fn  # noqa: SLF001
-        return unsub_coro_res.eject()
-
-    def _monkeypatch_get_msgtype_from_subfn(
-        self,
-        subfn: SubFn[TMsg_contra]
-    ) -> Res[type[TMsg_contra]]:
-        sig = inspect.signature(subfn)
-        params = list(sig.parameters.values())
-        # don't raise err for incorrect params amount, since we use
-        # functools.partial(sysfn, args=args) and it still leave two arguments
-        # if len(params) != 1:
-        #     return valerr(
-        #         f"subfn {subfn} must accept one argument, got {len(params)}")
-        param = params[0]
-        assert inspect.isclass(param.annotation)
-        return Ok(param.annotation)
+        return unsub.eject()
 
     async def _init_rsys(
         self,
-        sysfn: SysFn[TCfg],
+        sysfn: Sys[TCfg],
         plugin: Plugin
     )  -> Coroutine[Any, Any, Res[None]] | None:
         cfgtype = plugin.cfgtype
@@ -355,19 +407,4 @@ class App(Singleton):
         # TODO: replace with bus.dereg_rpc coro once yon supports it
         if rpcfn_key in self._bus._rpckey_to_fn:  # noqa: SLF001
             del self._bus._rpckey_to_fn[rpcfn_key]  # noqa: SLF001
-        return Ok(None)
-
-    async def _reg_sys_signature(self, sysfn: SysFn) -> Res[None]:
-        signature = inspect.signature(sysfn)
-        params = list(signature.parameters.values())
-        if len(params) != self._SYS_SIGNATURE_PARAMS_LEN:
-            return valerr(f"sysfn {sysfn} must accept only two args")
-        # don't check direct "is" since it's associated with generic,
-        # thought we're not sure this is the case
-        if not issubclass(params[1].annotation, SysArgs):
-            return valerr(
-                f"sysfn {sysfn} accept incorrect \"args\" type"
-                f" {params[0].annotation} => skip")
-        msgtype = params[0].annotation
-        (await self._bus.reg_types([msgtype])).eject()
         return Ok(None)

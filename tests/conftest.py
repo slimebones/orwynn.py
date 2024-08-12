@@ -4,7 +4,7 @@ from typing import Self
 
 import pytest
 import pytest_asyncio
-from yon import Con, ConArgs, ServerBusCfg, Transport
+from yon.server import Con, ConArgs, BusCfg, Transport
 
 from orwynn import App, AppCfg, Cfg
 
@@ -21,7 +21,7 @@ async def autorun():
 @pytest.fixture
 def app_cfg() -> AppCfg:
     return AppCfg(
-        server_bus_cfg=ServerBusCfg(
+        server_bus_cfg=BusCfg(
             transports=[
                 Transport(
                     is_server=True,

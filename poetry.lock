@@ -2126,13 +2126,13 @@ multidict = ">=4.0"
 
 [[package]]
 name = "yon"
-version = "1.0.12"
+version = "1.1.0"
 description = "Yon protocol implementation for Python."
 optional = false
 python-versions = "<4.0,>=3.11"
 files = [
-    {file = "yon-1.0.12-py3-none-any.whl", hash = "sha256:2947edbb49aec69079b88b85b05aca24d108239751d5a718e572da16fec2d0c5"},
-    {file = "yon-1.0.12.tar.gz", hash = "sha256:716e2eb5f2ecdf2f5bb524bd90569ca5440b017e3abfafee16f727ccb31ea60d"},
+    {file = "yon-1.1.0-py3-none-any.whl", hash = "sha256:37c2096c597c9bd9166d45e80d28f66a60303f7c10dbfa43c77644c6037855ec"},
+    {file = "yon-1.1.0.tar.gz", hash = "sha256:d7c8a77e782c92604480f21d35bfb86f07771991a6a7aa13f2aba596150af09e"},
 ]
 
 [package.dependencies]
@@ -2142,4 +2142,4 @@ ryz = ">=0.12.4,<0.13.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "7ee51ce5bbae3554027e11d156bbfea76e2cc7daaa8410d75773951db8f2be40"
+content-hash = "c3eb51ffed273feaeb9874d00e768e91d325e800fa48dc5ba7e353120ff36ab7"
