@@ -57,9 +57,9 @@ async def test_rsys():
 
     con = MockCon()
     con_task = asyncio.create_task(app.get_bus().eject().con(con))
-    await con.client__recv()
+    await con.client_recv()
     send_msid = uuid4()
-    await con.client__send({
+    await con.client_send({
         "sid": send_msid,
         "codeid": (await Code.get_regd_codeid_by_type(RpcSend)).eject(),
         "msg": {
@@ -71,7 +71,7 @@ async def test_rsys():
     })
     await asyncio.sleep(0.1)
     assert rpc_flag
-    recv = await asyncio.wait_for(con.client__recv(), 1)
+    recv = await asyncio.wait_for(con.client_recv(), 1)
     assert "msg" not in recv
     assert recv["lsid"] == send_msid
     assert recv["codeid"] \
@@ -126,9 +126,9 @@ async def test_rsys_err():
 
     con = MockCon()
     con_task = asyncio.create_task(app.get_bus().eject().con(con))
-    await con.client__recv()
+    await con.client_recv()
     send_msid = uuid4()
-    await con.client__send({
+    await con.client_send({
         "sid": send_msid,
         "codeid": (await Code.get_regd_codeid_by_type(RpcSend)).eject(),
         "msg": {
@@ -140,7 +140,7 @@ async def test_rsys_err():
     })
     await asyncio.sleep(0.1)
     assert rpc_flag
-    recv = await asyncio.wait_for(con.client__recv(), 1)
+    recv = await asyncio.wait_for(con.client_recv(), 1)
     assert recv["lsid"] == send_msid
     assert recv["codeid"] \
         == (await Code.get_regd_codeid_by_type(RpcRecv)).eject()
@@ -198,9 +198,9 @@ async def test_sys():
 
     con = MockCon()
     con_task = asyncio.create_task(app.get_bus().eject().con(con))
-    await con.client__recv()
+    await con.client_recv()
     send_msid = uuid4()
-    await con.client__send({
+    await con.client_send({
         "sid": send_msid,
         "codeid": (await Code.get_regd_codeid_by_type(Mock_1)).eject(),
         "msg": {
@@ -209,7 +209,7 @@ async def test_sys():
     })
     await asyncio.sleep(0.1)
     assert sys_flag
-    recv = await asyncio.wait_for(con.client__recv(), 1)
+    recv = await asyncio.wait_for(con.client_recv(), 1)
     assert "msg" not in recv
     assert recv["lsid"] == send_msid
     assert recv["codeid"] \
@@ -265,9 +265,9 @@ async def test_sys_err():
 
     con = MockCon()
     con_task = asyncio.create_task(app.get_bus().eject().con(con))
-    await con.client__recv()
+    await con.client_recv()
     send_msid = uuid4()
-    await con.client__send({
+    await con.client_send({
         "sid": send_msid,
         "codeid": (await Code.get_regd_codeid_by_type(Mock_1)).eject(),
         "msg": {
@@ -276,7 +276,7 @@ async def test_sys_err():
     })
     await asyncio.sleep(0.1)
     assert sys_flag
-    recv = await asyncio.wait_for(con.client__recv(), 1)
+    recv = await asyncio.wait_for(con.client_recv(), 1)
     assert recv["lsid"] == send_msid
     assert recv["codeid"] \
         == (await Code.get_regd_codeid_by_type(ValErr)).eject()

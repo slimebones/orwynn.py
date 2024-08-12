@@ -1,3 +1,4 @@
+import asyncio
 import os
 from asyncio import Queue
 from typing import Self
@@ -57,11 +58,11 @@ class MockCon(Con[None]):
     async def close(self):
         self._is_closed = True
 
-    async def client__send(self, data: dict):
+    async def client_send(self, data: dict):
         await self.inp_queue.put(data)
 
-    async def client__recv(self) -> dict:
-        return await self.out_queue.get()
+    async def client_recv(self, timeout: float = 1.0) -> dict:
+        return await asyncio.wait_for(self.out_queue.get(), timeout)
 
 @pytest_asyncio.fixture
 async def app(app_cfg: AppCfg) -> App:
