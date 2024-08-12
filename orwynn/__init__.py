@@ -63,8 +63,9 @@ def _get_coded_subclasses(t: type) -> list[type]:
         selected.extend(_get_coded_subclasses(t))
     return selected
 
-class SysInp(BaseModel, Generic[TMsg_contra, TCfg]):
-    msg: TMsg_contra
+TMsg = TypeVar("TMsg", bound=Msg)
+class SysInp(BaseModel, Generic[TMsg, TCfg]):
+    msg: TMsg
     app: "App"
     bus: Bus
     cfg: TCfg
@@ -73,6 +74,15 @@ class SysInp(BaseModel, Generic[TMsg_contra, TCfg]):
     class Config:
         arbitrary_types_allowed = True
 
+    def res(self, msg: TMsg) -> Res["SysInp[TMsg, TCfg]"]:
+        """
+        Generates Ok() res with new message.
+
+        Used generally at systems to return a message to publish.
+        """
+        self.msg = msg
+        return Ok(self)
+
 class SysOpts(BaseModel):
     pipeline_before: AsyncPipeline[SysInp] = AsyncPipeline()
     pipeline_after: AsyncPipeline[SysInp] = AsyncPipeline()
@@ -80,10 +90,12 @@ class SysOpts(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 
-TMsg_co = TypeVar("TMsg_co", bound=Msg, covariant=True)
 @runtime_checkable
-class Sys(Protocol, Generic[TMsg_co, TCfg]):
-    async def __call__(self, inp: SysInp[TMsg_co, TCfg]) -> Any: ...
+class Sys(Protocol, Generic[TMsg, TCfg]):
+    async def __call__(
+        self,
+        inp: SysInp[TMsg, TCfg]
+    ) -> Res[SysInp[TMsg, TCfg]]: ...
 
 class PluginInp(BaseModel, Generic[TCfg]):
     app: "App"
@@ -476,17 +488,23 @@ class App(Singleton):
     def _wrap_pipeline_as_sub(
         self,
         pipeline: AsyncPipeline,
-        args: SysInp
+        inp: SysInp
     ) -> SubFn:
-        args = args.model_copy()
+        # we copy inp here so pipes can skip copying. It's highly recommended
+        # for pipes to not create side effects with the inp objects since it's
+        # allowed to be changed throughout pipeline.
+        inp = inp.model_copy()
         async def inner(msg: Msg) -> SubFnRetval:
-            args.msg = msg
-            return await pipeline(args)
+            inp.msg = msg
+            return await pipeline(inp)
         return inner
 
     def _wrap_pipeline_as_rpc(
         self, pipeline: AsyncPipeline, args: SysInp
     ) -> RpcFn:
+        # we copy inp here so pipes can skip copying. It's highly recommended
+        # for pipes to not create side effects with the inp objects since it's
+        # allowed to be changed throughout pipeline.
         args = args.model_copy()
         async def inner(msg: Msg) -> Res[Msg]:
             args.msg = msg
