@@ -1,5 +1,5 @@
 import asyncio
-from yon.server import Bus, PubOpts, ok
+from yon.server import Bus, PubOpts, ok, RpcSend
 
 from orwynn import App, AppCfg, GlobalSysOpts, Plugin, RsysSpec, SysInp, SysOpts, SysSpec
 from orwynn._pepel import AsyncPipeline
@@ -33,8 +33,8 @@ async def test_pipeline(app_cfg: AppCfg):
 
     async def rpc_mock(inp: SysInp[Mock_1, MockCfg]) -> Res[SysInp]:
         assert inp.msg.key.startswith("start-")
-        assert inp.msg.key.count("h") == 6
-        return inp.ok()
+        assert inp.msg.key.count("h") == 8
+        return inp.ok(inp.msg)
 
     plugin = Plugin(
         name="test",
@@ -50,12 +50,15 @@ async def test_pipeline(app_cfg: AppCfg):
         global_opts=GlobalSysOpts(
             all=SysOpts(
                 pipeline_before=AsyncPipeline(add_str, add_str),
+                pipeline_after=AsyncPipeline(add_str, add_str)
             ),
             sys=SysOpts(
                 pipeline_before=AsyncPipeline(add_str, add_str),
+                pipeline_after=AsyncPipeline(add_str, add_str)
             ),
             rsys=SysOpts(
-                pipeline_before=AsyncPipeline(add_str, add_str)
+                pipeline_before=AsyncPipeline(add_str, add_str),
+                pipeline_after=AsyncPipeline(add_str, add_str)
             )
         )
     )
@@ -75,7 +78,7 @@ async def test_pipeline(app_cfg: AppCfg):
     await con.client_recv()
     await con.client_send({
         "sid": uuid4(),
-        "codeid": (await Code.get_regd_codeid_by_type(Mock_1)).eject(),
+        "codeid": (await Code.get_regd_codeid_by_type(RpcSend)).eject(),
         "msg": {
             "key": "test::mock",
             "data": {
@@ -83,8 +86,8 @@ async def test_pipeline(app_cfg: AppCfg):
             }
         }
     })
-    out = Mock_1.model_validate((await con.client_recv())["msg"]["data"])
+    out = Mock_1.model_validate((await con.client_recv())["msg"])
     assert out.key.startswith("start-")
-    assert out.key.count("h") == 12
+    assert out.key.count("h") == 16
 
     con_task.cancel()
