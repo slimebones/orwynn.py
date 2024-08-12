@@ -39,11 +39,16 @@ async def test_main(app_cfg: AppCfg):
 async def test_pipeline(app_cfg: AppCfg):
     async def add_str(inp: SysInp[Mock_1, MockCfg]) -> Res[SysInp]:
         inp.msg.key += "h"
+        if "usages" not in inp.extra:
+            inp.extra["usages"] = 0
+        inp.extra["usages"] += 1
+        assert inp.extra["usages"] == inp.msg.key.count("h")
         return Ok(inp)
 
     async def rpc_mock(inp: SysInp[Mock_1, MockCfg]) -> Res[SysInp]:
         assert inp.msg.key.startswith("start-")
         assert inp.msg.key.count("h") == 8
+        assert inp.extra["usages"] == 8
         return inp.ok(inp.msg)
 
     plugin = Plugin(
