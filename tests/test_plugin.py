@@ -4,9 +4,9 @@ from ryz.code import Code
 from ryz.err import ValErr
 from ryz.res import Ok, Res, valerr
 from ryz.uuid import uuid4
-from yon.server import BusCfg, SrpcRecv, SrpcSend, Transport, ok
+from yon.server import BusCfg, RpcRecv, RpcSend, Transport, ok
 
-from orwynn import App, AppCfg, Plugin, SysArgs
+from orwynn import App, AppCfg, Plugin, RsysSpec, SysArgs, SysSpec
 from tests.conftest import Mock_1, MockCfg, MockCon
 
 
@@ -36,7 +36,8 @@ async def test_rsys():
         cfgtype=MockCfg,
         init=_init,
         destroy=_destroy,
-        rsys=[rsys_test])
+        rsys=[RsysSpec.new("test", Mock_1, rsys_test)]
+    )
     app = await App().init(AppCfg(
         server_bus_cfg=BusCfg(
             transports=[
@@ -59,7 +60,7 @@ async def test_rsys():
     send_msid = uuid4()
     await con.client__send({
         "sid": send_msid,
-        "codeid": (await Code.get_regd_codeid_by_type(SrpcSend)).eject(),
+        "codeid": (await Code.get_regd_codeid_by_type(RpcSend)).eject(),
         "msg": {
             "key": "test::test",
             "data": {
@@ -73,7 +74,7 @@ async def test_rsys():
     assert "msg" not in recv
     assert recv["lsid"] == send_msid
     assert recv["codeid"] \
-        == (await Code.get_regd_codeid_by_type(SrpcRecv)).eject()
+        == (await Code.get_regd_codeid_by_type(RpcRecv)).eject()
 
     await app.destroy()
     assert destroy_flag
@@ -105,7 +106,7 @@ async def test_rsys_err():
         cfgtype=MockCfg,
         init=_init,
         destroy=_destroy,
-        rsys=[rsys_test])
+        rsys=[RsysSpec.new("test", Mock_1, rsys_test)])
     app = await App().init(AppCfg(
         server_bus_cfg=BusCfg(
             transports=[
@@ -128,7 +129,7 @@ async def test_rsys_err():
     send_msid = uuid4()
     await con.client__send({
         "sid": send_msid,
-        "codeid": (await Code.get_regd_codeid_by_type(SrpcSend)).eject(),
+        "codeid": (await Code.get_regd_codeid_by_type(RpcSend)).eject(),
         "msg": {
             "key": "test::test",
             "data": {
@@ -141,7 +142,7 @@ async def test_rsys_err():
     recv = await asyncio.wait_for(con.client__recv(), 1)
     assert recv["lsid"] == send_msid
     assert recv["codeid"] \
-        == (await Code.get_regd_codeid_by_type(SrpcRecv)).eject()
+        == (await Code.get_regd_codeid_by_type(RpcRecv)).eject()
     msg = recv["msg"]
     assert msg["errcode"] == "val_err"
     assert msg["msg"] == "whoops"
@@ -175,7 +176,8 @@ async def test_sys():
         cfgtype=MockCfg,
         init=_init,
         destroy=_destroy,
-        sys=[sys_test])
+        sys=[SysSpec.new(Mock_1, sys_test)]
+    )
     app = await App().init(AppCfg(
         server_bus_cfg=BusCfg(
             transports=[
@@ -241,7 +243,7 @@ async def test_sys_err():
         cfgtype=MockCfg,
         init=_init,
         destroy=_destroy,
-        sys=[sys_test])
+        sys=[SysSpec.new(Mock_1, sys_test)])
     app = await App().init(AppCfg(
         server_bus_cfg=BusCfg(
             transports=[

@@ -83,7 +83,7 @@ class SysSpec(BaseModel, Generic[TCfg]):
 
     @classmethod
     def new(
-        cls, msgtype: type[Msg], fn: Sys[TCfg], opts: SysOpts
+        cls, msgtype: type[Msg], fn: Sys[TCfg], opts: SysOpts = SysOpts()
     ) -> Self:
         return cls(msgtype=msgtype, fn=fn, opts=opts)
 
@@ -95,7 +95,11 @@ class RsysSpec(BaseModel, Generic[TCfg]):
 
     @classmethod
     def new(
-        cls, key: str, msgtype: type[Msg], fn: Sys[TCfg], opts: SysOpts
+        cls,
+        key: str,
+        msgtype: type[Msg],
+        fn: Sys[TCfg],
+        opts: SysOpts = SysOpts()
     ) -> Self:
         return cls(key=key, msgtype=msgtype, fn=fn, opts=opts)
 
@@ -416,7 +420,8 @@ class App(Singleton):
             .merge_right(sys_opts.pipeline_after)
         self._bus.reg_rpc(
             plugin.name + "::" + spec.key,
-            self._wrap_pipeline_as_rpcfn(pipeline)
+            self._wrap_pipeline_as_rpcfn(pipeline),
+            spec.msgtype
         ).eject()
         return functools.partial(self._dereg_rpc, spec.key)()
 
