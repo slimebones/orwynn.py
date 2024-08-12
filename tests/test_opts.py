@@ -1,6 +1,8 @@
+from ryz.res import Res
+
 from orwynn import _merge
 from orwynn._pepel import AsyncPipeline
-from ryz.res import Res
+
 
 def test_merge():
     async def f1(inp) -> Res: ...

@@ -1,4 +1,3 @@
-import functools
 import inspect
 import typing
 from copy import deepcopy
@@ -14,7 +13,6 @@ from typing import (
 
 from pydantic import BaseModel
 from ryz.code import Coded, Ok
-from orwynn._pepel import Pipeline
 from ryz.log import log
 from ryz.res import Err, Res, aresultify
 from ryz.singleton import Singleton
@@ -31,7 +29,7 @@ from yon.server import (
 
 from orwynn import env
 from orwynn._cfg import Cfg, CfgPack, CfgPackUtils, TCfg
-from orwynn._pepel import AsyncPipeline
+from orwynn._pepel import AsyncPipeline, Pipeline
 
 __all__ =[
     "App",
@@ -58,10 +56,10 @@ async def reg_scope_model_codes() -> Res[None]:
 
 def _get_coded_subclasses(t: type) -> list[type]:
     selected = []
-    for t in t.__subclasses__():
-        if getattr(t, "code", None) is not None:
-            selected.append(t)
-        selected.extend(_get_coded_subclasses(t))
+    for _t in t.__subclasses__():
+        if getattr(_t, "code", None) is not None:
+            selected.append(_t)
+        selected.extend(_get_coded_subclasses(_t))
     return selected
 
 TMsg = TypeVar("TMsg", bound=Msg)
