@@ -2,12 +2,14 @@ from copy import deepcopy
 from enum import Enum
 import functools
 import inspect
+from orwynn._pepel import AsyncPipeline
 from re import L
 import typing
 from typing import (
     Any,
     Coroutine,
     Generic,
+    Iterable,
     Protocol,
     Self,
     runtime_checkable,
@@ -19,13 +21,18 @@ from ryz.log import log
 from ryz.res import Err, Res, aresultify
 from ryz.singleton import Singleton
 from yon.server import (
+    RpcFn,
     Msg,
+    SubFnRetval,
     Bus,
     BusCfg,
     SubFn,
     SubOpts,
     TMsg_contra,
     valerr,
+    MsgCondition,
+    MsgFilter,
+    SubFnRetvalFilter
 )
 
 from orwynn import env
@@ -50,7 +57,8 @@ class SysArgs(BaseModel, Generic[TCfg]):
         arbitrary_types_allowed = True
 
 class SysOpts(BaseModel):
-    pass
+    pipeline_before: AsyncPipeline[SubFnRetval] = AsyncPipeline()
+    pipeline_after: AsyncPipeline[Msg] = AsyncPipeline()
 
 @runtime_checkable
 class Sys(Protocol, Generic[TCfg]):
@@ -63,14 +71,33 @@ class Sys(Protocol, Generic[TCfg]):
 class PluginFn(Protocol, Generic[TCfg]):
     async def __call__(self, args: "SysArgs[TCfg]") -> Res[None]: ...
 
-class OptedSys(Generic[TCfg]):
-    fn: Sys[TCfg]
-    opts: SysOpts = SysOpts()
-
 class GlobalSysOpts(BaseModel):
     all: SysOpts = SysOpts()
     sys: SysOpts = SysOpts()
     rsys: SysOpts = SysOpts()
+
+class SysSpec(BaseModel, Generic[TCfg]):
+    msgtype: type[Msg]
+    fn: Sys[TCfg]
+    opts: SysOpts = SysOpts()
+
+    @classmethod
+    def new(
+        cls, msgtype: type[Msg], fn: Sys[TCfg], opts: SysOpts
+    ) -> Self:
+        return cls(msgtype=msgtype, fn=fn, opts=opts)
+
+class RsysSpec(BaseModel, Generic[TCfg]):
+    key: str
+    msgtype: type[Msg]
+    fn: Sys[TCfg]
+    opts: SysOpts = SysOpts()
+
+    @classmethod
+    def new(
+        cls, key: str, msgtype: type[Msg], fn: Sys[TCfg], opts: SysOpts
+    ) -> Self:
+        return cls(key=key, msgtype=msgtype, fn=fn, opts=opts)
 
 class Plugin(BaseModel, Generic[TCfg]):
     """
@@ -80,15 +107,15 @@ class Plugin(BaseModel, Generic[TCfg]):
     * app_cfg.global_opts.<sys_type>
     * plugin.global_opts.all
     * plugin.global_opts.<sys_type>
-    * opted_sys.opts (if [`OptedSys`] is provided)
+    * sys_spec.opts
     """
     name: str
     cfgtype: type[TCfg]
 
     global_opts: GlobalSysOpts = GlobalSysOpts()
 
-    sys: list[Sys[TCfg] | OptedSys[TCfg]] | None = None
-    rsys: list[Sys[TCfg] | OptedSys[TCfg]] | None = None
+    sys: list[SysSpec] | None = None
+    rsys: list[RsysSpec] | None = None
     reg_types: list[type | Coded[type]] | None = None
 
     init: PluginFn[TCfg] | None = None
@@ -113,10 +140,6 @@ class AppCfg(Cfg):
     global_opts: GlobalSysOpts = GlobalSysOpts()
     plugins: list[Plugin] = []
     extend_cfg_pack: CfgPack = {}
-
-class SysType(Enum):
-    sys = "sys"
-    rsys = "rsys"
 
 def _merge(to_dict: dict, from_dict: dict) -> Res[dict]:
     """
@@ -151,8 +174,7 @@ def _merge(to_dict: dict, from_dict: dict) -> Res[dict]:
 def _merge_sys_opts(
     app_cfg: AppCfg,
     plugin: Plugin,
-    sys: Sys | OptedSys,
-    systype: SysType
+    spec: SysSpec | RsysSpec
 ) -> SysOpts:
     """
     # Merge order
@@ -161,28 +183,25 @@ def _merge_sys_opts(
     * app_cfg.global_opts.<sys_type>
     * plugin.global_opts.all
     * plugin.global_opts.<sys_type>
-    * opted_sys.opts (if [`OptedSys`] is provided)
+    * sys_spec.opts
     """
     d = app_cfg.global_opts.all.model_dump()
-    match systype:
-        case SysType.sys:
-            d.update(app_cfg.global_opts.sys.model_dump())
-        case SysType.rsys:
-            d.update(app_cfg.global_opts.rsys.model_dump())
-        case _:
-            raise SystemError("panic")
+    if isinstance(spec, SysSpec):
+        d.update(app_cfg.global_opts.sys.model_dump())
+    elif isinstance(spec, RsysSpec):
+        d.update(app_cfg.global_opts.rsys.model_dump())
+    else:
+        raise SystemError("panic")
 
     d.update(plugin.global_opts.all.model_dump())
-    match systype:
-        case SysType.sys:
-            d.update(plugin.global_opts.sys.model_dump())
-        case SysType.rsys:
-            d.update(plugin.global_opts.rsys.model_dump())
-        case _:
-            raise SystemError("panic")
+    if isinstance(spec, SysSpec):
+        d.update(plugin.global_opts.sys.model_dump())
+    elif isinstance(spec, RsysSpec):
+        d.update(plugin.global_opts.rsys.model_dump())
+    else:
+        raise SystemError("panic")
 
-    if isinstance(sys, OptedSys):
-        d.update(sys.opts.model_dump())
+    d.update(spec.opts.model_dump())
 
     return SysOpts.model_validate(d)
 
@@ -229,22 +248,10 @@ class App(Singleton):
 
     async def _init_plugin_systems(self, plugin: Plugin):
         if plugin.sys:
-            for sys_or_opted in plugin.sys:
-                sys_opts = _merge_sys_opts(
-                    self._cfg,
-                    plugin,
-                    sys_or_opted,
-                    SysType.sys
-                )
-                if isinstance(sys_or_opted, OptedSys):
-                    sys = sys_or_opted.fn
-                else:
-                    sys = sys_or_opted
-
+            for spec in plugin.sys:
                 destructor = await self._init_sys(
-                    sys,
-                    plugin,
-                    sys_opts
+                    spec,
+                    plugin
                 )
                 if destructor:
                     if plugin not in self._plugin_to_destructors:
@@ -254,15 +261,11 @@ class App(Singleton):
     async def _init_plugin_rsystems(self, plugin: Plugin):
         if plugin.rsys:
             # TODO: add rpc opts as soon as it's supported by yon
-            for sysfn_or_opted in plugin.rsys:
-                if isinstance(sysfn_or_opted, OptedSys):
-                    sysfn = sysfn_or_opted.fn
-                else:
-                    sysfn = sysfn_or_opted
-
+            for spec in plugin.rsys:
                 destructor = await self._init_rsys(
-                    sysfn,
-                    plugin)
+                    spec,
+                    plugin
+                )
                 if destructor:
                     if plugin not in self._plugin_to_destructors:
                         self._plugin_to_destructors[plugin] = []
@@ -350,10 +353,15 @@ class App(Singleton):
 
     async def _init_sys(
         self,
-        sysfn: Sys[TCfg],
-        plugin: Plugin,
-        sys_opts: SysOpts
+        spec: SysSpec[TCfg],
+        plugin: Plugin
     ) -> Coroutine[Any, Any, Res[None]] | None:
+        sys_opts = _merge_sys_opts(
+            self._cfg,
+            plugin,
+            spec
+        )
+
         cfgtype = plugin.cfgtype
         cfg = self._type_to_cfg[cfgtype]
         args = SysArgs(
@@ -362,49 +370,69 @@ class App(Singleton):
             cfg=cfg
         )
 
-        # TODO: remove once yon::Bus::sub supports auto signature evaluation
-        sig = inspect.signature(sysfn)
-        msg_param = sig.parameters.get("msg")
-        if not msg_param:
-            log.err(f"failed to init {sysfn} - must accept msg parameter")
-            return
-        msgtype = msg_param.annotation
-
-        subfn = functools.partial(sysfn, args=args)
+        sub = functools.partial(spec.fn, args=args)
+        pipeline = sys_opts \
+            .pipeline_before \
+            .copy() \
+            .append(sub) \
+            .merge_right(sys_opts.pipeline_after)
         unsub = typing.cast(
             Res[Coroutine[Any, Any, Res[None]]],
-            (await self._bus.sub(msgtype, subfn, sys_opts))
+            # for now we don't pass yon::SubOpts
+            (await self._bus.sub(
+                spec.msgtype,
+                self._wrap_pipeline_as_subfn(pipeline)
+            ))
         )
         return unsub.eject()
 
     async def _init_rsys(
         self,
-        sysfn: Sys[TCfg],
+        spec: RsysSpec[TCfg],
         plugin: Plugin
     )  -> Coroutine[Any, Any, Res[None]] | None:
+        sys_opts = _merge_sys_opts(
+            self._cfg,
+            plugin,
+            spec
+        )
+
         cfgtype = plugin.cfgtype
 
-        if not sysfn.__name__.startswith("rsys_"):  # type: ignore
-            log.err(
-                f"rsys {sysfn} name must start with \"rsys_\" => skip")
-            return None
-
-        # no need to reg signature for rpc function - the msg of it
+        # no need to reg signature for the rpc function - the msg of it
         # doesn't have to have the code
 
         cfg = self._type_to_cfg[cfgtype]
         args = SysArgs(
             app=self,
             bus=self._bus,
-            cfg=cfg)
-        rpcfn = functools.partial(sysfn, args=args)
-        rpcfn_key = sysfn.__name__.replace("rsys_", "")  # type: ignore
-        rpcfn.__name__ = sysfn.__name__.replace("rsys_", "srpc__")  # type: ignore
-        self._bus.reg_rpc(rpcfn, plugin.name + "::" + rpcfn_key).eject()
-        return functools.partial(self._dereg_rpc, rpcfn_key)()
+            cfg=cfg
+        )
+        rpc = functools.partial(spec.fn, args=args)
+        pipeline = sys_opts \
+            .pipeline_before \
+            .copy() \
+            .append(rpc) \
+            .merge_right(sys_opts.pipeline_after)
+        self._bus.reg_rpc(
+            plugin.name + "::" + spec.key,
+            self._wrap_pipeline_as_rpcfn(pipeline)
+        ).eject()
+        return functools.partial(self._dereg_rpc, spec.key)()
+
+    def _wrap_pipeline_as_subfn(self, pipeline: AsyncPipeline) -> SubFn:
+        async def inner(msg: Msg) -> SubFnRetval:
+            return await pipeline(msg)
+        return inner
+
+    def _wrap_pipeline_as_rpcfn(self, pipeline: AsyncPipeline) -> RpcFn:
+        async def inner(msg: Msg) -> Res[Msg]:
+            return await pipeline(msg)
+        return inner
 
     async def _dereg_rpc(self, rpcfn_key: str) -> Res[None]:
-        # TODO: replace with bus.dereg_rpc coro once yon supports it
+        # TODO: replace with bus.dereg_rpc coro or, better, with reg_rpc
+        #       returned callable once yon supports it
         if rpcfn_key in self._bus._rpckey_to_fn:  # noqa: SLF001
             del self._bus._rpckey_to_fn[rpcfn_key]  # noqa: SLF001
         return Ok(None)
