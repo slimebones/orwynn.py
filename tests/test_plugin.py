@@ -87,7 +87,7 @@ async def test_rsys_err():
     rpc_flag = False
 
     async def rsys_test(inp: SysInp[Mock_1, MockCfg]) -> Res[SysInp]:
-        assert msg.key == "hello"
+        assert inp.msg.key == "hello"
         nonlocal rpc_flag
         rpc_flag = True
         return valerr("whoops")

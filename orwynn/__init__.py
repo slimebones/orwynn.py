@@ -338,7 +338,7 @@ class App(Singleton):
 
         args_res = self._get_plugin_args(plugin)
         if isinstance(args_res, Err):
-            await args_res.atrack(f"get args for plugin {plugin}")
+            await args_res.atrack(f"get args for {plugin}")
             return
         args = args_res.okval
 
@@ -359,7 +359,8 @@ class App(Singleton):
         if plugin in self._plugin_to_destructors:
             for destructor in self._plugin_to_destructors[plugin]:
                 await (await aresultify(destructor)).atrack(
-                    f"plugin {plugin} destroy")
+                    f"{plugin} destroy"
+                )
             del self._plugin_to_destructors[plugin]
 
     def _get_plugin_args(
@@ -378,7 +379,7 @@ class App(Singleton):
                 continue
             args_res = self._get_plugin_args(plugin)
             if isinstance(args_res, Err):
-                await args_res.atrack(f"get args for plugin {plugin}")
+                await args_res.atrack(f"get args for {plugin}")
                 continue
             await plugin.postinit(args_res.okval)
 
@@ -425,7 +426,7 @@ class App(Singleton):
 
         cfgtype = plugin.cfgtype
         cfg = self._type_to_cfg[cfgtype]
-        args = SysInp(
+        inp = SysInp(
             msg=None,
             app=self,
             bus=self._bus,
@@ -443,7 +444,7 @@ class App(Singleton):
             # for now we don't pass yon::SubOpts
             (await self._bus.sub(
                 spec.msgtype,
-                self._wrap_pipeline_as_sub(pipeline, args)
+                self._wrap_pipeline_as_sub(pipeline, inp)
             ))
         )
         return unsub.eject()
@@ -472,18 +473,17 @@ class App(Singleton):
             cfg=cfg,
             extra={}
         )
-        rpc = functools.partial(spec.fn, args=args)
         pipeline = sys_opts \
             .pipeline_before \
             .copy() \
-            .append(rpc) \
+            .append(spec.fn) \
             .merge_right(sys_opts.pipeline_after)
         self._bus.reg_rpc(
             plugin.name + "::" + spec.key,
             self._wrap_pipeline_as_rpc(pipeline, args),
             spec.msgtype
         ).eject()
-        return functools.partial(self._dereg_rpc, spec.key)()
+        return self._new_dereg_rpc(spec.key)
 
     def _wrap_pipeline_as_sub(
         self,
@@ -500,7 +500,7 @@ class App(Singleton):
             if isinstance(r, Err):
                 return r
             r = r.okval.msg
-            return r
+            return Ok(r)
         return inner
 
     def _wrap_pipeline_as_rpc(
@@ -516,12 +516,14 @@ class App(Singleton):
             if isinstance(r, Err):
                 return r
             r = r.okval.msg
-            return r
+            return Ok(r)
         return inner
 
-    async def _dereg_rpc(self, rpcfn_key: str) -> Res[None]:
-        # TODO: replace with bus.dereg_rpc coro or, better, with reg_rpc
-        #       returned callable once yon supports it
-        if rpcfn_key in self._bus._rpckey_to_fn:  # noqa: SLF001
-            del self._bus._rpckey_to_fn[rpcfn_key]  # noqa: SLF001
-        return Ok(None)
+    def _new_dereg_rpc(self, rpcfn_key: str) -> Coroutine[Any, Any, Res[None]]:
+        async def inner() -> Res[None]:
+            # TODO: replace with bus.dereg_rpc coro or, better, with reg_rpc
+            #       returned callable once yon supports it
+            if rpcfn_key in self._bus._rpckey_to_fn:  # noqa: SLF001
+                del self._bus._rpckey_to_fn[rpcfn_key]  # noqa: SLF001
+            return Ok(None)
+        return inner()
