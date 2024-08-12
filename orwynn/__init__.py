@@ -236,7 +236,7 @@ def _merge_sys_opts(
     app_cfg: AppCfg,
     plugin: Plugin,
     spec: SysSpec | RsysSpec
-) -> SysOpts:
+) -> Res[SysOpts]:
     """
     # Merge order
 
@@ -248,23 +248,38 @@ def _merge_sys_opts(
     """
     d = app_cfg.global_opts.all.model_dump()
     if isinstance(spec, SysSpec):
-        _merge(d, app_cfg.global_opts.sys.model_dump())
+        d = _merge(d, app_cfg.global_opts.sys.model_dump())
+        if isinstance(d, Err):
+            return d
+        d = d.okval
     elif isinstance(spec, RsysSpec):
-        _merge(d, app_cfg.global_opts.rsys.model_dump())
+        d = _merge(d, app_cfg.global_opts.rsys.model_dump())
+        if isinstance(d, Err):
+            return d
+        d = d.okval
     else:
         raise SystemError("panic")  # noqa: TRY004
 
-    _merge(d, plugin.global_opts.all.model_dump())
+    d = _merge(d, plugin.global_opts.all.model_dump())
+    if isinstance(d, Err):
+        return d
+    d = d.okval
     if isinstance(spec, SysSpec):
-        _merge(d, plugin.global_opts.sys.model_dump())
+        d = _merge(d, plugin.global_opts.sys.model_dump())
+        if isinstance(d, Err):
+            return d
+        d = d.okval
     elif isinstance(spec, RsysSpec):
-        _merge(d, plugin.global_opts.rsys.model_dump())
+        d = _merge(d, plugin.global_opts.rsys.model_dump())
+        if isinstance(d, Err):
+            return d
+        d = d.okval
     else:
         raise SystemError("panic")  # noqa: TRY004
 
     _merge(d, spec.opts.model_dump())
 
-    return SysOpts.model_validate(d)
+    return Ok(SysOpts.model_validate(d))
 
 class App(Singleton):
     _SYS_SIGNATURE_PARAMS_LEN: int = 2
@@ -425,7 +440,7 @@ class App(Singleton):
             self._cfg,
             plugin,
             spec
-        )
+        ).eject()
 
         cfgtype = plugin.cfgtype
         cfg = self._type_to_cfg[cfgtype]
@@ -461,7 +476,7 @@ class App(Singleton):
             self._cfg,
             plugin,
             spec
-        )
+        ).eject()
 
         cfgtype = plugin.cfgtype
 
