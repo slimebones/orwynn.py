@@ -487,7 +487,7 @@ class App(Singleton):
 
     def _wrap_pipeline_as_sub(
         self,
-        pipeline: AsyncPipeline,
+        pipeline: AsyncPipeline[SysInp],
         inp: SysInp
     ) -> SubFn:
         # we copy inp here so pipes can skip copying. It's highly recommended
@@ -496,19 +496,27 @@ class App(Singleton):
         inp = inp.model_copy()
         async def inner(msg: Msg) -> SubFnRetval:
             inp.msg = msg
-            return await pipeline(inp)
+            r = await pipeline(inp)
+            if isinstance(r, Err):
+                return r
+            r = r.okval.msg
+            return r
         return inner
 
     def _wrap_pipeline_as_rpc(
-        self, pipeline: AsyncPipeline, args: SysInp
+        self, pipeline: AsyncPipeline[SysInp], inp: SysInp
     ) -> RpcFn:
         # we copy inp here so pipes can skip copying. It's highly recommended
         # for pipes to not create side effects with the inp objects since they
         # are allowed to be changed throughout pipeline.
-        args = args.model_copy()
+        inp = inp.model_copy()
         async def inner(msg: Msg) -> Res[Msg]:
-            args.msg = msg
-            return await pipeline(args)
+            inp.msg = msg
+            r = await pipeline(inp)
+            if isinstance(r, Err):
+                return r
+            r = r.okval.msg
+            return r
         return inner
 
     async def _dereg_rpc(self, rpcfn_key: str) -> Res[None]:

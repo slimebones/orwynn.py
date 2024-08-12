@@ -103,7 +103,6 @@ class AsyncPipeline(Generic[T_contra]):
                 val = await pipe(val)
                 if isinstance(val, Err):
                     return val
-                print(pipe)
                 val = val.okval
         except Exception as err:
             errmsg = f"during executing of pipe {last_pipe}," \
