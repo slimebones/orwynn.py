@@ -6,7 +6,7 @@ import pytest
 import pytest_asyncio
 from yon.server import BusCfg, Con, ConArgs, Transport
 
-from orwynn import App, AppCfg, Cfg, reg_scope_model_codes
+from orwynn import App, AppCfg, Cfg
 
 
 @pytest_asyncio.fixture(autouse=True)

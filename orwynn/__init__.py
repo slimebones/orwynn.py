@@ -12,25 +12,25 @@ from typing import (
     runtime_checkable,
 )
 
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
 from ryz.code import Coded, Ok
 from ryz.log import log
 from ryz.res import Err, Res, aresultify
 from ryz.singleton import Singleton
 from yon.server import (
     Bus,
-    TMsg_contra,
     BusCfg,
     Msg,
     RpcFn,
     SubFn,
     SubFnRetval,
+    TMsg_contra,
     valerr,
 )
 
 from orwynn import env
 from orwynn._cfg import Cfg, CfgPack, CfgPackUtils, TCfg
-from orwynn._pepel import AsyncPipeline, AsyncPipe
+from orwynn._pepel import AsyncPipeline
 
 __all__ =[
     "App",
@@ -52,10 +52,11 @@ async def reg_scope_model_codes() -> Res[None]:
     Searches for all subclasses of [pydantic::BaseModel] in the scope, and
     registers a code for those who implement [ryz::code::Coded] trait.
     """
-    selected: list[type[BaseModel]] = []
-    for t in BaseModel.__subclasses__():
-        if getattr(t, "code", None) is not None:
-            selected.append(t)
+    selected: list[type[BaseModel]] = [
+        t
+        for t in BaseModel.__subclasses__()
+        if getattr(t, "code", None) is not None
+    ]
     return await Bus.ie().reg_types(selected)
 
 class SysInp(BaseModel, Generic[TMsg_contra, TCfg]):
@@ -85,6 +86,9 @@ class PluginInp(BaseModel, Generic[TCfg]):
     bus: Bus
     cfg: TCfg
 
+    class Config:
+        arbitrary_types_allowed = True
+
 @runtime_checkable
 class PluginFn(Protocol, Generic[TCfg]):
     async def __call__(self, inp: "PluginInp[TCfg]") -> Res[None]: ...
@@ -95,7 +99,8 @@ class GlobalSysOpts(BaseModel):
     rsys: SysOpts = SysOpts()
 
 class SysSpec(BaseModel, Generic[TMsg_contra, TCfg]):
-    msgtype: type[TMsg_contra]
+    # we dont use `type[TMsg_contra]` since pydantic cannot resolve it properly
+    msgtype: type
     fn: Sys[TMsg_contra, TCfg]
     opts: SysOpts = SysOpts()
 
@@ -113,7 +118,8 @@ class SysSpec(BaseModel, Generic[TMsg_contra, TCfg]):
 
 class RsysSpec(BaseModel, Generic[TMsg_contra, TCfg]):
     key: str
-    msgtype: type[Msg]
+    # we dont use `type[TMsg_contra]` since pydantic cannot resolve it properly
+    msgtype: type
     fn: Sys[TMsg_contra, TCfg]
     opts: SysOpts = SysOpts()
 
@@ -253,9 +259,6 @@ class App(Singleton):
         return Ok(self._bus)
 
     async def init(self, cfg: AppCfg = AppCfg()) -> Self:
-        if cfg.reg_scope_model_codes:
-            (await reg_scope_model_codes()).eject()
-
         if self._is_initd:
             return self
 
@@ -266,6 +269,9 @@ class App(Singleton):
         self._cfg = cfg
         self._init_mode()
         await self._bus.init(self._cfg.bus_cfg)
+
+        if cfg.reg_scope_model_codes:
+            (await reg_scope_model_codes()).eject()
 
         self._type_to_cfg = await self._gen_type_to_cfg()
         self._plugins = list(self._cfg.plugins)
