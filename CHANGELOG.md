@@ -1,3 +1,8 @@
+# 3.2.0
+
+- refactor functions to conform with universal pipeline signature
+- add general `SysOpts` class to pipeline system messages
+
 # 3.1.5
 
 - update to newest yon
