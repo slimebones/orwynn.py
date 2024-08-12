@@ -52,12 +52,16 @@ async def reg_scope_model_codes() -> Res[None]:
     Searches for all subclasses of [pydantic::BaseModel] in the scope, and
     registers a code for those who implement [ryz::code::Coded] trait.
     """
-    selected: list[type[BaseModel]] = [
-        t
-        for t in BaseModel.__subclasses__()
-        if getattr(t, "code", None) is not None
-    ]
+    selected = _get_coded_subclasses(BaseModel)
     return await Bus.ie().reg_types(selected)
+
+def _get_coded_subclasses(t: type) -> list[type]:
+    selected = []
+    for t in t.__subclasses__():
+        if getattr(t, "code", None) is not None:
+            selected.append(t)
+        selected.extend(_get_coded_subclasses(t))
+    return selected
 
 class SysInp(BaseModel, Generic[TMsg_contra, TCfg]):
     msg: TMsg_contra

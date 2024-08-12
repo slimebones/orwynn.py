@@ -1,5 +1,6 @@
 import asyncio
 
+from pydantic import BaseModel
 from ryz.code import Code
 from ryz.err import ValErr
 from ryz.res import Ok, Res, valerr

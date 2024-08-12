@@ -2,6 +2,7 @@ import os
 from asyncio import Queue
 from typing import Self
 
+from pydantic import BaseModel
 import pytest
 import pytest_asyncio
 from yon.server import BusCfg, Con, ConArgs, Transport
@@ -70,7 +71,7 @@ async def app(app_cfg: AppCfg) -> App:
 class MockCfg(Cfg):
     num: int
 
-class Mock_1(Cfg):
+class Mock_1(BaseModel):
     key: str
 
     @staticmethod
