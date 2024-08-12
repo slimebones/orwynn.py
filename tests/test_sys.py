@@ -21,3 +21,12 @@ async def test_main(app_cfg: AppCfg):
     r = (await Bus.ie().pubr(
         Mock_1(key="hello"), PubOpts(pubr_timeout=1))).eject()
     assert isinstance(r, ok)
+
+# async def test_pipeline(app_cfg: AppCfg):
+#     async def rpc_mock(inp: SysInp[Mock_1, MockCfg]) -> Res[SysInp]:
+#         return inp.ok()
+
+#     app_cfg.global_opts.all.pipeline_before
+#     plugin = Plugin(
+#         name="test"
+#     )

@@ -14,6 +14,7 @@ from typing import (
 
 from pydantic import BaseModel
 from ryz.code import Coded, Ok
+from orwynn._pepel import Pipeline
 from ryz.log import log
 from ryz.res import Err, Res, aresultify
 from ryz.singleton import Singleton
@@ -224,6 +225,8 @@ def _merge(to_dict: dict, from_dict: dict) -> Res[dict]:
                 v = v_to.extend(v_from)
             elif isinstance(v_to, set):
                 v = v_to.update(v_from)
+            elif isinstance(v_to, (Pipeline, AsyncPipeline)):
+                v = v_to.merge_right(v_from)
             # all other types are just overwritten
         to_dict[k_from] = v
 
@@ -245,21 +248,21 @@ def _merge_sys_opts(
     """
     d = app_cfg.global_opts.all.model_dump()
     if isinstance(spec, SysSpec):
-        d.update(app_cfg.global_opts.sys.model_dump())
+        _merge(d, app_cfg.global_opts.sys.model_dump())
     elif isinstance(spec, RsysSpec):
-        d.update(app_cfg.global_opts.rsys.model_dump())
+        _merge(d, app_cfg.global_opts.rsys.model_dump())
     else:
         raise SystemError("panic")  # noqa: TRY004
 
-    d.update(plugin.global_opts.all.model_dump())
+    _merge(d, plugin.global_opts.all.model_dump())
     if isinstance(spec, SysSpec):
-        d.update(plugin.global_opts.sys.model_dump())
+        _merge(d, plugin.global_opts.sys.model_dump())
     elif isinstance(spec, RsysSpec):
-        d.update(plugin.global_opts.rsys.model_dump())
+        _merge(d, plugin.global_opts.rsys.model_dump())
     else:
         raise SystemError("panic")  # noqa: TRY004
 
-    d.update(spec.opts.model_dump())
+    _merge(d, spec.opts.model_dump())
 
     return SysOpts.model_validate(d)
 
