@@ -11,7 +11,7 @@ from typing import (
     runtime_checkable,
 )
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Extra
 from ryz.code import Coded, Ok
 from ryz.log import log
 from ryz.res import Err, Res, aresultify
@@ -28,7 +28,7 @@ from yon.server import (
 
 from orwynn import env
 from orwynn._cfg import Cfg, CfgPack, CfgPackUtils, TCfg
-from orwynn._pepel import AsyncPipeline
+from orwynn._pepel import AsyncPipeline, AsyncPipe
 
 __all__ =[
     "App",
@@ -53,30 +53,34 @@ async def reg_scope_model_codes() -> Res[None]:
     return await Bus.ie().reg_types(selected)
 
 class SysArgs(BaseModel, Generic[TCfg]):
+    msg: Msg
     app: "App"
     bus: Bus
     cfg: TCfg
+    extra: dict
 
     class Config:
         arbitrary_types_allowed = True
 
 class SysOpts(BaseModel):
-    pipeline_before: AsyncPipeline[SubFnRetval] = AsyncPipeline()
-    pipeline_after: AsyncPipeline[Msg] = AsyncPipeline()
+    pipeline_before: AsyncPipeline[SysArgs] = AsyncPipeline()
+    pipeline_after: AsyncPipeline[SysArgs] = AsyncPipeline()
 
     class Config:
         arbitrary_types_allowed = True
 
 @runtime_checkable
 class Sys(Protocol, Generic[TCfg]):
-    async def __call__(
-        self, msg: Msg, args: SysArgs[TCfg]
-    ) -> Any:
-        ...
+    async def __call__(self, val: SysArgs[TCfg]) -> Any: ...
+
+class PluginArgs(BaseModel, Generic[TCfg]):
+    app: "App"
+    bus: Bus
+    cfg: TCfg
 
 @runtime_checkable
 class PluginFn(Protocol, Generic[TCfg]):
-    async def __call__(self, args: "SysArgs[TCfg]") -> Res[None]: ...
+    async def __call__(self, val: "PluginArgs[TCfg]") -> Res[None]: ...
 
 class GlobalSysOpts(BaseModel):
     all: SysOpts = SysOpts()
@@ -300,7 +304,7 @@ class App(Singleton):
         if plugin.reg_types:
             await self._bus.reg_types(plugin.reg_types)
 
-        args_res = self._get_sys_args_for_plugin(plugin)
+        args_res = self._get_plugin_args(plugin)
         if isinstance(args_res, Err):
             await args_res.atrack(f"get args for plugin {plugin}")
             return
@@ -316,8 +320,7 @@ class App(Singleton):
     async def _destroy_plugin(self, plugin: Plugin):
         assert plugin.cfgtype in self._type_to_cfg, \
             "plugin must be initd in order to be destroyed"
-        cfg = self._type_to_cfg[plugin.cfgtype]
-        args = SysArgs(app=self, bus=self._bus, cfg=cfg)
+        args = self._get_plugin_args(plugin).eject()
         if plugin.destroy is not None:
             await (await aresultify(plugin.destroy(args))).atrack(
                 f"({plugin}) destroy")
@@ -327,12 +330,13 @@ class App(Singleton):
                     f"plugin {plugin} destroy")
             del self._plugin_to_destructors[plugin]
 
-    def _get_sys_args_for_plugin(
-            self, plugin: Plugin[TCfg]) -> Res[SysArgs[TCfg]]:
+    def _get_plugin_args(
+        self, plugin: Plugin[TCfg]
+    ) -> Res[PluginArgs[TCfg]]:
         if plugin.cfgtype not in self._type_to_cfg:
             return valerr(f"({plugin}) unrecognized cfg type")
         cfg = typing.cast(TCfg, self._type_to_cfg[plugin.cfgtype])
-        return Ok(SysArgs(app=self, bus=self._bus, cfg=cfg))
+        return Ok(PluginArgs(app=self, bus=self._bus, cfg=cfg))
 
     async def _init_all_plugins(self):
         for plugin in self._plugins:
@@ -340,7 +344,7 @@ class App(Singleton):
         for plugin in self._plugins:
             if not plugin.postinit:
                 continue
-            args_res = self._get_sys_args_for_plugin(plugin)
+            args_res = self._get_plugin_args(plugin)
             if isinstance(args_res, Err):
                 await args_res.atrack(f"get args for plugin {plugin}")
                 continue
@@ -390,23 +394,24 @@ class App(Singleton):
         cfgtype = plugin.cfgtype
         cfg = self._type_to_cfg[cfgtype]
         args = SysArgs(
+            msg=None,
             app=self,
             bus=self._bus,
-            cfg=cfg
+            cfg=cfg,
+            extra={}
         )
 
-        sub = functools.partial(spec.fn, args=args)
         pipeline = sys_opts \
             .pipeline_before \
             .copy() \
-            .append(sub) \
+            .append(spec.fn) \
             .merge_right(sys_opts.pipeline_after)
         unsub = typing.cast(
             Res[Coroutine[Any, Any, Res[None]]],
             # for now we don't pass yon::SubOpts
             (await self._bus.sub(
                 spec.msgtype,
-                self._wrap_pipeline_as_subfn(pipeline)
+                self._wrap_pipeline_as_sub(pipeline, args)
             ))
         )
         return unsub.eject()
@@ -429,9 +434,11 @@ class App(Singleton):
 
         cfg = self._type_to_cfg[cfgtype]
         args = SysArgs(
+            msg=None,
             app=self,
             bus=self._bus,
-            cfg=cfg
+            cfg=cfg,
+            extra={}
         )
         rpc = functools.partial(spec.fn, args=args)
         pipeline = sys_opts \
@@ -441,19 +448,27 @@ class App(Singleton):
             .merge_right(sys_opts.pipeline_after)
         self._bus.reg_rpc(
             plugin.name + "::" + spec.key,
-            self._wrap_pipeline_as_rpcfn(pipeline),
+            self._wrap_pipeline_as_rpc(pipeline, args),
             spec.msgtype
         ).eject()
         return functools.partial(self._dereg_rpc, spec.key)()
 
-    def _wrap_pipeline_as_subfn(self, pipeline: AsyncPipeline) -> SubFn:
+    def _wrap_pipeline_as_sub(
+        self, pipeline: AsyncPipeline, args: SysArgs[TCfg]
+    ) -> SubFn:
+        args = args.model_copy()
         async def inner(msg: Msg) -> SubFnRetval:
-            return await pipeline(msg)
+            args.msg = msg
+            return await pipeline(args)
         return inner
 
-    def _wrap_pipeline_as_rpcfn(self, pipeline: AsyncPipeline) -> RpcFn:
+    def _wrap_pipeline_as_rpc(
+        self, pipeline: AsyncPipeline, args: SysArgs[TCfg]
+    ) -> RpcFn:
+        args = args.model_copy()
         async def inner(msg: Msg) -> Res[Msg]:
-            return await pipeline(msg)
+            args.msg = msg
+            return await pipeline(args)
         return inner
 
     async def _dereg_rpc(self, rpcfn_key: str) -> Res[None]:
