@@ -1,7 +1,5 @@
-from collections import namedtuple
 import inspect
 import typing
-from copy import deepcopy
 from typing import (
     Any,
     Coroutine,
@@ -13,22 +11,19 @@ from typing import (
 )
 
 from pydantic import BaseModel
-from ryz.core import Coded, Ok
 from ryz import log
-from ryz.core import Err, Res, aresultify
+from ryz.core import Coded, Err, Ok, Res, aresultify
 from ryz.singleton import Singleton
-from yon.server import (
+
+from orwynn import env
+from orwynn._cfg import Cfg, CfgPack, CfgPackUtils, TCfg
+from orwynn.yon.server import (
     Bus,
     BusCfg,
     Msg,
     SubFn,
     TMsg_contra,
-    Err,
 )
-
-from orwynn import env
-from orwynn._cfg import Cfg, CfgPack, CfgPackUtils, TCfg
-from orwynn._pepel import AsyncPipeline, Pipeline
 
 __all__ =[
     "App",
@@ -131,38 +126,6 @@ class AppCfg(Cfg):
     Whether to automatically register all available [`pydantic::BaseModel`]
     subclasses.
     """
-
-def _merge(to_dict: dict, from_dict: dict) -> Res[dict]:
-    """
-    Updates `to_dict` using recursive strategies, merging all nested mergeable
-    collections.
-    """
-    to_dict = deepcopy(to_dict)
-
-    for k_from, v_from in from_dict.items():
-        v = v_from
-        if k_from in to_dict:
-            v_to = to_dict[k_from]
-            if type(v_to) is not type(v_from):
-                return Err(
-                    f"incompatible types for dict key {k_from} - {type(v_to)}"
-                    f" is not {type(v_from)}"
-                )
-            elif isinstance(v_to, dict):
-                r = _merge(v_to, v_from)
-                if isinstance(r, Err):
-                    return r
-                v = r.ok
-            elif isinstance(v_to, list):
-                v = v_to.extend(v_from)
-            elif isinstance(v_to, set):
-                v = v_to.update(v_from)
-            elif isinstance(v_to, (Pipeline, AsyncPipeline)):
-                v = v_to.merge_right(v_from)
-            # all other types are just overwritten
-        to_dict[k_from] = v
-
-    return Ok(to_dict)
 
 class App(Singleton):
     _SYS_SIGNATURE_PARAMS_LEN: int = 2

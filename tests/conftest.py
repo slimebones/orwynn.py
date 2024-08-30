@@ -6,9 +6,9 @@ from typing import Self
 import pytest
 import pytest_asyncio
 from pydantic import BaseModel
-from orwynn.yon.server import BusCfg, Con, ConArgs, Transport
 
 from orwynn import App, AppCfg, Cfg
+from orwynn.yon.server import BusCfg, Con, ConArgs, Transport
 
 
 @pytest_asyncio.fixture(autouse=True)

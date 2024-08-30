@@ -7,12 +7,10 @@ Yon server implementation for Python.
 
 import asyncio
 import contextlib
-import functools
 import typing
 from asyncio import Queue
-from collections.abc import Awaitable, Callable
 from contextvars import ContextVar
-from inspect import isclass, signature
+from inspect import isclass
 from typing import (
     Any,
     ClassVar,
@@ -24,21 +22,20 @@ from typing import (
 )
 
 from pydantic import BaseModel
-from ryz.core import Code, Coded, ecode
-from ryz.core import Err
 from ryz import log
+from ryz.core import Code, Coded, Err, Ok, Res, aresultify, ecode
 from ryz.ptr import ptr
-from ryz.core import Err, Ok, Res, aresultify
 from ryz.singleton import Singleton
 from ryz.uuid import uuid4
-from yon.server._msg import (
+
+from orwynn.yon.server.msg import (
     Bmsg,
     Msg,
     TMsg_contra,
     Welcome,
     ok,
 )
-from yon.server._transport import (
+from orwynn.yon.server.transport import (
     ActiveTransport,
     Con,
     ConArgs,
@@ -46,8 +43,8 @@ from yon.server._transport import (
     OnSendFn,
     Transport,
 )
-from yon.server._udp import Udp
-from yon.server._ws import Ws
+from orwynn.yon.server.udp import Udp
+from orwynn.yon.server.ws import Ws
 
 __all__ = [
     "Bus",
@@ -423,7 +420,7 @@ class Bus(Singleton):
     async def unsub(self, subsid: str):
         if subsid not in self._subsid_to_code:
             log.err(f"sub with id {subsid} not found")
-            return
+            return None
 
         assert self._subsid_to_code[subsid] in self._code_to_subfns
 

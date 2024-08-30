@@ -1,9 +1,5 @@
-import asyncio
 
-from ryz.core import Code
 from ryz.core import Ok, Res
-from ryz.uuid import uuid4
-from orwynn.yon.server import Bus, PubOpts, ok
 
 from orwynn import (
     App,
@@ -12,8 +8,8 @@ from orwynn import (
     SysInp,
     SysSpec,
 )
-from orwynn._pepel import AsyncPipeline
-from tests.conftest import Mock_1, MockCfg, MockCon
+from orwynn.yon.server import Bus, PubOpts, ok
+from tests.conftest import Mock_1, MockCfg
 
 
 async def test_main(app_cfg: AppCfg):

@@ -2,7 +2,8 @@ from typing import Self
 
 from aiohttp import WSMsgType
 from aiohttp.web import WebSocketResponse as AiohttpWebsocket
-from yon.server._transport import Con, ConArgs
+
+from orwynn.yon.server.transport import Con, ConArgs
 
 
 class Ws(Con[AiohttpWebsocket]):
