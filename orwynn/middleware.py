@@ -1,9 +1,8 @@
-from typing import Awaitable, Callable, Protocol, Self, runtime_checkable
+from typing import Awaitable, Callable
 
 from ryz.core import Res
 
 from orwynn.sys import Sys, SysInp
-from orwynn.cfg import TCfg
 from orwynn.yon.server.msg import Msg
 
 Next = Callable[[SysInp], Awaitable[Res[Msg]]]

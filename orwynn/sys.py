@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, Generic, Protocol, TypeVar, runtime_checkable
+
 from ryz.core import Res
 from ryz.model import Model
 
