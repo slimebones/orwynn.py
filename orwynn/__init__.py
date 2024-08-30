@@ -75,7 +75,8 @@ class Plugin(BaseModel, Generic[TCfg]):
     cfgtype: type[TCfg]
 
     sys: list[SysSpec] | None = None
-    reg_types: list[type | Coded[type]] | None = None
+    reg_regular_codes: list[type | Coded[type]] = []
+    reg_ecodes: list[str] = []
 
     init: PluginFn[TCfg] | None = None
     destroy: PluginFn[TCfg] | None = None
@@ -134,7 +135,7 @@ class App(Singleton):
 
         self._type_to_cfg = await self._gen_type_to_cfg()
         self._plugins = list(self._cfg.plugins)
-        await self._init_all_plugins()
+        await self._init_plugins_on_boot()
 
         self._is_initd = True
 
@@ -163,9 +164,6 @@ class App(Singleton):
                     self._plugin_to_destructors[plugin].append(destructor)
 
     async def _init_plugin(self, plugin: Plugin):
-        if plugin.reg_types:
-            await self._bus.reg_regular_codes(*plugin.reg_types)
-
         args_res = self._get_plugin_args(plugin)
         if isinstance(args_res, Err):
             await args_res.atrack(f"get args for {plugin}")
@@ -198,9 +196,21 @@ class App(Singleton):
         cfg = typing.cast(TCfg, self._type_to_cfg[plugin.cfgtype])
         return Ok(PluginInp(app=self, bus=self._bus, cfg=cfg))
 
-    async def _init_all_plugins(self):
+    async def _init_plugins_on_boot(self):
+        regular_codes = []
+        ecodes = []
         for plugin in self._plugins:
+            regular_codes.extend(plugin.reg_regular_codes)
+            ecodes.extend(plugin.reg_ecodes)
             await self._init_plugin(plugin)
+
+        # init all codes for plugins once - even if they are gonna be disabled,
+        # this won't be done the second time for the same application boot
+        (await Bus().reg_regular_codes(*regular_codes, _set_welcome=False))\
+            .unwrap()
+        (await Bus().reg_ecodes(*ecodes, _set_welcome=True))\
+            .unwrap()
+
         for plugin in self._plugins:
             if not plugin.postinit:
                 continue
