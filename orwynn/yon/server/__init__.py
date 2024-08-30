@@ -16,6 +16,7 @@ from inspect import isclass, signature
 from typing import (
     Any,
     ClassVar,
+    Coroutine,
     Generic,
     Iterable,
     Protocol,
@@ -83,10 +84,9 @@ class StaticCodeid:
     Welcome = 0
     Ok = 1
 
-SubFnRetval = Res[Msg]
 @runtime_checkable
 class SubFn(Protocol, Generic[TMsg_contra]):
-    async def __call__(self, msg: TMsg_contra) -> SubFnRetval: ...
+    async def __call__(self, msg: TMsg_contra) -> Res[Msg]: ...
 
 def sub(msgtype: type[TMsg_contra]):
     def wrapper(target: SubFn[TMsg_contra]):
@@ -174,7 +174,7 @@ class PubOpts(BaseModel):
 
 MsgCondition = Callable[[Msg], Awaitable[bool]]
 MsgFilter = Callable[[Msg], Awaitable[Msg]]
-SubFnRetvalFilter = Callable[[SubFnRetval], Awaitable[SubFnRetval]]
+SubFnRetvalFilter = Callable[[Res[Msg]], Awaitable[Res[Msg]]]
 
 class SubOpts(BaseModel):
     recv_last_msg: bool = True
@@ -235,8 +235,6 @@ class BusCfg(BaseModel):
     global_subfn_conditions: Iterable[MsgCondition] | None = None
     global_subfn_inp_filters: Iterable[MsgFilter] | None = None
     global_subfn_out_filters: Iterable[SubFnRetvalFilter] | None = None
-
-    consider_sub_decorators: bool = True
 
     class Config:
         arbitrary_types_allowed = True
@@ -368,10 +366,6 @@ class Bus(Singleton):
         codes, and renew it on each [`Bus._set_welcome`] call.
         """
 
-        if self._cfg.consider_sub_decorators:
-            for msgtype, subfn in self.subfn_init_queue:
-                (await self.sub(msgtype, subfn)).unwrap()
-
     @property
     def is_initd(self) -> bool:
         return self._is_initd
@@ -470,7 +464,7 @@ class Bus(Singleton):
         msgtype_or_code: type[Msg] | str,
         subfn: SubFn[Msg],
         opts: SubOpts = SubOpts(),
-    ) -> Res[Callable[[], Awaitable[Res[None]]]]:
+    ) -> Res[Coroutine[Any, Any, None]]:
         """
         Subscribes to certain message.
 
@@ -511,11 +505,17 @@ class Bus(Singleton):
             last_body = self._code_to_last_mbody[code]
             await self._call_subfn(subfn, last_body)
 
-        return Ok(functools.partial(self.unsub, subsid))
+        return Ok(self._unsub_wrapper(subsid)())
 
-    async def unsub(self, subsid: str) -> Res[None]:
+    def _unsub_wrapper(self, subsid: str):
+        async def inner():
+            await self.unsub(subsid)
+        return inner
+
+    async def unsub(self, subsid: str):
         if subsid not in self._subsid_to_code:
-            return Err(f"sub with id {subsid} not found")
+            log.err(f"sub with id {subsid} not found")
+            return
 
         assert self._subsid_to_code[subsid] in self._code_to_subfns
 
@@ -533,7 +533,7 @@ class Bus(Singleton):
         sids: list[str],
     ) -> None:
         for sid in sids:
-            (await self.unsub(sid)).ignore()
+            await self.unsub(sid)
 
     async def pubr(
         self,
@@ -797,7 +797,7 @@ class Bus(Singleton):
     def _parse_subfn_ret(
         self,
         subfn: SubFn,
-        ret: SubFnRetval
+        ret: Res[Msg]
     ) -> Iterable[Msg]:
         # unpack here, though it can be done inside pub(), but we want to
         # process iterables here

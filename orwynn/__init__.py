@@ -1,3 +1,4 @@
+from collections import namedtuple
 import inspect
 import typing
 from copy import deepcopy
@@ -21,7 +22,6 @@ from yon.server import (
     BusCfg,
     Msg,
     SubFn,
-    SubFnRetval,
     TMsg_contra,
     Err,
 )
@@ -40,7 +40,6 @@ __all__ =[
     "Plugin",
     "PluginInp",
     "SysSpec",
-    "SysOpts",
     "reg_scope_model_codes"
 ]
 
@@ -71,19 +70,12 @@ class SysInp(BaseModel, Generic[TMsg, TCfg]):
     class Config:
         arbitrary_types_allowed = True
 
-class SysOpts(BaseModel):
-    pipeline_before: AsyncPipeline[SysInp] = AsyncPipeline()
-    pipeline_after: AsyncPipeline[SysInp] = AsyncPipeline()
-
-    class Config:
-        arbitrary_types_allowed = True
-
 @runtime_checkable
 class Sys(Protocol, Generic[TMsg, TCfg]):
     async def __call__(
         self,
         inp: SysInp[TMsg, TCfg]
-    ) -> Res[SysInp[TMsg, TCfg]]: ...
+    ) -> Res[Msg]: ...
 
 class PluginInp(BaseModel, Generic[TCfg]):
     app: "App"
@@ -97,63 +89,16 @@ class PluginInp(BaseModel, Generic[TCfg]):
 class PluginFn(Protocol, Generic[TCfg]):
     async def __call__(self, inp: "PluginInp[TCfg]") -> Res[None]: ...
 
-class GlobalSysOpts(BaseModel):
-    all: SysOpts = SysOpts()
-    sys: SysOpts = SysOpts()
-    rsys: SysOpts = SysOpts()
-
-class SysSpec(BaseModel, Generic[TMsg_contra, TCfg]):
-    # we dont use `type[TMsg_contra]` since pydantic cannot resolve it properly
-    msgtype: type
-    fn: Sys[TMsg_contra, TCfg]
-    opts: SysOpts = SysOpts()
-
-    class Config:
-        arbitrary_types_allowed = True
-
-    @classmethod
-    def new(
-        cls,
-        msgtype: type[TMsg_contra],
-        fn: Sys[TMsg_contra, TCfg],
-        opts: SysOpts = SysOpts()
-    ) -> Self:
-        return cls(msgtype=msgtype, fn=fn, opts=opts)
-
-class RsysSpec(BaseModel, Generic[TMsg_contra, TCfg]):
-    key: str
-    # we dont use `type[TMsg_contra]` since pydantic cannot resolve it properly
-    msgtype: type
-    fn: Sys[TMsg_contra, TCfg]
-    opts: SysOpts = SysOpts()
-
-    class Config:
-        arbitrary_types_allowed = True
-
-    @classmethod
-    def new(
-        cls,
-        key: str,
-        msgtype: type[TMsg_contra],
-        fn: Sys[TMsg_contra, TCfg],
-        opts: SysOpts = SysOpts()
-    ) -> Self:
-        return cls(key=key, msgtype=msgtype, fn=fn, opts=opts)
+class SysSpec(Generic[TMsg_contra, TCfg]):
+    def __init__(
+        self, msgtype: TMsg_contra, fn: Sys[TMsg_contra, TCfg]
+    ):
+        self.msgtype = msgtype
+        self.fn = fn
 
 class Plugin(BaseModel, Generic[TCfg]):
-    """
-    # SysOpts merge order
-
-    * app_cfg.global_opts.all
-    * app_cfg.global_opts.<sys_type>
-    * plugin.global_opts.all
-    * plugin.global_opts.<sys_type>
-    * sys_spec.opts
-    """
     name: str
     cfgtype: type[TCfg]
-
-    global_opts: GlobalSysOpts = GlobalSysOpts()
 
     sys: list[SysSpec] | None = None
     reg_types: list[type | Coded[type]] | None = None
@@ -177,7 +122,6 @@ class Plugin(BaseModel, Generic[TCfg]):
 class AppCfg(Cfg):
     std_verbosity: int = 1
     bus_cfg: BusCfg = BusCfg()
-    global_opts: GlobalSysOpts = GlobalSysOpts()
     plugins: list[Plugin] = []
     extend_cfg_pack: CfgPack = {}
     reg_scope_model_codes: bool = True
@@ -218,55 +162,6 @@ def _merge(to_dict: dict, from_dict: dict) -> Res[dict]:
 
     return Ok(to_dict)
 
-def _merge_sys_opts(
-    app_cfg: AppCfg,
-    plugin: Plugin,
-    spec: SysSpec | RsysSpec
-) -> Res[SysOpts]:
-    """
-    # Merge order
-
-    * app_cfg.global_opts.all
-    * app_cfg.global_opts.<sys_type>
-    * plugin.global_opts.all
-    * plugin.global_opts.<sys_type>
-    * sys_spec.opts
-    """
-    d = app_cfg.global_opts.all.model_dump()
-    if isinstance(spec, SysSpec):
-        d = _merge(d, app_cfg.global_opts.sys.model_dump())
-        if isinstance(d, Err):
-            return d
-        d = d.ok
-    elif isinstance(spec, RsysSpec):
-        d = _merge(d, app_cfg.global_opts.rsys.model_dump())
-        if isinstance(d, Err):
-            return d
-        d = d.ok
-    else:
-        raise SystemError("panic")  # noqa: TRY004
-
-    d = _merge(d, plugin.global_opts.all.model_dump())
-    if isinstance(d, Err):
-        return d
-    d = d.ok
-    if isinstance(spec, SysSpec):
-        d = _merge(d, plugin.global_opts.sys.model_dump())
-        if isinstance(d, Err):
-            return d
-        d = d.ok
-    elif isinstance(spec, RsysSpec):
-        d = _merge(d, plugin.global_opts.rsys.model_dump())
-        if isinstance(d, Err):
-            return d
-        d = d.ok
-    else:
-        raise SystemError("panic")  # noqa: TRY004
-
-    _merge(d, spec.opts.model_dump())
-
-    return Ok(SysOpts.model_validate(d))
-
 class App(Singleton):
     _SYS_SIGNATURE_PARAMS_LEN: int = 2
 
@@ -284,7 +179,8 @@ class App(Singleton):
 
         self._bus = Bus.ie()
         self._plugin_to_destructors: dict[
-            Plugin, list[Coroutine[Any, Any, Res[None]]]] = {}
+            Plugin, list[Coroutine[Any, Any, None]]
+        ] = {}
 
         self._cfg = cfg
         self._init_mode()
@@ -386,14 +282,13 @@ class App(Singleton):
         cfg_pack.update(self._cfg.extend_cfg_pack)
         cfgsf = await CfgPackUtils.bake_cfgs(self._mode, cfg_pack)
         type_to_cfg: dict[type[Cfg], Cfg] = {}
+
+        log.std_verbosity = self._cfg.std_verbosity
+        log.is_debug = env.is_debug()
+
         for cfg in cfgsf:
-            cfg_type = type(cfg)
-            if cfg_type is AppCfg:
-                self._cfg = typing.cast(AppCfg, cfg)
-                log.std_verbosity = self._cfg.std_verbosity
-                log.is_debug = env.is_debug()
-                continue
-            type_to_cfg[cfg_type] = cfg
+            type_to_cfg[type(cfg)] = cfg
+
         return type_to_cfg
 
     def _get_msg_type_from_sysfn(self, fn: Sys) -> type:
@@ -407,13 +302,7 @@ class App(Singleton):
         self,
         spec: SysSpec[TMsg_contra, TCfg],
         plugin: Plugin
-    ) -> Coroutine[Any, Any, Res[None]] | None:
-        sys_opts = _merge_sys_opts(
-            self._cfg,
-            plugin,
-            spec
-        ).unwrap()
-
+    ) -> Coroutine[Any, Any, None]:
         cfgtype = plugin.cfgtype
         cfg = self._type_to_cfg[cfgtype]
         inp = SysInp(
@@ -424,35 +313,22 @@ class App(Singleton):
             extra={}
         )
 
-        pipeline = sys_opts \
-            .pipeline_before \
-            .copy() \
-            .append(spec.fn) \
-            .merge_right(sys_opts.pipeline_after)
-        unsub = typing.cast(
-            Res[Coroutine[Any, Any, Res[None]]],
-            # for now we don't pass yon::SubOpts
-            (await self._bus.sub(
-                spec.msgtype,
-                self._wrap_pipeline_as_sub(pipeline, inp)
-            ))
-        )
+        unsub = (await self._bus.sub(
+            spec.msgtype,
+            self._wrap_sys_as_sub(spec.fn, inp)
+        ))
         return unsub.unwrap()
 
-    def _wrap_pipeline_as_sub(
+    def _wrap_sys_as_sub(
         self,
-        pipeline: AsyncPipeline[SysInp],
+        sys: Sys,
         inp: SysInp
     ) -> SubFn:
         # we copy inp here so pipes can skip copying. It's highly recommended
         # for pipes to not create side effects with the inp objects since it's
         # allowed to be changed throughout pipeline.
         inp = inp.model_copy()
-        async def inner(msg: Msg) -> SubFnRetval:
+        async def inner(msg: Msg) -> Res[Msg]:
             inp.msg = msg
-            r = await pipeline(inp)
-            if isinstance(r, Err):
-                return r
-            r = r.ok.msg
-            return Ok(r)
+            return await sys(inp)
         return inner
