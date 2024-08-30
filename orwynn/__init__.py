@@ -1,9 +1,7 @@
 import inspect
 import typing
 from typing import (
-    Any,
     Callable,
-    Coroutine,
     Generic,
     Protocol,
     Self,

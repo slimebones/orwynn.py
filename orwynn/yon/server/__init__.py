@@ -15,7 +15,6 @@ from typing import (
     Any,
     Callable,
     ClassVar,
-    Coroutine,
     Generic,
     Iterable,
     Protocol,
