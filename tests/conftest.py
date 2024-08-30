@@ -30,7 +30,7 @@ def app_cfg() -> AppCfg:
                     con_type=MockCon
                 )
             ],
-            reg_types=[Mock_1]),
+            reg_regular_codes=[Mock_1]),
         extend_cfg_pack={
             "test": [
                 MockCfg(num=1)

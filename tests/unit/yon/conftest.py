@@ -49,7 +49,7 @@ async def bus() -> Bus:
                 is_server=True,
                 con_type=MockCon)
         ],
-        reg_types=[
+        reg_regular_codes=[
             Mock_1,
             Mock_2,
             EmptyMock

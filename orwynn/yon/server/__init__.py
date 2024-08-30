@@ -145,7 +145,7 @@ class BusCfg(BaseModel):
     will be returned.
     """
 
-    reg_types: Iterable[type] | None = None
+    reg_regular_codes: Iterable[type] | None = None
     """
     Types to register on bus initialization.
     """
@@ -255,7 +255,7 @@ class Bus(Singleton):
             # recognizable without knowing code ids
             Welcome,
             ok,
-            *(cfg.reg_types if cfg.reg_types else []),
+            *(cfg.reg_regular_codes if cfg.reg_regular_codes else []),
             _set_welcome=False
         )).unwrap()
         # this must be a list to avoid unconsistent codeid generation
