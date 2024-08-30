@@ -2,7 +2,7 @@ import asyncio
 
 from ryz.core import Code
 from ryz.core import ValErr
-from ryz.core import Ok, Res, valerr
+from ryz.core import Ok, Res, Err
 from ryz.uuid import uuid4
 from yon.server import BusCfg, RpcRecv, RpcSend, Transport, ok
 
@@ -89,7 +89,7 @@ async def test_rsys_err():
         assert inp.msg.key == "hello"
         nonlocal rpc_flag
         rpc_flag = True
-        return valerr("whoops")
+        return Err("whoops")
 
     async def _init(inp: PluginInp[MockCfg]) -> Res[None]:
         nonlocal init_flag
@@ -227,7 +227,7 @@ async def test_sys_err():
         assert inp.msg.key == "hello"
         nonlocal sys_flag
         sys_flag = True
-        return valerr("whoops")
+        return Err("whoops")
 
     async def _init(inp: PluginInp[MockCfg]) -> Res[None]:
         nonlocal init_flag

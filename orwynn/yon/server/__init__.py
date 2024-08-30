@@ -23,11 +23,11 @@ from typing import (
 )
 
 from pydantic import BaseModel
-from ryz.core import Code, Coded
-from ryz.core import AlreadyProcessedErr, ErrDto, NotFoundErr, ValErr
+from ryz.core import Code, Coded, ecode
+from ryz.core import Err
 from ryz import log
 from ryz.ptr import ptr
-from ryz.core import Err, Ok, Res, Result, UnwrapErr, aresultify, valerr
+from ryz.core import Err, Ok, Res, aresultify
 from ryz.singleton import Singleton
 from ryz.uuid import uuid4
 from yon.server._msg import (
@@ -244,7 +244,6 @@ class BusCfg(BaseModel):
     sub_ctxfn: Callable[[Bmsg], Awaitable[Res[CtxManager]]] | None = None
     rpc_ctxfn: Callable[[RpcSend], Awaitable[Res[CtxManager]]] | None = None
 
-    trace_errs_on_pub: bool = True
     log_net_send: bool = True
     log_net_recv: bool = True
 
@@ -292,14 +291,14 @@ class Bus(Singleton):
             self, consid: str) -> Res[list[str]]:
         con = self._sid_to_con.get(consid, None)
         if con is None:
-            return valerr(f"no con with sid {consid}")
+            return Err(f"no con with sid {consid}")
         return Ok(con.get_tokens())
 
     def set_con_tokens(
             self, consid: str, tokens: list[str]) -> Res[None]:
         con = self._sid_to_con.get(consid, None)
         if con is None:
-            return valerr(f"no con with sid {consid}")
+            return Err(f"no con with sid {consid}")
         con.set_tokens(tokens)
         return Ok(None)
 
@@ -307,21 +306,21 @@ class Bus(Singleton):
         consid_res = self.get_ctx_consid()
         if isinstance(consid_res, Err):
             return consid_res
-        return self.get_con_tokens(consid_res.okval)
+        return self.get_con_tokens(consid_res.ok)
 
     def set_ctx_con_tokens(
             self, tokens: list[str]) -> Res[None]:
         consid_res = self.get_ctx_consid()
         if isinstance(consid_res, Err):
             return consid_res
-        return self.set_con_tokens(consid_res.okval, tokens)
+        return self.set_con_tokens(consid_res.ok, tokens)
 
     async def close_con(self, consid: str) -> Res[None]:
         con = self._sid_to_con.get(consid, None)
         if con is None:
-            return valerr(f"no con with sid {consid}")
+            return Err(f"no con with sid {consid}")
         if con.is_closed:
-            return valerr("already closed")
+            return Err("already closed")
         if consid in self._sid_to_con:
             del self._sid_to_con[consid]
         return await aresultify(con.close())
@@ -365,26 +364,6 @@ class Bus(Singleton):
             ok,
             RpcSend,
             RpcRecv,
-            ValErr,
-            NotFoundErr,
-            Coded(
-                code="exception",
-                val=Exception),
-            Coded(
-                code="value_error",
-                val=ValueError),
-            Coded(
-                code="type_error",
-                val=TypeError),
-            Coded(
-                code="system_error",
-                val=SystemError),
-            Coded(
-                code="key_error",
-                val=KeyError),
-            Coded(
-                code="attribute_error",
-                val=AttributeError),
             *reg_types
         ])).unwrap()
 
@@ -417,7 +396,7 @@ class Bus(Singleton):
         So it's better to be called once and at the start of the program.
         """
         if not self._is_initd:
-            return valerr("bus should be initialized")
+            return Err("bus should be initialized")
         upd_res = await Code.upd(types, self.DEFAULT_CODE_ORDER)
         if isinstance(upd_res, Err):
             return upd_res
@@ -441,26 +420,26 @@ class Bus(Singleton):
                                to provided function's signature for `msg`.
         """
         if key in cls._rpckey_to_fn:
-            return Err(ValErr(f"rpc key {key} is already regd"))
+            return Err(f"rpc key {key} is already regd")
 
         if msgtype is None:
             sig = signature(fn)
             msg_param = sig.parameters.get("msg")
             if not msg_param:
-                return valerr(
+                return Err(
                     f"rpc fn {fn} with key {key} must accept"
                     " \"msg: AnyBaseModel\" as it's sole argument"
                 )
             msgtype = msg_param.annotation
         if msgtype is None:
-            return valerr("rpc msg type cannot be None")
+            return Err("rpc msg type cannot be None")
         if msgtype is BaseModel:
-            return valerr(
+            return Err(
                 f"rpc fn {fn} with key {key} cannot declare BaseModel"
                 " as it's direct args type"
             )
         if not issubclass(msgtype, BaseModel):
-            return valerr(
+            return Err(
                 f"rpc fn {fn} with code {key} must accept args in form"
                 f" of BaseModel, got {msgtype}"
             )
@@ -536,16 +515,16 @@ class Bus(Singleton):
         Once the message is occured within the bus, the provided action is
         called.
 
-        Args:
-            subfn:
-                Function to fire once the messsage has arrived.
-            opts (optional):
-                Subscription options.
-        Returns:
+        # Args
+
+        * `subfn` - Function to fire once the messsage has arrived.
+        * `opts` - Subscription options.
+
+        # Returns
             Unsubscribe function.
         """
         if not isclass(msgtype):
-            return valerr(f"bodytype {msgtype} should be a class")
+            return Err(f"bodytype {msgtype} should be a class")
 
         r = self._check_norpc_mbody(msgtype, "subscription")
         if isinstance(r, Err):
@@ -556,10 +535,10 @@ class Bus(Singleton):
         code_res = Code.get_from_type(msgtype)
         if isinstance(code_res, Err):
             return code_res
-        code = code_res.okval
+        code = code_res.ok
 
         if not Code.has_code(code):
-            return valerr(f"code \"{code}\" is not regd")
+            return Err(f"code \"{code}\" is not regd")
 
         if code not in self._code_to_subfns:
             self._code_to_subfns[code] = []
@@ -575,7 +554,7 @@ class Bus(Singleton):
 
     async def unsub(self, subsid: str) -> Res[None]:
         if subsid not in self._subsid_to_code:
-            return Err(ValErr(f"sub with id {subsid} not found"))
+            return Err(f"sub with id {subsid} not found")
 
         assert self._subsid_to_code[subsid] in self._code_to_subfns
 
@@ -606,12 +585,12 @@ class Bus(Singleton):
         If the response is Exception, it is wrapped to res::Err.
         """
         aevt = asyncio.Event()
-        ptr: ptr[Msg] = ptr(target=None)
+        p: ptr[Msg] = ptr(target=None)
 
         def wrapper(aevt: asyncio.Event, ptr: ptr[Msg]):
             async def fn(msg: Msg):
                 aevt.set()
-                ptr.target = msg
+                p.target = msg
             return fn
 
         if opts.subfn is not None:
@@ -626,52 +605,51 @@ class Bus(Singleton):
             try:
                 await asyncio.wait_for(aevt.wait(), opts.pubr_timeout)
             except asyncio.TimeoutError as err:
-                return Err(err)
+                return Err.from_native(err)
 
-        if (isinstance(ptr.target, Exception)):
-            return Err(ptr.target)
+        if (isinstance(p.target, Exception)):
+            return Err.from_native(p.target)
 
-        return Ok(ptr.target)
+        return Ok(p.target)
 
     def get_ctx_key(self, key: str) -> Res[Any]:
         val = _yon_ctx.get().get(key, None)
         if val:
             return Ok(val)
-        return Err(NotFoundErr(f"\"{key}\" entry in yon ctx"))
+        return Err(f"\"{key}\" entry in yon ctx", ecode.NotFound)
 
     def get_ctx_consid(self) -> Res[str]:
         return self.get_ctx_key("consid")
 
     async def pub(
         self,
-        msg: Msg | Result | Bmsg,
+        msg: Msg | Res | Bmsg,
         opts: PubOpts = PubOpts()
     ) -> Res[None]:
         """
         Publishes message to the bus.
 
-        For received UnwrapErr, it's res.errval will be used.
+        For received UnwrapErr, it's res.err will be used.
 
         Received Exceptions are additionally logged if
         cfg.trace_errs_on_pub == True.
 
-        Passed Result will be fetched for the value.
+        Passed `Res` will be fetched for the value.
         """
         if isinstance(msg, Ok):
-            msg = msg.okval
+            msg = msg.ok
         elif isinstance(msg, Err):
-            msg = msg.errval
+            msg = msg.err
 
         if isinstance(msg, Bmsg):
             bmsg = msg
             msg = bmsg.msg
-            code = bmsg.skip__code
         else:
-            msg_res = self._make_bmsg(msg, opts)
-            if isinstance(msg_res, Err):
-                return msg_res
-            bmsg = msg_res.okval
-            code = bmsg.skip__code
+            r = self._new_bmsg(msg, opts)
+            if isinstance(r, Err):
+                return r
+            bmsg = r.ok
+        code = bmsg.skip__code
 
         r = self._check_norpc_mbody(bmsg, "publication")
         if isinstance(r, Err):
@@ -679,28 +657,13 @@ class Bus(Singleton):
 
         if opts.subfn is not None:
             if bmsg.sid in self._lsid_to_subfn:
-                return Err(AlreadyProcessedErr(f"{bmsg} for pubr"))
+                return Err(f"{bmsg} for pubr", ecode.AlreadyProcessed)
             self._lsid_to_subfn[bmsg.sid] = opts.subfn
 
         self._code_to_last_mbody[code] = msg
 
         await self._exec_pub_send_order(bmsg, opts)
         return Ok(None)
-
-    def _unpack_err(self, body: Exception, track: bool) -> Msg:
-        if isinstance(body, Exception):
-            if isinstance(body, UnwrapErr):
-                res = body.result
-                assert isinstance(res, Err)
-                if isinstance(res.errval, Exception):
-                    body = res.errval
-                else:
-                    body = IncorrectYonApiUsageErr(
-                        f"got res with err value {res.errval},"
-                        " which is not an instance of Exception")
-            if track:
-                log.track(body, "unpack err")
-        return body
 
     def _unpack_lsid(self, lsid: str | None) -> Res[str | None]:
         if lsid == "$ctx::msid":
@@ -709,30 +672,31 @@ class Bus(Singleton):
             msid_res = self.get_ctx_key("msid")
             if isinstance(msid_res, Err):
                 return msid_res
-            lsid = msid_res.okval
+            lsid = msid_res.ok
             assert isinstance(lsid, str)
         elif isinstance(lsid, str) and lsid.startswith("$"):
-            return valerr(f"unrecognized PubOpts.lsid operator: {lsid}")
+            return Err(f"unrecognized PubOpts.lsid operator: {lsid}")
         return Ok(lsid)
 
-    def _make_bmsg(
+    def _new_bmsg(
         self,
         msg: Msg,
         opts: PubOpts = PubOpts()
     ) -> Res[Bmsg]:
-        code_res = Code.get_from_type(type(msg))
-        if isinstance(code_res, Err):
-            return code_res
-        code = code_res.okval
-        if not Code.has_code(code):
-            return valerr(f"code {code} is not registered")
+        if isinstance(msg, Err):
+            is_err = True
+            code = msg.code
+        else:
+            is_err = False
+            r = Code.get_from_type(type(msg))
+            if isinstance(r, Err):
+                return r
+            code = r.ok
 
-        msg = self._unpack_err(msg, self._cfg.trace_errs_on_pub)
-
-        lsid_res = self._unpack_lsid(opts.lsid)
-        if isinstance(lsid_res, Err):
-            return lsid_res
-        lsid = lsid_res.okval
+        r = self._unpack_lsid(opts.lsid)
+        if isinstance(r, Err):
+            return r
+        lsid = r.ok
 
         target_consids = None
         if opts.target_consids:
@@ -741,14 +705,16 @@ class Bus(Singleton):
             # try to get ctx consid, otherwise left as none
             consid_res = self.get_ctx_key("consid")
             if isinstance(consid_res, Ok):
-                assert isinstance(consid_res.okval, str)
-                target_consids = [consid_res.okval]
+                assert isinstance(consid_res.ok, str)
+                target_consids = [consid_res.ok]
 
         return Ok(Bmsg(
             lsid=lsid,
             skip__code=code,
+            is_err=is_err,
             msg=msg,
-            skip__target_consids=target_consids))
+            skip__target_consids=target_consids
+        ))
 
     async def _exec_pub_send_order(self, bmsg: Bmsg, opts: PubOpts):
         # SEND ORDER
@@ -773,7 +739,11 @@ class Bus(Singleton):
 
     async def _pub_bmsg_to_net(self, bmsg: Bmsg):
         if bmsg.skip__target_consids:
-            rbmsg = (await bmsg.serialize_to_net()).unwrap_or(None)
+            rbmsg = await bmsg.serialize_to_net()
+            if isinstance(rbmsg, Err):
+                rbmsg = None
+            else:
+                rbmsg = rbmsg.ok
             if rbmsg is None:
                 return
             await self._pub_rbmsg_to_net(rbmsg, bmsg.skip__target_consids)
@@ -858,9 +828,9 @@ class Bus(Singleton):
         # unpack here, though it can be done inside pub(), but we want to
         # process iterables here
         if isinstance(retval, Ok):
-            retval = retval.okval
+            retval = retval.ok
         if isinstance(retval, Err):
-            retval = retval.errval
+            retval = retval.err
 
         if isinstance(retval, SkipMe):
             return []
@@ -903,9 +873,10 @@ class Bus(Singleton):
             or (
                 not iscls
                 and (isinstance(body, (RpcSend, RpcRecv))))):
-            return Err(ValErr(
+            return Err(
                 f"mbody {body} in context of \"{disp_ctx}\" cannot be"
-                " associated with rpc"))
+                " associated with rpc"
+            )
         return Ok(None)
 
     def _apply_opts_to_subfn(
@@ -946,10 +917,11 @@ class Bus(Singleton):
             return retbody
         return wrapper
 
-    async def _receive_from_con(
-            self,
-            con: Con,
-            atransport: ActiveTransport) -> dict:
+    async def _recv_from_con(
+        self,
+        con: Con,
+        atransport: ActiveTransport
+    ) -> dict:
         try:
             return await asyncio.wait_for(
                 con.recv(),
@@ -964,7 +936,7 @@ class Bus(Singleton):
             log.info(f"receive: {rbmsg}", 2)
             atransport.inp_queue.put_nowait((con, rbmsg))
 
-    async def _process_inp_queue(
+    async def _proc_inp_queue(
             self,
             transport: Transport,
             queue: Queue[tuple[Con, dict]]):
@@ -980,24 +952,20 @@ class Bus(Singleton):
             if isinstance(bmsg, Err):
                 await bmsg.atrack()
                 continue
-            await self._accept_net_bmsg(bmsg.okval)
+            await self._accept_net_bmsg(bmsg.ok)
 
-    async def _process_out_queue(
-            self,
-            transport: Transport,
-            queue: Queue[tuple[Con, dict]]):
+    async def _proc_out_queue(
+        self,
+        transport: Transport,
+        queue: Queue[tuple[Con, dict]]
+    ):
         while True:
             con, rbmsg = await queue.get()
-
             if self._cfg.log_net_send:
                 log.info(f"NET::SEND | {con.sid} | {rbmsg}")
-
             if transport.on_send:
                 with contextlib.suppress(Exception):
                     await transport.on_send(con.sid, rbmsg)
-
-            log.info(f"send to consid {con.sid}: {rbmsg}", 2)
-
             await con.send(rbmsg)
 
     async def _accept_net_bmsg(self, bmsg: Bmsg):
@@ -1007,7 +975,7 @@ class Bus(Singleton):
         elif isinstance(bmsg.msg, RpcSend):
             # process rpc in a separate task to not block inp queue
             # processing
-            task = asyncio.create_task(self._call_rpc(bmsg))
+            task = asyncio.create_task(self._rpc(bmsg))
             self._rpc_tasks.add(task)
             task.add_done_callback(self._rpc_tasks.discard)
             return
@@ -1021,7 +989,7 @@ class Bus(Singleton):
                 )
             ).atrack()
 
-    async def _call_rpc(self, bmsg: Bmsg):
+    async def _rpc(self, bmsg: Bmsg):
         msg = bmsg.msg
         if msg.key not in self._rpckey_to_fn:
             log.err(f"no such rpc code {msg.key} for req {msg} => skip")
@@ -1048,39 +1016,37 @@ class Bus(Singleton):
         except Exception as err:
             await log.atrack(
                 err, f"rpcfn on req {msg} => wrap to usual RpcRecv")
-            res = Err(err)
+            res = Err.from_native(err)
 
         val: Any
         if isinstance(res, Ok):
-            val = res.okval
+            val = res.ok
         elif isinstance(res, Err):
-            val = (await create_err_dto(res.errval)).unwrap()
-            val = typing.cast(ErrDto, val).model_dump(exclude={"stacktrace"})
+            val = res
         else:
             log.err(
                 f"rpcfn on req {msg} returned non-res val {res} => skip")
             return
 
-        # val must be any serializable by pydantic object, so here we pass it
-        # directly to Msg, which will do serialization automatically under the
-        # hood
-        evt = Bmsg(
-            lsid=bmsg.sid,
-            skip__target_consids=[bmsg.skip__consid],
-            skip__code=RpcRecv.code(),
-            # pass val directly to optimize
-            msg=val
+        assert bmsg.skip__consid is not None
+        r = self._new_bmsg(
+            val,
+            PubOpts(lsid=bmsg.sid, target_consids=[bmsg.skip__consid])
         )
+        if isinstance(r, Err):
+            log.err(f"cannot create bmsg from val {val}")
+            return
+        bmsg = r.ok
         # we publish directly to the net since inner participants can't
         # subscribe to this
-        await self._pub_bmsg_to_net(evt)
+        await self._pub_bmsg_to_net(bmsg)
 
     async def _parse_rbmsg(
         self, rbmsg: dict, con: Con
     ) -> Res[Bmsg]:
         msid: str | None = rbmsg.get("sid", None)
         if not msid:
-            return valerr("msg without sid")
+            return Err("msg without sid")
         # msgs coming from net receive conection sid
         rbmsg["skip__consid"] = con.sid
         bmsg = await Bmsg.deserialize_from_net(rbmsg)
@@ -1105,9 +1071,9 @@ class Bus(Singleton):
 
             inp_queue = Queue(transport.max_inp_queue_size)
             out_queue = Queue(transport.max_out_queue_size)
-            inp_task = asyncio.create_task(self._process_inp_queue(
+            inp_task = asyncio.create_task(self._proc_inp_queue(
                 transport, inp_queue))
-            out_task = asyncio.create_task(self._process_out_queue(
+            out_task = asyncio.create_task(self._proc_out_queue(
                 transport, out_queue))
             atransport = ActiveTransport(
                 transport=transport,
@@ -1121,7 +1087,7 @@ class Bus(Singleton):
         codes_res = await Code.get_regd_codes()
         if isinstance(codes_res, Err):
             return codes_res
-        codes = codes_res.okval
+        codes = codes_res.ok
         welcome = Welcome(codes=codes)
         self._preserialized_welcome_msg = (await Bmsg(
             skip__code=Welcome.code(),

@@ -2,8 +2,8 @@ import importlib
 from typing import Any, TypeVar
 
 from pydantic import BaseModel
-from ryz.core import AlreadyProcessedErr
 from ryz import log
+from ryz.core import Err, ecode
 from ryz.tree import ReversedTreeNode, TreeNode, TreeUtils
 
 
@@ -89,7 +89,10 @@ class CfgPackUtils:
             for cfg in item:
                 cfg_type = type(cfg)
                 if cfg_type in chain_item_cfg_types:
-                    raise AlreadyProcessedErr(f"{cfg_type} for this chain")
+                    raise Err(
+                        f"{cfg_type} for this chain",
+                        ecode.AlreadyProcessed
+                    )
                 if cfg_type not in typef_to_cfgf:
                     typef_to_cfgf[cfg_type] = cfg
                     continue

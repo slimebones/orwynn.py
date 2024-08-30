@@ -2,8 +2,6 @@ from typing import Any, Callable, Self, TypeVar
 
 from pydantic import BaseModel
 from ryz.core import Code
-from ryz.core import ValErr
-from ryz.core_utils import create_err_dto
 from ryz import log
 from ryz.core import Err, Ok, Res, resultify
 from ryz.uuid import uuid4
@@ -56,6 +54,10 @@ class Bmsg(BaseModel):
     """
     Code of msg's body.
     """
+    is_err: bool
+    """
+    Indicates if contained message is an err.
+    """
     msg: Msg
 
     class Config:
@@ -75,22 +77,23 @@ class Bmsg(BaseModel):
     async def serialize_to_net(self) -> Res[dict]:
         final = self.model_dump()
 
-        body = final["msg"]
+        msg = final["msg"]
         # don't include empty collections in serialization
-        if getattr(body, "__len__", None) is not None and len(body) == 0:
-            body = None
+        if getattr(msg, "__len__", None) is not None and len(msg) == 0:
+            msg = None
 
         # serialize exception to errdto
-        if isinstance(body, Exception):
-            err_dto_res = await create_err_dto(body)
-            if isinstance(err_dto_res, Err):
-                return err_dto_res
-            body = err_dto_res.okval.model_dump(exclude={"stacktrace"})
+        if isinstance(msg, Exception):
+            if not isinstance(msg, Err):
+                # traceback won't be a thing here so we ignore how many frames
+                # we skip
+                msg = Err.from_native(msg)
+            msg = {"code": msg.code, "msg": msg.msg}
 
         codeid_res = await Code.get_regd_codeid(self.skip__code)
         if isinstance(codeid_res, Err):
             return codeid_res
-        final["codeid"] = codeid_res.okval
+        final["codeid"] = codeid_res.ok
 
         if "skip__consid" in final and final["skip__consid"] is not None:
             # consids must exist only inside server bus, it's probably an err
@@ -106,27 +109,28 @@ class Bmsg(BaseModel):
         for k in keys_to_del:
             del final[k]
 
-        final["msg"] = body
-        if body is None and "msg" in final:
+        final["msg"] = msg
+        if msg is None and "msg" in final:
             del final["msg"]
         return Ok(final)
 
     @classmethod
     async def _parse_rbmsg_code(cls, rbmsg: dict) -> Res[str]:
         if "codeid" not in rbmsg:
-            return Err(ValErr(f"msg {rbmsg} must have \"codeid\" field"))
+            return Err(f"msg {rbmsg} must have \"codeid\" field")
         codeid = rbmsg["codeid"]
         del rbmsg["codeid"]
         if not isinstance(codeid, int):
-            return Err(ValErr(
-                f"invalid type of codeid {codeid}, expected int"))
+            return Err(
+                f"invalid type of codeid {codeid}, expected int"
+            )
 
         code_res = await Code.get_regd_code_by_id(codeid)
         if isinstance(code_res, Err):
             return code_res
-        code = code_res.okval
+        code = code_res.ok
         if not Code.has_code(code):
-            return Err(ValErr(f"unregd code {code}"))
+            return Err(f"unregd code {code}")
 
         return Ok(code)
 
@@ -155,14 +159,14 @@ class Bmsg(BaseModel):
         code_res = await cls._parse_rbmsg_code(rbmsg)
         if isinstance(code_res, Err):
             return code_res
-        code = code_res.okval
+        code = code_res.ok
 
         rbmsg["skip__code"] = code
 
         custom_type_res = await Code.get_regd_type_by_code(code)
         if isinstance(custom_type_res, Err):
             return custom_type_res
-        custom_type = custom_type_res.okval
+        custom_type = custom_type_res.ok
 
         deserialize_custom = getattr(custom_type, "deserialize", None)
         final_deserialize_fn: Callable[[], Any]
@@ -172,9 +176,10 @@ class Bmsg(BaseModel):
             if msg is None:
                 msg = {}
             elif not isinstance(msg, dict):
-                return Err(ValErr(
+                return Err(
                     f"if custom type ({custom_type}) is a BaseModel, body"
-                    f" {msg} must be a dict, got type {type(msg)}"))
+                    f" {msg} must be a dict, got type {type(msg)}"
+                )
             final_deserialize_fn = lambda: custom_type(**msg)
         elif deserialize_custom is not None:
             final_deserialize_fn = lambda: deserialize_custom(msg)
@@ -191,7 +196,7 @@ class Bmsg(BaseModel):
         msg = await cls._parse_rbmsg_msg(rbmsg)
         if isinstance(msg, Err):
             return msg
-        msg = msg.okval
+        msg = msg.ok
 
         if "lsid" not in rbmsg:
             rbmsg["lsid"] = None

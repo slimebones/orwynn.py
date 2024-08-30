@@ -24,7 +24,7 @@ from yon.server import (
     SubFn,
     SubFnRetval,
     TMsg_contra,
-    valerr,
+    Err,
 )
 
 from orwynn import env
@@ -210,7 +210,7 @@ def _merge(to_dict: dict, from_dict: dict) -> Res[dict]:
         if k_from in to_dict:
             v_to = to_dict[k_from]
             if type(v_to) is not type(v_from):
-                return valerr(
+                return Err(
                     f"incompatible types for dict key {k_from} - {type(v_to)}"
                     f" is not {type(v_from)}"
                 )
@@ -218,7 +218,7 @@ def _merge(to_dict: dict, from_dict: dict) -> Res[dict]:
                 r = _merge(v_to, v_from)
                 if isinstance(r, Err):
                     return r
-                v = r.okval
+                v = r.ok
             elif isinstance(v_to, list):
                 v = v_to.extend(v_from)
             elif isinstance(v_to, set):
@@ -249,29 +249,29 @@ def _merge_sys_opts(
         d = _merge(d, app_cfg.global_opts.sys.model_dump())
         if isinstance(d, Err):
             return d
-        d = d.okval
+        d = d.ok
     elif isinstance(spec, RsysSpec):
         d = _merge(d, app_cfg.global_opts.rsys.model_dump())
         if isinstance(d, Err):
             return d
-        d = d.okval
+        d = d.ok
     else:
         raise SystemError("panic")  # noqa: TRY004
 
     d = _merge(d, plugin.global_opts.all.model_dump())
     if isinstance(d, Err):
         return d
-    d = d.okval
+    d = d.ok
     if isinstance(spec, SysSpec):
         d = _merge(d, plugin.global_opts.sys.model_dump())
         if isinstance(d, Err):
             return d
-        d = d.okval
+        d = d.ok
     elif isinstance(spec, RsysSpec):
         d = _merge(d, plugin.global_opts.rsys.model_dump())
         if isinstance(d, Err):
             return d
-        d = d.okval
+        d = d.ok
     else:
         raise SystemError("panic")  # noqa: TRY004
 
@@ -287,7 +287,7 @@ class App(Singleton):
 
     def get_bus(self) -> Res[Bus]:
         if not self._is_initd:
-            return valerr("not initialized")
+            return Err("not initialized")
         return Ok(self._bus)
 
     async def init(self, cfg: AppCfg = AppCfg()) -> Self:
@@ -356,7 +356,7 @@ class App(Singleton):
         if isinstance(args_res, Err):
             await args_res.atrack(f"get args for {plugin}")
             return
-        args = args_res.okval
+        args = args_res.ok
 
         await self._init_plugin_systems(plugin)
         await self._init_plugin_rsystems(plugin)
@@ -383,7 +383,7 @@ class App(Singleton):
         self, plugin: Plugin[TCfg]
     ) -> Res[PluginInp[TCfg]]:
         if plugin.cfgtype not in self._type_to_cfg:
-            return valerr(f"({plugin}) unrecognized cfg type")
+            return Err(f"({plugin}) unrecognized cfg type")
         cfg = typing.cast(TCfg, self._type_to_cfg[plugin.cfgtype])
         return Ok(PluginInp(app=self, bus=self._bus, cfg=cfg))
 
@@ -397,7 +397,7 @@ class App(Singleton):
             if isinstance(args_res, Err):
                 await args_res.atrack(f"get args for {plugin}")
                 continue
-            await plugin.postinit(args_res.okval)
+            await plugin.postinit(args_res.ok)
 
     async def _destroy_all_plugins(self):
         for plugin in self._plugins:
@@ -515,7 +515,7 @@ class App(Singleton):
             r = await pipeline(inp)
             if isinstance(r, Err):
                 return r
-            r = r.okval.msg
+            r = r.ok.msg
             return Ok(r)
         return inner
 
@@ -531,7 +531,7 @@ class App(Singleton):
             r = await pipeline(inp)
             if isinstance(r, Err):
                 return r
-            r = r.okval.msg
+            r = r.ok.msg
             return Ok(r)
         return inner
 

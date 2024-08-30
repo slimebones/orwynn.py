@@ -23,7 +23,7 @@ async def test_main(sbus: Bus):
         username = msg.username
         email = msg.email
         if username == "throw":
-            return Err(ValErr("hello"))
+            return Err("hello"))
         assert username == "test_username"
         assert email == "test_email"
         return Ok(0)

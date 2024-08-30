@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from ryz.core import Code
 from ryz.core import ValErr
 from ryz.core_utils import get_err_msg
-from ryz.core import Err, Ok, valerr
+from ryz.core import Err, Ok, Err
 from ryz.uuid import uuid4
 from yon.server import (
     Bus,
@@ -196,10 +196,10 @@ async def test_auth_example():
         sbus = Bus.ie()
         consid_res = sbus.get_ctx_consid()
         # skip inner messages
-        if isinstance(consid_res, Err) or not consid_res.okval:
+        if isinstance(consid_res, Err) or not consid_res.ok:
             return data
 
-        consid = consid_res.okval
+        consid = consid_res.ok
         tokens = sbus.get_con_tokens(consid).unwrap()
         # if data is mock_1, the con must have tokens
         if isinstance(data, Mock_1) and not tokens:
@@ -210,7 +210,7 @@ async def test_auth_example():
         if msg.username == "right":
             Bus.ie().set_ctx_con_tokens(["right"])
             return None
-        return valerr(f"wrong username {msg.username}")
+        return Err(f"wrong username {msg.username}")
 
     async def sub_logout(msg: Logout):
         Bus.ie().set_ctx_con_tokens([])
@@ -240,7 +240,7 @@ async def test_auth_example():
 
     await asyncio.wait_for(con.client__recv(), 1)
     mock_1_codeid = (await Code.get_regd_codeid_by_type(Mock_1)).unwrap()
-    valerr_codeid = (await Code.get_regd_codeid_by_type(ValErr)).unwrap()
+    Err_codeid = (await Code.get_regd_codeid_by_type(ValErr)).unwrap()
     login_codeid = (await Code.get_regd_codeid_by_type(Login)).unwrap()
     logout_codeid = (await Code.get_regd_codeid_by_type(Logout)).unwrap()
 
@@ -253,7 +253,7 @@ async def test_auth_example():
         }
     })
     response = await asyncio.wait_for(con.client__recv(), 1)
-    assert response["codeid"] == valerr_codeid
+    assert response["codeid"] == Err_codeid
     assert response["msg"]["msg"] == "forbidden"
 
     # register wrong username
@@ -265,7 +265,7 @@ async def test_auth_example():
         }
     })
     response = await asyncio.wait_for(con.client__recv(), 1)
-    assert response["codeid"] == valerr_codeid
+    assert response["codeid"] == Err_codeid
     assert response["msg"]["msg"] == "wrong username wrong"
 
     # register right username

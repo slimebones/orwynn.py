@@ -5,7 +5,7 @@ from typing import Self
 
 import pytest_asyncio
 from pydantic import BaseModel
-from ryz.core import Ok, Res, valerr
+from ryz.core import Ok, Res, Err
 from yon.server import (
     Bus,
     BusCfg,
@@ -101,4 +101,4 @@ def find_codeid_in_welcome_rbmsg(code: str, rbmsg: dict) -> Res[int]:
     for i, code_container in enumerate(rbmsg["msg"]["codes"]):
         if code in code_container:
             return Ok(i)
-    return valerr(code)
+    return Err(code)
