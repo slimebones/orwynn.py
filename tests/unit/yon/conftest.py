@@ -37,11 +37,10 @@ class EmptyMock(BaseModel):
 @pytest_asyncio.fixture(autouse=True)
 async def auto():
     yield
-    Bus.subfn_init_queue.clear()
     await Bus.destroy()
 
 @pytest_asyncio.fixture
-async def sbus() -> Bus:
+async def bus() -> Bus:
     bus = Bus.ie()
     cfg = BusCfg(
         transports=[

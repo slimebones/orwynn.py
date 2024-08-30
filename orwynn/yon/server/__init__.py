@@ -56,8 +56,6 @@ __all__ = [
     "SubOpts",
     "PubOpts",
 
-    "IncorrectYonApiUsageErr",
-
     "Msg",
 
     "StaticCodeid",
@@ -69,12 +67,6 @@ __all__ = [
     "Udp",
     "OnSendFn",
     "OnRecvFn",
-
-    "PubList",
-    "InterruptPipeline",
-    "SkipMe",
-
-    "sub"
 ]
 
 class StaticCodeid:
@@ -87,53 +79,6 @@ class StaticCodeid:
 @runtime_checkable
 class SubFn(Protocol, Generic[TMsg_contra]):
     async def __call__(self, msg: TMsg_contra) -> Res[Msg]: ...
-
-def sub(msgtype: type[TMsg_contra]):
-    def wrapper(target: SubFn[TMsg_contra]):
-        Bus.subfn_init_queue.add((msgtype, target))
-        def inner(*args, **kwargs) -> Any:
-            return target(*args, **kwargs)
-        return inner
-    return wrapper
-
-class PubList(list[Msg]):
-    """
-    List of messages to be published.
-
-    Useful as retval from subfn to signify that this list should be unpacked
-    and each item be published.
-    """
-
-class SkipMe:
-    """
-    Used by subscribers to prevent any actions on it's retval, since
-    returning None will cause bus to publish Ok(None).
-    """
-
-class InterruptPipeline:
-    def __init__(self, body: Msg) -> None:
-        self.body = body
-
-class IncorrectYonApiUsageErr(Exception):
-    """
-    An error occured at attached resource server, which worked with
-    yon api incorrectly.
-    """
-    @staticmethod
-    def code() -> str:
-        return "yon::incorrect_yon_api_usage_err"
-
-class InternalInvokedActionUnhandledErr(Exception):
-    def __init__(self, action: Callable, err: Exception):
-        super().__init__(
-            f"invoked {action} unhandled err: {err!r}"
-        )
-
-class InternalBusUnhandledErr(Exception):
-    def __init__(self, err: Exception):
-        super().__init__(
-            f"bus unhandled err: {err}"
-        )
 
 class PubOpts(BaseModel):
     subfn: SubFn | None = None
@@ -172,26 +117,8 @@ class PubOpts(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 
-MsgCondition = Callable[[Msg], Awaitable[bool]]
-MsgFilter = Callable[[Msg], Awaitable[Msg]]
-SubFnRetvalFilter = Callable[[Res[Msg]], Awaitable[Res[Msg]]]
-
 class SubOpts(BaseModel):
     recv_last_msg: bool = True
-    """
-    Whether to receive last stored msg with the same body code.
-    """
-    conditions: Iterable[MsgCondition] | None = None
-    """
-    Conditions that must be true in order for the subscriber to be called.
-
-    Are applied to the body only after passing it through ``in_filters``.
-
-    If all conditions fail for a subscriber, it is skipped completely
-    (returns RetState.SkipMe).
-    """
-    inp_filters: Iterable[MsgFilter] | None = None
-    out_filters: Iterable[SubFnRetvalFilter] | None = None
 
 _yon_ctx = ContextVar("yon", default={})
 
@@ -227,29 +154,12 @@ class BusCfg(BaseModel):
     """
     reg_ecodes: Iterable[str] | None = None
 
-    sub_ctxfn: Callable[[Bmsg], Awaitable[Res[CtxManager]]] | None = None
-
     log_net_send: bool = True
     log_net_recv: bool = True
-
-    global_subfn_conditions: Iterable[MsgCondition] | None = None
-    global_subfn_inp_filters: Iterable[MsgFilter] | None = None
-    global_subfn_out_filters: Iterable[SubFnRetvalFilter] | None = None
-
-    class Config:
-        arbitrary_types_allowed = True
 
 class Bus(Singleton):
     """
     Yon server bus implementation.
-    """
-    subfn_init_queue: ClassVar[set[tuple[type[Msg], SubFn]]] = set()
-    """
-    Queue of subscription functions to be subscribed on bus's initialization.
-
-    Is not cleared, so after bus recreation, it's no need to reimport all subs.
-
-    Using this queue can be disabled by cfg.consider_sub_decorators.
     """
     DEFAULT_TRANSPORT: ClassVar[Transport] = Transport(
         is_server=True,
@@ -481,8 +391,6 @@ class Bus(Singleton):
         """
         if isclass(msgtype_or_code):
             subsid = uuid4()
-            subfn = self._apply_opts_to_subfn(subfn, opts)
-
             r = Code.get_from_type(msgtype_or_code)
             if isinstance(r, Err):
                 return r
@@ -582,6 +490,9 @@ class Bus(Singleton):
 
     def get_ctx_consid(self) -> Res[str]:
         return self.get_ctx_key("consid")
+
+    def get_ctx_msid(self) -> Res[str]:
+        return self.get_ctx_key("msid")
 
     def get_cached_codes(self) -> list[str]:
         return self._cached_codes
@@ -766,63 +677,33 @@ class Bus(Singleton):
         Note that even None response is published as ok(None).
         """
         _yon_ctx.set(self._gen_ctx_dict_for_msg(bmsg))
-
-        if self._cfg.sub_ctxfn is not None:
-            try:
-                ctx_manager = (await self._cfg.sub_ctxfn(bmsg)).unwrap()
-            except Exception as err:
-                await log.atrack(
-                    err, f"rpx ctx manager retrieval for body {bmsg.msg}")
-                return
-            async with ctx_manager:
-                ret = await subfn(bmsg.msg)
-        else:
-            ret = await subfn(bmsg.msg)
-
-        vals = self._parse_subfn_ret(subfn, ret)
-        if not vals:
+        ret = await subfn(bmsg.msg)
+        msg = self._parse_subfn_ret_to_msg(subfn, ret)
+        if msg is None:
             return
 
         # by default all subsriber's body are intended to be linked to
         # initial message, so we attach this message ctx msid
         lsid = _yon_ctx.get().get("subfn_lsid", "$ctx::msid")
         pub_opts = PubOpts(lsid=lsid)
-        for val in vals:
-            val_ = val
-            if val_ is None:
-                val_ = ok()
-            await (await self.pub(val_, pub_opts)).atrack(
-                f"during subfn {subfn} retval publication")
+        await (await self.pub(msg, pub_opts)).atrack(
+            f"during subfn=<{subfn}> return msg=<{msg}> publication"
+        )
 
-    def _parse_subfn_ret(
+    def _parse_subfn_ret_to_msg(
         self,
         subfn: SubFn,
         ret: Res[Msg]
-    ) -> Iterable[Msg]:
+    ) -> Msg | Err:
         # unpack here, though it can be done inside pub(), but we want to
         # process iterables here
         if isinstance(ret, Ok):
-            ret = ret.ok
-        if isinstance(ret, Err):
-            ret = ret.err
-
-        if isinstance(ret, SkipMe):
-            return []
-        if isinstance(ret, InterruptPipeline):
-            log.err(
-                f"retval {ret} cannot be returned from subfn {subfn}")
-            return []
-        if isclass(ret):
-            log.err(f"subfn {subfn} shouldn't return class {ret}")
-            return []
-
-        vals = []
-        if isinstance(ret, PubList):
-            vals = ret
+            final = ret.ok
+        elif isinstance(ret, Err):
+            final = ret.err
         else:
-            vals = [ret]
-
-        return vals
+            final = Err(f"non-result {subfn} ret {ret}")
+        return final
 
     def set_ctx_subfn_lsid(self, lsid: str | None):
         """
@@ -832,44 +713,6 @@ class Bus(Singleton):
         """
         ctx_dict = _yon_ctx.get().copy()
         ctx_dict["subfn__lsid"] = lsid
-
-    def _apply_opts_to_subfn(
-            self, subfn: SubFn, opts: SubOpts) -> SubFn:
-        async def wrapper(msg: Msg) -> Any:
-            # globals are applied before locals
-            inp_filters = [
-                *(self._cfg.global_subfn_inp_filters or []),
-                *(opts.inp_filters or [])
-            ]
-            conditions = [
-                *(self._cfg.global_subfn_conditions or []),
-                *(opts.conditions or [])
-            ]
-            out_filters = [
-                *(self._cfg.global_subfn_out_filters or []),
-                *(opts.out_filters or [])
-            ]
-
-            for f in inp_filters:
-                msg = await f(msg)
-                if isinstance(msg, InterruptPipeline):
-                    return msg.body
-
-            for f in conditions:
-                flag = await f(msg)
-                # if any condition fails, skip the subfn
-                if not flag:
-                    return SkipMe()
-
-            retbody = await subfn(msg)
-
-            for f in out_filters:
-                retbody = await f(retbody)
-                if isinstance(retbody, InterruptPipeline):
-                    return retbody.body
-
-            return retbody
-        return wrapper
 
     async def _recv_from_con(
         self,
