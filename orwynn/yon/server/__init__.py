@@ -240,6 +240,7 @@ class BusCfg(BaseModel):
     """
     Types to register on bus initialization.
     """
+    reg_ecodes: Iterable[str] | None = None
 
     sub_ctxfn: Callable[[Bmsg], Awaitable[Res[CtxManager]]] | None = None
     rpc_ctxfn: Callable[[RpcSend], Awaitable[Res[CtxManager]]] | None = None
@@ -356,16 +357,35 @@ class Bus(Singleton):
 
         self._rpc_tasks: set[asyncio.Task] = set()
 
-        reg_types = [] if cfg.reg_types is None else cfg.reg_types
-        (await self.reg_types([
+        (await self.reg_regular_codes(
             # by yon protocol, welcome msg is always the first, to be
             # recognizable without knowing code ids
             Welcome,
             ok,
             RpcSend,
             RpcRecv,
-            *reg_types
-        ])).unwrap()
+            *(cfg.reg_types if cfg.reg_types else [])
+        )).unwrap()
+        self._ecodes: set[str] = set()
+        (await self.reg_ecodes(
+            ecode.Err,
+            ecode.NotFound,
+            ecode.Lock,
+            ecode.AlreadyProcessed,
+            ecode.Panic,
+            ecode.Unsupported,
+            ecode.Val,
+            *(cfg.reg_ecodes if cfg.reg_ecodes else [])
+        )).unwrap()
+        """
+        We use a separate object for error codes, since all of them point to
+        the same type - [`Err`].
+        """
+        self._cached_codes: list[str] = []
+        """
+        Since order of codes doesn't change, we can maintain a list of
+        codes, and renew it on each [`Bus._set_welcome`] call.
+        """
 
         if self._cfg.consider_sub_decorators:
             for msgtype, subfn in self.subfn_init_queue:
@@ -379,8 +399,8 @@ class Bus(Singleton):
     async def get_regd_type(cls, code: str) -> Res[type]:
         return await Code.get_regd_type_by_code(code)
 
-    async def reg_types(
-        self, types: Iterable[type | Coded[type]]
+    async def reg_regular_codes(
+        self, *types: type | Coded[type]
     ) -> Res[None]:
         """
         Reg codes for types.
@@ -401,6 +421,13 @@ class Bus(Singleton):
         if isinstance(upd_res, Err):
             return upd_res
         return await self._set_welcome()
+
+    async def reg_ecodes(self, *ecodes: str) -> Res[None]:
+        self._ecodes.update(*ecodes)
+        return await self._set_welcome()
+
+    def get_ecodes(self) -> set[str]:
+        return self._ecodes.copy()
 
     @classmethod
     def reg_rpc(
@@ -505,7 +532,7 @@ class Bus(Singleton):
 
     async def sub(
         self,
-        msgtype: type[Msg],
+        msgtype_or_code: type[Msg] | str,
         subfn: SubFn[TMsg_contra],
         opts: SubOpts = SubOpts(),
     ) -> Res[Callable[[], Awaitable[Res[None]]]]:
@@ -523,21 +550,23 @@ class Bus(Singleton):
         # Returns
             Unsubscribe function.
         """
-        if not isclass(msgtype):
-            return Err(f"bodytype {msgtype} should be a class")
+        if isclass(msgtype_or_code):
+            r = self._check_norpc_mbody(msgtype_or_code, "subscription")
+            if isinstance(r, Err):
+                return r
+            subsid = uuid4()
+            subfn = self._apply_opts_to_subfn(subfn, opts)
 
-        r = self._check_norpc_mbody(msgtype, "subscription")
-        if isinstance(r, Err):
-            return r
-        subsid = uuid4()
-        subfn = self._apply_opts_to_subfn(subfn, opts)
+            r = Code.get_from_type(msgtype_or_code)
+            if isinstance(r, Err):
+                return r
+            code = r.ok
+        elif not isinstance(msgtype_or_code, str):
+            return Err(f"{msgtype_or_code} must be either a type or code")
+        else:
+            code = msgtype_or_code
 
-        code_res = Code.get_from_type(msgtype)
-        if isinstance(code_res, Err):
-            return code_res
-        code = code_res.ok
-
-        if not Code.has_code(code):
+        if code not in self.get_cached_codes():
             return Err(f"code \"{code}\" is not regd")
 
         if code not in self._code_to_subfns:
@@ -620,6 +649,23 @@ class Bus(Singleton):
 
     def get_ctx_consid(self) -> Res[str]:
         return self.get_ctx_key("consid")
+
+    def get_cached_codes(self) -> list[str]:
+        return self._cached_codes
+
+    def get_cached_code_by_codeid(self, codeid: int) -> Res[str]:
+        if len(self._cached_codes) - 1 < codeid:
+            return Err(f"no such codeid {codeid}", ecode.NotFound)
+        return Ok(self._cached_codes[codeid])
+
+    def get_cached_codeid_by_code(self, code: str) -> Res[int]:
+        """
+        Get a codeid of a registered code or error code.
+        """
+        for i, c in enumerate(self._cached_codes):
+            if code == c:
+                return Ok(i)
+        return Err(f"{code} not found", ecode.NotFound)
 
     async def pub(
         self,
@@ -739,7 +785,12 @@ class Bus(Singleton):
 
     async def _pub_bmsg_to_net(self, bmsg: Bmsg):
         if bmsg.skip__target_consids:
-            rbmsg = await bmsg.serialize_to_net()
+            codeid = self.get_cached_codeid_by_code(bmsg.skip__code)
+            if isinstance(codeid, Err):
+                await codeid.atrack(f"codeid retrieval for {bmsg}")
+                return
+            codeid = codeid.ok
+            rbmsg = await bmsg.serialize_to_net(codeid)
             if isinstance(rbmsg, Err):
                 rbmsg = None
             else:
@@ -802,11 +853,11 @@ class Bus(Singleton):
                     err, f"rpx ctx manager retrieval for body {bmsg.msg}")
                 return
             async with ctx_manager:
-                retval = await subfn(bmsg.msg)
+                ret = await subfn(bmsg.msg)
         else:
-            retval = await subfn(bmsg.msg)
+            ret = await subfn(bmsg.msg)
 
-        vals = self._parse_subfn_retval(subfn, retval)
+        vals = self._parse_subfn_ret(subfn, ret)
         if not vals:
             return
 
@@ -821,32 +872,33 @@ class Bus(Singleton):
             await (await self.pub(val_, pub_opts)).atrack(
                 f"during subfn {subfn} retval publication")
 
-    def _parse_subfn_retval(
-            self,
-            subfn: SubFn,
-            retval: SubFnRetval) -> Iterable[Msg]:
+    def _parse_subfn_ret(
+        self,
+        subfn: SubFn,
+        ret: SubFnRetval
+    ) -> Iterable[Msg]:
         # unpack here, though it can be done inside pub(), but we want to
         # process iterables here
-        if isinstance(retval, Ok):
-            retval = retval.ok
-        if isinstance(retval, Err):
-            retval = retval.err
+        if isinstance(ret, Ok):
+            ret = ret.ok
+        if isinstance(ret, Err):
+            ret = ret.err
 
-        if isinstance(retval, SkipMe):
+        if isinstance(ret, SkipMe):
             return []
-        if isinstance(retval, InterruptPipeline):
+        if isinstance(ret, InterruptPipeline):
             log.err(
-                f"retval {retval} cannot be returned from subfn {subfn}")
+                f"retval {ret} cannot be returned from subfn {subfn}")
             return []
-        if isclass(retval):
-            log.err(f"subfn {subfn} shouldn't return class {retval}")
+        if isclass(ret):
+            log.err(f"subfn {subfn} shouldn't return class {ret}")
             return []
 
         vals = []
-        if isinstance(retval, PubList):
-            vals = retval
+        if isinstance(ret, PubList):
+            vals = ret
         else:
-            vals = [retval]
+            vals = [ret]
 
         return vals
 
@@ -1084,15 +1136,18 @@ class Bus(Singleton):
             self._con_type_to_atransport[transport.con_type] = atransport
 
     async def _set_welcome(self) -> Res[None]:
-        codes_res = await Code.get_regd_codes()
-        if isinstance(codes_res, Err):
-            return codes_res
-        codes = codes_res.ok
+        r = await Code.get_regd_codes()
+        if isinstance(r, Err):
+            return r
+        codes = r.ok
+        # we always put error codes after the regular ones
+        codes.extend(self._ecodes)
+        self._cached_codes = codes.copy()
         welcome = Welcome(codes=codes)
         self._preserialized_welcome_msg = (await Bmsg(
             skip__code=Welcome.code(),
             msg=welcome
-        ).serialize_to_net()).unwrap()
+        ).serialize_to_net(1)).unwrap()
         rewelcome_res = await self._rewelcome_all_cons()
         if isinstance(rewelcome_res, Err):
             return rewelcome_res

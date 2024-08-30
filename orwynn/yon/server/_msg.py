@@ -54,7 +54,7 @@ class Bmsg(BaseModel):
     """
     Code of msg's body.
     """
-    is_err: bool
+    is_err: bool | None = None
     """
     Indicates if contained message is an err.
     """
@@ -72,9 +72,7 @@ class Bmsg(BaseModel):
         assert self.sid
         return hash(self.sid)
 
-    # todo: use orwynn indication funcs for serialize/deserialize methods
-
-    async def serialize_to_net(self) -> Res[dict]:
+    async def serialize_to_net(self, codeid: int) -> Res[dict]:
         final = self.model_dump()
 
         msg = final["msg"]
@@ -88,12 +86,11 @@ class Bmsg(BaseModel):
                 # traceback won't be a thing here so we ignore how many frames
                 # we skip
                 msg = Err.from_native(msg)
-            msg = {"code": msg.code, "msg": msg.msg}
+            # to not duplicate code in two places, we omit it in the msg, and
+            # specify it at the bmsg (which is done at [`Bus::_new_bmsg`])
+            msg = {"msg": msg.msg}
 
-        codeid_res = await Code.get_regd_codeid(self.skip__code)
-        if isinstance(codeid_res, Err):
-            return codeid_res
-        final["codeid"] = codeid_res.ok
+        final["codeid"] = codeid
 
         if "skip__consid" in final and final["skip__consid"] is not None:
             # consids must exist only inside server bus, it's probably an err
@@ -117,7 +114,7 @@ class Bmsg(BaseModel):
     @classmethod
     async def _parse_rbmsg_code(cls, rbmsg: dict) -> Res[str]:
         if "codeid" not in rbmsg:
-            return Err(f"msg {rbmsg} must have \"codeid\" field")
+            return Err(f"rbmsg {rbmsg} must have \"codeid\" field")
         codeid = rbmsg["codeid"]
         del rbmsg["codeid"]
         if not isinstance(codeid, int):
@@ -125,10 +122,14 @@ class Bmsg(BaseModel):
                 f"invalid type of codeid {codeid}, expected int"
             )
 
-        code_res = await Code.get_regd_code_by_id(codeid)
-        if isinstance(code_res, Err):
-            return code_res
-        code = code_res.ok
+        if "is_err" in rbmsg and rbmsg["is_err"] is not None:
+            # client cannot send error messages
+            return Err("must not deserialize error messages")
+        # so here we know we won't be dealing with ecodes
+        r = await Code.get_regd_code_by_id(codeid)
+        if isinstance(r, Err):
+            return r
+        code = r.ok
         if not Code.has_code(code):
             return Err(f"unregd code {code}")
 
@@ -153,13 +154,13 @@ class Bmsg(BaseModel):
         return keys_to_del
 
     @classmethod
-    async def _parse_rbmsg_msg(cls, rbmsg: dict) -> Res[Msg]:
+    async def _parse_rbmsg(cls, rbmsg: dict) -> Res[Msg]:
         msg = rbmsg.get("msg", None)
 
-        code_res = await cls._parse_rbmsg_code(rbmsg)
-        if isinstance(code_res, Err):
-            return code_res
-        code = code_res.ok
+        r = await cls._parse_rbmsg_code(rbmsg)
+        if isinstance(r, Err):
+            return r
+        code = r.ok
 
         rbmsg["skip__code"] = code
 
@@ -193,7 +194,7 @@ class Bmsg(BaseModel):
     async def deserialize_from_net(cls, rbmsg: dict) -> Res[Self]:
         """Recovers model of this class using dictionary."""
         # parse body separately according to it's regd type
-        msg = await cls._parse_rbmsg_msg(rbmsg)
+        msg = await cls._parse_rbmsg(rbmsg)
         if isinstance(msg, Err):
             return msg
         msg = msg.ok
@@ -209,7 +210,7 @@ class Bmsg(BaseModel):
         return Ok(bmsg)
 
 TBmsg = TypeVar("TBmsg", bound=Bmsg)
-# lowercase to not conflict with result.Ok
+# lowercase to not conflict with res.Ok
 class ok(BaseModel):
     def __str__(self) -> str:
         return "ok message"

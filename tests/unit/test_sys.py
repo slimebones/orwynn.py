@@ -3,7 +3,7 @@ import asyncio
 from ryz.core import Code
 from ryz.core import Ok, Res
 from ryz.uuid import uuid4
-from yon.server import Bus, PubOpts, RpcSend, ok
+from orwynn.yon.server import Bus, PubOpts, RpcSend, ok
 
 from orwynn import (
     App,

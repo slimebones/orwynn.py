@@ -2,12 +2,10 @@ import asyncio
 from typing import Any
 
 from pydantic import BaseModel
-from ryz.core import Code
-from ryz.core import ValErr
-from ryz.core_utils import get_err_msg
+from ryz.core import Code, ecode
 from ryz.core import Err, Ok, Err
 from ryz.uuid import uuid4
-from yon.server import (
+from orwynn.yon.server import (
     Bus,
     BusCfg,
     ConArgs,
@@ -50,9 +48,9 @@ async def test_data_static_indexes(sbus: Bus):
 async def test_pubsub_err(sbus: Bus):
     flag = False
 
-    async def sub_test(msg: ValErr):
-        assert type(msg) is ValErr
-        assert get_err_msg(msg) == "hello"
+    async def sub_test(msg: Err):
+        assert msg.is_(ecode.Val)
+        assert msg.msg == "hello"
         nonlocal flag
         flag = True
 

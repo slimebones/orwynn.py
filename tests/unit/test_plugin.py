@@ -1,9 +1,9 @@
 import asyncio
 
-from ryz.core import Code
+from ryz.core import Code, ecode
 from ryz.core import Ok, Res, Err
 from ryz.uuid import uuid4
-from orwynn.yon.server import BusCfg, RpcRecv, RpcSend, Transport, ok
+from orwynn.yon.server import Bus, BusCfg, RpcRecv, RpcSend, Transport, ok
 
 from orwynn import App, AppCfg, Plugin, PluginInp, RsysSpec, SysInp, SysSpec
 from tests.conftest import Mock_1, MockCfg, MockCon
@@ -276,8 +276,8 @@ async def test_sys_err():
     assert sys_flag
     recv = await asyncio.wait_for(con.client_recv(), 1)
     assert recv["lsid"] == send_msid
-    assert recv["codeid"] \
-        == (await Code.get_regd_codeid_by_type(ValErr)).unwrap()
+    assert recv["codeid"] == Bus() \
+        .get_cached_codeid_by_code(ecode.Val).unwrap()
     msg = recv["msg"]
     assert msg["errcode"] == "val_err"
     assert msg["msg"] == "whoops"

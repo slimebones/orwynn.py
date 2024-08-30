@@ -6,7 +6,7 @@ from ryz.core import get_fqname
 from ryz.core import ValErr
 from ryz.core import Err, Ok, Res
 from ryz.uuid import uuid4
-from yon.server import Bus, ConArgs, rpc
+from orwynn.yon.server import Bus, ConArgs, rpc
 
 from tests.unit.yon.conftest import (
     EmptyMock,

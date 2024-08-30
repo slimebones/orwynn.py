@@ -52,7 +52,7 @@ async def reg_scope_model_codes() -> Res[None]:
     registers a code for those who implement [ryz::code::Coded] trait.
     """
     selected = _get_coded_subclasses(BaseModel)
-    return await Bus.ie().reg_types(selected)
+    return await Bus.ie().reg_regular_codes(*selected)
 
 def _get_coded_subclasses(t: type) -> list[type]:
     selected = []
@@ -350,7 +350,7 @@ class App(Singleton):
 
     async def _init_plugin(self, plugin: Plugin):
         if plugin.reg_types:
-            await self._bus.reg_types(plugin.reg_types)
+            await self._bus.reg_regular_codes(*plugin.reg_types)
 
         args_res = self._get_plugin_args(plugin)
         if isinstance(args_res, Err):
