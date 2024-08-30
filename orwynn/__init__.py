@@ -14,7 +14,9 @@ from ryz import log
 from ryz.core import Coded, Err, Ok, Res, aresultify, resultify
 from ryz.singleton import Singleton
 
-from orwynn import env
+from orwynn import env, middleware
+from orwynn import Middleware, Next
+from orwynn.middleware import Middleware
 from orwynn.sys import Sys, SysInp, SysSpec
 from orwynn.cfg import Cfg, CfgPack, CfgPackUtils, TCfg
 from orwynn.yon.server import (
@@ -26,6 +28,8 @@ from orwynn.yon.server import (
 )
 
 __all__ =[
+    "Middleware",
+    "Next",
     "App",
     "AppCfg",
     "Cfg",
@@ -99,6 +103,7 @@ class AppCfg(Cfg):
     Whether to automatically register all available [`pydantic::BaseModel`]
     subclasses.
     """
+    middlewares: list[Middleware] = []
 
 class App(Singleton):
     _SYS_SIGNATURE_PARAMS_LEN: int = 2
@@ -266,5 +271,5 @@ class App(Singleton):
         inp = inp.model_copy()
         async def inner(msg: Msg) -> Res[Msg]:
             inp.msg = msg
-            return await sys(inp)
+            return await middleware.construct(self._cfg.middlewares, sys)(inp)
         return inner
