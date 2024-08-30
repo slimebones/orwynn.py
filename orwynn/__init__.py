@@ -15,7 +15,8 @@ from ryz.core import Coded, Err, Ok, Res, aresultify, resultify
 from ryz.singleton import Singleton
 
 from orwynn import env
-from orwynn._cfg import Cfg, CfgPack, CfgPackUtils, TCfg
+from orwynn.sys import Sys, SysInp, SysSpec
+from orwynn.cfg import Cfg, CfgPack, CfgPackUtils, TCfg
 from orwynn.yon.server import (
     Bus,
     BusCfg,
@@ -52,33 +53,6 @@ def _get_coded_subclasses(t: type) -> list[type]:
             selected.append(_t)
         selected.extend(_get_coded_subclasses(_t))
     return selected
-
-TMsg = TypeVar("TMsg", bound=Msg)
-class SysInp(BaseModel, Generic[TMsg, TCfg]):
-    msg: TMsg
-    app: "App"
-    bus: Bus
-    cfg: TCfg
-    extra: dict
-
-    class Config:
-        arbitrary_types_allowed = True
-
-@runtime_checkable
-class Sys(Protocol, Generic[TMsg, TCfg]):
-    async def __call__(
-        self,
-        inp: SysInp[TMsg, TCfg]
-    ) -> Res[Msg]: ...
-
-# for now we haven't managed to enforce correct msgtype and fn accepted type
-# match, so linter will be silent on these errors
-class SysSpec(Generic[TMsg, TCfg]):
-    def __init__(
-        self, msgtype: type[TMsg], fn: Sys[TMsg, TCfg]
-    ):
-        self.msgtype = msgtype
-        self.fn = fn
 
 class PluginInp(BaseModel, Generic[TCfg]):
     app: "App"
