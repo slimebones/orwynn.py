@@ -3,7 +3,7 @@ import asyncio
 from ryz.core import Code, ecode
 from ryz.core import Ok, Res, Err
 from ryz.uuid import uuid4
-from orwynn.yon.server import Bus, BusCfg, RpcRecv, RpcSend, Transport, ok
+from orwynn.yon.server import Bus, BusCfg, RpcSend, Transport, ok
 
 from orwynn import App, AppCfg, Plugin, PluginInp, RsysSpec, SysInp, SysSpec
 from tests.conftest import Mock_1, MockCfg, MockCon
@@ -72,8 +72,6 @@ async def test_rsys():
     recv = await asyncio.wait_for(con.client_recv(), 1)
     assert "msg" not in recv
     assert recv["lsid"] == send_msid
-    assert recv["codeid"] \
-        == (await Code.get_regd_codeid_by_type(RpcRecv)).unwrap()
 
     await app.destroy()
     assert destroy_flag
@@ -140,10 +138,8 @@ async def test_rsys_err():
     assert rpc_flag
     recv = await asyncio.wait_for(con.client_recv(), 1)
     assert recv["lsid"] == send_msid
-    assert recv["codeid"] \
-        == (await Code.get_regd_codeid_by_type(RpcRecv)).unwrap()
+    assert recv["codeid"] == Bus().get_cached_codeid_by_code(ecode.Val)
     msg = recv["msg"]
-    assert msg["errcode"] == "val_err"
     assert msg["msg"] == "whoops"
 
     await app.destroy()

@@ -37,7 +37,6 @@ from yon.server._msg import (
     Welcome,
     ok,
 )
-from yon.server._rpc import EmptyRpcArgs, RpcFn, RpcRecv, RpcSend
 from yon.server._transport import (
     ActiveTransport,
     Con,
@@ -60,11 +59,6 @@ __all__ = [
 
     "Msg",
 
-    "RpcFn",
-    "rpc",
-    "RpcSend",
-    "RpcRecv",
-    "EmptyRpcArgs",
     "StaticCodeid",
 
     "Con",
@@ -89,7 +83,7 @@ class StaticCodeid:
     Welcome = 0
     Ok = 1
 
-SubFnRetval = Msg | Iterable[Msg] | None
+SubFnRetval = Res[Msg]
 @runtime_checkable
 class SubFn(Protocol, Generic[TMsg_contra]):
     async def __call__(self, msg: TMsg_contra) -> SubFnRetval: ...
@@ -97,15 +91,6 @@ class SubFn(Protocol, Generic[TMsg_contra]):
 def sub(msgtype: type[TMsg_contra]):
     def wrapper(target: SubFn[TMsg_contra]):
         Bus.subfn_init_queue.add((msgtype, target))
-        def inner(*args, **kwargs) -> Any:
-            return target(*args, **kwargs)
-        return inner
-    return wrapper
-
-# placed here and not at _rpc.py to avoid circulars
-def rpc(key: str):
-    def wrapper(target: RpcFn):
-        Bus.reg_rpc(key, target).unwrap()
         def inner(*args, **kwargs) -> Any:
             return target(*args, **kwargs)
         return inner
@@ -243,7 +228,6 @@ class BusCfg(BaseModel):
     reg_ecodes: Iterable[str] | None = None
 
     sub_ctxfn: Callable[[Bmsg], Awaitable[Res[CtxManager]]] | None = None
-    rpc_ctxfn: Callable[[RpcSend], Awaitable[Res[CtxManager]]] | None = None
 
     log_net_send: bool = True
     log_net_recv: bool = True
@@ -269,7 +253,6 @@ class Bus(Singleton):
 
     Using this queue can be disabled by cfg.consider_sub_decorators.
     """
-    _rpckey_to_fn: ClassVar[dict[str, tuple[RpcFn, type[BaseModel]]]] = {}
     DEFAULT_TRANSPORT: ClassVar[Transport] = Transport(
         is_server=True,
         con_type=Ws,
@@ -362,8 +345,6 @@ class Bus(Singleton):
             # recognizable without knowing code ids
             Welcome,
             ok,
-            RpcSend,
-            RpcRecv,
             *(cfg.reg_types if cfg.reg_types else [])
         )).unwrap()
         self._ecodes: set[str] = set()
@@ -429,51 +410,6 @@ class Bus(Singleton):
     def get_ecodes(self) -> set[str]:
         return self._ecodes.copy()
 
-    @classmethod
-    def reg_rpc(
-        cls,
-        key: str,
-        fn: RpcFn,
-        msgtype: type[BaseModel] | None = None
-    ) -> Res[None]:
-        """
-        Registers rpc functions for a key.
-
-        # Args
-
-        * key - key for a rpc function
-        * fn - rpc function
-        * msgtype (optional) - msg type the rpc function will accept. Defaults
-                               to provided function's signature for `msg`.
-        """
-        if key in cls._rpckey_to_fn:
-            return Err(f"rpc key {key} is already regd")
-
-        if msgtype is None:
-            sig = signature(fn)
-            msg_param = sig.parameters.get("msg")
-            if not msg_param:
-                return Err(
-                    f"rpc fn {fn} with key {key} must accept"
-                    " \"msg: AnyBaseModel\" as it's sole argument"
-                )
-            msgtype = msg_param.annotation
-        if msgtype is None:
-            return Err("rpc msg type cannot be None")
-        if msgtype is BaseModel:
-            return Err(
-                f"rpc fn {fn} with key {key} cannot declare BaseModel"
-                " as it's direct args type"
-            )
-        if not issubclass(msgtype, BaseModel):
-            return Err(
-                f"rpc fn {fn} with code {key} must accept args in form"
-                f" of BaseModel, got {msgtype}"
-            )
-
-        cls._rpckey_to_fn[key] = (fn, msgtype)
-        return Ok(None)
-
     async def postinit(self):
         self._is_post_initd = True
 
@@ -491,7 +427,6 @@ class Bus(Singleton):
             atransport.inp_queue_processor.cancel()
             atransport.out_queue_processor.cancel()
 
-        cls._rpckey_to_fn.clear()
         Code.destroy()
 
         Bus.try_discard()
@@ -533,7 +468,7 @@ class Bus(Singleton):
     async def sub(
         self,
         msgtype_or_code: type[Msg] | str,
-        subfn: SubFn[TMsg_contra],
+        subfn: SubFn[Msg],
         opts: SubOpts = SubOpts(),
     ) -> Res[Callable[[], Awaitable[Res[None]]]]:
         """
@@ -551,9 +486,6 @@ class Bus(Singleton):
             Unsubscribe function.
         """
         if isclass(msgtype_or_code):
-            r = self._check_norpc_mbody(msgtype_or_code, "subscription")
-            if isinstance(r, Err):
-                return r
             subsid = uuid4()
             subfn = self._apply_opts_to_subfn(subfn, opts)
 
@@ -617,9 +549,10 @@ class Bus(Singleton):
         p: ptr[Msg] = ptr(target=None)
 
         def wrapper(aevt: asyncio.Event, ptr: ptr[Msg]):
-            async def fn(msg: Msg):
+            async def fn(msg: Msg) -> Res[None]:
                 aevt.set()
                 p.target = msg
+                return Ok()
             return fn
 
         if opts.subfn is not None:
@@ -669,47 +602,36 @@ class Bus(Singleton):
 
     async def pub(
         self,
-        msg: Msg | Res | Bmsg,
+        msg: Msg,
         opts: PubOpts = PubOpts()
     ) -> Res[None]:
         """
         Publishes message to the bus.
-
-        For received UnwrapErr, it's res.err will be used.
-
-        Received Exceptions are additionally logged if
-        cfg.trace_errs_on_pub == True.
-
-        Passed `Res` will be fetched for the value.
         """
-        if isinstance(msg, Ok):
-            msg = msg.ok
-        elif isinstance(msg, Err):
-            msg = msg.err
-
         if isinstance(msg, Bmsg):
             bmsg = msg
-            msg = bmsg.msg
         else:
             r = self._new_bmsg(msg, opts)
             if isinstance(r, Err):
                 return r
             bmsg = r.ok
+        return await self._pub_bmsg(bmsg, opts)
+
+    async def _pub_bmsg(
+        self,
+        bmsg: Bmsg,
+        opts: PubOpts = PubOpts()
+    ) -> Res[None]:
         code = bmsg.skip__code
-
-        r = self._check_norpc_mbody(bmsg, "publication")
-        if isinstance(r, Err):
-            return r
-
         if opts.subfn is not None:
             if bmsg.sid in self._lsid_to_subfn:
                 return Err(f"{bmsg} for pubr", ecode.AlreadyProcessed)
             self._lsid_to_subfn[bmsg.sid] = opts.subfn
 
-        self._code_to_last_mbody[code] = msg
+        self._code_to_last_mbody[code] = bmsg.msg
 
         await self._exec_pub_send_order(bmsg, opts)
-        return Ok(None)
+        return Ok()
 
     def _unpack_lsid(self, lsid: str | None) -> Res[str | None]:
         if lsid == "$ctx::msid":
@@ -911,26 +833,6 @@ class Bus(Singleton):
         ctx_dict = _yon_ctx.get().copy()
         ctx_dict["subfn__lsid"] = lsid
 
-    def _check_norpc_mbody(
-            self, body: Msg | type[Msg], disp_ctx: str) -> Res[None]:
-        """
-        Since rpc msgs cannot participate in actions like "sub" and "pub",
-        we have a separate fn to check this.
-        """
-        iscls = isclass(body)
-        if (
-            (
-                iscls
-                and (issubclass(body, RpcSend) or issubclass(body, RpcRecv)))
-            or (
-                not iscls
-                and (isinstance(body, (RpcSend, RpcRecv))))):
-            return Err(
-                f"mbody {body} in context of \"{disp_ctx}\" cannot be"
-                " associated with rpc"
-            )
-        return Ok(None)
-
     def _apply_opts_to_subfn(
             self, subfn: SubFn, opts: SubOpts) -> SubFn:
         async def wrapper(msg: Msg) -> Any:
@@ -1021,18 +923,11 @@ class Bus(Singleton):
             await con.send(rbmsg)
 
     async def _accept_net_bmsg(self, bmsg: Bmsg):
-        if isinstance(bmsg.msg, RpcRecv):
-            log.err(f"server bus won't accept RpcRecv messages, got {bmsg}")
-            return
-        elif isinstance(bmsg.msg, RpcSend):
-            # process rpc in a separate task to not block inp queue
-            # processing
-            task = asyncio.create_task(self._rpc(bmsg))
-            self._rpc_tasks.add(task)
-            task.add_done_callback(self._rpc_tasks.discard)
-            return
         # publish to inner bus with no duplicate net resending
-        pub = await self.pub(bmsg, PubOpts(send_to_net=False))
+        pub = await self._pub_bmsg(
+            bmsg,
+            PubOpts(send_to_net=False)
+        )
         if isinstance(pub, Err):
             await (
                 await self.pub(
@@ -1040,58 +935,6 @@ class Bus(Singleton):
                     PubOpts(lsid=bmsg.lsid)
                 )
             ).atrack()
-
-    async def _rpc(self, bmsg: Bmsg):
-        msg = bmsg.msg
-        if msg.key not in self._rpckey_to_fn:
-            log.err(f"no such rpc code {msg.key} for req {msg} => skip")
-            return
-        fn, args_type = self._rpckey_to_fn[msg.key]
-
-        _yon_ctx.set(self._gen_ctx_dict_for_msg(bmsg))
-
-        ctx_manager: CtxManager | None = None
-        if self._cfg.rpc_ctxfn is not None:
-            try:
-                ctx_manager = (await self._cfg.rpc_ctxfn(msg)).unwrap()
-            except Exception as err:
-                await log.atrack(
-                    err,
-                    f"rpx ctx manager retrieval for body {msg} => skip")
-                return
-        try:
-            if ctx_manager:
-                async with ctx_manager:
-                    res = await fn(args_type.model_validate(msg.data))
-            else:
-                res = await fn(args_type.model_validate(msg.data))
-        except Exception as err:
-            await log.atrack(
-                err, f"rpcfn on req {msg} => wrap to usual RpcRecv")
-            res = Err.from_native(err)
-
-        val: Any
-        if isinstance(res, Ok):
-            val = res.ok
-        elif isinstance(res, Err):
-            val = res
-        else:
-            log.err(
-                f"rpcfn on req {msg} returned non-res val {res} => skip")
-            return
-
-        assert bmsg.skip__consid is not None
-        r = self._new_bmsg(
-            val,
-            PubOpts(lsid=bmsg.sid, target_consids=[bmsg.skip__consid])
-        )
-        if isinstance(r, Err):
-            log.err(f"cannot create bmsg from val {val}")
-            return
-        bmsg = r.ok
-        # we publish directly to the net since inner participants can't
-        # subscribe to this
-        await self._pub_bmsg_to_net(bmsg)
 
     async def _parse_rbmsg(
         self, rbmsg: dict, con: Con
@@ -1147,7 +990,7 @@ class Bus(Singleton):
         self._preserialized_welcome_msg = (await Bmsg(
             skip__code=Welcome.code(),
             msg=welcome
-        ).serialize_to_net(1)).unwrap()
+        ).serialize_to_net(StaticCodeid.Welcome)).unwrap()
         rewelcome_res = await self._rewelcome_all_cons()
         if isinstance(rewelcome_res, Err):
             return rewelcome_res

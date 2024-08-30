@@ -54,19 +54,20 @@ async def test_pubsub_err(sbus: Bus):
         nonlocal flag
         flag = True
 
-    (await sbus.sub(ValErr, sub_test)).unwrap()
-    (await sbus.pub(ValErr("hello"))).unwrap()
+    (await sbus.sub(ecode.Val, sub_test)).unwrap()
+    (await sbus.pub(Err("hello", ecode.Val))).unwrap()
     assert flag
 
 async def test_pubr(sbus: Bus):
-    async def sub_test(msg: ValErr):
-        assert type(msg) is ValErr
-        assert get_err_msg(msg) == "hello"
+    async def sub_test(msg: Err):
+        assert msg.is_(ecode.Val)
+        assert msg.msg == "hello"
         return Ok(Mock_1(num=1))
 
-    (await sbus.sub(ValErr, sub_test)).unwrap()
+    (await sbus.sub(ecode.Val, sub_test)).unwrap()
     response = (await sbus.pubr(
-        ValErr("hello"), PubOpts(pubr_timeout=1))).unwrap()
+        Err("hello", ecode.Val), PubOpts(pubr_timeout=1)
+    )).unwrap()
     assert type(response) is Mock_1
     assert response.num == 1
 
@@ -201,7 +202,7 @@ async def test_auth_example():
         tokens = sbus.get_con_tokens(consid).unwrap()
         # if data is mock_1, the con must have tokens
         if isinstance(data, Mock_1) and not tokens:
-            return InterruptPipeline(ValErr("forbidden"))
+            return InterruptPipeline(Err("forbidden", ecode.Val))
         return data
 
     async def sub_login(msg: Login):
@@ -228,7 +229,7 @@ async def test_auth_example():
     )
     await sbus.init(cfg)
 
-    (await sbus.reg_types({Login, Logout})).unwrap()
+    (await sbus.reg_regular_codes(Login, Logout)).unwrap()
     (await sbus.sub(Login, sub_login)).unwrap()
     (await sbus.sub(Logout, sub_logout)).unwrap()
     (await sbus.sub(Mock_1, sub_mock_1)).unwrap()
@@ -238,7 +239,7 @@ async def test_auth_example():
 
     await asyncio.wait_for(con.client__recv(), 1)
     mock_1_codeid = (await Code.get_regd_codeid_by_type(Mock_1)).unwrap()
-    Err_codeid = (await Code.get_regd_codeid_by_type(ValErr)).unwrap()
+    err_codeid = Bus().get_cached_codeid_by_code(ecode.Val)
     login_codeid = (await Code.get_regd_codeid_by_type(Login)).unwrap()
     logout_codeid = (await Code.get_regd_codeid_by_type(Logout)).unwrap()
 
@@ -251,7 +252,7 @@ async def test_auth_example():
         }
     })
     response = await asyncio.wait_for(con.client__recv(), 1)
-    assert response["codeid"] == Err_codeid
+    assert response["codeid"] == err_codeid
     assert response["msg"]["msg"] == "forbidden"
 
     # register wrong username
@@ -263,7 +264,7 @@ async def test_auth_example():
         }
     })
     response = await asyncio.wait_for(con.client__recv(), 1)
-    assert response["codeid"] == Err_codeid
+    assert response["codeid"] == err_codeid
     assert response["msg"]["msg"] == "wrong username wrong"
 
     # register right username

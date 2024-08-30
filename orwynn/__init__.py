@@ -20,7 +20,6 @@ from yon.server import (
     Bus,
     BusCfg,
     Msg,
-    RpcFn,
     SubFn,
     SubFnRetval,
     TMsg_contra,
@@ -41,7 +40,6 @@ __all__ =[
     "Plugin",
     "PluginInp",
     "SysSpec",
-    "RsysSpec",
     "SysOpts",
     "reg_scope_model_codes"
 ]
@@ -72,15 +70,6 @@ class SysInp(BaseModel, Generic[TMsg, TCfg]):
 
     class Config:
         arbitrary_types_allowed = True
-
-    def ok(self, msg: TMsg | None = None) -> Res["SysInp[TMsg, TCfg]"]:
-        """
-        Generates Ok() res with new message.
-
-        Used generally at systems to return a message to publish.
-        """
-        self.msg = msg  # type: ignore
-        return Ok(self)
 
 class SysOpts(BaseModel):
     pipeline_before: AsyncPipeline[SysInp] = AsyncPipeline()
@@ -167,7 +156,6 @@ class Plugin(BaseModel, Generic[TCfg]):
     global_opts: GlobalSysOpts = GlobalSysOpts()
 
     sys: list[SysSpec] | None = None
-    rsys: list[RsysSpec] | None = None
     reg_types: list[type | Coded[type]] | None = None
 
     init: PluginFn[TCfg] | None = None
@@ -335,19 +323,6 @@ class App(Singleton):
                         self._plugin_to_destructors[plugin] = []
                     self._plugin_to_destructors[plugin].append(destructor)
 
-    async def _init_plugin_rsystems(self, plugin: Plugin):
-        if plugin.rsys:
-            # TODO: add rpc opts as soon as it's supported by yon
-            for spec in plugin.rsys:
-                destructor = await self._init_rsys(
-                    spec,
-                    plugin
-                )
-                if destructor:
-                    if plugin not in self._plugin_to_destructors:
-                        self._plugin_to_destructors[plugin] = []
-                    self._plugin_to_destructors[plugin].append(destructor)
-
     async def _init_plugin(self, plugin: Plugin):
         if plugin.reg_types:
             await self._bus.reg_regular_codes(*plugin.reg_types)
@@ -359,7 +334,6 @@ class App(Singleton):
         args = args_res.ok
 
         await self._init_plugin_systems(plugin)
-        await self._init_plugin_rsystems(plugin)
 
         if plugin.init is not None:
             await (await aresultify(plugin.init(args))).atrack(
@@ -465,42 +439,6 @@ class App(Singleton):
         )
         return unsub.unwrap()
 
-    async def _init_rsys(
-        self,
-        spec: RsysSpec,
-        plugin: Plugin
-    )  -> Coroutine[Any, Any, Res[None]] | None:
-        sys_opts = _merge_sys_opts(
-            self._cfg,
-            plugin,
-            spec
-        ).unwrap()
-
-        cfgtype = plugin.cfgtype
-
-        # no need to reg signature for the rpc function - the msg of it
-        # doesn't have to have the code
-
-        cfg = self._type_to_cfg[cfgtype]
-        args = SysInp(
-            msg=None,
-            app=self,
-            bus=self._bus,
-            cfg=cfg,
-            extra={}
-        )
-        pipeline = sys_opts \
-            .pipeline_before \
-            .copy() \
-            .append(spec.fn) \
-            .merge_right(sys_opts.pipeline_after)
-        self._bus.reg_rpc(
-            plugin.name + "::" + spec.key,
-            self._wrap_pipeline_as_rpc(pipeline, args),
-            spec.msgtype
-        ).unwrap()
-        return self._new_dereg_rpc(spec.key)
-
     def _wrap_pipeline_as_sub(
         self,
         pipeline: AsyncPipeline[SysInp],
@@ -518,28 +456,3 @@ class App(Singleton):
             r = r.ok.msg
             return Ok(r)
         return inner
-
-    def _wrap_pipeline_as_rpc(
-        self, pipeline: AsyncPipeline[SysInp], inp: SysInp
-    ) -> RpcFn:
-        # we copy inp here so pipes can skip copying. It's highly recommended
-        # for pipes to not create side effects with the inp objects since they
-        # are allowed to be changed throughout pipeline.
-        inp = inp.model_copy()
-        async def inner(msg: Msg) -> Res[Msg]:
-            inp.msg = msg
-            r = await pipeline(inp)
-            if isinstance(r, Err):
-                return r
-            r = r.ok.msg
-            return Ok(r)
-        return inner
-
-    def _new_dereg_rpc(self, rpcfn_key: str) -> Coroutine[Any, Any, Res[None]]:
-        async def inner() -> Res[None]:
-            # TODO: replace with bus.dereg_rpc coro or, better, with reg_rpc
-            #       returned callable once yon supports it
-            if rpcfn_key in self._bus._rpckey_to_fn:  # noqa: SLF001
-                del self._bus._rpckey_to_fn[rpcfn_key]  # noqa: SLF001
-            return Ok(None)
-        return inner()

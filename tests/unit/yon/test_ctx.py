@@ -8,7 +8,6 @@ from orwynn.yon.server import (
     BusCfg,
     ConArgs,
     EmptyRpcArgs,
-    RpcRecv,
     RpcSend,
     Transport,
     ok,

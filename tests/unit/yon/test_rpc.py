@@ -2,8 +2,7 @@ import asyncio
 from typing import Any
 
 from pydantic import BaseModel
-from ryz.core import get_fqname
-from ryz.core import ValErr
+from ryz.core import ecode, get_fqname
 from ryz.core import Err, Ok, Res
 from ryz.uuid import uuid4
 from orwynn.yon.server import Bus, ConArgs, rpc
@@ -23,7 +22,7 @@ async def test_main(sbus: Bus):
         username = msg.username
         email = msg.email
         if username == "throw":
-            return Err("hello"))
+            return Err("hello")
         assert username == "test_username"
         assert email == "test_email"
         return Ok(0)
@@ -63,10 +62,9 @@ async def test_main(sbus: Bus):
     })
     rpc_rbmsg = await asyncio.wait_for(con_1.client__recv(), 1)
     assert rpc_rbmsg["lsid"] == send_msid
+    assert rpc_rbmsg["codeid"] == Bus().get_cached_codeid_by_code(ecode.Val)
     rpc_msg = rpc_rbmsg["msg"]
-    assert rpc_msg["errcode"] == ValErr.code()
     assert rpc_msg["msg"] == "hello"
-    assert rpc_msg["name"] == get_fqname(ValErr())
 
     con_task_1.cancel()
 
