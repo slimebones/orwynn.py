@@ -1,4 +1,4 @@
-from ryz.res import Res
+from ryz.core import Res
 
 from orwynn import _merge
 from orwynn._pepel import AsyncPipeline
@@ -22,7 +22,7 @@ def test_merge():
         }
     }
 
-    d3 = _merge(d1, d2).eject()
+    d3 = _merge(d1, d2).unwrap()
     pipeline: AsyncPipeline = d3["pipeline"]
     assert list(pipeline) == [f1, f2, f3]
     nested_pipeline: AsyncPipeline = d3["nested"]["pipeline"]

@@ -12,9 +12,9 @@ from typing import (
 )
 
 from pydantic import BaseModel
-from ryz.code import Coded, Ok
-from ryz.log import log
-from ryz.res import Err, Res, aresultify
+from ryz.core import Coded, Ok
+from ryz import log
+from ryz.core import Err, Res, aresultify
 from ryz.singleton import Singleton
 from yon.server import (
     Bus,
@@ -303,7 +303,7 @@ class App(Singleton):
         await self._bus.init(self._cfg.bus_cfg)
 
         if cfg.reg_scope_model_codes:
-            (await reg_scope_model_codes()).eject()
+            (await reg_scope_model_codes()).unwrap()
 
         self._type_to_cfg = await self._gen_type_to_cfg()
         self._plugins = list(self._cfg.plugins)
@@ -368,7 +368,7 @@ class App(Singleton):
     async def _destroy_plugin(self, plugin: Plugin):
         assert plugin.cfgtype in self._type_to_cfg, \
             "plugin must be initd in order to be destroyed"
-        args = self._get_plugin_args(plugin).eject()
+        args = self._get_plugin_args(plugin).unwrap()
         if plugin.destroy is not None:
             await (await aresultify(plugin.destroy(args))).atrack(
                 f"({plugin}) destroy")
@@ -438,7 +438,7 @@ class App(Singleton):
             self._cfg,
             plugin,
             spec
-        ).eject()
+        ).unwrap()
 
         cfgtype = plugin.cfgtype
         cfg = self._type_to_cfg[cfgtype]
@@ -463,7 +463,7 @@ class App(Singleton):
                 self._wrap_pipeline_as_sub(pipeline, inp)
             ))
         )
-        return unsub.eject()
+        return unsub.unwrap()
 
     async def _init_rsys(
         self,
@@ -474,7 +474,7 @@ class App(Singleton):
             self._cfg,
             plugin,
             spec
-        ).eject()
+        ).unwrap()
 
         cfgtype = plugin.cfgtype
 
@@ -498,7 +498,7 @@ class App(Singleton):
             plugin.name + "::" + spec.key,
             self._wrap_pipeline_as_rpc(pipeline, args),
             spec.msgtype
-        ).eject()
+        ).unwrap()
         return self._new_dereg_rpc(spec.key)
 
     def _wrap_pipeline_as_sub(

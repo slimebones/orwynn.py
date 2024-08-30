@@ -1,7 +1,7 @@
 import asyncio
 
-from ryz.code import Code
-from ryz.res import Ok, Res
+from ryz.core import Code
+from ryz.core import Ok, Res
 from ryz.uuid import uuid4
 from yon.server import Bus, PubOpts, RpcSend, ok
 
@@ -33,7 +33,7 @@ async def test_main(app_cfg: AppCfg):
     await App().init(app_cfg)
 
     r = (await Bus.ie().pubr(
-        Mock_1(key="hello"), PubOpts(pubr_timeout=1))).eject()
+        Mock_1(key="hello"), PubOpts(pubr_timeout=1))).unwrap()
     assert isinstance(r, ok)
 
 async def test_pipeline(app_cfg: AppCfg):
@@ -89,11 +89,11 @@ async def test_pipeline(app_cfg: AppCfg):
     app = await App().init(app_cfg)
 
     con = MockCon()
-    con_task = asyncio.create_task(app.get_bus().eject().con(con))
+    con_task = asyncio.create_task(app.get_bus().unwrap().con(con))
     await con.client_recv()
     await con.client_send({
         "sid": uuid4(),
-        "codeid": (await Code.get_regd_codeid_by_type(RpcSend)).eject(),
+        "codeid": (await Code.get_regd_codeid_by_type(RpcSend)).unwrap(),
         "msg": {
             "key": "test::mock",
             "data": {

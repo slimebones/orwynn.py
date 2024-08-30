@@ -23,12 +23,11 @@ from typing import (
 )
 
 from pydantic import BaseModel
-from ryz.code import Code, Coded
-from ryz.err import AlreadyProcessedErr, ErrDto, NotFoundErr, ValErr
-from ryz.err_utils import create_err_dto
-from ryz.log import log
-from ryz.ptr import Ptr
-from ryz.res import Err, Ok, Res, Result, UnwrapErr, aresultify, valerr
+from ryz.core import Code, Coded
+from ryz.core import AlreadyProcessedErr, ErrDto, NotFoundErr, ValErr
+from ryz import log
+from ryz.ptr import ptr
+from ryz.core import Err, Ok, Res, Result, UnwrapErr, aresultify, valerr
 from ryz.singleton import Singleton
 from ryz.uuid import uuid4
 from yon.server._msg import (
@@ -106,7 +105,7 @@ def sub(msgtype: type[TMsg_contra]):
 # placed here and not at _rpc.py to avoid circulars
 def rpc(key: str):
     def wrapper(target: RpcFn):
-        Bus.reg_rpc(key, target).eject()
+        Bus.reg_rpc(key, target).unwrap()
         def inner(*args, **kwargs) -> Any:
             return target(*args, **kwargs)
         return inner
@@ -387,11 +386,11 @@ class Bus(Singleton):
                 code="attribute_error",
                 val=AttributeError),
             *reg_types
-        ])).eject()
+        ])).unwrap()
 
         if self._cfg.consider_sub_decorators:
             for msgtype, subfn in self.subfn_init_queue:
-                (await self.sub(msgtype, subfn)).eject()
+                (await self.sub(msgtype, subfn)).unwrap()
 
     @property
     def is_initd(self) -> bool:
@@ -607,9 +606,9 @@ class Bus(Singleton):
         If the response is Exception, it is wrapped to res::Err.
         """
         aevt = asyncio.Event()
-        ptr: Ptr[Msg] = Ptr(target=None)
+        ptr: ptr[Msg] = ptr(target=None)
 
-        def wrapper(aevt: asyncio.Event, ptr: Ptr[Msg]):
+        def wrapper(aevt: asyncio.Event, ptr: ptr[Msg]):
             async def fn(msg: Msg):
                 aevt.set()
                 ptr.target = msg
@@ -827,7 +826,7 @@ class Bus(Singleton):
 
         if self._cfg.sub_ctxfn is not None:
             try:
-                ctx_manager = (await self._cfg.sub_ctxfn(bmsg)).eject()
+                ctx_manager = (await self._cfg.sub_ctxfn(bmsg)).unwrap()
             except Exception as err:
                 await log.atrack(
                     err, f"rpx ctx manager retrieval for body {bmsg.msg}")
@@ -1034,7 +1033,7 @@ class Bus(Singleton):
         ctx_manager: CtxManager | None = None
         if self._cfg.rpc_ctxfn is not None:
             try:
-                ctx_manager = (await self._cfg.rpc_ctxfn(msg)).eject()
+                ctx_manager = (await self._cfg.rpc_ctxfn(msg)).unwrap()
             except Exception as err:
                 await log.atrack(
                     err,
@@ -1055,7 +1054,7 @@ class Bus(Singleton):
         if isinstance(res, Ok):
             val = res.okval
         elif isinstance(res, Err):
-            val = (await create_err_dto(res.errval)).eject()
+            val = (await create_err_dto(res.errval)).unwrap()
             val = typing.cast(ErrDto, val).model_dump(exclude={"stacktrace"})
         else:
             log.err(
@@ -1127,7 +1126,7 @@ class Bus(Singleton):
         self._preserialized_welcome_msg = (await Bmsg(
             skip__code=Welcome.code(),
             msg=welcome
-        ).serialize_to_net()).eject()
+        ).serialize_to_net()).unwrap()
         rewelcome_res = await self._rewelcome_all_cons()
         if isinstance(rewelcome_res, Err):
             return rewelcome_res

@@ -10,7 +10,7 @@ Rpc works only in network mode (client-server communication).
 from typing import Any, Protocol, TypeVar
 
 from pydantic import BaseModel
-from ryz.res import Res
+from ryz.core import Res
 from yon.server._msg import Msg
 
 

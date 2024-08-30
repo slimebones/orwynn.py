@@ -2,9 +2,9 @@ import asyncio
 from typing import Any
 
 from pydantic import BaseModel
-from ryz.code import get_fqname
-from ryz.err import ValErr
-from ryz.res import Err, Ok, Res
+from ryz.core import get_fqname
+from ryz.core import ValErr
+from ryz.core import Err, Ok, Res
 from ryz.uuid import uuid4
 from yon.server import Bus, ConArgs, rpc
 
@@ -34,10 +34,10 @@ async def test_main(sbus: Bus):
 
     welcome_rbmsg = await asyncio.wait_for(con_1.client__recv(), 1)
     yon_rpc_req_codeid = find_codeid_in_welcome_rbmsg(
-        "yon::server::rpc_send", welcome_rbmsg).eject()
+        "yon::server::rpc_send", welcome_rbmsg).unwrap()
 
     rpckey = "update_email"
-    Bus.reg_rpc(rpckey, rpc_update_email).eject()
+    Bus.reg_rpc(rpckey, rpc_update_email).unwrap()
 
     await con_1.client__send({
         "sid": uuid4(),
@@ -83,7 +83,7 @@ async def test_reg_custom_rpc_key():
         return Ok(None)
     bus = Bus.ie()
     await bus.init()
-    bus.reg_rpc("whocares", rpc_test).eject()
+    bus.reg_rpc("whocares", rpc_test).unwrap()
     assert "whocares" in bus._rpckey_to_fn
 
 async def test_provide_custom_msgtype():
@@ -95,7 +95,7 @@ async def test_provide_custom_msgtype():
 
     bus = Bus.ie()
     await bus.init()
-    bus.reg_rpc("test", rpc_test, Something).eject()
+    bus.reg_rpc("test", rpc_test, Something).unwrap()
     assert bus._rpckey_to_fn["test"] == (rpc_test, Something)
 
 async def test_provide_custom_msgtype_wrong():

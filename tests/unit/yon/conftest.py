@@ -5,7 +5,7 @@ from typing import Self
 
 import pytest_asyncio
 from pydantic import BaseModel
-from ryz.res import Ok, Res, valerr
+from ryz.core import Ok, Res, valerr
 from yon.server import (
     Bus,
     BusCfg,

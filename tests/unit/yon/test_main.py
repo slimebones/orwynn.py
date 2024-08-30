@@ -2,10 +2,10 @@ import asyncio
 from typing import Any
 
 from pydantic import BaseModel
-from ryz.code import Code
-from ryz.err import ValErr
-from ryz.err_utils import get_err_msg
-from ryz.res import Err, Ok, valerr
+from ryz.core import Code
+from ryz.core import ValErr
+from ryz.core_utils import get_err_msg
+from ryz.core import Err, Ok, valerr
 from ryz.uuid import uuid4
 from yon.server import (
     Bus,
@@ -37,13 +37,13 @@ async def test_pubsub(sbus: Bus):
         nonlocal flag
         flag = True
 
-    (await sbus.sub(Mock_1, sub_mock_1)).eject()
-    (await sbus.pub(Mock_1(num=1))).eject()
+    (await sbus.sub(Mock_1, sub_mock_1)).unwrap()
+    (await sbus.pub(Mock_1(num=1))).unwrap()
 
     assert flag
 
 async def test_data_static_indexes(sbus: Bus):
-    codes = (await Code.get_regd_codes()).eject()
+    codes = (await Code.get_regd_codes()).unwrap()
     assert codes[0] == "yon::server::welcome"
     assert codes[1] == "yon::ok"
 
@@ -56,8 +56,8 @@ async def test_pubsub_err(sbus: Bus):
         nonlocal flag
         flag = True
 
-    (await sbus.sub(ValErr, sub_test)).eject()
-    (await sbus.pub(ValErr("hello"))).eject()
+    (await sbus.sub(ValErr, sub_test)).unwrap()
+    (await sbus.pub(ValErr("hello"))).unwrap()
     assert flag
 
 async def test_pubr(sbus: Bus):
@@ -66,9 +66,9 @@ async def test_pubr(sbus: Bus):
         assert get_err_msg(msg) == "hello"
         return Ok(Mock_1(num=1))
 
-    (await sbus.sub(ValErr, sub_test)).eject()
+    (await sbus.sub(ValErr, sub_test)).unwrap()
     response = (await sbus.pubr(
-        ValErr("hello"), PubOpts(pubr_timeout=1))).eject()
+        ValErr("hello"), PubOpts(pubr_timeout=1))).unwrap()
     assert type(response) is Mock_1
     assert response.num == 1
 
@@ -86,7 +86,7 @@ async def test_lsid_net(sbus: Bus):
     await asyncio.wait_for(con.client__recv(), 1)
     await con.client__send({
         "sid": uuid4(),
-        "codeid": (await Code.get_regd_codeid_by_type(Mock_1)).eject(),
+        "codeid": (await Code.get_regd_codeid_by_type(Mock_1)).unwrap(),
         "msg": {
             "num": 1
         }
@@ -121,7 +121,7 @@ async def test_recv_empty_data(sbus: Bus):
     await asyncio.wait_for(con.client__recv(), 1)
     await con.client__send({
         "sid": uuid4(),
-        "codeid": (await Code.get_regd_codeid_by_type(EmptyMock)).eject()
+        "codeid": (await Code.get_regd_codeid_by_type(EmptyMock)).unwrap()
     })
     response = await asyncio.wait_for(con.client__recv(), 1)
     assert response["codeid"] == StaticCodeid.Ok
@@ -142,7 +142,7 @@ async def test_send_empty_data(sbus: Bus):
     await asyncio.wait_for(con.client__recv(), 1)
     await con.client__send({
         "sid": uuid4(),
-        "codeid": (await Code.get_regd_codeid_by_type(Mock_1)).eject(),
+        "codeid": (await Code.get_regd_codeid_by_type(Mock_1)).unwrap(),
         "msg": {
             "num": 1
         }
@@ -150,7 +150,7 @@ async def test_send_empty_data(sbus: Bus):
     response = await asyncio.wait_for(con.client__recv(), 1)
     assert \
         response["codeid"] \
-        == (await Code.get_regd_codeid_by_type(EmptyMock)).eject()
+        == (await Code.get_regd_codeid_by_type(EmptyMock)).unwrap()
     assert "data" not in response
 
     con_task.cancel()
@@ -173,8 +173,8 @@ async def test_global_subfn_conditions():
         global_subfn_conditions=[condition])
     await sbus.init(cfg)
 
-    (await sbus.sub(Mock_1, sub_test)).eject()
-    (await sbus.pub(Mock_1(num=1))).eject()
+    (await sbus.sub(Mock_1, sub_test)).unwrap()
+    (await sbus.pub(Mock_1(num=1))).unwrap()
 
 async def test_auth_example():
     """
@@ -200,7 +200,7 @@ async def test_auth_example():
             return data
 
         consid = consid_res.okval
-        tokens = sbus.get_con_tokens(consid).eject()
+        tokens = sbus.get_con_tokens(consid).unwrap()
         # if data is mock_1, the con must have tokens
         if isinstance(data, Mock_1) and not tokens:
             return InterruptPipeline(ValErr("forbidden"))
@@ -230,19 +230,19 @@ async def test_auth_example():
     )
     await sbus.init(cfg)
 
-    (await sbus.reg_types({Login, Logout})).eject()
-    (await sbus.sub(Login, sub_login)).eject()
-    (await sbus.sub(Logout, sub_logout)).eject()
-    (await sbus.sub(Mock_1, sub_mock_1)).eject()
+    (await sbus.reg_types({Login, Logout})).unwrap()
+    (await sbus.sub(Login, sub_login)).unwrap()
+    (await sbus.sub(Logout, sub_logout)).unwrap()
+    (await sbus.sub(Mock_1, sub_mock_1)).unwrap()
 
     con = MockCon(ConArgs(core=None))
     con_task = asyncio.create_task(sbus.con(con))
 
     await asyncio.wait_for(con.client__recv(), 1)
-    mock_1_codeid = (await Code.get_regd_codeid_by_type(Mock_1)).eject()
-    valerr_codeid = (await Code.get_regd_codeid_by_type(ValErr)).eject()
-    login_codeid = (await Code.get_regd_codeid_by_type(Login)).eject()
-    logout_codeid = (await Code.get_regd_codeid_by_type(Logout)).eject()
+    mock_1_codeid = (await Code.get_regd_codeid_by_type(Mock_1)).unwrap()
+    valerr_codeid = (await Code.get_regd_codeid_by_type(ValErr)).unwrap()
+    login_codeid = (await Code.get_regd_codeid_by_type(Login)).unwrap()
+    logout_codeid = (await Code.get_regd_codeid_by_type(Logout)).unwrap()
 
     # unregistered mock_1
     await con.client__send({

@@ -4,8 +4,8 @@ Manages data processing.
 
 from typing import Any, Generic, Iterator, Protocol, Self, TypeVar
 
-from ryz.log import log
-from ryz.res import Err, Ok, Res
+from ryz import log
+from ryz.core import Err, Ok, Res
 
 T_contra = TypeVar("T_contra", contravariant=True)
 

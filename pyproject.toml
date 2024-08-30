@@ -22,7 +22,8 @@ typing-extensions = "^4.7.1"
 pydantic = "^2.6.0"
 aiofiles = "^23.2.1"
 inflection = "^0.5.1"
-yon = "^1.1.0"
+ryz = "^0.13.0"
+aiohttp = {version = "^3.9.3", extras = ["speedups"]}
 
 [tool.poetry.group.dev.dependencies]
 lorem = "^0.1.1"

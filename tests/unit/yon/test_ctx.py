@@ -1,7 +1,7 @@
 import asyncio
 
-from ryz.code import Code
-from ryz.res import Ok, Res
+from ryz.core import Code
+from ryz.core import Ok, Res
 from ryz.uuid import uuid4
 from yon.server import (
     Bus,
@@ -33,14 +33,14 @@ async def test_subfn(sbus: Bus):
     await asyncio.wait_for(con.client__recv(), 1)
     await con.client__send({
         "sid": uuid4(),
-        "codeid": (await Code.get_regd_codeid_by_type(Mock_1)).eject(),
+        "codeid": (await Code.get_regd_codeid_by_type(Mock_1)).unwrap(),
         "msg": {
             "num": 1
         }
     })
     rbmsg = await asyncio.wait_for(con.client__recv(), 1)
     assert \
-        rbmsg["codeid"] == (await Code.get_regd_codeid_by_type(ok)).eject()
+        rbmsg["codeid"] == (await Code.get_regd_codeid_by_type(ok)).unwrap()
     con_task.cancel()
 
 async def test_rpc(sbus: Bus):
@@ -53,10 +53,10 @@ async def test_rpc(sbus: Bus):
     # recv welcome
     await asyncio.wait_for(con.client__recv(), 1)
     rpckey = "update_email"
-    Bus.reg_rpc(rpckey, rpc_update_email).eject()
+    Bus.reg_rpc(rpckey, rpc_update_email).unwrap()
     await con.client__send({
         "sid": uuid4(),
-        "codeid": (await Code.get_regd_codeid_by_type(RpcSend)).eject(),
+        "codeid": (await Code.get_regd_codeid_by_type(RpcSend)).unwrap(),
         "msg": {
             "key": rpckey,
             "data": {"username": "test_username", "email": "test_email"}
@@ -64,7 +64,7 @@ async def test_rpc(sbus: Bus):
     })
     rbmsg = await asyncio.wait_for(con.client__recv(), 1)
     assert rbmsg["codeid"] == \
-        (await Code.get_regd_codeid_by_type(RpcRecv)).eject()
+        (await Code.get_regd_codeid_by_type(RpcRecv)).unwrap()
 
     con_task.cancel()
 
@@ -97,10 +97,10 @@ async def test_rpc_custom_ctx_manager():
     # recv welcome
     await asyncio.wait_for(con.client__recv(), 1)
     rpckey = "update_email"
-    Bus.reg_rpc(rpckey, rpc_update_email).eject()
+    Bus.reg_rpc(rpckey, rpc_update_email).unwrap()
     await con.client__send({
         "sid": uuid4(),
-        "codeid": (await Code.get_regd_codeid_by_type(RpcSend)).eject(),
+        "codeid": (await Code.get_regd_codeid_by_type(RpcSend)).unwrap(),
         "msg": {
             "key": rpckey,
             "data": {}
@@ -108,6 +108,6 @@ async def test_rpc_custom_ctx_manager():
     })
     rbmsg = await asyncio.wait_for(con.client__recv(), 1)
     assert rbmsg["codeid"] == \
-        (await Code.get_regd_codeid_by_type(RpcRecv)).eject()
+        (await Code.get_regd_codeid_by_type(RpcRecv)).unwrap()
 
     con_task.cancel()
