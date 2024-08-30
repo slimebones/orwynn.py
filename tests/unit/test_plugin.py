@@ -1,10 +1,9 @@
 import asyncio
 
 from ryz.core import Code
-from ryz.core import ValErr
 from ryz.core import Ok, Res, Err
 from ryz.uuid import uuid4
-from yon.server import BusCfg, RpcRecv, RpcSend, Transport, ok
+from orwynn.yon.server import BusCfg, RpcRecv, RpcSend, Transport, ok
 
 from orwynn import App, AppCfg, Plugin, PluginInp, RsysSpec, SysInp, SysSpec
 from tests.conftest import Mock_1, MockCfg, MockCon

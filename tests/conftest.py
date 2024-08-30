@@ -6,7 +6,7 @@ from typing import Self
 import pytest
 import pytest_asyncio
 from pydantic import BaseModel
-from yon.server import BusCfg, Con, ConArgs, Transport
+from orwynn.yon.server import BusCfg, Con, ConArgs, Transport
 
 from orwynn import App, AppCfg, Cfg
 

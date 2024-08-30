@@ -42,7 +42,7 @@ class Pipeline(Generic[T_contra]):
             errmsg = f"during executing of pipe {last_pipe}," \
                      f" for value {val} an err {err} occured"
             log.track(err, errmsg)
-            return Err(err)
+            return Err.from_native(err)
 
         return Ok(val)
 
@@ -108,7 +108,7 @@ class AsyncPipeline(Generic[T_contra]):
             errmsg = f"during executing of pipe {last_pipe}," \
                      f" for value {val} an err {err} occured"
             log.track(err, errmsg)
-            return Err(err)
+            return Err.from_native(err)
 
         return Ok(val)
 
