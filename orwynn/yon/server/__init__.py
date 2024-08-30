@@ -680,7 +680,9 @@ class Bus(Singleton):
         ret = await subfn(bmsg.msg)
         msg = self._parse_subfn_ret_to_msg(subfn, ret)
         if msg is None:
-            return
+            # returned None is always converted to `ok()` to ensure the caller
+            # receives the response
+            msg = ok()
 
         # by default all subsriber's body are intended to be linked to
         # initial message, so we attach this message ctx msid

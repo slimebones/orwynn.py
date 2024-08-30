@@ -77,6 +77,8 @@ class Sys(Protocol, Generic[TMsg, TCfg]):
         inp: SysInp[TMsg, TCfg]
     ) -> Res[Msg]: ...
 
+# for now we haven't managed to enforce correct msgtype and fn accepted type
+# match, so linter will be silent on these errors
 class SysSpec(Generic[TMsg, TCfg]):
     def __init__(
         self, msgtype: type[TMsg], fn: Sys[TMsg, TCfg]
