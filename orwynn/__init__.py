@@ -77,6 +77,13 @@ class Sys(Protocol, Generic[TMsg, TCfg]):
         inp: SysInp[TMsg, TCfg]
     ) -> Res[Msg]: ...
 
+class SysSpec(Generic[TMsg, TCfg]):
+    def __init__(
+        self, msgtype: type[TMsg], fn: Sys[TMsg, TCfg]
+    ):
+        self.msgtype = msgtype
+        self.fn = fn
+
 class PluginInp(BaseModel, Generic[TCfg]):
     app: "App"
     bus: Bus
@@ -88,13 +95,6 @@ class PluginInp(BaseModel, Generic[TCfg]):
 @runtime_checkable
 class PluginFn(Protocol, Generic[TCfg]):
     async def __call__(self, inp: "PluginInp[TCfg]") -> Res[None]: ...
-
-class SysSpec(Generic[TMsg_contra, TCfg]):
-    def __init__(
-        self, msgtype: TMsg_contra, fn: Sys[TMsg_contra, TCfg]
-    ):
-        self.msgtype = msgtype
-        self.fn = fn
 
 class Plugin(BaseModel, Generic[TCfg]):
     name: str
