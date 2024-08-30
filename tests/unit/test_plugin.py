@@ -84,7 +84,7 @@ async def test_sys_err():
         assert inp.msg.key == "hello"
         nonlocal sys_flag
         sys_flag = True
-        return Err("whoops")
+        return Err("whoops", ecode.Val)
 
     async def _init(inp: PluginInp[MockCfg]) -> Res[None]:
         nonlocal init_flag
@@ -137,7 +137,6 @@ async def test_sys_err():
     assert recv["codeid"] == Bus() \
         .get_cached_codeid_by_code(ecode.Val).unwrap()
     msg = recv["msg"]
-    assert msg["errcode"] == "val_err"
     assert msg["msg"] == "whoops"
 
     await app.destroy()

@@ -2,6 +2,7 @@ import inspect
 import typing
 from typing import (
     Any,
+    Callable,
     Coroutine,
     Generic,
     Protocol,
@@ -12,7 +13,7 @@ from typing import (
 
 from pydantic import BaseModel
 from ryz import log
-from ryz.core import Coded, Err, Ok, Res, aresultify
+from ryz.core import Coded, Err, Ok, Res, aresultify, resultify
 from ryz.singleton import Singleton
 
 from orwynn import env
@@ -144,7 +145,7 @@ class App(Singleton):
 
         self._bus = Bus.ie()
         self._plugin_to_destructors: dict[
-            Plugin, list[Coroutine[Any, Any, None]]
+            Plugin, list[Callable]
         ] = {}
 
         self._cfg = cfg
@@ -209,9 +210,7 @@ class App(Singleton):
                 f"({plugin}) destroy")
         if plugin in self._plugin_to_destructors:
             for destructor in self._plugin_to_destructors[plugin]:
-                await (await aresultify(destructor)).atrack(
-                    f"{plugin} destroy"
-                )
+                await resultify(destructor).atrack(f"{plugin} destroy")
             del self._plugin_to_destructors[plugin]
 
     def _get_plugin_args(
@@ -267,7 +266,7 @@ class App(Singleton):
         self,
         spec: SysSpec[TMsg_contra, TCfg],
         plugin: Plugin
-    ) -> Coroutine[Any, Any, None]:
+    ) -> Callable:
         cfgtype = plugin.cfgtype
         cfg = self._type_to_cfg[cfgtype]
         inp = SysInp(

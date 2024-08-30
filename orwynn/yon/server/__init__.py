@@ -13,6 +13,7 @@ from contextvars import ContextVar
 from inspect import isclass
 from typing import (
     Any,
+    Callable,
     ClassVar,
     Coroutine,
     Generic,
@@ -245,14 +246,21 @@ class Bus(Singleton):
 
         self._rpc_tasks: set[asyncio.Task] = set()
 
+        self._cached_codes: list[str] = []
+        """
+        Since order of codes doesn't change, we can maintain a list of
+        codes, and renew it on each [`Bus._set_welcome`] call.
+        """
         (await self.reg_regular_codes(
             # by yon protocol, welcome msg is always the first, to be
             # recognizable without knowing code ids
             Welcome,
             ok,
-            *(cfg.reg_types if cfg.reg_types else [])
+            *(cfg.reg_types if cfg.reg_types else []),
+            _set_welcome=False
         )).unwrap()
-        self._ecodes: set[str] = set()
+        # this must be a list to avoid unconsistent codeid generation
+        self._ecodes: list[str] = []
         (await self.reg_ecodes(
             ecode.Err,
             ecode.NotFound,
@@ -261,17 +269,15 @@ class Bus(Singleton):
             ecode.Panic,
             ecode.Unsupported,
             ecode.Val,
-            *(cfg.reg_ecodes if cfg.reg_ecodes else [])
+            *(cfg.reg_ecodes if cfg.reg_ecodes else []),
+            _set_welcome=False
         )).unwrap()
         """
         We use a separate object for error codes, since all of them point to
         the same type - [`Err`].
         """
-        self._cached_codes: list[str] = []
-        """
-        Since order of codes doesn't change, we can maintain a list of
-        codes, and renew it on each [`Bus._set_welcome`] call.
-        """
+        # set welcome only once after registering all types of codes
+        (await self._set_welcome()).unwrap()
 
     @property
     def is_initd(self) -> bool:
@@ -282,7 +288,7 @@ class Bus(Singleton):
         return await Code.get_regd_type_by_code(code)
 
     async def reg_regular_codes(
-        self, *types: type | Coded[type]
+        self, *types: type | Coded[type], _set_welcome: bool = True
     ) -> Res[None]:
         """
         Reg codes for types.
@@ -302,13 +308,19 @@ class Bus(Singleton):
         upd_res = await Code.upd(types, self.DEFAULT_CODE_ORDER)
         if isinstance(upd_res, Err):
             return upd_res
-        return await self._set_welcome()
+        if _set_welcome:
+            return await self._set_welcome()
+        return Ok()
 
-    async def reg_ecodes(self, *ecodes: str) -> Res[None]:
-        self._ecodes.update(*ecodes)
-        return await self._set_welcome()
+    async def reg_ecodes(
+        self, *ecodes: str, _set_welcome: bool = True
+    ) -> Res[None]:
+        self._ecodes.extend(ecodes)
+        if _set_welcome:
+            return await self._set_welcome()
+        return Ok()
 
-    def get_ecodes(self) -> set[str]:
+    def get_ecodes(self) -> list[str]:
         return self._ecodes.copy()
 
     async def postinit(self):
@@ -371,7 +383,7 @@ class Bus(Singleton):
         msgtype_or_code: type[Msg] | str,
         subfn: SubFn[Msg],
         opts: SubOpts = SubOpts(),
-    ) -> Res[Coroutine[Any, Any, None]]:
+    ) -> Res[Callable]:
         """
         Subscribes to certain message.
 
@@ -387,7 +399,6 @@ class Bus(Singleton):
             Unsubscribe function.
         """
         if isclass(msgtype_or_code):
-            subsid = uuid4()
             r = Code.get_from_type(msgtype_or_code)
             if isinstance(r, Err):
                 return r
@@ -403,6 +414,7 @@ class Bus(Singleton):
         if code not in self._code_to_subfns:
             self._code_to_subfns[code] = []
         self._code_to_subfns[code].append(subfn)
+        subsid = uuid4()
         self._subsid_to_subfn[subsid] = subfn
         self._subsid_to_code[subsid] = code
 
@@ -410,17 +422,17 @@ class Bus(Singleton):
             last_body = self._code_to_last_mbody[code]
             await self._call_subfn(subfn, last_body)
 
-        return Ok(self._unsub_wrapper(subsid)())
+        return Ok(self._unsub_wrapper(subsid))
 
-    def _unsub_wrapper(self, subsid: str):
-        async def inner():
-            await self.unsub(subsid)
+    def _unsub_wrapper(self, subsid: str) -> Callable:
+        def inner():
+            self.unsub(subsid)
         return inner
 
-    async def unsub(self, subsid: str):
+    def unsub(self, subsid: str):
         if subsid not in self._subsid_to_code:
             log.err(f"sub with id {subsid} not found")
-            return None
+            return
 
         assert self._subsid_to_code[subsid] in self._code_to_subfns
 
@@ -431,14 +443,13 @@ class Bus(Singleton):
         del self._subsid_to_code[subsid]
         del self._subsid_to_subfn[subsid]
         del self._code_to_subfns[msg_type]
-        return Ok(None)
 
-    async def unsub_many(
+    def unsub_many(
         self,
         sids: list[str],
     ) -> None:
         for sid in sids:
-            await self.unsub(sid)
+            self.unsub(sid)
 
     async def pubr(
         self,
@@ -733,13 +744,19 @@ class Bus(Singleton):
             atransport.inp_queue.put_nowait((con, rbmsg))
 
     async def _proc_inp_queue(
-            self,
-            transport: Transport,
-            queue: Queue[tuple[Con, dict]]):
+        self,
+        transport: Transport,
+        queue: Queue[tuple[Con, dict]]
+    ):
         while True:
             con, rbmsg = await queue.get()
             if self._cfg.log_net_recv:
-                log.info(f"NET::RECV | {con.sid} | {rbmsg}")
+                code = self.get_cached_code_by_codeid(rbmsg["codeid"])
+                if isinstance(code, Ok):
+                    code = code.ok
+                else:
+                    code = "unknown"
+                log.info(f"NET::RECV | \"{code}\" from {con.sid} | {rbmsg}")
             if transport.on_recv:
                 with contextlib.suppress(Exception):
                     # we don't pass whole con to avoid control leaks
@@ -758,7 +775,14 @@ class Bus(Singleton):
         while True:
             con, rbmsg = await queue.get()
             if self._cfg.log_net_send:
-                log.info(f"NET::SEND | {con.sid} | {rbmsg}")
+                code = self.get_cached_code_by_codeid(rbmsg["codeid"])
+                if isinstance(code, Err):
+                    await code.atrack(
+                        f"rbmsg=<{rbmsg}> code retrieval on net send"
+                    )
+                    continue
+                code = code.ok
+                log.info(f"NET::SEND | \"{code}\" to {con.sid} | {rbmsg}")
             if transport.on_send:
                 with contextlib.suppress(Exception):
                     await transport.on_send(con.sid, rbmsg)
