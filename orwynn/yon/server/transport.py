@@ -12,6 +12,7 @@ from asyncio import Queue, Task
 from typing import Generic, Protocol, Self, TypeVar, runtime_checkable
 
 from pydantic import BaseModel
+from ryz.core import Err, Ok, Res
 from ryz.uuid import uuid4
 
 TConCore = TypeVar("TConCore")
@@ -48,6 +49,7 @@ class Con(Generic[TConCore]):
         self._sid = uuid4()
         self._core = args.core
         self._is_closed = False
+        self._name: str | None = None
 
         self._tokens: list[str] = []
 
@@ -57,9 +59,15 @@ class Con(Generic[TConCore]):
     async def __anext__(self) -> dict:
         raise NotImplementedError
 
+    def __str__(self) -> str:
+        return f"Con {self.get_display()}"
+
     @property
     def sid(self) -> str:
         return self._sid
+
+    def get_display(self) -> str:
+        return self._name or self._sid
 
     def get_tokens(self) -> list[str]:
         """
@@ -70,6 +78,15 @@ class Con(Generic[TConCore]):
 
     def set_tokens(self, tokens: list[str]):
         self._tokens = tokens.copy()
+
+    def set_name(self, name: str):
+        """
+        Sets a name of a connection.
+        """
+        self._name = name
+
+    def get_name(self) -> Res[str]:
+        return Ok(self._name) if self._name else Err(f"undefined {self} name")
 
     def is_closed(self) -> bool:
         return self._is_closed

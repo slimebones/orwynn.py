@@ -147,3 +147,13 @@ async def test_send_empty_data(bus: Bus):
     assert "data" not in response
 
     con_task.cancel()
+
+async def test_set_con_name_normal_ok(bus: Bus):
+    con = MockCon(ConArgs(core=None))
+    con_task = asyncio.create_task(bus.con(con))
+    await asyncio.sleep(0.00001)
+    bus.set_con_name(con.sid, "hello").unwrap()
+    assert bus.get_con_name(con.sid).unwrap() == "hello"
+    assert con._name == "hello"
+    assert con.get_display() == "hello"
+    con_task.cancel()

@@ -191,6 +191,25 @@ class Bus(Singleton):
         con.set_tokens(tokens)
         return Ok(None)
 
+    def set_con_name(
+        self,
+        consid: str,
+        name: str
+    ) -> Res[None]:
+        con = self._sid_to_con.get(consid, None)
+        if con is None:
+            return Err(f"no con with sid {consid}")
+        con.set_name(name)
+        return Ok()
+
+    def get_con_name(
+        self, consid: str
+    ) -> Res[str]:
+        con = self._sid_to_con.get(consid, None)
+        if con is None:
+            return Err(f"no con with sid {consid}")
+        return con.get_name()
+
     def get_ctx_con_tokens(self) -> Res[list[str]]:
         consid_res = self.get_ctx_consid()
         if isinstance(consid_res, Err):
@@ -755,7 +774,10 @@ class Bus(Singleton):
                     code = code.ok
                 else:
                     code = "unknown"
-                log.info(f"NET::RECV | \"{code}\" from {con.sid} | {rbmsg}")
+                log.info(
+                    "NET::RECV "
+                    f"| \"{code}\" from {con.get_display()} | {rbmsg}"
+                )
             if transport.on_recv:
                 with contextlib.suppress(Exception):
                     # we don't pass whole con to avoid control leaks
@@ -781,7 +803,9 @@ class Bus(Singleton):
                     )
                     continue
                 code = code.ok
-                log.info(f"NET::SEND | \"{code}\" to {con.sid} | {rbmsg}")
+                log.info(
+                    f"NET::SEND | \"{code}\" to {con.get_display()} | {rbmsg}"
+                )
             if transport.on_send:
                 with contextlib.suppress(Exception):
                     await transport.on_send(con.sid, rbmsg)
