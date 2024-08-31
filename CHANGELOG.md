@@ -1,6 +1,9 @@
 # 3.3.0
 
 - add yon
+- remove rpc
+- add middleware
+- add named connections
 
 # 3.2.0
 
